@@ -1,5 +1,18 @@
 #pragma once
 
+// GmeHandler — base class and helpers for all GME request handlers.
+//
+//  HandlerBase        - Abstract base that every game-action handler inherits from.
+//                       Subclasses must provide:
+//                         GetGroupId()  - the obfuscated request-id key used to
+//                                         route the request from GmeController.
+//                         GetAesKey()   - the per-handler AES key for decrypting
+//                                         the request body and encrypting the response.
+//                         Handle()      - the actual business logic.
+//  DrogonCallback     - Alias for the Drogon HTTP response callback type.
+//  newGmeOkResponse   - Builds a 200 response with an AES-encrypted JSON body.
+//  newGmeErrorResponse - Builds an error response with the GME error envelope.
+
 #include "GmeTypes.hpp"
 #include "GmeRequest.hpp"
 #include "GmeTypes.hpp"

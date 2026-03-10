@@ -30,7 +30,7 @@ void Handler::InitializeRequest2Handler::Handle(UserInfo& user, DrogonCallback c
 	inInfo.Deserialize(req);
 
 	// TODO: we probably have a lot of stuff missing
-	GME_DB->execSqlAsync("SELECT account_id, username, admin FROM users WHERE id=$1",
+	GME_DB->execSqlAsync("SELECT account_id, username, admin, tutorial_end_flag FROM users WHERE id=$1",
 		[this, cb, &user](const drogon::orm::Result& res) { OnUserInfoSuccess(res, cb, user); },
 		[this, cb](const drogon::orm::DrogonDbException& e) { OnError(e, cb); },
 		user.info.userID
@@ -47,25 +47,20 @@ void Handler::InitializeRequest2Handler::OnUserInfoSuccess(const drogon::orm::Re
 		user.info.accountID = sql[col++].as<std::string>();
 		user.info.handleName = sql[col++].as<std::string>();
 		user.info.debugMode = sql[col++].as<bool>() ? 1 : 0;
+		int dbTutorialEnd   = sql[col++].as<int>();
 
-		// DEV_SKIP_TUTORIAL: Force tutorial complete for all existing users.
-		//
-		// Root cause of the post-asset-validation crash:
-		//   AccountController::HandleGuest inserts the user row into the DB before
-		//   this handler is ever called, so result.size() > 0 is ALWAYS true for our
-		//   seeded account. The else-branch below (which sets tutorialEndFlag=1) is
-		//   therefore never reached. tutorialEndFlag stays at the struct default of 0,
-		//   the client receives "tutorial not complete", attempts the tutorial sequence,
-		//   hits an unimplemented tutorial handler, gets a bad/empty response, crashes.
-		//
-		// TODO (tutorial): Remove this block once tutorialEndFlag is persisted in the
-		//   users table. Add a tutorial_end_flag INTEGER column via a new migration:
-		//     "ALTER TABLE users ADD COLUMN tutorial_end_flag INTEGER DEFAULT 0;"
-		//   The tutorial-completion handler should UPDATE it to 1 after the player
-		//   picks their starter unit. Read it back here alongside account_id/username.
+		// DEV_SKIP_TUTORIAL overrides the persisted value so developers can
+		// skip the (not-yet-implemented) tutorial flow. When the tutorial
+		// completion handler is finished and DEV_SKIP_TUTORIAL is retired,
+		// remove the #if block and rely solely on dbTutorialEnd.
+		// TODO (tutorial): Remove this block once the tutorial-completion handler
+		//   updates tutorial_end_flag=1 for the player's row.
 #if DEV_SKIP_TUTORIAL
 		user.info.tutorialEndFlag = 1;
 		user.info.tutorialStatus = 0;
+#else
+		user.info.tutorialEndFlag = dbTutorialEnd;
+		user.info.tutorialStatus  = dbTutorialEnd ? 0 : 12;
 #endif
 	}
 	else {

@@ -1,5 +1,15 @@
 #pragma once
 
+// GmeRequest — base interfaces for all GME request and response objects.
+//
+//  IRequest  (namespace Request)  - Deserialized from the decrypted JSON body
+//                                   received from the game client.
+//  IResponse (namespace Response) - Serialized into the JSON body that is AES-
+//                                   encrypted and returned to the game client.
+//
+// Both interfaces use obfuscated group-name keys (e.g. "IKqx1Cn9") that match
+// what the original game binary expects in the wire protocol.
+
 #include <string>
 #include <json/value.h>
 

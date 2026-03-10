@@ -205,8 +205,9 @@ void Handler::GetUserInfoRequestHandler::HandleResolved(UserInfo& user, DrogonCa
                 user.teamInfo.ActionPoint = sql[col++].as<uint32_t>();
             }
             else {
-                // Initialize new user with starter config
-                //TODO: Call New User Logic Here
+                // First time this user has been seen in userinfo — seed defaults
+                // from start_info.json and persist the row so future requests
+                // read from the DB instead of re-initializing every time.
                 auto sc = System::Instance().MstConfig().StartInfo();
                 user.teamInfo.UserID = user.info.userID;
                 user.teamInfo.Level = sc.Level;
