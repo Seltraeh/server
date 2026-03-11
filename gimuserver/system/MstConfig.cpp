@@ -699,6 +699,8 @@ void MstConfig::LoadAllTables(const std::string& basePath)
 	LoadExtraSkillPassive(basePath);
 	m_dailyTask.LoadTableFromJson(basePath);
 	m_startInfo.LoadTableFromJson(basePath);
+	LoadSeedItems(basePath);
+	LoadMissionIds(basePath);
 
 	// precompute extra data to save time
 	{
@@ -707,4 +709,31 @@ void MstConfig::LoadAllTables(const std::string& basePath)
 		n.Serialize(m_initMst);
 		n.Serialize(m_userInfoMst);
 	}
+}
+
+void MstConfig::LoadSeedItems(const std::string& basePath)
+{
+	Json::Value root;
+	LoadJson(basePath, "item_master.json", root);
+
+	const auto& arr = root["seed_items"];
+	m_seedItems.reserve(arr.size());
+	for (const auto& v : arr)
+	{
+		SeedItem s;
+		s.id       = v["id"].asInt();
+		s.quantity = v["quantity"].asInt();
+		m_seedItems.push_back(s);
+	}
+}
+
+void MstConfig::LoadMissionIds(const std::string& basePath)
+{
+	Json::Value root;
+	LoadJson(basePath, "mission_master.json", root);
+
+	const auto& arr = root["mission_ids"];
+	m_missionIds.reserve(arr.size());
+	for (const auto& v : arr)
+		m_missionIds.push_back(v.asInt());
 }

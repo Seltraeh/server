@@ -3,6 +3,7 @@
 #include <string>
 #include <drogon/orm/DbClient.h>
 #include <gimuserver/system/MstConfig.hpp>
+#include <gimuserver/system/UnitMstConfig.hpp>
 #include <gimuserver/system/ServerConfig.hpp>
 #include <gimuserver/system/LogConfig.hpp>
 #include <gimuserver/db/MigrationManager.hpp>
@@ -15,6 +16,7 @@ public:
     void LoadSystemConfig(const std::string& path);
     void RunMigrations(drogon::orm::DbClientPtr ptr);
     void DevValidateAndSeedUnits(drogon::orm::DbClientPtr ptr);
+    void DevValidateAndSeedItems(drogon::orm::DbClientPtr ptr);
 
     // Queries the users table for the first real account and caches the ID.
     // Called once at startup after RunMigrations. GmeController reads this
@@ -32,6 +34,7 @@ public:
     const auto& GetSessionTimeout()  const { return m_sessionTimeout; }
     // "mst"
     const auto& MstConfig()    const { return m_mstConfig; }
+    const auto& Units()        const { return m_unitMst; }
     // "server"
     const auto& ServerConfig() { return m_serverCfg; }
     // "log"
@@ -47,6 +50,7 @@ private:
 
     ::ServerConfig   m_serverCfg;
     ::MstConfig      m_mstConfig;
+    ::UnitMstConfig  m_unitMst;
     ::LogConfig      m_logCfg;
     MigrationManager m_mg;
 

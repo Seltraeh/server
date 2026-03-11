@@ -38,7 +38,9 @@ void System::ParseSystemConfig(const Json::Value& v)
     m_dbPath = v["gme_sqlite_path"].asString();
     m_sessionTimeout = size_t(v["session_timeout"].asUInt64());
 
-    m_mstConfig.LoadAllTables(v["mst_root"].asString());
+    const auto mstRoot = v["mst_root"].asString();
+    m_mstConfig.LoadAllTables(mstRoot);
+    m_unitMst.LoadFromJson(mstRoot + "/unit_master.json");
 }
 
 void System::RunMigrations(drogon::orm::DbClientPtr p)
@@ -76,7 +78,8 @@ void System::DevValidateAndSeedUnits(drogon::orm::DbClientPtr db)
 #if !DEV_SKIP_TUTORIAL
     return;
 #else
-    const size_t expectedCount = ALL_UNIT_IDS.size();
+    const auto& unitIds = m_unitMst.GetAllUnitIds();
+    const size_t expectedCount = unitIds.size();
 
     LOG_INFO << "System::DevValidateAndSeedUnits: checking existing users "
         << "(expecting " << expectedCount << " units each)";
@@ -110,7 +113,7 @@ void System::DevValidateAndSeedUnits(drogon::orm::DbClientPtr db)
             LOG_INFO << "System::DevValidateAndSeedUnits: user " << userId
                 << " has " << have << "/" << expectedCount << " units - seeding.";
 
-            for (const auto& unitId : ALL_UNIT_IDS)
+            for (const auto& unitId : unitIds)
             {
                 try
                 {
@@ -131,6 +134,72 @@ void System::DevValidateAndSeedUnits(drogon::orm::DbClientPtr db)
     catch (const drogon::orm::DrogonDbException& e)
     {
         LOG_ERROR << "System::DevValidateAndSeedUnits: DB error: " << e.base().what();
+    }
+#endif
+}
+
+void System::DevValidateAndSeedItems(drogon::orm::DbClientPtr db)
+{
+#if !DEV_SKIP_TUTORIAL
+    return;
+#else
+    const auto& seedItems = m_mstConfig.GetSeedItems();
+    if (seedItems.empty())
+        return;
+
+    LOG_INFO << "System::DevValidateAndSeedItems: checking existing users "
+        << "(expecting " << seedItems.size() << " item types each)";
+
+    try
+    {
+        auto users = db->execSqlSync("SELECT id FROM users;");
+
+        if (users.empty())
+        {
+            LOG_INFO << "System::DevValidateAndSeedItems: no existing users, nothing to do.";
+            return;
+        }
+
+        for (const auto& row : users)
+        {
+            const std::string userId = row["id"].as<std::string>();
+
+            auto countResult = db->execSqlSync(
+                "SELECT COUNT(*) FROM user_items WHERE user_id = $1;", userId);
+
+            const size_t have = countResult[0][0].as<size_t>();
+
+            if (have >= seedItems.size())
+            {
+                LOG_DEBUG << "System::DevValidateAndSeedItems: user " << userId
+                    << " already has " << have << " item types, skipping.";
+                continue;
+            }
+
+            LOG_INFO << "System::DevValidateAndSeedItems: user " << userId
+                << " has " << have << "/" << seedItems.size() << " item types - seeding.";
+
+            for (const auto& item : seedItems)
+            {
+                try
+                {
+                    db->execSqlSync(
+                        "INSERT OR IGNORE INTO user_items (user_id, item_id, quantity) VALUES ($1, $2, $3);",
+                        userId, item.id, item.quantity);
+                }
+                catch (const drogon::orm::DrogonDbException& e)
+                {
+                    LOG_WARN << "System::DevValidateAndSeedItems: failed to insert item "
+                        << item.id << " for " << userId << ": " << e.base().what();
+                }
+            }
+
+            LOG_INFO << "System::DevValidateAndSeedItems: finished seeding user " << userId;
+        }
+    }
+    catch (const drogon::orm::DrogonDbException& e)
+    {
+        LOG_ERROR << "System::DevValidateAndSeedItems: DB error: " << e.base().what();
     }
 #endif
 }

@@ -31,6 +31,10 @@ int main(int argc, char** argv)
                     //    seed count. No-op when DEV_SKIP_TUTORIAL=0.
                     System::Instance().DevValidateAndSeedUnits(db);
 
+                    // 3. DEV: top up any users whose item inventory is empty.
+                    //    No-op when DEV_SKIP_TUTORIAL=0.
+                    System::Instance().DevValidateAndSeedItems(db);
+
                     // 3. Resolve and cache the real user ID so GmeController can
                     //    route all incoming requests without a per-request DB lookup.
                     System::Instance().ResolveActiveUser(db);

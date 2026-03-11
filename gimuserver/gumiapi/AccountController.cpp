@@ -1,5 +1,6 @@
 #include "AccountController.hpp"
 #include "core/Utils.hpp"
+#include "core/System.hpp"
 #include <db/DbMacro.hpp>
 
 // =============================================================================
@@ -22,12 +23,15 @@
 #define DEV_SKIP_TUTORIAL 1
 
 // -----------------------------------------------------------------------------
-// Full unit roster extracted from the reference gme.sqlite (2547 units).
-// When DEV_SKIP_TUTORIAL is disabled, remove this list and let the tutorial
-// gacha handler insert only the unit the player selects.
+// Full unit roster is loaded at startup from unit_master.json by UnitMstConfig.
+// System::Instance().Units().GetAllUnitIds() returns the insertion-ordered list
+// with Maxwell (51147) first so he gets the lowest AUTOINCREMENT id and lands
+// in the leader deck slot.
+// When DEV_SKIP_TUTORIAL is disabled, remove seeding entirely and let the
+// tutorial gacha handler insert only the unit the player selects.
 // -----------------------------------------------------------------------------
 #if DEV_SKIP_TUTORIAL
-static const std::vector<std::string> ALL_UNIT_IDS = {
+static const std::vector<std::string> ALL_UNIT_IDS_PLACEHOLDER = {  // kept for reference only
     "30030", "50802", "850418_100", "10613", "40714", "60965", "840868", "50015",
     "840034", "30927", "51337", "860758_2_100", "830698", "50203", "60774", "50072",
     "740237", "820547", "10715", "830767", "840124", "11116", "860818", "810558",
@@ -373,29 +377,74 @@ static void SeedAllUnitsForUser(
     std::function<void()> onError)
 {
     // Build a single INSERT using a VALUES list. SQLite handles this fine
-    // and it avoids the overhead and deadlock risk of 2540 individual statements.
-    // "INSERT OR IGNORE" is safe if the user already has some units.
+    // and it avoids the overhead and deadlock risk of thousands of individual
+    // statements. "INSERT OR IGNORE" is safe if the user already has some units.
+    const auto& unitIds = System::Instance().Units().GetAllUnitIds();
+
     std::string sql =
         "INSERT OR IGNORE INTO user_units (user_id, unit_id) VALUES ";
 
-    for (size_t i = 0; i < ALL_UNIT_IDS.size(); ++i)
+    for (size_t i = 0; i < unitIds.size(); ++i)
     {
-        sql += "('" + userId + "', '" + ALL_UNIT_IDS[i] + "')";
-        if (i + 1 < ALL_UNIT_IDS.size()) sql += ",";
+        sql += "('" + userId + "', '" + unitIds[i] + "')";
+        if (i + 1 < unitIds.size()) sql += ",";
     }
     sql += ";";
 
     GME_DB->execSqlAsync(
         sql,
-        [userId, onDone](const drogon::orm::Result&)
+        [userId, onDone, count = unitIds.size()](const drogon::orm::Result&)
         {
-            LOG_INFO << "AccountController: seeded " << ALL_UNIT_IDS.size()
+            LOG_INFO << "AccountController: seeded " << count
                 << " units for user " << userId << " [DEV_SKIP_TUTORIAL]";
             onDone();
         },
         [userId, onError](const drogon::orm::DrogonDbException& e)
         {
             LOG_ERROR << "AccountController: unit seed failed for user "
+                << userId << ": " << e.base().what();
+            onError();
+        }
+    );
+}
+
+// Seed all items from item_master.json for a new user. Called after unit seeding.
+static void SeedItemsForUser(
+    const std::string& userId,
+    std::function<void()> onDone,
+    std::function<void()> onError)
+{
+    const auto& seedItems = System::Instance().MstConfig().GetSeedItems();
+    if (seedItems.empty())
+    {
+        onDone();
+        return;
+    }
+
+    // Single multi-row INSERT for efficiency.
+    std::string sql =
+        "INSERT OR IGNORE INTO user_items (user_id, item_id, quantity) VALUES ";
+
+    for (size_t i = 0; i < seedItems.size(); ++i)
+    {
+        sql += "('" + userId + "', " +
+               std::to_string(seedItems[i].id) + ", " +
+               std::to_string(seedItems[i].quantity) + ")";
+        if (i + 1 < seedItems.size()) sql += ",";
+    }
+    sql += ";";
+
+    GME_DB->execSqlAsync(
+        sql,
+        [userId, onDone, count = seedItems.size()](const drogon::orm::Result&)
+        {
+            LOG_INFO << "AccountController: seeded " << count
+                << " item types for user " << userId << " [DEV_SKIP_TUTORIAL]";
+            onDone();
+        },
+        [userId, onError](const drogon::orm::DrogonDbException& e)
+        {
+            LOG_ERROR << "AccountController: item seed failed for user "
                 << userId << ": " << e.base().what();
             onError();
         }
@@ -458,15 +507,21 @@ void AccountController::HandleGuest(const HttpRequestPtr& rq, std::function<void
                                 callback(HttpResponse::newHttpJsonResponse(v));
 
 #if DEV_SKIP_TUTORIAL
-                                // Fire unit seed after response — no callback needed.
-                                // DevValidateAndSeedUnits at startup will catch any
-                                // units that failed to insert if the seed is interrupted.
-                                SeedAllUnitsForUser(userId, []() {
+                                // Fire unit + item seeds after response.
+                                // DevValidateAndSeedUnits/Items at startup will catch
+                                // any rows that failed if the seed is interrupted.
+                                SeedAllUnitsForUser(userId, [userId]() {
                                     LOG_INFO << "AccountController: unit seed complete";
+                                    SeedItemsForUser(userId, []() {
+                                        LOG_INFO << "AccountController: item seed complete";
                                     }, []() {
-                                        LOG_WARN << "AccountController: unit seed failed - "
-                                            << "DevValidateAndSeedUnits will retry on next start";
-                                        });
+                                        LOG_WARN << "AccountController: item seed failed - "
+                                            << "DevValidateAndSeedItems will retry on next start";
+                                    });
+                                }, []() {
+                                    LOG_WARN << "AccountController: unit seed failed - "
+                                        << "DevValidateAndSeedUnits will retry on next start";
+                                });
 #endif
                             },
                             [callback](const drogon::orm::DrogonDbException& e)

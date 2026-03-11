@@ -7,9 +7,12 @@ struct UserClearMissionInfo : public IResponse
 {
 	struct Data
 	{
+		int missionId = 0;
+
 		void Serialize(Json::Value& v) const
 		{
-			// TODO
+			// ⚠ Field key is a placeholder — confirm from log_res/decompilation.
+			v["Xk9Rp2nW"] = missionId;
 		}
 	};
 

@@ -7,9 +7,17 @@ struct UserWarehouseInfo : public IResponse
 {
 	struct Data
 	{
+		std::string userID;
+		int itemId   = 0;
+		int quantity = 0;
+
 		void Serialize(Json::Value& v) const
 		{
-			// TODO
+			// ⚠ Field keys are placeholders — confirm from log_res captures.
+			// "h7eY3sAK" is the user_id key shared with UserUnitInfo.
+			v["h7eY3sAK"] = userID;
+			v["JE2nFs9R"] = itemId;
+			v["yH6kTq0A"] = quantity;
 		}
 	};
 

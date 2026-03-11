@@ -24,29 +24,47 @@
 #include <json/reader.h>
 
 namespace {
-    // Helper: Populate unit data structure with default values
+    // Helper: Populate unit data structure with real stats from UnitMstConfig.
+    // Falls back to safe defaults if the unit ID is not found in the master data.
     void PopulateUnitData(Response::UserUnitInfo::Data& d, const std::string& userId,
         uint32_t userUnitId, uint64_t unitId) {
-        d.userID = userId;
+        d.userID     = userId;
         d.userUnitID = userUnitId;
-        d.unitID = unitId;
-        d.element = "fire";
-        d.unitLv = 1;
-        d.newFlg = 1;
+        d.unitID     = unitId;
+        d.unitLv     = 1;
+        d.newFlg     = 1;
         d.receiveDate = 100;
-        d.FeBP = 100;
+        d.FeBP        = 100;
         d.FeMaxUsableBP = 200;
+        d.unitTypeID  = 1; // lord type
 
-        // Base stats - all start at 1000
-        d.baseHp = d.baseAtk = d.baseDef = d.baseHeal = 1000;
+        // Look up real stats from the unit master (extracted from bravefrontier_data)
+        const auto* e = System::Instance().Units().FindUnit(unitId);
+        if (e)
+        {
+            d.element       = e->element;
+            d.baseHp        = e->maxHp;
+            d.baseAtk       = e->maxAtk;
+            d.baseDef       = e->maxDef;
+            d.baseHeal      = e->maxRec;   // BF "rec" maps to server "heal"
+            d.leaderSkillID = e->lsId;
+            d.skillID       = e->bbId;
+            d.extraSkillID  = e->esId;
+        }
+        else
+        {
+            // Unknown unit — keep safe fallback values so the client doesn't crash
+            d.element       = "fire";
+            d.baseHp = d.baseAtk = d.baseDef = d.baseHeal = 1000;
+            d.leaderSkillID = d.skillID = d.extraSkillID = 0;
+        }
+
+        // Enhancement stats (not used at default level)
         d.addHp = d.addAtk = d.addDef = d.addHeal = 100;
         d.extHp = d.extAtk = d.extDef = d.extHeal = 100;
         d.limitOverHP = d.limitOverAtk = d.limitOverDef = d.limitOverHeal = 200;
         d.exp = d.totalExp = 1;
 
-        // Default skill and equipment IDs
-        d.unitTypeID = 1;
-        d.leaderSkillID = d.skillID = d.extraSkillID = 0;
         d.eqipItemFrameID = d.eqipItemFrameID2 = 0;
         d.eqipItemID = d.equipItemID2 = 0;
         d.ExtraPassiveSkillID = d.ExtraPassiveSkillID2 = d.AddExtraPassiveSkillID = 0;
@@ -252,58 +270,92 @@ void Handler::GetUserInfoRequestHandler::HandleResolved(UserInfo& user, DrogonCa
             if (user.teamInfo.ActionPoint == 0)
                 user.teamInfo.ActionPoint = user.teamInfo.MaxActionPoint;
 
-            // Load user units and build complete response
+            // Load user units, then chain an item query before building the response.
             GME_DB->execSqlAsync(
                 "SELECT id, unit_id FROM user_units WHERE user_id = $1 LIMIT 4000",
                 [this, &user, cb](const drogon::orm::Result& unitResult) {
                     LOG_INFO << "Found " << unitResult.size() << " units for user " << user.info.userID;
 
-                    // Build comprehensive response with all user data
-                    Json::Value res;
-                    user.info.Serialize(res);
-                    user.teamInfo.Serialize(res);
-
-                    // Add login campaign info
-                    Response::UserLoginCampaignInfo campaign;
-                    campaign.currentDay = 1;
-                    campaign.totalDays = 96;
-                    campaign.firstForTheDay = true;
-                    campaign.Serialize(res);
-
-                    // Add unit inventory
                     auto unitInfo = BuildUnitInfo(unitResult, user.info.userID);
-                    unitInfo.Serialize(res);
 
-                    // Add party deck
-                    auto deckInfo = CreateDefaultDeck(unitInfo);
-                    deckInfo.Serialize(res);
+                    // Chain: query item inventory after unit inventory.
+                    GME_DB->execSqlAsync(
+                        "SELECT item_id, quantity FROM user_items WHERE user_id = $1",
+                        [this, &user, cb, unitInfo = std::move(unitInfo)](const drogon::orm::Result& itemResult) {
+                            // Build comprehensive response with all user data
+                            Json::Value res;
+                            user.info.Serialize(res);
+                            user.teamInfo.Serialize(res);
 
-                    // Serialize all other game data structures
-                    Response::UserTeamArchive{}.Serialize(res);
-                    Response::UserTeamArenaArchive{}.Serialize(res);
-                    Response::UserUnitDictionary{}.Serialize(res);
-                    Response::UserFavorite{}.Serialize(res);
-                    Response::UserClearMissionInfo{}.Serialize(res);
-                    Response::UserWarehouseInfo{}.Serialize(res);
-                    Response::ItemFavorite{}.Serialize(res);
-                    Response::UserItemDictionaryInfo{}.Serialize(res);
-                    Response::UserArenaInfo{}.Serialize(res);
-                    Response::UserGiftInfo{}.Serialize(res);
+                            // Add login campaign info
+                            Response::UserLoginCampaignInfo campaign;
+                            campaign.currentDay = 1;
+                            campaign.totalDays = 96;
+                            campaign.firstForTheDay = true;
+                            campaign.Serialize(res);
 
-                    // Add summoner journal info
-                    Response::SummonerJournalUserInfo journal;
-                    journal.userId = user.info.userID;
-                    journal.Serialize(res);
+                            // Add unit inventory
+                            unitInfo.Serialize(res);
 
-                    // Add signal key for client authentication
-                    Response::SignalKey signalKey;
-                    signalKey.key = "5EdKHavF";
-                    signalKey.Serialize(res);
+                            // Add party deck
+                            auto deckInfo = CreateDefaultDeck(unitInfo);
+                            deckInfo.Serialize(res);
 
-                    // Append master config data
-                    System::Instance().MstConfig().CopyUserInfoMstTo(res);
+                            // Serialize game data structures
+                            Response::UserTeamArchive{}.Serialize(res);
+                            Response::UserTeamArenaArchive{}.Serialize(res);
+                            Response::UserUnitDictionary{}.Serialize(res);
+                            Response::UserFavorite{}.Serialize(res);
 
-                    cb(newGmeOkResponse(GetGroupId(), GetAesKey(), res));
+                            // All missions marked as cleared — loaded from mission_master.json
+                            {
+                                Response::UserClearMissionInfo missions;
+                                for (int id : System::Instance().MstConfig().GetMissionIds())
+                                {
+                                    Response::UserClearMissionInfo::Data d;
+                                    d.missionId = id;
+                                    missions.Mst.push_back(d);
+                                }
+                                missions.Serialize(res);
+                            }
+
+                            // Item warehouse — populated from user_items DB query
+                            {
+                                Response::UserWarehouseInfo wh;
+                                for (const auto& row : itemResult)
+                                {
+                                    Response::UserWarehouseInfo::Data d;
+                                    d.userID   = user.info.userID;
+                                    d.itemId   = row["item_id"].as<int>();
+                                    d.quantity = row["quantity"].as<int>();
+                                    wh.Mst.push_back(d);
+                                }
+                                wh.Serialize(res);
+                            }
+
+                            Response::ItemFavorite{}.Serialize(res);
+                            Response::UserItemDictionaryInfo{}.Serialize(res);
+                            Response::UserArenaInfo{}.Serialize(res);
+                            Response::UserGiftInfo{}.Serialize(res);
+
+                            // Add summoner journal info
+                            Response::SummonerJournalUserInfo journal;
+                            journal.userId = user.info.userID;
+                            journal.Serialize(res);
+
+                            // Add signal key for client authentication
+                            Response::SignalKey signalKey;
+                            signalKey.key = "5EdKHavF";
+                            signalKey.Serialize(res);
+
+                            // Append master config data
+                            System::Instance().MstConfig().CopyUserInfoMstTo(res);
+
+                            cb(newGmeOkResponse(GetGroupId(), GetAesKey(), res));
+                        },
+                        [this, cb](const drogon::orm::DrogonDbException& e) { OnError(e, cb); },
+                        user.info.userID
+                    );
                 },
                 [this, cb](const drogon::orm::DrogonDbException& e) { OnError(e, cb); },
                 user.info.userID
