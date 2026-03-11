@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "GimuServer (Debug)",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d A:\\BF\\BF_WorkingDir\\server\\deploy && A:\\BF\\BF_WorkingDir\\beautiful-greider-build\\standalone_frontend\\Debug\\gimuserverw.exe"],
+      "port": 9960
+    },
+    {
+      "name": "GimuServer (Release)",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d A:\\BF\\BF_WorkingDir\\server\\deploy && A:\\BF\\BF_WorkingDir\\server\\standalone_frontend\\Release\\gimuserverw.exe"],
+      "port": 9960
+    }
+  ]
+}

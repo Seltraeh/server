@@ -486,3 +486,7 @@ vcpkg_installed/
 .vscode
 generated/
 .cmake/
+
+# Claude Code local session data (permissions, worktree state)
+.claude/settings.local.json
+.claude/worktrees/
