@@ -2,21 +2,25 @@
 #include "gme/response/SignalKey.hpp"
 #include "gme/response/UserUnitInfo.hpp"
 #include "gme/response/MissionStartInfo.hpp"
+#include "gme/response/BattleGroupMst.hpp"
 #include "core/System.hpp"
 
 void Handler::MissionStartRequestHandler::Handle(UserInfo& user, DrogonCallback cb, const Json::Value& req) const
 {
 	Json::Value res;
-	
-    Response::MissionStartInfo missionInfo;
-    Response::MissionStartInfo::Data d;
-    d.userID = user.info.userID;
-    d.reinforceUserID = "n9ZMPC0t";
-    d.friendPoint = 42640;
-    d.missionID = "10";
-    d.deckNum = 1;
-    missionInfo.Mst.emplace_back(d);
-    missionInfo.Serialize(res);
+
+    // MissionStartInfo
+    {
+        Response::MissionStartInfo missionInfo;
+        Response::MissionStartInfo::Data d;
+        d.userID = user.info.userID;
+        d.reinforceUserID = "n9ZMPC0t";
+        d.friendPoint = 42640;
+        d.missionID = "10";
+        d.deckNum = 1;
+        missionInfo.Mst.emplace_back(d);
+        missionInfo.Serialize(res);
+    }
 
     {
         Json::Value status;
@@ -121,57 +125,29 @@ void Handler::MissionStartRequestHandler::Handle(UserInfo& user, DrogonCallback 
         res["zI2tJB7R"].append(reinforceUser);
     }
 
+    // BattleGroupMst — one entry per wave (battle_order 1–5)
     {
-        Json::Value mission;
-        mission["ZSf8e1MG"] = "11";
-        mission["j28VNcUW"] = "10";
-        mission["VETu07N6"] = "1";
-        mission["ug9xV4Fz"] = "50";
-        mission["5aetPz3C"] = "0";
-        mission["mFxqsc7Y"] = "0";
-        mission["etM5TCb9"] = "0";
-        mission["Qzhp8B40"] = "101301";
-        res["pj41dy9g"].append(mission);
+        Response::BattleGroupMst bgm;
+        auto& mst = bgm.Mst;
 
-        mission["ZSf8e1MG"] = "12";
-        mission["j28VNcUW"] = "10";
-        mission["VETu07N6"] = "2";
-        mission["ug9xV4Fz"] = "50";
-        mission["5aetPz3C"] = "0";
-        mission["mFxqsc7Y"] = "0";
-        mission["etM5TCb9"] = "0";
-        mission["Qzhp8B40"] = "101302";
-        res["pj41dy9g"].append(mission);
+        auto add = [&](uint32_t gid, uint32_t order, uint32_t monGrp, bool boss) {
+            Response::BattleGroupMst::Data d;
+            d.group_id          = gid;
+            d.mission_id        = 10;
+            d.battle_order      = order;
+            d.first_atk_rate    = 0;
+            d.battle_monster_id = monGrp;
+            d.boss_flg          = boss;
+            mst.emplace_back(d);
+        };
 
-        mission["ZSf8e1MG"] = "14";
-        mission["j28VNcUW"] = "10";
-        mission["VETu07N6"] = "3";
-        mission["ug9xV4Fz"] = "50";
-        mission["5aetPz3C"] = "0";
-        mission["mFxqsc7Y"] = "0";
-        mission["etM5TCb9"] = "0";
-        mission["Qzhp8B40"] = "101300";
-        res["pj41dy9g"].append(mission);
+        add(11, 1, 101301, false);
+        add(12, 2, 101302, false);
+        add(14, 3, 101300, false);
+        add(16, 4, 101302, false);
+        add(18, 5, 101304, true);
 
-        mission["ZSf8e1MG"] = "16";
-        mission["j28VNcUW"] = "10";
-        mission["VETu07N6"] = "4";
-        mission["ug9xV4Fz"] = "50";
-        mission["5aetPz3C"] = "0";
-        mission["mFxqsc7Y"] = "0";
-        mission["etM5TCb9"] = "0";
-        mission["Qzhp8B40"] = "101302";
-        res["pj41dy9g"].append(mission);
-
-        mission["ZSf8e1MG"] = "18";
-        mission["j28VNcUW"] = "10";
-        mission["VETu07N6"] = "5";
-        mission["ug9xV4Fz"] = "100";
-        mission["5aetPz3C"] = "0";
-        mission["mFxqsc7Y"] = "0";
-        mission["etM5TCb9"] = "1";
-        mission["Qzhp8B40"] = "101304";
-        res["pj41dy9g"].append(mission);
+        bgm.Serialize(res);
     }
 
     {
@@ -184,324 +160,157 @@ void Handler::MissionStartRequestHandler::Handle(UserInfo& user, DrogonCallback 
         res["Kz7qfSs5"].append(bonus);
     }
 
+    // BattleMonsterGroupMst — enemy placement per monster group
     {
-        Json::Value missionData;
-        missionData["Qzhp8B40"] = "101301";
-        missionData["q9I4karx"] = "??????1-2";
-        missionData["o49dYfpH"] = "30352";
-        missionData["hZtF1s8B"] = "0";
-        missionData["3g8PW6x0"] = "180:302";
-        missionData["i30R8TAs"] = "7:10000:3,7:10300:3";
-        missionData["hw3L0uVj"] = "25:30030:1:0,30:30030:2:0";
-        missionData["5wB9SHAV"] = "15,25:500,25:250,25:10,25:10000:1";
-        res["75t0sx9z"].append(missionData);
+        Response::BattleMonsterGroupMst bmgm;
+        auto& mst = bmgm.Mst;
 
-        missionData["Qzhp8B40"] = "101301";
-        missionData["q9I4karx"] = "??????1-2";
-        missionData["o49dYfpH"] = "40352";
-        missionData["hZtF1s8B"] = "1";
-        missionData["3g8PW6x0"] = "120:248";
-        missionData["i30R8TAs"] = "7:10000:3,7:10300:3";
-        missionData["hw3L0uVj"] = "25:40030:1:0,30:40030:2:0";
-        missionData["5wB9SHAV"] = "15,25:500,25:250,25:10,25:10000:1";
-        res["75t0sx9z"].append(missionData);
+        auto add = [&](uint32_t monGrp, uint32_t monId, uint32_t order,
+                       const std::string& pos, const std::string& itemDrop,
+                       const std::string& unitDrop, const std::string& treasDrop) {
+            Response::BattleMonsterGroupMst::Data d;
+            d.battle_monster_id = monGrp;
+            d.monster_id        = monId;
+            d.group_order       = order;
+            d.position          = pos;
+            d.item_drop         = itemDrop;
+            d.unit_drop         = unitDrop;
+            d.treasure_drop     = treasDrop;
+            mst.emplace_back(d);
+        };
 
-        missionData["Qzhp8B40"] = "101302";
-        missionData["q9I4karx"] = "??????2-1";
-        missionData["o49dYfpH"] = "10352";
-        missionData["hZtF1s8B"] = "0";
-        missionData["3g8PW6x0"] = "180:302";
-        missionData["i30R8TAs"] = "7:10000:3,7:10300:3";
-        missionData["hw3L0uVj"] = "25:10030:1:0,30:10030:2:0";
-        missionData["5wB9SHAV"] = "15,25:500,25:250,25:10,25:10000:1";
-        res["75t0sx9z"].append(missionData);
+        add(101301, 30352, 0, "180:302", "7:10000:3,7:10300:3", "25:30030:1:0,30:30030:2:0", "15,25:500,25:250,25:10,25:10000:1");
+        add(101301, 40352, 1, "120:248", "7:10000:3,7:10300:3", "25:40030:1:0,30:40030:2:0", "15,25:500,25:250,25:10,25:10000:1");
+        add(101302, 10352, 0, "180:302", "7:10000:3,7:10300:3", "25:10030:1:0,30:10030:2:0", "15,25:500,25:250,25:10,25:10000:1");
+        add(101302, 50352, 1, "120:248", "7:10000:3,7:10300:3", "25:50030:1:0,30:50030:2:0", "15,25:500,25:250,25:10,25:10000:1");
+        add(101302, 30352, 2,  "96:352", "7:10000:3,7:10300:3", "25:30030:1:0,30:30030:2:0", "15,25:500,25:250,25:10,25:10000:1");
+        add(101300, 10352, 0, "180:302", "7:10000:3,7:10300:3", "25:10030:1:0,30:10030:2:0", "15,25:500,25:250,25:10,25:10000:1");
+        add(101300, 20352, 1, "120:248", "7:10000:3,7:10300:3", "25:20030:1:0,30:20030:2:0", "15,25:500,25:250,25:10,25:10000:1");
+        add(101304, 40401, 0, "180:302", "7:10301:5,3:10603:1",  "0:0:0:0,0:0:0:0",           "0,25:500,25:250,25:10,25:10301:1");
 
-        missionData["Qzhp8B40"] = "101302";
-        missionData["q9I4karx"] = "??????2-1";
-        missionData["o49dYfpH"] = "50352";
-        missionData["hZtF1s8B"] = "1";
-        missionData["3g8PW6x0"] = "120:248";
-        missionData["i30R8TAs"] = "7:10000:3,7:10300:3";
-        missionData["hw3L0uVj"] = "25:50030:1:0,30:50030:2:0";
-        missionData["5wB9SHAV"] = "15,25:500,25:250,25:10,25:10000:1";
-        res["75t0sx9z"].append(missionData);
-
-        missionData["Qzhp8B40"] = "101302";
-        missionData["q9I4karx"] = "??????2-1";
-        missionData["o49dYfpH"] = "30352";
-        missionData["hZtF1s8B"] = "2";
-        missionData["3g8PW6x0"] = "96:352";
-        missionData["i30R8TAs"] = "7:10000:3,7:10300:3";
-        missionData["hw3L0uVj"] = "25:30030:1:0,30:30030:2:0";
-        missionData["5wB9SHAV"] = "15,25:500,25:250,25:10,25:10000:1";
-        res["75t0sx9z"].append(missionData);
-
-        missionData["Qzhp8B40"] = "101300";
-        missionData["q9I4karx"] = "??????1-1";
-        missionData["o49dYfpH"] = "10352";
-        missionData["hZtF1s8B"] = "0";
-        missionData["3g8PW6x0"] = "180:302";
-        missionData["i30R8TAs"] = "7:10000:3,7:10300:3";
-        missionData["hw3L0uVj"] = "25:10030:1:0,30:10030:2:0";
-        missionData["5wB9SHAV"] = "15,25:500,25:250,25:10,25:10000:1";
-        res["75t0sx9z"].append(missionData);
-
-        missionData["Qzhp8B40"] = "101300";
-        missionData["q9I4karx"] = "??????1-1";
-        missionData["o49dYfpH"] = "20352";
-        missionData["hZtF1s8B"] = "1";
-        missionData["3g8PW6x0"] = "120:248";
-        missionData["i30R8TAs"] = "7:10000:3,7:10300:3";
-        missionData["hw3L0uVj"] = "25:20030:1:0,30:20030:2:0";
-        missionData["5wB9SHAV"] = "15,25:500,25:250,25:10,25:10000:1";
-        res["75t0sx9z"].append(missionData);
-
-        missionData["Qzhp8B40"] = "101304";
-        missionData["q9I4karx"] = "??????boss";
-        missionData["o49dYfpH"] = "40401";
-        missionData["hZtF1s8B"] = "0";
-        missionData["3g8PW6x0"] = "180:302";
-        missionData["i30R8TAs"] = "7:10301:5,3:10603:1";
-        missionData["hw3L0uVj"] = "0:0:0:0,0:0:0:0";
-        missionData["5wB9SHAV"] = "0,25:500,25:250,25:10,25:10301:1";
-        res["75t0sx9z"].append(missionData);
+        bmgm.Serialize(res);
     }
 
+    // MonsterMst — enemy stat definitions
     {
-        Json::Value enemy;
-        enemy["o49dYfpH"] = "30352";
-        enemy["Btf93Xs1"] = "????Lv2";
-        enemy["3evIn0zZ"] = "????";
-        enemy["e7DK0FQT"] = "830";
-        enemy["67CApcti"] = "340";
-        enemy["q08xLEsy"] = "90";
-        enemy["CEeqs63b"] = "0:0:0:0:0:0";
-        enemy["iNy0ZU5M"] = "3";
-        enemy["eyUo6a8c"] = "24:123:1";
-        enemy["6Aou5M9r"] = "30:100:2:1";
-        enemy["n9h7p02P"] = "1";
-        enemy["Najhr8m6"] = "33";
-        enemy["9FN0GAei"] = "5";
-        enemy["HTVh8a65"] = "21";
-        enemy["vNk2sI4X"] = "5";
-        enemy["9pXSKmn1"] = "5";
-        enemy["J2hPXGo5"] = "2";
-        enemy["mv4o39Uz"] = "1";
-        enemy["h2L1YI90"] = "1";
-        enemy["XE7Yi5c3"] = "1";
-        enemy["D4Y5bWK7"] = "1";
-        enemy["oMGC3hW0"] = "1";
-        enemy["m4EK7Gt6"] = "1";
-        enemy["6fwL59FT"] = "100.00";
-        enemy["i74vGUFa"] = "1";
-        enemy["F4bQ7r8C"] = "";
-        enemy["hjAy9St3"] = "";
-        enemy["2Smu5Mtq"] = "";
-        enemy["2EF0d6ue"] = "";
-        enemy["QqfI9mM4"] = "";
-        enemy["CYk84E3W"] = "0,0";
-        enemy["3BpHN6VD"] = "";
-        enemy["Lkh6gYkT"] = "0,0";
-        enemy["pn16CNah"] = "30030";
-        enemy["Y6bd4fXp"] = "0,0,0";
-        enemy["jm6JSK2D"] = "";
-        enemy["qp37xTDh"] = "??87";
-        res["U0v5IeJo"].append(enemy);
+        Response::MonsterMst mm;
+        auto& mst = mm.Mst;
 
-        enemy["o49dYfpH"] = "40352";
-        enemy["Btf93Xs1"] = "????Lv2";
-        enemy["3evIn0zZ"] = "????";
-        enemy["e7DK0FQT"] = "760";
-        enemy["67CApcti"] = "370";
-        enemy["q08xLEsy"] = "0";
-        enemy["CEeqs63b"] = "0:0:0:0:0:0";
-        enemy["iNy0ZU5M"] = "4";
-        enemy["eyUo6a8c"] = "24:124:1";
-        enemy["6Aou5M9r"] = "30:100:2:1";
-        enemy["n9h7p02P"] = "1";
-        enemy["Najhr8m6"] = "30";
-        enemy["9FN0GAei"] = "5";
-        enemy["HTVh8a65"] = "19";
-        enemy["vNk2sI4X"] = "5";
-        enemy["9pXSKmn1"] = "2";
-        enemy["J2hPXGo5"] = "2";
-        enemy["mv4o39Uz"] = "1";
-        enemy["h2L1YI90"] = "1";
-        enemy["XE7Yi5c3"] = "1";
-        enemy["D4Y5bWK7"] = "1";
-        enemy["oMGC3hW0"] = "1";
-        enemy["m4EK7Gt6"] = "1";
-        enemy["6fwL59FT"] = "100.00";
-        enemy["i74vGUFa"] = "1";
-        enemy["F4bQ7r8C"] = "";
-        enemy["hjAy9St3"] = "";
-        enemy["2Smu5Mtq"] = "";
-        enemy["2EF0d6ue"] = "";
-        enemy["QqfI9mM4"] = "";
-        enemy["CYk84E3W"] = "0,0";
-        enemy["3BpHN6VD"] = "";
-        enemy["Lkh6gYkT"] = "0,0";
-        enemy["pn16CNah"] = "40030";
-        enemy["Y6bd4fXp"] = "0,0,0";
-        enemy["jm6JSK2D"] = "";
-        enemy["qp37xTDh"] = "??120";
-        res["U0v5IeJo"].append(enemy);
+        auto makeMonster = [](uint32_t id, uint32_t hp, uint32_t atk, uint32_t def,
+                               uint32_t elem, uint32_t wait,
+                               const std::string& efx, const std::string& dmg,
+                               uint32_t maxZel, uint32_t zelCnt,
+                               uint32_t maxKarma, uint32_t karmaCnt,
+                               uint32_t aiId, uint32_t unitId) -> Response::MonsterMst::Data
+        {
+            Response::MonsterMst::Data d;
+            d.monster_id       = id;
+            d.hp               = hp;
+            d.atk              = atk;
+            d.def              = def;
+            d.element          = elem;
+            d.drop_check_cnt   = 1;
+            d.max_zel_drop     = maxZel;
+            d.zel_drop_cnt     = zelCnt;
+            d.max_karma_drop   = maxKarma;
+            d.karma_drop_cnt   = karmaCnt;
+            d.wait             = wait;
+            d.move_speed_type  = 2;
+            d.atk_move_type    = 1;
+            d.back_move_type   = 1;
+            d.skill_move_type  = 1;
+            d.after_image      = 1;
+            d.max_act_cnt      = 1;
+            d.min_act_cnt      = 1;
+            d.act_rate         = 100.0f;
+            d.ai_id            = aiId;
+            d.unit_id          = unitId;
+            d.effect_frame     = efx;
+            d.damage_frame     = dmg;
+            return d;
+        };
 
-        enemy["o49dYfpH"] = "10352";
-        enemy["Btf93Xs1"] = "????Lv2";
-        enemy["3evIn0zZ"] = "????";
-        enemy["e7DK0FQT"] = "800";
-        enemy["67CApcti"] = "320";
-        enemy["q08xLEsy"] = "50";
-        enemy["CEeqs63b"] = "0:0:0:0:0:0";
-        enemy["iNy0ZU5M"] = "1";
-        enemy["eyUo6a8c"] = "24:121:1";
-        enemy["6Aou5M9r"] = "30:100:2:1";
-        enemy["n9h7p02P"] = "3";
-        enemy["Najhr8m6"] = "32";
-        enemy["9FN0GAei"] = "5";
-        enemy["HTVh8a65"] = "20";
-        enemy["vNk2sI4X"] = "5";
-        enemy["9pXSKmn1"] = "5";
-        enemy["J2hPXGo5"] = "2";
-        enemy["mv4o39Uz"] = "1";
-        enemy["h2L1YI90"] = "1";
-        enemy["XE7Yi5c3"] = "1";
-        enemy["D4Y5bWK7"] = "1";
-        enemy["oMGC3hW0"] = "1";
-        enemy["m4EK7Gt6"] = "1";
-        enemy["6fwL59FT"] = "100.00";
-        enemy["i74vGUFa"] = "1";
-        enemy["F4bQ7r8C"] = "";
-        enemy["hjAy9St3"] = "";
-        enemy["2Smu5Mtq"] = "";
-        enemy["2EF0d6ue"] = "";
-        enemy["QqfI9mM4"] = "";
-        enemy["CYk84E3W"] = "0,0";
-        enemy["3BpHN6VD"] = "";
-        enemy["Lkh6gYkT"] = "0,0";
-        enemy["pn16CNah"] = "10030";
-        enemy["Y6bd4fXp"] = "0,0,0";
-        enemy["jm6JSK2D"] = "";
-        enemy["qp37xTDh"] = "??21";
-        res["U0v5IeJo"].append(enemy);
+        mst.emplace_back(makeMonster(30352, 830,  340,  90, 3, 5, "24:123:1", "30:100:2:1", 33, 5, 21, 5, 1, 30030));
+        mst.emplace_back(makeMonster(40352, 760,  370,   0, 4, 2, "24:124:1", "30:100:2:1", 30, 5, 19, 5, 1, 40030));
+        mst.emplace_back(makeMonster(10352, 800,  320,  50, 1, 5, "24:121:1", "30:100:2:1", 32, 5, 20, 5, 1, 10030));
+        mst.emplace_back(makeMonster(50352, 850,  340,  60, 5, 1, "24:125:1", "30:100:2:1", 34, 5, 21, 5, 1, 50030));
+        mst.emplace_back(makeMonster(20352, 780,  330,  20, 2, 5, "24:122:1", "30:100:2:1", 31, 5, 20, 5, 1, 20030));
+        mst.emplace_back(makeMonster(40401, 2500, 470,  30, 4, 0, "36:124:1", "42:100:2:1", 100, 5, 63, 5, 1, 40031));
 
-        enemy["o49dYfpH"] = "50352";
-        enemy["Btf93Xs1"] = "????Lv2";
-        enemy["3evIn0zZ"] = "????";
-        enemy["e7DK0FQT"] = "850";
-        enemy["67CApcti"] = "340";
-        enemy["q08xLEsy"] = "60";
-        enemy["CEeqs63b"] = "0:0:0:0:0:0";
-        enemy["iNy0ZU5M"] = "5";
-        enemy["eyUo6a8c"] = "24:125:1";
-        enemy["6Aou5M9r"] = "30:100:2:1";
-        enemy["n9h7p02P"] = "1";
-        enemy["Najhr8m6"] = "34";
-        enemy["9FN0GAei"] = "5";
-        enemy["HTVh8a65"] = "21";
-        enemy["vNk2sI4X"] = "5";
-        enemy["9pXSKmn1"] = "1";
-        enemy["J2hPXGo5"] = "2";
-        enemy["mv4o39Uz"] = "1";
-        enemy["h2L1YI90"] = "1";
-        enemy["XE7Yi5c3"] = "1";
-        enemy["D4Y5bWK7"] = "1";
-        enemy["oMGC3hW0"] = "1";
-        enemy["m4EK7Gt6"] = "1";
-        enemy["6fwL59FT"] = "100.00";
-        enemy["i74vGUFa"] = "1";
-        enemy["F4bQ7r8C"] = "";
-        enemy["hjAy9St3"] = "";
-        enemy["2Smu5Mtq"] = "";
-        enemy["2EF0d6ue"] = "";
-        enemy["QqfI9mM4"] = "";
-        enemy["CYk84E3W"] = "0,0";
-        enemy["3BpHN6VD"] = "";
-        enemy["Lkh6gYkT"] = "0,0";
-        enemy["pn16CNah"] = "50030";
-        enemy["Y6bd4fXp"] = "0,0,0";
-        enemy["jm6JSK2D"] = "";
-        enemy["qp37xTDh"] = "??153";
-        res["U0v5IeJo"].append(enemy);
+        mm.Serialize(res);
+    }
 
-        enemy["o49dYfpH"] = "20352";
-        enemy["Btf93Xs1"] = "????Lv2";
-        enemy["3evIn0zZ"] = "????";
-        enemy["e7DK0FQT"] = "780";
-        enemy["67CApcti"] = "330";
-        enemy["q08xLEsy"] = "20";
-        enemy["CEeqs63b"] = "0:0:0:0:0:0";
-        enemy["iNy0ZU5M"] = "2";
-        enemy["eyUo6a8c"] = "24:122:1";
-        enemy["6Aou5M9r"] = "30:100:2:1";
-        enemy["n9h7p02P"] = "1";
-        enemy["Najhr8m6"] = "31";
-        enemy["9FN0GAei"] = "5";
-        enemy["HTVh8a65"] = "20";
-        enemy["vNk2sI4X"] = "5";
-        enemy["9pXSKmn1"] = "5";
-        enemy["J2hPXGo5"] = "2";
-        enemy["mv4o39Uz"] = "1";
-        enemy["h2L1YI90"] = "1";
-        enemy["XE7Yi5c3"] = "1";
-        enemy["D4Y5bWK7"] = "1";
-        enemy["oMGC3hW0"] = "1";
-        enemy["m4EK7Gt6"] = "1";
-        enemy["6fwL59FT"] = "100.00";
-        enemy["i74vGUFa"] = "1";
-        enemy["F4bQ7r8C"] = "";
-        enemy["hjAy9St3"] = "";
-        enemy["2Smu5Mtq"] = "";
-        enemy["2EF0d6ue"] = "";
-        enemy["QqfI9mM4"] = "";
-        enemy["CYk84E3W"] = "0,0";
-        enemy["3BpHN6VD"] = "";
-        enemy["Lkh6gYkT"] = "0,0";
-        enemy["pn16CNah"] = "20030";
-        enemy["Y6bd4fXp"] = "0,0,0";
-        enemy["jm6JSK2D"] = "";
-        enemy["qp37xTDh"] = "??54";
-        res["U0v5IeJo"].append(enemy);
+    // UnitSkillMst — skill definitions used by enemies in this mission
+    {
+        Response::UnitSkillMst usm;
+        auto& mst = usm.Mst;
 
-        enemy["o49dYfpH"] = "40401";
-        enemy["Btf93Xs1"] = "???????Lv1";
-        enemy["3evIn0zZ"] = "???????";
-        enemy["e7DK0FQT"] = "2500";
-        enemy["67CApcti"] = "470";
-        enemy["q08xLEsy"] = "30";
-        enemy["CEeqs63b"] = "0:0:0:0:0:0";
-        enemy["iNy0ZU5M"] = "4";
-        enemy["eyUo6a8c"] = "36:124:1";
-        enemy["6Aou5M9r"] = "42:100:2:1";
-        enemy["n9h7p02P"] = "1";
-        enemy["Najhr8m6"] = "100";
-        enemy["9FN0GAei"] = "5";
-        enemy["HTVh8a65"] = "63";
-        enemy["vNk2sI4X"] = "5";
-        enemy["9pXSKmn1"] = "0";
-        enemy["J2hPXGo5"] = "2";
-        enemy["mv4o39Uz"] = "1";
-        enemy["h2L1YI90"] = "1";
-        enemy["XE7Yi5c3"] = "1";
-        enemy["D4Y5bWK7"] = "1";
-        enemy["oMGC3hW0"] = "1";
-        enemy["m4EK7Gt6"] = "1";
-        enemy["6fwL59FT"] = "100.00";
-        enemy["i74vGUFa"] = "1";
-        enemy["F4bQ7r8C"] = "";
-        enemy["hjAy9St3"] = "";
-        enemy["2Smu5Mtq"] = "";
-        enemy["2EF0d6ue"] = "";
-        enemy["QqfI9mM4"] = "";
-        enemy["CYk84E3W"] = "0,0";
-        enemy["3BpHN6VD"] = "";
-        enemy["Lkh6gYkT"] = "0,0";
-        enemy["pn16CNah"] = "40031";
-        enemy["Y6bd4fXp"] = "0,0,0";
-        enemy["jm6JSK2D"] = "";
-        enemy["qp37xTDh"] = "??121";
-        res["U0v5IeJo"].append(enemy);
+        auto addSkill = [&](uint32_t id, uint32_t type, uint32_t rank,
+                            const std::string& proc) {
+            Response::UnitSkillMst::Data d;
+            d.skill_id       = id;
+            d.skill_type     = type;
+            d.skill_rank     = rank;
+            d.move_flag      = 0;
+            d.atk_move_flag  = 0;
+            d.drop_check_cnt = 0;
+            d.wait           = 0;
+            d.element        = 0;
+            d.process_id     = proc;
+            d.target_type    = "1";
+            d.target_area    = "0";
+            d.disp_frame     = "5:18";
+            d.effect_frame   = "5:18";
+            d.start_frame    = "5";
+            d.damage_frame   = "18:1";
+            mst.emplace_back(d);
+        };
+
+        addSkill(2000140, 1, 1, "1:10000:1");
+        addSkill(2000141, 1, 1, "1:10300:1");
+        addSkill(2000142, 1, 1, "1:10000:1");
+        addSkill(2000143, 1, 1, "1:10300:1");
+        addSkill(2000144, 1, 1, "1:10000:1");
+        addSkill(2000145, 1, 1, "1:10300:1");
+        addSkill(2000146, 1, 1, "1:10301:5");
+        addSkill(2000147, 3, 1, "3:10603:1");
+        addSkill(2000148, 1, 1, "1:10000:1");
+
+        usm.Serialize(res);
+    }
+
+    // AIMst — AI behaviour for enemy monsters (ai_id 20017)
+    {
+        Response::AIMst aim;
+        auto& mst = aim.Mst;
+
+        auto addAI = [&](uint32_t pri, const std::string& term, uint32_t tgt,
+                         const std::string& search, const std::string& atk, uint32_t pct) {
+            Response::AIMst::Data d;
+            d.ai_id       = 20017;
+            d.priority    = pri;
+            d.ai_term     = term;
+            d.target      = tgt;
+            d.search_term = search;
+            d.atk_param   = atk;
+            d.percent     = pct;
+            mst.emplace_back(d);
+        };
+
+        addAI(1,  "1:50:1", 1, "1:1", "2000140", 100);
+        addAI(2,  "1:50:2", 1, "1:1", "2000141", 100);
+        addAI(3,  "1:50:3", 1, "1:1", "2000142", 100);
+        addAI(4,  "1:50:4", 1, "1:1", "2000143", 100);
+        addAI(5,  "1:50:5", 1, "1:1", "2000144", 100);
+        addAI(6,  "0:0:0",  1, "1:1", "2000140",  50);
+        addAI(7,  "0:0:0",  1, "2:1", "2000141",  50);
+        addAI(8,  "0:0:0",  1, "1:1", "2000142",  50);
+        addAI(9,  "0:0:0",  1, "2:1", "2000143",  50);
+        addAI(10, "0:0:0",  1, "1:1", "2000144", 100);
+        addAI(11, "0:0:0",  1, "1:1", "2000146",  60);
+        addAI(12, "0:0:0",  1, "1:1", "2000147",  40);
+
+        aim.Serialize(res);
     }
 
     res["8hoyIF9Q"] = Json::arrayValue;
@@ -528,8 +337,6 @@ void Handler::MissionStartRequestHandler::Handle(UserInfo& user, DrogonCallback 
         announcement["jsRoN50z"] = "http://ios21900.bfww.gumi.sg//news.gumi.sg/bravefrontier/news/files/html/2022-03/Closure_Announcement_033022_1648608188.html";
         res["Pj6zDW3m"] = announcement;
     }
-
-    std::cout << "MissionStartHandler response: " << res.toStyledString() << std::endl;
 
 	cb(newGmeOkResponse(GetGroupId(), GetAesKey(), res));
 }
