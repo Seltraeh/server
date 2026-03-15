@@ -29,7 +29,7 @@ void Handler::MissionStartRequestHandler::Handle(UserInfo& user, DrogonCallback 
     }
 
     {
-        Json::Value userState;
+        Json::Value userState; //TODO: This user data overwrites the current user in gme.sqlite. Analyse the current structure to fill in any blanks we may have, comment what values mean what, and overwrite this segment with our database user profile so the data doesnt get swapped after a mission concludes.
         userState["h7eY3sAK"] = "n9ZMPC0t";
         userState["D9wXQI2V"] = "309";
         userState["d96tuT2E"] = "232666";

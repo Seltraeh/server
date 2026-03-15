@@ -12,7 +12,7 @@ else()
 endif()
 
 set(SERVER_VERSION_REV 1) # Increment this when a new release happens
-set(SERVER_YEAR "2022-2024")
+set(SERVER_YEAR "2022-2026")
 set(SERVER_ISSUE_URL "https://www.github.com/decompfrontier/server/issues/")
 set(SERVER_HOME_PAGE "https://decompfrontier.github.io/")
 

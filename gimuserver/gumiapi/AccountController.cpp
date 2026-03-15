@@ -391,6 +391,40 @@ static void SeedAllUnitsForUser(
         {
             LOG_INFO << "AccountController: seeded " << ALL_UNIT_IDS.size()
                 << " units for user " << userId << " [DEV_SKIP_TUTORIAL]";
+
+            // Apply real stats from unit_mst for all newly seeded rows.
+            // Fire-and-forget — login response is already sent; GetUserInfo fires ~2s later.
+            static const char* kStatUpdate =
+                "UPDATE user_units SET "
+                "  base_hp  = COALESCE((SELECT lord_hp  FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), base_hp),"
+                "  base_atk = COALESCE((SELECT lord_atk FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), base_atk),"
+                "  base_def = COALESCE((SELECT lord_def FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), base_def),"
+                "  base_heal= COALESCE((SELECT lord_rec FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), base_heal),"
+                "  add_hp   = COALESCE((SELECT add_hp   FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), add_hp),"
+                "  add_atk  = COALESCE((SELECT add_atk  FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), add_atk),"
+                "  add_def  = COALESCE((SELECT add_def  FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), add_def),"
+                "  add_heal = COALESCE((SELECT add_heal FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), add_heal),"
+                "  skill_id       = COALESCE((SELECT bb_id  FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1) AND bb_id  != 0), skill_id),"
+                "  extra_skill_id = COALESCE((SELECT sbb_id FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1) AND sbb_id != 0), extra_skill_id),"
+                "  leader_skill_id= COALESCE((SELECT ls_id  FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), leader_skill_id),"
+                "  element      = COALESCE((SELECT element   FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), element),"
+                "  unit_type_id = COALESCE((SELECT unit_kind FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), unit_type_id),"
+                "  skill_lv       = CASE WHEN COALESCE((SELECT bb_id  FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), 0) != 0 THEN 10 ELSE skill_lv END,"
+                "  extra_skill_lv = CASE WHEN COALESCE((SELECT sbb_id FROM unit_mst WHERE unit_id = SUBSTR(user_units.unit_id,1,INSTR(user_units.unit_id||'_','_')-1)), 0) != 0 THEN 10 ELSE extra_skill_lv END "
+                "WHERE user_id = $1 AND base_hp = 1000";
+
+            GME_DB->execSqlAsync(
+                kStatUpdate,
+                [userId](const drogon::orm::Result&) {
+                    LOG_INFO << "AccountController: applied unit_mst stats for user " << userId;
+                    },
+                [userId](const drogon::orm::DrogonDbException& e) {
+                    LOG_WARN << "AccountController: unit_mst stat update failed for "
+                        << userId << ": " << e.base().what();
+                    },
+                userId
+            );
+
             onDone();
         },
         [userId, onError](const drogon::orm::DrogonDbException& e)

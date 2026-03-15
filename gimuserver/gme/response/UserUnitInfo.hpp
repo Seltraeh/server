@@ -64,7 +64,7 @@ struct UserUnitInfo : public IResponse
 			v["XJs2rPx0"] = limitOverHeal; //? Not in order with IDA
 			v["iNy0ZU5M"] = element;
 			v["oS3kTZ2W"] = std::to_string(leaderSkillID); // str
-			v["nj9Lw7mV"] = skillID; // str
+			v["nj9Lw7mV"] = std::to_string(skillID); // Updated to cast to string for consistency with other ID fields
 			v["3NbeC8AB"] = skillLv;
 			v["iEFZ6H19"] = std::to_string(extraSkillID); // str
 			v["RQ5GnFE2"] = extraSkillLv;
@@ -90,13 +90,11 @@ struct UserUnitInfo : public IResponse
 	};
 
 	const char* getGroupName() const override {
-		if (overwrite) return "4ceMWH6k";	// Overwrite all units ?
-		return "qC2tJs4E";					// Add to existing units ?
+		return "4ceMWH6k";	//Summoning Artifact from when we overwrite the old UserUnitInfo response to delete all units. TODO: Make summoning units increment with the gme.sqlite to allow for endless summoning and no overwriting of units.
 	}
 
 	std::vector<Data> Mst;
 
-	bool overwrite = true; // For summoning, set to false. <false results in all user units deletion> <true keeps current units>
 
 protected:
 	size_t getRespCount() const override { return Mst.size(); }

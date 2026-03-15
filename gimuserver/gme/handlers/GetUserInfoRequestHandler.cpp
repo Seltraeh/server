@@ -125,13 +125,6 @@ namespace {
 }
 
 void Handler::GetUserInfoRequestHandler::Handle(UserInfo& user, DrogonCallback cb, const Json::Value& req) const {
-    // The Windows client sends dummy placeholder values like '0101AABB' as user_id
-    // inside the encrypted GME packet body. The GmeController copies that into
-    // user.info.userID before calling us, so we cannot trust it directly.
-    //
-    // Resolution: query the users table. If the current userID exists, use it.
-    // Otherwise (UNION ALL) fall back to the first real user in the DB.
-    // For offline single-player this always resolves to the one real account.
     LOG_INFO << "UserInfoHandler: raw user_id: " << user.info.userID;
 
     GME_DB->execSqlAsync(
