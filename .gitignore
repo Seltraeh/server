@@ -487,3 +487,4 @@ vcpkg_installed/
 generated/
 .cmake/
 .claude/
+*.py
