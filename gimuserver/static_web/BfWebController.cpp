@@ -43,8 +43,8 @@ std::vector<char> generatePlaceholderPng(int width, int height) {
     std::vector<char> pngData;
 
     // PNG signature
-    const char signature[] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-    pngData.insert(pngData.end(), signature, signature + 8);
+    const unsigned char signature[] = { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
+    pngData.insert(pngData.end(), reinterpret_cast<const char*>(signature), reinterpret_cast<const char*>(signature) + 8);
 
     // IHDR chunk
     uint32_t ihdrLength = 13;

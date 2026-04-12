@@ -1,5 +1,7 @@
 #include "MstConfig.hpp"
 #include <fstream>
+#include <algorithm>
+#include <drogon/drogon.h>
 
 #include "core/System.hpp"
 #include "gme/response/LoginCampaignMst.hpp"
@@ -680,6 +682,154 @@ void MstConfig::LoadUrl(const std::string& path)
 }
 
 
+void MstConfig::LoadItemMst(const std::string& basePath)
+{
+	// Load F_ITEM_MST_Ver*.json — scan for the first match in basePath.
+	// Falls back gracefully if the file is absent (non-fatal for server startup).
+	Json::Value root;
+	try { LoadJson(basePath, "F_ITEM_MST_Ver1027.json", root); }
+	catch (const std::exception& e)
+	{
+		LOG_WARN << "MstConfig: item MST not loaded — " << e.what();
+		return;
+	}
+
+	m_itemMst.clear();
+	m_itemMst.reserve(root.size());
+
+	for (const auto& item : root)
+	{
+		ItemMstEntry entry;
+		entry.itemId = item["itemId"].asString();
+
+		// All MST numeric fields are serialized as JSON strings — use stoi, not asInt().
+		int maxStack = 1;
+		try { maxStack = std::stoi(item["itemMaxStack"].asString()); }
+		catch (...) {}
+		entry.maxStack = maxStack > 0 ? maxStack : 1;
+
+		int sphereType = 0;
+		try { sphereType = std::stoi(item["itemSphereType"].asString()); }
+		catch (...) {}
+		entry.sphereType = sphereType;
+
+		m_itemMst.emplace_back(std::move(entry));
+	}
+
+	LOG_INFO << "MstConfig: loaded " << m_itemMst.size() << " item MST entries";
+}
+
+void MstConfig::LoadUnitExpPatterns(const std::string& basePath)
+{
+	Json::Value root;
+	try { LoadJson(basePath, "unitexp_pattern.json", root); }
+	catch (const std::exception& e)
+	{
+		LOG_WARN << "MstConfig: unitexp_pattern.json not loaded — " << e.what();
+		return;
+	}
+
+	m_unitExpPatterns.clear();
+	for (const auto& entry : root["patterns"])
+	{
+		int id      = entry["id"].asInt();
+		int lv      = entry["lv"].asInt();
+		int needExp = entry["needExp"].asInt();
+		m_unitExpPatterns[id].emplace_back(lv, needExp);
+	}
+
+	// Ensure each pattern is sorted ascending by level
+	for (auto& [id, vec] : m_unitExpPatterns)
+		std::sort(vec.begin(), vec.end());
+
+	LOG_INFO << "MstConfig: loaded unit exp patterns for "
+	         << m_unitExpPatterns.size() << " pattern IDs";
+}
+
+void MstConfig::LoadUnitMst(const std::string& basePath)
+{
+	static const char* kFiles[] = {
+		"F_UNIT_MST_1_Ver1084.json",
+		"F_UNIT_MST_2_Ver1084.json"
+	};
+
+	m_unitMst.clear();
+	for (const char* fname : kFiles)
+	{
+		Json::Value root;
+		try { LoadJson(basePath, fname, root); }
+		catch (const std::exception& e)
+		{
+			LOG_WARN << "MstConfig: " << fname << " not loaded — " << e.what();
+			continue;
+		}
+
+		for (const auto& u : root)
+		{
+			UnitMstData d;
+			d.unitId = u["unitId"].asString();
+			try { d.expPatternId = std::stoi(u["unitExpPatternId"].asString()); } catch (...) {}
+			try { d.maxLevel     = std::stoi(u["unitMaxLevel"].asString());     } catch (...) {}
+			try { d.xpBoost      = std::stoi(u["unitAdditionalXpBoost"].asString()); } catch (...) {}
+			try { d.sellPrice    = std::stoi(u["sellPrice"].asString());             } catch (...) {}
+			try { d.cost         = std::stoi(u["unitCost"].asString());              } catch (...) {}
+			try { d.rare         = std::stoi(u["rarity"].asString());                } catch (...) {}
+			try { d.element      = std::stoi(u["element"].asString());               } catch (...) {}
+			try { d.baseHp       = std::stoi(u["unitBaseHp"].asString());       } catch (...) {}
+			try { d.lordHp       = std::stoi(u["unitLordHp"].asString());       } catch (...) {}
+			try { d.baseAtk      = std::stoi(u["unitBaseAtk"].asString());      } catch (...) {}
+			try { d.lordAtk      = std::stoi(u["unitLordAtk"].asString());      } catch (...) {}
+			try { d.baseDef      = std::stoi(u["unitBaseDef"].asString());      } catch (...) {}
+			try { d.lordDef      = std::stoi(u["unitLordDef"].asString());      } catch (...) {}
+			try { d.baseRec      = std::stoi(u["unitBaseRec"].asString());      } catch (...) {}
+			try { d.lordRec      = std::stoi(u["unitLordRec"].asString());      } catch (...) {}
+			m_unitMst[d.unitId] = std::move(d);
+		}
+	}
+
+	LOG_INFO << "MstConfig: loaded " << m_unitMst.size() << " unit MST entries";
+}
+
+int MstConfig::GetLevelFromTotalExp(int patternId, int maxLevel, int totalExp) const
+{
+	// needExp[lv] = exp to advance FROM level (lv-1) TO level lv (incremental).
+	// We accumulate increments until we can no longer advance.
+	auto it = m_unitExpPatterns.find(patternId);
+	if (it == m_unitExpPatterns.end()) return 1;
+
+	int accumulated = 0;
+	int level = 1;
+	for (const auto& [lv, needExp] : it->second)
+	{
+		if (lv > maxLevel) break;
+		if (lv <= 1 || needExp <= 0) continue;  // level 1 is the start; 0-cost = locked
+		if (accumulated + needExp <= totalExp)
+		{
+			accumulated += needExp;
+			level = lv;
+		}
+		else break;
+	}
+	return level;
+}
+
+int MstConfig::GetExpForLevel(int patternId, int level) const
+{
+	// Returns the cumulative exp needed to REACH `level` from level 1.
+	// = sum of needExp[2] + needExp[3] + ... + needExp[level]
+	auto it = m_unitExpPatterns.find(patternId);
+	if (it == m_unitExpPatterns.end()) return 0;
+
+	int accumulated = 0;
+	for (const auto& [lv, needExp] : it->second)
+	{
+		if (lv > level) break;
+		if (lv <= 1) continue;
+		accumulated += needExp;
+	}
+	return accumulated;
+}
+
 void MstConfig::LoadAllTables(const std::string& basePath)
 {
 	LoadLoginCampaignMst(basePath, m_initMst);
@@ -699,6 +849,29 @@ void MstConfig::LoadAllTables(const std::string& basePath)
 	LoadExtraSkillPassive(basePath);
 	m_dailyTask.LoadTableFromJson(basePath);
 	m_startInfo.LoadTableFromJson(basePath);
+	LoadItemMst(basePath);
+	LoadUnitExpPatterns(basePath);
+	// Serialize all exp-pattern rows into m_userInfoMst so they are included
+	// in every GetUserInfo response (group key JYFGe9y6).  Without this the
+	// client cannot compute "Next Lv." thresholds or render the EXP bar.
+	{
+		Response::UnitExpPatternMst expMst;
+		for (const auto& [patternId, entries] : m_unitExpPatterns)
+		{
+			for (const auto& [lv, needExp] : entries)
+			{
+				Response::UnitExpPatternMst::Data d;
+				d.id      = (uint32_t)patternId;
+				d.lv      = (uint32_t)lv;
+				d.needExp = (uint64_t)needExp;
+				expMst.Mst.emplace_back(d);
+			}
+		}
+		expMst.Serialize(m_userInfoMst);
+		LOG_INFO << "MstConfig: serialized " << expMst.Mst.size()
+		         << " UnitExpPattern rows into userInfoMst";
+	}
+	LoadUnitMst(basePath);
 
 	// precompute extra data to save time
 	{

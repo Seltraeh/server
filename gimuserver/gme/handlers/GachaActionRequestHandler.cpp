@@ -3,11 +3,16 @@
 #include "gme/response/UserUnitInfo.hpp"
 #include "core/System.hpp"
 #include <db/DbMacro.hpp>
+#include <cstdlib>
 
 void Handler::GachaActionRequestHandler::Handle(UserInfo& user, DrogonCallback cb, const Json::Value& req) const
 {
     // TODO: randomize unit_id from gacha rates; 10017 is hardcoded for now.
     static const char* kSummonUnitId = "10017";
+
+    // Assign a random unit type (1=Lord 2=Anima 3=Breaker 4=Guardian 5=Oracle 6=Rex).
+    // Matches the original game's per-acquisition random roll.
+    const int unitType = 1 + (std::rand() % 6);
 
     // Insert the summoned unit into user_units with stats from unit_mst.
     // INSERT OR IGNORE keeps the operation safe if the unit already exists.
@@ -24,7 +29,7 @@ void Handler::GachaActionRequestHandler::Handle(UserInfo& user, DrogonCallback c
         "  COALESCE(add_def, 100),  COALESCE(add_heal, 100),"
         "  CASE WHEN bb_id  != 0 THEN bb_id  ELSE 0 END, CASE WHEN bb_id  != 0 THEN 10 ELSE 0 END,"
         "  CASE WHEN sbb_id != 0 THEN sbb_id ELSE 0 END, CASE WHEN sbb_id != 0 THEN 10 ELSE 0 END,"
-        "  COALESCE(ls_id, 0), COALESCE(element, 'fire'), COALESCE(unit_kind, 1),"
+        "  COALESCE(ls_id, 0), COALESCE(element, 'fire'), $3,"
         "  100, 200 "
         "FROM unit_mst WHERE unit_id = $2",
         [this, userId = user.info.userID, cb](const drogon::orm::Result&)
@@ -107,6 +112,6 @@ void Handler::GachaActionRequestHandler::Handle(UserInfo& user, DrogonCallback c
             );
         },
         [this, cb](const drogon::orm::DrogonDbException& e) { OnError(e, cb); },
-        user.info.userID, kSummonUnitId
+        user.info.userID, kSummonUnitId, unitType
     );
 }

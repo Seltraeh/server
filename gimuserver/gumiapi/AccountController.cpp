@@ -1,5 +1,6 @@
 #include "AccountController.hpp"
 #include "core/Utils.hpp"
+#include "core/System.hpp"
 #include <db/DbMacro.hpp>
 
 // =============================================================================
@@ -435,6 +436,39 @@ static void SeedAllUnitsForUser(
         }
     );
 }
+
+// Seed ALL item MST entries into the warehouse for new users at max stack.
+// Uses MstConfig::GetItemMstEntries() which is populated from F_ITEM_MST_Ver1027.json
+// at server startup. Fires one async INSERT OR IGNORE per item; failures are logged
+// but do not abort the remaining inserts.
+// Gated by DEV_SKIP_TUTORIAL same as units.
+static void SeedAllItemsForUser(const std::string& userId)
+{
+    const auto& items = System::Instance().MstConfig().GetItemMstEntries();
+    if (items.empty())
+    {
+        LOG_WARN << "AccountController: item MST not loaded — warehouse not seeded for " << userId;
+        return;
+    }
+
+    for (const auto& entry : items)
+    {
+        GME_DB->execSqlAsync(
+            "INSERT OR IGNORE INTO user_warehouse_items "
+            "(user_id, item_id, possession, new_flg, unknown_flg) "
+            "VALUES ($1, $2, $3, 1, 0)",
+            [userId, itemId = entry.itemId](const drogon::orm::Result&) { /* silent ok */ },
+            [userId, itemId = entry.itemId](const drogon::orm::DrogonDbException& e) {
+                LOG_WARN << "AccountController: warehouse seed failed item=" << itemId
+                    << " user=" << userId << ": " << e.base().what();
+            },
+            userId, entry.itemId, entry.maxStack
+        );
+    }
+
+    LOG_INFO << "AccountController: queued warehouse seed of " << items.size()
+        << " items for user " << userId;
+}
 #endif // DEV_SKIP_TUTORIAL
 
 void AccountController::HandleGuest(const HttpRequestPtr& rq, std::function<void(const HttpResponsePtr&)>&& callback)
@@ -501,6 +535,7 @@ void AccountController::HandleGuest(const HttpRequestPtr& rq, std::function<void
                                         LOG_WARN << "AccountController: unit seed failed - "
                                             << "DevValidateAndSeedUnits will retry on next start";
                                         });
+                                SeedAllItemsForUser(userId);
 #endif
                             },
                             [callback](const drogon::orm::DrogonDbException& e)

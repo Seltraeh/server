@@ -132,9 +132,10 @@ struct PopulateUnitMstTable : public IMigration
                 if (elemIdx < 0 || elemIdx > 5) elemIdx = 0;
                 const char* element = kElementMap[elemIdx];
 
-                // Unit kind
+                // Unit kind — preserve 0 (enhancement/fodder) as-is; the client
+                // uses it to distinguish normal units (1) from fodder (0) in the
+                // ingredient selection screen.
                 int unitKind = std::stoi(unit.get("unitKind", "1").asString());
-                if (unitKind == 0) unitKind = 1; // treat 0 as normal
 
                 // Build row
                 std::string row =

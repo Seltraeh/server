@@ -75,7 +75,7 @@ struct UserUnitInfo : public IResponse
 			v["RXfC31FA"] = std::to_string(eqipItemFrameID2); // str
 			v["mZA7fH2v"] = std::to_string(equipItemID2); // str
 			v["dJNpLc81"] = newFlg;
-			//v["DbMVG16I"] = ? ;
+			v["DbMVG16I"] = 0;        // unknown int
 			v["cP83zNsv"] = std::to_string(ExtraPassiveSkillID); // str
 			v["LjY4DfRg"] = std::to_string(ExtraPassiveSkillID2); // str
 			v["T4rewHa9"] = std::to_string(AddExtraPassiveSkillID); // str
@@ -85,6 +85,16 @@ struct UserUnitInfo : public IResponse
 			v["GIO9DTif"] = FeMaxUsableBP;
 			v["Fnxab5CN"] = FeSkillInfo; // str
 			v["49sa3sld"] = OmniLevel;
+			// Fields identified from binary analysis — purpose unknown, default 0
+			v["98WfKiyA"] = 0;
+			v["jkldTrhL"] = 0;
+			v["9i2xhMaJ"] = 0;
+			v["btZizNep"] = 0;
+			v["RVVgyuor"] = 0;
+			v["U8FCB2Wj"] = 0;
+			v["NqVAPbLC"] = 0;
+			v["mgNdrCEe"] = 0;
+			v["utP1c0CD"] = 0;
 
 		}
 	};

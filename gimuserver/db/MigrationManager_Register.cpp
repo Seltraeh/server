@@ -3,6 +3,10 @@
 #include "migrations/CreateUserUnitsTable.hpp"
 #include "migrations/AddStatsToUserUnitsTable.hpp"
 #include "migrations/PopulateUnitMstTable.hpp"
+#include "migrations/CreateUserWarehouseItemsTable.hpp"
+#include "migrations/AddSphereSlotsToUserUnits.hpp"
+#include "migrations/CreateUserPartyDecksTable.hpp"
+#include "migrations/RandomizeUnitTypes.hpp"
 
 #define ADD(x) m_migs.push_back(std::make_shared<Migrations::##x>());
 
@@ -12,4 +16,8 @@ void MigrationManager::Register()
     ADD(CreateUserUnitsTable);
     ADD(AddStatsToUserUnitsTable);
     ADD(PopulateUnitMstTable);
+    ADD(CreateUserWarehouseItemsTable);
+    ADD(AddSphereSlotsToUserUnits);
+    ADD(CreateUserPartyDecksTable);
+    ADD(RandomizeUnitTypes);
 }

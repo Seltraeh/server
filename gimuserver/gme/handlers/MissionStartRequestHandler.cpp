@@ -28,57 +28,26 @@ void Handler::MissionStartRequestHandler::Handle(UserInfo& user, DrogonCallback 
         res["6FrKacq7"].append(status);
     }
 
+    // UserState (fEi17cnx) — player snapshot sent to the battle engine.
+    // UserTeamInfo covers all known keys; extra captured keys (timestamps,
+    // unknown flags) are appended verbatim from the original live-server capture
+    // so the battle engine receives a complete structure.
     {
-        Json::Value userState; //TODO: This user data overwrites the current user in gme.sqlite. Analyse the current structure to fill in any blanks we may have, comment what values mean what, and overwrite this segment with our database user profile so the data doesnt get swapped after a mission concludes.
-        userState["h7eY3sAK"] = "n9ZMPC0t";
-        userState["D9wXQI2V"] = "309";
-        userState["d96tuT2E"] = "232666";
-        userState["YnM14RIP"] = "199";
-        userState["0P9X1YHs"] = "196";
-        userState["V0yJS7vZ"] = "1650627374";
-        userState["f0IY4nj8"] = 540;
-        userState["9m5FWR8q"] = "3";
-        userState["YS2JG9no"] = "2";
-        userState["32HCWt51"] = "1650627005";
-        userState["jp9s8IyY"] = 3231;
-        userState["ouXxIY63"] = "150";
-        userState["Px1X7fcd"] = "620";
-        userState["QYP4kId9"] = "383";
-        userState["Z0Y4RoD7"] = "1";
-        userState["gKNfIZiA"] = 2;
-        userState["TwqMChon"] = "-1,-99,-99";
-        userState["3u41PhR2"] = "50";
-        userState["2rR5s6wn"] = "0";
-        userState["5pjoGBC4"] = "200";
-        userState["iI7Wj6pM"] = "125";
-        userState["J3stQ7jd"] = "42640";
-        userState["Najhr8m6"] = "64394391";
-        userState["HTVh8a65"] = "99202910";
-        userState["03UGMHxF"] = "225";
-        userState["bM7RLu5K"] = "La Gimu Trolla PUNTO";
-        userState["s2WnRw9N"] = "460,420,430,0,0";
-        userState["EfinBo65"] = "7";
-        userState["qVBx7g2c"] = "0";
-        userState["1RQT92uE"] = "0";
-        userState["kW5QuUz7"] = "20220422";
-        userState["3w6YDS4z"] = "3";
-        userState["lKuj3Ier"] = "";
-        userState["JmFn3g9t"] = "0";
-        userState["9r3aLmaB"] = "1";
-        userState["bya9a67k"] = "2580";
-        userState["22rqpZTo"] = "3285";
-        userState["KAZmxkgy"] = 0;
-        userState["AKP8t3xK"] = 0;
-        userState["Nou5bCmm"] = 0;
-        userState["s3uU4Lgb"] = 1;
-        userState["3a8b9D8i"] = "0";
-        userState["7qncTHUJ"] = 0;
-        userState["38d7D18b"] = 0;
-        userState["D38bda8B"] = 0;
-        userState["Qo9doUsp"] = 0;
-        userState["d37CaiX1"] = 0;
-        userState["92uj7oXB"] = 0;
-        res["fEi17cnx"].append(userState);
+        user.teamInfo.UserID = user.info.userID; // ensure in sync with session
+        user.teamInfo.Serialize(res);
+
+        // Extra keys present in the live capture that are not modelled in UserTeamInfo.
+        // Values are kept from the original capture; semantics are not yet known.
+        auto& state = res["fEi17cnx"][0];
+        state["V0yJS7vZ"] = "1650627374"; // captured timestamp (server open date)
+        state["32HCWt51"] = "1650627005"; // captured timestamp
+        state["kW5QuUz7"] = "20220422";   // captured date string
+        state["3w6YDS4z"] = "3";          // unknown flag
+        state["JmFn3g9t"] = "0";          // unknown flag
+        state["AKP8t3xK"] = 0;            // unknown flag
+        state["Nou5bCmm"] = 0;            // unknown flag
+        state["38d7D18b"] = 0;            // unknown flag
+        state["D38bda8B"] = 0;            // unknown flag
     }
 
     {
@@ -322,12 +291,15 @@ void Handler::MissionStartRequestHandler::Handle(UserInfo& user, DrogonCallback 
         res["nAligJSQ"].append(status);
     }
 
+    // ClientInfo (IKqx1Cn9) — session identity shown in the battle header.
+    // Device/UUID fields are kept from the live capture; userID and handleName
+    // use the authenticated session values.
     {
         Json::Value clientInfo;
-        clientInfo["h7eY3sAK"] = "n9ZMPC0t";
-        clientInfo["B5JQyV8j"] = "Arves100";
-        clientInfo["iN7buP0j"] = "WAS-LX1A_android8.0.0";
-        clientInfo["Ma5GnU0H"] = "4e457983-74b0-4ea7-9a98-1c5890dfc836";
+        clientInfo["h7eY3sAK"] = user.info.userID;
+        clientInfo["B5JQyV8j"] = user.info.handleName;
+        clientInfo["iN7buP0j"] = "WAS-LX1A_android8.0.0"; // captured device string
+        clientInfo["Ma5GnU0H"] = "4e457983-74b0-4ea7-9a98-1c5890dfc836"; // captured UUID
         res["IKqx1Cn9"].append(clientInfo);
     }
 
