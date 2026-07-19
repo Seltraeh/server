@@ -29,6 +29,14 @@ HANDLEF(CampaignMissionGet)
 
     CampaignMissionGetResp resp{};
 
+    // Same MST scoping as CampaignStart: user_campaign_missions also holds
+    // quest clear-history rows (MissionEnd), which must not surface in the
+    // Grand Mission list.
+    const auto& gmMst = theServer()->cache().grandMissionMst();
+    std::set<std::string> gmIds;
+    for (const auto& m : gmMst)
+        gmIds.insert(std::to_string(m.mission_id));
+
     try
     {
         const auto rows = co_await theDb()->execSqlCoro(
@@ -41,6 +49,8 @@ HANDLEF(CampaignMissionGet)
         {
             CampaignMissionEntry e{};
             e.mission_id     = r["mission_id"].as<std::string>();
+            if (!gmIds.contains(e.mission_id))
+                continue;
             e.attain_percent = r["attain_percent"].as<int32_t>();
             e.state          = r["state"].as<int32_t>();
             e.mission_on_flg = (e.state >= 1) ? "1" : "0";

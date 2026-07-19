@@ -3,6 +3,7 @@
 
 #include <gimuserver/archive/MissionArchiver.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <algorithm>
 #include <chrono>
 #include <optional>
 
@@ -65,9 +66,19 @@ HANDLEF(CampaignBattleEnd)
         }
     }
 
-    // Rewards are archive-driven: resolve the cleared mission's record up front
-    // and fail explicitly when it's missing, rather than crediting a silent
-    // default.  Mirrors MissionEnd (9TvyNR5H).
+    // Is this a Grand Mission?  (F_GRAND_MISSION_MST via ServerCache.)  The
+    // handler also used to see quest-shaped ids while the campaign flow was
+    // being brought up, so behaviour is keyed off MST membership.
+    const auto& gmMst = theServer()->cache().grandMissionMst();
+    int32_t curId = -1;
+    try { curId = std::stoi(missionId); } catch (const std::exception&) {}
+    const bool isGrandMission = std::any_of(gmMst.begin(), gmMst.end(),
+        [curId](const auto& m) { return m.mission_id == curId; });
+
+    // Per-run zel/karma come from the mission archive when a record exists.
+    // Grand Missions have no archive records (their meaningful rewards are
+    // claimed through CampaignReceipt from F_GRAND_MISSION_REWARD_MST), so a
+    // missing record is only an error for non-Grand missions.
     std::optional<MissionRecord> missionRecord;
     try
     {
@@ -78,7 +89,7 @@ HANDLEF(CampaignBattleEnd)
     {
         // std::stoul throws on an empty / non-numeric mission id.
     }
-    if (!missionRecord)
+    if (!missionRecord && !isGrandMission)
     {
         co_return HandleResult::error("Archive error",
             "CampaignBattleEnd: no mission archive record for mission '" + missionId + "'");
@@ -93,65 +104,93 @@ HANDLEF(CampaignBattleEnd)
                 std::chrono::duration_cast<std::chrono::seconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count());
 
+            // NOTE: sqlite indexes $N params by order of FIRST APPEARANCE and
+            // drogon binds positionally — $N must appear in 1,2,3… order or
+            // the wrong values bind silently (this exact UPDATE previously
+            // used $3 first and matched zero rows).
             co_await theDb()->execSqlCoro(
                 "UPDATE user_campaign_missions"
                 " SET state=2, attain_percent=100,"
                 "     clear_count = clear_count + 1,"
-                "     last_cleared_at = $3"
-                " WHERE user_id=$1 AND mission_id=$2;",
-                std::string(kUserId), missionId, now);
+                "     last_cleared_at = $1"
+                " WHERE user_id=$2 AND mission_id=$3;",
+                now, std::string(kUserId), missionId);
         }
         catch (const drogon::orm::DrogonDbException& ex)
         {
             LOG_WARN << "CampaignBattleEnd: mission UPDATE failed: " << ex.base().what();
         }
 
-        // Step 1b: unlock the next sequential mission, if any.  This keeps the
+        // Step 1b: unlock the next Grand Mission, if any.  This keeps the
         // player on a one-mission-at-a-time progression: only the missions
-        // they've earned (cleared one earlier) become available.  Pairs with
-        // the PermitPlace mission filter in UserInfo.cpp — the client only
-        // sees missions whose row exists in user_campaign_missions, so adding
-        // a row here is what makes the next mission visible on the map.
+        // they've earned (cleared one earlier) become available.
+        //
+        // The successor comes from F_GRAND_MISSION_MST, NOT curId+1 — the real
+        // id sequence has gaps (…5000016 → 5008001 → … → 5008003 → 5008008 →
+        // … → 5200000 → 5200002), so arithmetic succession both inserts
+        // phantom rows and strands the player at every gap.
         //
         // INSERT OR IGNORE means we never downgrade a mission that's already
         // available or cleared; we only add brand-new rows.
-        try
+        if (isGrandMission)
         {
-            const int32_t curId   = std::stoi(missionId);
-            const std::string nextId = std::to_string(curId + 1);
+            int32_t nextId = -1;
+            for (const auto& m : gmMst)
+                if (m.mission_id > curId && (nextId < 0 || m.mission_id < nextId))
+                    nextId = m.mission_id;
 
-            co_await theDb()->execSqlCoro(
-                "INSERT OR IGNORE INTO user_campaign_missions"
-                " (user_id, mission_id, state, attain_percent)"
-                " VALUES ($1, $2, 1, 0);",
-                std::string(kUserId), nextId);
+            if (nextId >= 0)
+            {
+                try
+                {
+                    co_await theDb()->execSqlCoro(
+                        "INSERT OR IGNORE INTO user_campaign_missions"
+                        " (user_id, mission_id, state, attain_percent)"
+                        " VALUES ($1, $2, 1, 0);",
+                        std::string(kUserId), std::to_string(nextId));
 
-            LOG_INFO << "CampaignBattleEnd: cleared mission " << missionId
-                     << " — unlocked next mission " << nextId;
+                    LOG_INFO << "CampaignBattleEnd: cleared mission " << missionId
+                             << " — unlocked next mission " << nextId;
+                }
+                catch (const drogon::orm::DrogonDbException& ex)
+                {
+                    LOG_WARN << "CampaignBattleEnd: next-mission unlock failed: "
+                             << ex.base().what();
+                }
+            }
+            else
+            {
+                LOG_INFO << "CampaignBattleEnd: cleared final Grand Mission " << missionId;
+            }
         }
-        catch (const std::exception& ex)
+        else
         {
-            // std::stoi throws on non-numeric mission IDs (e.g. event campaigns
-            // with alphabetic suffixes).  Skip the unlock step in that case.
-            LOG_WARN << "CampaignBattleEnd: next-mission unlock skipped: " << ex.what();
+            LOG_WARN << "CampaignBattleEnd: mission " << missionId
+                     << " not in F_GRAND_MISSION_MST — successor unlock skipped";
         }
     }
 
     // Step 2: credit the cleared mission's zel + karma from the archive record.
-    try
+    // Grand Missions without an archive record credit nothing here — their
+    // rewards come from the receipt claim.
+    if (missionRecord)
     {
-        co_await theDb()->execSqlCoro(
-            "UPDATE user_info"
-            " SET zel = MIN(zel + $1, $3),"
-            "     karma = MIN(karma + $2, $3)"
-            " WHERE id=$4;",
-            static_cast<int64_t>(missionRecord->zel),
-            static_cast<int64_t>(missionRecord->karma),
-            kMaxZelKarma, std::string(kUserId));
-    }
-    catch (const drogon::orm::DrogonDbException& ex)
-    {
-        LOG_WARN << "CampaignBattleEnd: reward UPDATE failed: " << ex.base().what();
+        try
+        {
+            // $N in strict first-appearance order (sqlite named-param gotcha).
+            co_await theDb()->execSqlCoro(
+                "UPDATE user_info"
+                " SET zel = MIN(zel + $1, $2),"
+                "     karma = MIN(karma + $3, $4)"
+                " WHERE id=$5;",
+                static_cast<int64_t>(missionRecord->zel), kMaxZelKarma,
+                static_cast<int64_t>(missionRecord->karma), kMaxZelKarma,
+                std::string(kUserId));
+        }
+        catch (const drogon::orm::DrogonDbException& ex)
+        {
+            LOG_WARN << "CampaignBattleEnd: reward UPDATE failed: " << ex.base().what();
+        }
     }
 
     // Step 3: clear active mission state.

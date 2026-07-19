@@ -40,7 +40,18 @@ HANDLEF(CampaignStart)
 
     CampaignStartResp resp{};
 
-    // Load mission progress.
+    // The Grand Mission catalog (F_GRAND_MISSION_MST via ServerCache) scopes
+    // this handler: user_campaign_missions doubles as the quest clear-history
+    // store (MissionEnd writes quest ids there for the UT1SVg59 progression
+    // list), and those quest rows must not leak into the Grand Mission select
+    // screen.  Only rows whose mission_id exists in the MST are emitted.
+    const auto& gmMst = theServer()->cache().grandMissionMst();
+    std::set<std::string> gmIds;
+    for (const auto& m : gmMst)
+        gmIds.insert(std::to_string(m.mission_id));
+
+    // Load mission progress (MST-scoped).
+    bool haveGmRow = false;
     try
     {
         const auto rows = co_await theDb()->execSqlCoro(
@@ -53,15 +64,47 @@ HANDLEF(CampaignStart)
         {
             CampaignMissionEntry e{};
             e.mission_id     = r["mission_id"].as<std::string>();
+            if (!gmIds.contains(e.mission_id))
+                continue;
             e.attain_percent = r["attain_percent"].as<int32_t>();
             e.state          = r["state"].as<int32_t>();
             e.mission_on_flg = (e.state >= 1) ? "1" : "0";
             resp.missions.emplace_back(std::move(e));
+            haveGmRow = true;
         }
     }
     catch (const drogon::orm::DrogonDbException& ex)
     {
         LOG_WARN << "CampaignStart: mission SELECT failed: " << ex.base().what();
+    }
+
+    // First entry: seed the lowest-id Grand Mission as available so a fresh
+    // user has somewhere to start.  CampaignBattleEnd unlocks the successors
+    // one clear at a time.
+    if (!haveGmRow && !gmIds.empty())
+    {
+        const std::string firstId = *gmIds.begin();  // lexicographic == numeric: all ids are 7 digits
+        try
+        {
+            co_await theDb()->execSqlCoro(
+                "INSERT OR IGNORE INTO user_campaign_missions"
+                " (user_id, mission_id, state, attain_percent)"
+                " VALUES ($1, $2, 1, 0);",
+                std::string(kUserId), firstId);
+
+            CampaignMissionEntry e{};
+            e.mission_id     = firstId;
+            e.attain_percent = 0;
+            e.state          = 1;
+            e.mission_on_flg = "1";
+            resp.missions.emplace_back(std::move(e));
+            LOG_INFO << "CampaignStart: seeded first Grand Mission " << firstId
+                     << " for user " << kUserId;
+        }
+        catch (const drogon::orm::DrogonDbException& ex)
+        {
+            LOG_WARN << "CampaignStart: seed INSERT failed: " << ex.base().what();
+        }
     }
 
     // Load campaign party decks.  If user_campaign_decks is empty (not yet
