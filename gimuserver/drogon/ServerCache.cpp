@@ -126,6 +126,22 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_grandMissionEventMst = LoadJson<GrandMissionEventMstCache>(mstRoot, "grand_mission_event_mst.json").data;
 		m_grandMissionRewardMst = LoadJson<GrandMissionRewardMstCache>(mstRoot, "grand_mission_reward_mst.json").data;
 
+		// Raid Battle master data — wrapper keys and field maps documented
+		// in mst/raid.kdl (BOSS_PARTS has no response class; not loaded).
+		m_raidWorldMst = LoadJson<RaidWorldMstCache>(mstRoot, "raid_world_mst.json").data;
+		m_raidMapMst = LoadJson<RaidMapMstCache>(mstRoot, "raid_map_mst.json").data;
+		m_raidRcMst = LoadJson<RaidRcMstCache>(mstRoot, "raid_rc_mst.json").data;
+		m_raidPlaystyleMst = LoadJson<RaidPlaystyleMstCache>(mstRoot, "raid_playstyle_mst.json").data;
+		m_raidBossMst = LoadJson<RaidBossMstCache>(mstRoot, "raid_boss_mst.json").data;
+		m_raidBossRouteMst = LoadJson<RaidBossRouteMstCache>(mstRoot, "raid_boss_route_mst.json").data;
+		m_raidMissionMst = LoadJson<RaidMissionMstCache>(mstRoot, "raid_mission_mst.json").data;
+		m_raidMissionBossMst = LoadJson<RaidMissionBossMstCache>(mstRoot, "raid_mission_boss_mst.json").data;
+		m_raidMissionClearCndMst = LoadJson<RaidMissionClearCndMstCache>(mstRoot, "raid_mission_clear_cnd_mst.json").data;
+		m_raidMissionPointMst = LoadJson<RaidMissionPointMstCache>(mstRoot, "raid_mission_point_mst.json").data;
+		m_raidPointMst = LoadJson<RaidPointMstCache>(mstRoot, "raid_point_mst.json").data;
+		m_raidUserRouteMst = LoadJson<RaidUserRouteMstCache>(mstRoot, "raid_user_route_mst.json").data;
+		m_raidBattleGroupMst = LoadJson<RaidBattleGroupMstCache>(mstRoot, "raid_battle_group_mst.json").data;
+
 		// cache: GachaList response (gacha_info comes from GachaArchiver at
 		// request time; only the category banners are cached here)
 		m_gachaListRsp.gacha_categories = LoadJson<GachaCategoryCache>(mstRoot, "gacha_category_mst.json").data;

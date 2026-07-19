@@ -102,6 +102,26 @@ public:
 	inline const auto& grandMissionEventMst() const { return m_grandMissionEventMst; }
 	inline const auto& grandMissionRewardMst() const { return m_grandMissionRewardMst; }
 
+	/*!
+	* Raid Battle master data, one getter per table (13 of 14 — BOSS_PARTS
+	* has no response class in the binary).  See mst/raid.kdl for the field
+	* maps and tools/MST_PORTING_BACKLOG.md for the 2026-07-19 port pass.
+	* @return Vector of the matching Raid*Mst entries
+	*/
+	inline const auto& raidWorldMst() const { return m_raidWorldMst; }
+	inline const auto& raidMapMst() const { return m_raidMapMst; }
+	inline const auto& raidRcMst() const { return m_raidRcMst; }
+	inline const auto& raidPlaystyleMst() const { return m_raidPlaystyleMst; }
+	inline const auto& raidBossMst() const { return m_raidBossMst; }
+	inline const auto& raidBossRouteMst() const { return m_raidBossRouteMst; }
+	inline const auto& raidMissionMst() const { return m_raidMissionMst; }
+	inline const auto& raidMissionBossMst() const { return m_raidMissionBossMst; }
+	inline const auto& raidMissionClearCndMst() const { return m_raidMissionClearCndMst; }
+	inline const auto& raidMissionPointMst() const { return m_raidMissionPointMst; }
+	inline const auto& raidPointMst() const { return m_raidPointMst; }
+	inline const auto& raidUserRouteMst() const { return m_raidUserRouteMst; }
+	inline const auto& raidBattleGroupMst() const { return m_raidBattleGroupMst; }
+
 private:
 	/*!
 	* DLS cached JSON.
@@ -170,4 +190,22 @@ private:
 	std::vector<GrandMissionEndCndMst> m_grandMissionEndCndMst;
 	std::vector<GrandMissionEventMst> m_grandMissionEventMst;
 	std::vector<GrandMissionRewardMst> m_grandMissionRewardMst;
+
+	/*!
+	* Raid Battle master data, loaded from deploy/system/raid_*.json
+	* (wrapper keys documented in mst/raid.kdl).
+	*/
+	std::vector<RaidWorldMst> m_raidWorldMst;
+	std::vector<RaidMapMst> m_raidMapMst;
+	std::vector<RaidRcMst> m_raidRcMst;
+	std::vector<RaidPlaystyleMst> m_raidPlaystyleMst;
+	std::vector<RaidBossMst> m_raidBossMst;
+	std::vector<RaidBossRouteMst> m_raidBossRouteMst;
+	std::vector<RaidMissionMst> m_raidMissionMst;
+	std::vector<RaidMissionBossMst> m_raidMissionBossMst;
+	std::vector<RaidMissionClearCndMst> m_raidMissionClearCndMst;
+	std::vector<RaidMissionPointMst> m_raidMissionPointMst;
+	std::vector<RaidPointMst> m_raidPointMst;
+	std::vector<RaidUserRouteMst> m_raidUserRouteMst;
+	std::vector<RaidBattleGroupMst> m_raidBattleGroupMst;
 };
