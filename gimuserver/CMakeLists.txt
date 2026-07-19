@@ -28,4 +28,8 @@ target_precompile_headers(gimuserver PRIVATE App.hpp)
 
 if (MSVC)
     target_compile_options(gimuserver PUBLIC "/constexpr:steps8388608")
+    # ServerCache.cpp instantiates one glaze LoadJson<T> per cached MST
+    # table; past ~50 tables the object file exceeds the default COFF
+    # section limit (C1128).
+    target_compile_options(gimuserver PRIVATE "/bigobj")
 endif()

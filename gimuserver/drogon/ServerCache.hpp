@@ -84,6 +84,24 @@ public:
 	*/
 	inline const auto& itemMst() const { return m_itemMst; }
 
+	/*!
+	* Grand Mission ("Campaign") master data, one getter per table.  The
+	* Campaign handlers use these for mission/reward validation; see
+	* mst/grand_mission.kdl for the field maps and
+	* tools/MST_PORTING_BACKLOG.md for the 2026-07-19 port pass.
+	* @return Vector of the matching GrandMission*Mst entries
+	*/
+	inline const auto& grandMissionMst() const { return m_grandMissionMst; }
+	inline const auto& grandMissionMapMst() const { return m_grandMissionMapMst; }
+	inline const auto& grandMissionSpotMst() const { return m_grandMissionSpotMst; }
+	inline const auto& grandMissionRouteMst() const { return m_grandMissionRouteMst; }
+	inline const auto& grandMissionIconMst() const { return m_grandMissionIconMst; }
+	inline const auto& grandMissionTreasureMst() const { return m_grandMissionTreasureMst; }
+	inline const auto& grandMissionFlgMst() const { return m_grandMissionFlgMst; }
+	inline const auto& grandMissionEndCndMst() const { return m_grandMissionEndCndMst; }
+	inline const auto& grandMissionEventMst() const { return m_grandMissionEventMst; }
+	inline const auto& grandMissionRewardMst() const { return m_grandMissionRewardMst; }
+
 private:
 	/*!
 	* DLS cached JSON.
@@ -136,4 +154,20 @@ private:
 	* Loaded from deploy/system/item_mst.json.
 	*/
 	std::vector<ItemMst> m_itemMst;
+
+	/*!
+	* Grand Mission ("Campaign") master data, loaded from
+	* deploy/system/grand_mission_*.json (wrapper keys documented in
+	* mst/grand_mission.kdl).
+	*/
+	std::vector<GrandMissionMst> m_grandMissionMst;
+	std::vector<GrandMissionMapMst> m_grandMissionMapMst;
+	std::vector<GrandMissionSpotMst> m_grandMissionSpotMst;
+	std::vector<GrandMissionRouteMst> m_grandMissionRouteMst;
+	std::vector<GrandMissionIconMst> m_grandMissionIconMst;
+	std::vector<GrandMissionTreasureMst> m_grandMissionTreasureMst;
+	std::vector<GrandMissionFlgMst> m_grandMissionFlgMst;
+	std::vector<GrandMissionEndCndMst> m_grandMissionEndCndMst;
+	std::vector<GrandMissionEventMst> m_grandMissionEventMst;
+	std::vector<GrandMissionRewardMst> m_grandMissionRewardMst;
 };

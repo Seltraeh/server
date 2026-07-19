@@ -113,6 +113,19 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_missionMst = LoadJson<MissionMstCache>(mstRoot, "mission_mst.json").data;
 		m_itemMst = LoadJson<ItemMstCache>(mstRoot, "item_mst.json").data;
 
+		// Grand Mission ("Campaign") master data — wrapper keys and field
+		// maps documented in mst/grand_mission.kdl.
+		m_grandMissionMst = LoadJson<GrandMissionMstCache>(mstRoot, "grand_mission_mst.json").data;
+		m_grandMissionMapMst = LoadJson<GrandMissionMapMstCache>(mstRoot, "grand_mission_map_mst.json").data;
+		m_grandMissionSpotMst = LoadJson<GrandMissionSpotMstCache>(mstRoot, "grand_mission_spot_mst.json").data;
+		m_grandMissionRouteMst = LoadJson<GrandMissionRouteMstCache>(mstRoot, "grand_mission_route_mst.json").data;
+		m_grandMissionIconMst = LoadJson<GrandMissionIconMstCache>(mstRoot, "grand_mission_icon_mst.json").data;
+		m_grandMissionTreasureMst = LoadJson<GrandMissionTreasureMstCache>(mstRoot, "grand_mission_treasure_mst.json").data;
+		m_grandMissionFlgMst = LoadJson<GrandMissionFlgMstCache>(mstRoot, "grand_mission_flg_mst.json").data;
+		m_grandMissionEndCndMst = LoadJson<GrandMissionEndCndMstCache>(mstRoot, "grand_mission_end_cnd_mst.json").data;
+		m_grandMissionEventMst = LoadJson<GrandMissionEventMstCache>(mstRoot, "grand_mission_event_mst.json").data;
+		m_grandMissionRewardMst = LoadJson<GrandMissionRewardMstCache>(mstRoot, "grand_mission_reward_mst.json").data;
+
 		// cache: GachaList response (gacha_info comes from GachaArchiver at
 		// request time; only the category banners are cached here)
 		m_gachaListRsp.gacha_categories = LoadJson<GachaCategoryCache>(mstRoot, "gacha_category_mst.json").data;
