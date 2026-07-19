@@ -1,0 +1,10 @@
+{
+  "aCmTmaOx": [
+    {"peCeLuNq": "101", "gBLoOL3p": "パワーストライク", "U9ABSYEp": "1", "iNy0ZU5M": "1", "b5VveUd8": "formation_effect_move.png,formation_effect_move.png,formation_effect_move.png,formation_effect_move.png,formation_effect_move.png", "VuIPnfDO": "1:25,0,0,0,0#1:25,0,0,0,0#1:25,0,0,0,0#1:25,0,0,0,0#1:25,0,0,0,0", "qp37xTDh": "すべてのユニットの攻撃力が２５％アップ<br />テトラウォールに有利：カイザーシールドに不利"},
+    {"peCeLuNq": "102", "gBLoOL3p": "孤岳天武の陣", "U9ABSYEp": "1", "iNy0ZU5M": "2", "b5VveUd8": ",,formation_effect_move.png,,", "VuIPnfDO": "1:0,0,0,0,0#1:0,0,0,0,0#1:100,0,0,0,100#1:0,0,0,0,0#1:0,0,0,0,0", "qp37xTDh": "中心ユニットの攻撃力、ＨＰが１００％アップ<br />五芒堅鎖の陣に有利：テトラウォールに不利"},
+    {"peCeLuNq": "103", "gBLoOL3p": "レイドバンガード", "U9ABSYEp": "1", "iNy0ZU5M": "3", "b5VveUd8": "formation_effect_move.png,formation_effect_move.png,,,", "VuIPnfDO": "1:50,0,0,0,0#1:50,0,0,0,0#1:0,0,0,0,0#1:0,0,0,0,0#1:0,0,0,0,0", "qp37xTDh": "前衛ユニットの攻撃力が５０％アップ<br />カイザーシールドに有利：五芒堅鎖の陣に不利"},
+    {"peCeLuNq": "201", "gBLoOL3p": "五芒堅鎖の陣", "U9ABSYEp": "2", "iNy0ZU5M": "1", "b5VveUd8": "formation_effect_move.png,formation_effect_move.png,formation_effect_move.png,formation_effect_move.png,formation_effect_move.png", "VuIPnfDO": "1:0,25,0,0,25#1:0,25,0,0,25#1:0,25,0,0,25#1:0,25,0,0,25#1:0,25,0,0,25", "qp37xTDh": "すべてのユニットの防御力、ＨＰが２５％アップ<br />レイドバンガードに有利：孤岳天武の陣に不利"},
+    {"peCeLuNq": "202", "gBLoOL3p": "カイザーシールド", "U9ABSYEp": "2", "iNy0ZU5M": "2", "b5VveUd8": "formation_effect_move.png,formation_effect_move.png,,,", "VuIPnfDO": "1:0,50,0,0,50#1:0,50,0,0,50#1:0,0,0,0,0#1:0,0,0,0,0#1:0,0,0,0,0", "qp37xTDh": "前衛ユニットの防御力、ＨＰが５０％アップ<br />パワーストライクに有利：レイドバンガードに不利"},
+    {"peCeLuNq": "203", "gBLoOL3p": "テトラウォール", "U9ABSYEp": "2", "iNy0ZU5M": "3", "b5VveUd8": "formation_effect_move.png,formation_effect_move.png,,formation_effect_move.png,formation_effect_move.png", "VuIPnfDO": "1:50,50,0,0,0#1:50,50,0,0,0#1:0,0,0,0,0#1:50,50,0,0,0#1:50,50,0,0,0", "qp37xTDh": "中心以外のユニットの攻撃力、防御力が５０％アップ<br />孤岳天武の陣に有利：パワーストライクに不利"}
+  ]
+}
