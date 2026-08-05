@@ -178,6 +178,14 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_summonerImageMst = LoadJson<SummonerImageMstCache>(mstRoot, "summoner_image_mst.json").data;
 		m_summonerLevelMst = LoadJson<SummonerLevelMstCache>(mstRoot, "summoner_level_mst.json").data;
 
+		// Local-only MST loads, if this checkout has any.  Runs last so it can
+		// rely on everything above; see ServerCacheLocalMembers.inl for storage.
+		// After ADDING the file, touch this file: when it was absent nothing
+		// recorded a dependency on it, so the build won't otherwise notice.
+#if __has_include("ServerCacheLocalLoad.inl")
+	#include "ServerCacheLocalLoad.inl"
+#endif
+
 		// cache: GachaList response (gacha_info comes from GachaArchiver at
 		// request time; only the category banners are cached here)
 		m_gachaListRsp.gacha_categories = LoadJson<GachaCategoryCache>(mstRoot, "gacha_category_mst.json").data;

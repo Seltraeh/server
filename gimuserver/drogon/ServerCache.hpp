@@ -292,4 +292,13 @@ private:
 	std::vector<SummonerExSkillMst> m_summonerExSkillMst;
 	std::vector<SummonerImageMst> m_summonerImageMst;
 	std::vector<SummonerLevelMst> m_summonerLevelMst;
+
+// Local-only members and getters, if this checkout has any.  Must be last in
+// the class: the include manages its own access specifiers and leaves the
+// class in whatever mode it ends on.
+// After ADDING the file, touch this header: when it was absent nothing
+// recorded a dependency on it, so the build won't otherwise notice.
+#if __has_include("ServerCacheLocalMembers.inl")
+	#include "ServerCacheLocalMembers.inl"
+#endif
 };
