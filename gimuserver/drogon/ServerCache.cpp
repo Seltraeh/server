@@ -141,6 +141,30 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_raidPointMst = LoadJson<RaidPointMstCache>(mstRoot, "raid_point_mst.json").data;
 		m_raidUserRouteMst = LoadJson<RaidUserRouteMstCache>(mstRoot, "raid_user_route_mst.json").data;
 		m_raidBattleGroupMst = LoadJson<RaidBattleGroupMstCache>(mstRoot, "raid_battle_group_mst.json").data;
+		// Colosseum (PvP arena) master data — wrapper keys and field maps
+		// documented in mst/colosseum.kdl.
+		m_colosseumClassMst = LoadJson<ColosseumClassMstCache>(mstRoot, "colosseum_class_mst.json").data;
+		m_colosseumExtraRuleMst = LoadJson<ColosseumExtraRuleMstCache>(mstRoot, "colosseum_extra_rule_mst.json").data;
+		m_colosseumFormationMst = LoadJson<ColosseumFormationMstCache>(mstRoot, "colosseum_formation_mst.json").data;
+		m_colosseumSupportMst = LoadJson<ColosseumSupportMstCache>(mstRoot, "colosseum_support_mst.json").data;
+
+		// Dual Brave Burst master data — see mst/dbb.kdl.
+		m_dbbMst = LoadJson<DbbMstCache>(mstRoot, "dbb_mst.json").data;
+		m_dbbBondRecipeMst = LoadJson<DbbBondRecipeMstCache>(mstRoot, "dbb_bond_recipe_mst.json").data;
+
+		// Guild master data — see mst/guild.kdl (ART and SKILL_DETAILS remain
+		// unported; their response classes are ambiguous).
+		m_guildInfoMst = LoadJson<GuildInfoMstCache>(mstRoot, "guild_info_mst.json").data;
+		m_guildMemberSkillMst = LoadJson<GuildMemberSkillMstCache>(mstRoot, "guild_member_skill_mst.json").data;
+		m_guildPointExchangeMst = LoadJson<GuildPointExchangeMstCache>(mstRoot, "guild_point_exchange_mst.json").data;
+
+		// Purchase age-band spend caps — see mst/purchase.kdl.
+		m_purchaseAgeLimitMst = LoadJson<PurchaseAgeLimitMstCache>(mstRoot, "purchase_age_limit_mst.json").data;
+
+		// Frontier Gate master data — see mst/frontier_gate.kdl (REWARD and
+		// AREA remain unported; no response class in the export).
+		m_frontierGateMst = LoadJson<FrontierGateMstCache>(mstRoot, "frontier_gate_mst.json").data;
+		m_frontierGateSupportMst = LoadJson<FrontierGateSupportMstCache>(mstRoot, "frontier_gate_support_mst.json").data;
 
 		// cache: GachaList response (gacha_info comes from GachaArchiver at
 		// request time; only the category banners are cached here)

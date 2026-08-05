@@ -122,6 +122,42 @@ public:
 	inline const auto& raidUserRouteMst() const { return m_raidUserRouteMst; }
 	inline const auto& raidBattleGroupMst() const { return m_raidBattleGroupMst; }
 
+	/*!
+	* Colosseum (PvP arena) master data — brackets, extra rules, formations
+	* and support effects.  Field maps in mst/colosseum.kdl.
+	*/
+	inline const auto& colosseumClassMst() const { return m_colosseumClassMst; }
+	inline const auto& colosseumExtraRuleMst() const { return m_colosseumExtraRuleMst; }
+	inline const auto& colosseumFormationMst() const { return m_colosseumFormationMst; }
+	inline const auto& colosseumSupportMst() const { return m_colosseumSupportMst; }
+
+	/*!
+	* Dual Brave Burst master data — pair catalog and bond recipes.
+	* Field maps in mst/dbb.kdl.
+	*/
+	inline const auto& dbbMst() const { return m_dbbMst; }
+	inline const auto& dbbBondRecipeMst() const { return m_dbbBondRecipeMst; }
+
+	/*!
+	* Guild master data — level curve, member skills, point exchange shop.
+	* Field maps in mst/guild.kdl.
+	*/
+	inline const auto& guildInfoMst() const { return m_guildInfoMst; }
+	inline const auto& guildMemberSkillMst() const { return m_guildMemberSkillMst; }
+	inline const auto& guildPointExchangeMst() const { return m_guildPointExchangeMst; }
+
+	/*!
+	* Age-banded real-money spend caps.  Field map in mst/purchase.kdl.
+	*/
+	inline const auto& purchaseAgeLimitMst() const { return m_purchaseAgeLimitMst; }
+
+	/*!
+	* Frontier Gate master data — gate catalog and support effects.
+	* Field maps in mst/frontier_gate.kdl.
+	*/
+	inline const auto& frontierGateMst() const { return m_frontierGateMst; }
+	inline const auto& frontierGateSupportMst() const { return m_frontierGateSupportMst; }
+
 private:
 	/*!
 	* DLS cached JSON.
@@ -208,4 +244,26 @@ private:
 	std::vector<RaidPointMst> m_raidPointMst;
 	std::vector<RaidUserRouteMst> m_raidUserRouteMst;
 	std::vector<RaidBattleGroupMst> m_raidBattleGroupMst;
+
+	// Colosseum — mst/colosseum.kdl
+	std::vector<ColosseumClassMst> m_colosseumClassMst;
+	std::vector<ColosseumExtraRuleMst> m_colosseumExtraRuleMst;
+	std::vector<ColosseumFormationMst> m_colosseumFormationMst;
+	std::vector<ColosseumSupportMst> m_colosseumSupportMst;
+
+	// Dual Brave Burst — mst/dbb.kdl
+	std::vector<DbbMst> m_dbbMst;
+	std::vector<DbbBondRecipeMst> m_dbbBondRecipeMst;
+
+	// Guild — mst/guild.kdl
+	std::vector<GuildInfoMst> m_guildInfoMst;
+	std::vector<GuildMemberSkillMst> m_guildMemberSkillMst;
+	std::vector<GuildPointExchangeMst> m_guildPointExchangeMst;
+
+	// Purchase age caps — mst/purchase.kdl
+	std::vector<PurchaseAgeLimitMst> m_purchaseAgeLimitMst;
+
+	// Frontier Gate — mst/frontier_gate.kdl
+	std::vector<FrontierGateMst> m_frontierGateMst;
+	std::vector<FrontierGateSupportMst> m_frontierGateSupportMst;
 };
