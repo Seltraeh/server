@@ -158,6 +158,21 @@ public:
 	inline const auto& frontierGateMst() const { return m_frontierGateMst; }
 	inline const auto& frontierGateSupportMst() const { return m_frontierGateSupportMst; }
 
+	/*!
+	* Summoner Unit master data — the player avatar's level curve, per-element
+	* progression, arm catalog, ability tree, EX skills and illustrations.
+	* Field maps in mst/summoner.kdl.
+	*/
+	inline const auto& summonerAbilityMst() const { return m_summonerAbilityMst; }
+	inline const auto& summonerAbilityLevelMst() const { return m_summonerAbilityLevelMst; }
+	inline const auto& summonerAbilityUpMst() const { return m_summonerAbilityUpMst; }
+	inline const auto& summonerArmMst() const { return m_summonerArmMst; }
+	inline const auto& summonerArmElementMst() const { return m_summonerArmElementMst; }
+	inline const auto& summonerElementLevelMst() const { return m_summonerElementLevelMst; }
+	inline const auto& summonerExSkillMst() const { return m_summonerExSkillMst; }
+	inline const auto& summonerImageMst() const { return m_summonerImageMst; }
+	inline const auto& summonerLevelMst() const { return m_summonerLevelMst; }
+
 private:
 	/*!
 	* DLS cached JSON.
@@ -266,4 +281,15 @@ private:
 	// Frontier Gate — mst/frontier_gate.kdl
 	std::vector<FrontierGateMst> m_frontierGateMst;
 	std::vector<FrontierGateSupportMst> m_frontierGateSupportMst;
+
+	// Summoner Unit — mst/summoner.kdl
+	std::vector<SummonerAbilityMst> m_summonerAbilityMst;
+	std::vector<SummonerAbilityLevelMst> m_summonerAbilityLevelMst;
+	std::vector<SummonerAbilityUpMst> m_summonerAbilityUpMst;
+	std::vector<SummonerArmMst> m_summonerArmMst;
+	std::vector<SummonerArmElementMst> m_summonerArmElementMst;
+	std::vector<SummonerElementLevelMst> m_summonerElementLevelMst;
+	std::vector<SummonerExSkillMst> m_summonerExSkillMst;
+	std::vector<SummonerImageMst> m_summonerImageMst;
+	std::vector<SummonerLevelMst> m_summonerLevelMst;
 };

@@ -166,6 +166,18 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_frontierGateMst = LoadJson<FrontierGateMstCache>(mstRoot, "frontier_gate_mst.json").data;
 		m_frontierGateSupportMst = LoadJson<FrontierGateSupportMstCache>(mstRoot, "frontier_gate_support_mst.json").data;
 
+		// Summoner Unit master data — see mst/summoner.kdl (ARM_LEVEL and
+		// ARM_PASSIVE remain unported; no response class in the export).
+		m_summonerAbilityMst = LoadJson<SummonerAbilityMstCache>(mstRoot, "summoner_ability_mst.json").data;
+		m_summonerAbilityLevelMst = LoadJson<SummonerAbilityLevelMstCache>(mstRoot, "summoner_ability_level_mst.json").data;
+		m_summonerAbilityUpMst = LoadJson<SummonerAbilityUpMstCache>(mstRoot, "summoner_ability_up_mst.json").data;
+		m_summonerArmMst = LoadJson<SummonerArmMstCache>(mstRoot, "summoner_arm_mst.json").data;
+		m_summonerArmElementMst = LoadJson<SummonerArmElementMstCache>(mstRoot, "summoner_arm_element_mst.json").data;
+		m_summonerElementLevelMst = LoadJson<SummonerElementLevelMstCache>(mstRoot, "summoner_element_level_mst.json").data;
+		m_summonerExSkillMst = LoadJson<SummonerExSkillMstCache>(mstRoot, "summoner_ex_skill_mst.json").data;
+		m_summonerImageMst = LoadJson<SummonerImageMstCache>(mstRoot, "summoner_image_mst.json").data;
+		m_summonerLevelMst = LoadJson<SummonerLevelMstCache>(mstRoot, "summoner_level_mst.json").data;
+
 		// cache: GachaList response (gacha_info comes from GachaArchiver at
 		// request time; only the category banners are cached here)
 		m_gachaListRsp.gacha_categories = LoadJson<GachaCategoryCache>(mstRoot, "gacha_category_mst.json").data;
