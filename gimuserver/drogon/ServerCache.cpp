@@ -178,6 +178,45 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_summonerImageMst = LoadJson<SummonerImageMstCache>(mstRoot, "summoner_image_mst.json").data;
 		m_summonerLevelMst = LoadJson<SummonerLevelMstCache>(mstRoot, "summoner_level_mst.json").data;
 
+		// Skill tables — SkillMst's schema already lived in mst/skill.kdl;
+		// the sidecars are in mst/skill_ext.kdl.
+		m_skillMst = LoadJson<SkillMstCache>(mstRoot, "skill_mst.json").data;
+		m_skillLevelMst = LoadJson<SkillLevelMstCache>(mstRoot, "skill_level_mst.json").data;
+		m_leaderSkillMst = LoadJson<LeaderSkillMstCache>(mstRoot, "leader_skill_mst.json").data;
+
+		// Unit evolution — see mst/unit_evo.kdl.
+		m_unitEvoMst = LoadJson<UnitEvoMstCache>(mstRoot, "unit_evo_mst.json").data;
+		m_unitEvoOmniMst = LoadJson<UnitEvoOmniMstCache>(mstRoot, "unit_evo_omni_mst.json").data;
+		m_unitEvoOmniTypeMst = LoadJson<UnitEvoOmniTypeMstCache>(mstRoot, "unit_evo_omni_type_mst.json").data;
+		m_unitEvoOmniRecipeMst = LoadJson<UnitEvoOmniRecipeMstCache>(mstRoot, "unit_evo_omni_recipe_mst.json").data;
+
+		// Unit side-tables — see mst/unit_ext.kdl (MissionEp3Mst's schema
+		// already lived in mst/mission_ep3.kdl).
+		m_unitTypeMst = LoadJson<UnitTypeMstCache>(mstRoot, "unit_type_mst.json").data;
+		m_unitExtMst = LoadJson<UnitExtMstCache>(mstRoot, "unit_ext_mst.json").data;
+		m_unitEp3Mst = LoadJson<UnitEp3MstCache>(mstRoot, "unit_ep3_mst.json").data;
+		m_unitCgsMst = LoadJson<UnitCgsMstCache>(mstRoot, "unit_cgs_mst.json").data;
+		m_unitCommentMst = LoadJson<UnitCommentMstCache>(mstRoot, "unit_comment_mst.json").data;
+		m_unitFeSkillMst = LoadJson<UnitFeSkillMstCache>(mstRoot, "unit_fe_skill_mst.json").data;
+		m_unitFeCategoryMst = LoadJson<UnitFeCategoryMstCache>(mstRoot, "unit_fe_category_mst.json").data;
+		m_missionEp3Mst = LoadJson<MissionEp3MstCache>(mstRoot, "mission_ep3_mst.json").data;
+
+		// World geography — see mst/area.kdl.
+		m_gateMst = LoadJson<GateMstCache>(mstRoot, "gate_mst.json").data;
+		m_areaMst = LoadJson<AreaMstCache>(mstRoot, "area_mst.json").data;
+		m_dungeonMst = LoadJson<DungeonMstCache>(mstRoot, "dungeon_mst.json").data;
+
+		// Shop / medal / help / fixed-PvP singletons — see mst/shop.kdl.
+		m_shopItemMst = LoadJson<ShopItemMstCache>(mstRoot, "shop_item_mst.json").data;
+		m_medalMst = LoadJson<MedalMstCache>(mstRoot, "medal_mst.json").data;
+		m_helpDetailMst = LoadJson<HelpDetailMstCache>(mstRoot, "help_detail_mst.json").data;
+		m_pvpFixedSettingMst = LoadJson<PvpFixedSettingMstCache>(mstRoot, "pvp_fixed_setting_mst.json").data;
+
+		// NOTE: gacha_info_mst.json is deliberately NOT loaded here.  The
+		// GachaInfoMst struct in mst/gacha.kdl is the per-request RESPONSE
+		// shape (12 fields) and GachaArchiver serves it at request time; the
+		// MST file has 23 columns, so a strict load into that struct throws.
+
 		// Local-only MST loads, if this checkout has any.  Runs last so it can
 		// rely on everything above; see ServerCacheLocalMembers.inl for storage.
 		// After ADDING the file, touch this file: when it was absent nothing

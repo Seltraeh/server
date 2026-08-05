@@ -173,6 +173,53 @@ public:
 	inline const auto& summonerImageMst() const { return m_summonerImageMst; }
 	inline const auto& summonerLevelMst() const { return m_summonerLevelMst; }
 
+	/*!
+	* Skill catalog and its sidecars.  Field maps in mst/skill.kdl (SkillMst)
+	* and mst/skill_ext.kdl.
+	*/
+	inline const auto& skillMst() const { return m_skillMst; }
+	inline const auto& skillLevelMst() const { return m_skillLevelMst; }
+	inline const auto& leaderSkillMst() const { return m_leaderSkillMst; }
+
+	/*!
+	* Unit evolution recipes, standard and Omni.  Field maps in
+	* mst/unit_evo.kdl.
+	*/
+	inline const auto& unitEvoMst() const { return m_unitEvoMst; }
+	inline const auto& unitEvoOmniMst() const { return m_unitEvoOmniMst; }
+	inline const auto& unitEvoOmniTypeMst() const { return m_unitEvoOmniTypeMst; }
+	inline const auto& unitEvoOmniRecipeMst() const { return m_unitEvoOmniRecipeMst; }
+
+	/*!
+	* Unit side-tables — types, extras, EP3 costs, animation manifests,
+	* comments and the Frontier Evolution tree.  Field maps in
+	* mst/unit_ext.kdl and mst/mission_ep3.kdl.
+	*/
+	inline const auto& unitTypeMst() const { return m_unitTypeMst; }
+	inline const auto& unitExtMst() const { return m_unitExtMst; }
+	inline const auto& unitEp3Mst() const { return m_unitEp3Mst; }
+	inline const auto& unitCgsMst() const { return m_unitCgsMst; }
+	inline const auto& unitCommentMst() const { return m_unitCommentMst; }
+	inline const auto& unitFeSkillMst() const { return m_unitFeSkillMst; }
+	inline const auto& unitFeCategoryMst() const { return m_unitFeCategoryMst; }
+	inline const auto& missionEp3Mst() const { return m_missionEp3Mst; }
+
+	/*!
+	* World geography — gates, areas, dungeons.  Field maps in mst/area.kdl.
+	*/
+	inline const auto& gateMst() const { return m_gateMst; }
+	inline const auto& areaMst() const { return m_areaMst; }
+	inline const auto& dungeonMst() const { return m_dungeonMst; }
+
+	/*!
+	* Shop, medal, help-detail and fixed-PvP tables.  Field maps in
+	* mst/shop.kdl.
+	*/
+	inline const auto& shopItemMst() const { return m_shopItemMst; }
+	inline const auto& medalMst() const { return m_medalMst; }
+	inline const auto& helpDetailMst() const { return m_helpDetailMst; }
+	inline const auto& pvpFixedSettingMst() const { return m_pvpFixedSettingMst; }
+
 private:
 	/*!
 	* DLS cached JSON.
@@ -292,6 +339,38 @@ private:
 	std::vector<SummonerExSkillMst> m_summonerExSkillMst;
 	std::vector<SummonerImageMst> m_summonerImageMst;
 	std::vector<SummonerLevelMst> m_summonerLevelMst;
+
+	// Skills — mst/skill.kdl + mst/skill_ext.kdl
+	std::vector<SkillMst> m_skillMst;
+	std::vector<SkillLevelMst> m_skillLevelMst;
+	std::vector<LeaderSkillMst> m_leaderSkillMst;
+
+	// Unit evolution — mst/unit_evo.kdl
+	std::vector<UnitEvoMst> m_unitEvoMst;
+	std::vector<UnitEvoOmniMst> m_unitEvoOmniMst;
+	std::vector<UnitEvoOmniTypeMst> m_unitEvoOmniTypeMst;
+	std::vector<UnitEvoOmniRecipeMst> m_unitEvoOmniRecipeMst;
+
+	// Unit side-tables — mst/unit_ext.kdl + mst/mission_ep3.kdl
+	std::vector<UnitTypeMst> m_unitTypeMst;
+	std::vector<UnitExtMst> m_unitExtMst;
+	std::vector<UnitEp3Mst> m_unitEp3Mst;
+	std::vector<UnitCgsMst> m_unitCgsMst;
+	std::vector<UnitCommentMst> m_unitCommentMst;
+	std::vector<UnitFeSkillMst> m_unitFeSkillMst;
+	std::vector<UnitFeCategoryMst> m_unitFeCategoryMst;
+	std::vector<MissionEp3Mst> m_missionEp3Mst;
+
+	// World geography — mst/area.kdl
+	std::vector<GateMst> m_gateMst;
+	std::vector<AreaMst> m_areaMst;
+	std::vector<DungeonMst> m_dungeonMst;
+
+	// Shop / medal / help / fixed-PvP — mst/shop.kdl
+	std::vector<ShopItemMst> m_shopItemMst;
+	std::vector<MedalMst> m_medalMst;
+	std::vector<HelpDetailMst> m_helpDetailMst;
+	std::vector<PvpFixedSettingMst> m_pvpFixedSettingMst;
 
 // Local-only members and getters, if this checkout has any.  Must be last in
 // the class: the include manages its own access specifiers and leaves the
