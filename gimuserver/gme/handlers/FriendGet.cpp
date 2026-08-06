@@ -70,11 +70,11 @@ HANDLEF(FriendGet)
         // Active-deck leader first, fall back to highest-level unit so the
         // friend slot always has data.  Matches MissionStart's query shape.
         auto rows = co_await theDb()->execSqlCoro(
-            "SELECT uu.user_unit_id, uu.unit_id, uu.unit_lv,"
+            "SELECT uu.user_unit_id, uu.unit_id, uu.unit_lvl,"
             " uu.base_hp,  uu.add_hp,  uu.ext_hp,"
             " uu.base_atk, uu.add_atk, uu.ext_atk,"
             " uu.base_def, uu.add_def, uu.ext_def,"
-            " uu.base_heal,uu.add_heal,uu.ext_heal,"
+            " uu.base_rec,uu.add_rec,uu.ext_rec,"
             " uu.skill_id, uu.skill_lv, uu.extra_skill_id, uu.extra_skill_lv,"
             " uu.unit_type_id, uu.element"
             " FROM user_decks pd"
@@ -87,16 +87,16 @@ HANDLEF(FriendGet)
         if (rows.empty())
         {
             rows = co_await theDb()->execSqlCoro(
-                "SELECT user_unit_id, unit_id, unit_lv,"
+                "SELECT user_unit_id, unit_id, unit_lvl,"
                 " base_hp,  add_hp,  ext_hp,"
                 " base_atk, add_atk, ext_atk,"
                 " base_def, add_def, ext_def,"
-                " base_heal,add_heal,ext_heal,"
+                " base_rec,add_rec,ext_rec,"
                 " skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
                 " unit_type_id, element"
                 " FROM user_units"
                 " WHERE user_id=$1"
-                " ORDER BY unit_lv DESC, user_unit_id DESC LIMIT 1;",
+                " ORDER BY unit_lvl DESC, user_unit_id DESC LIMIT 1;",
                 std::string(kUserId));
         }
 
@@ -113,7 +113,7 @@ HANDLEF(FriendGet)
             catch (...) {}
 
             const int32_t elemId         = friendGet_elementToInt(r["element"].as<std::string>());
-            const int32_t unitLv         = r["unit_lv"].as<int32_t>();
+            const int32_t unitLv         = r["unit_lvl"].as<int32_t>();
             const int32_t baseHp         = r["base_hp"].as<int32_t>();
             const int32_t addHp          = r["add_hp"].as<int32_t>();
             const int32_t extHp          = r["ext_hp"].as<int32_t>();
@@ -123,9 +123,9 @@ HANDLEF(FriendGet)
             const int32_t baseDef        = r["base_def"].as<int32_t>();
             const int32_t addDef         = r["add_def"].as<int32_t>();
             const int32_t extDef         = r["ext_def"].as<int32_t>();
-            const int32_t baseHeal       = r["base_heal"].as<int32_t>();
-            const int32_t addHeal        = r["add_heal"].as<int32_t>();
-            const int32_t extHeal        = r["ext_heal"].as<int32_t>();
+            const int32_t baseHeal       = r["base_rec"].as<int32_t>();
+            const int32_t addHeal        = r["add_rec"].as<int32_t>();
+            const int32_t extHeal        = r["ext_rec"].as<int32_t>();
             const int32_t skillId        = r["skill_id"].as<int32_t>();
             const int32_t skillLv        = r["skill_lv"].as<int32_t>();
             const int32_t extraSkillId   = r["extra_skill_id"].as<int32_t>();
