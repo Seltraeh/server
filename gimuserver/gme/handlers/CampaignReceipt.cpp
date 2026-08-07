@@ -9,7 +9,7 @@
 // Rewards come from F_GRAND_MISSION_REWARD_MST (ServerCache
 // grandMissionRewardMst()), replacing the old fixed 1000-zel/200-karma stub.
 //
-// Reward-row selection (evidence: deploy/system/grand_mission_reward_mst.json,
+// Reward-row selection (evidence: deploy/mst/grand_mission_reward_mst.json,
 // semantics pinned via the labelled daily_task_prize_mst rows that share the
 // present_type hash 30Kw4WBa — see mst/grand_mission.kdl):
 //   reward_type=1 "N% Completion Bonus"    — conditions = percent threshold;
