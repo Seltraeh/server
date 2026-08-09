@@ -5,6 +5,9 @@
 #include <gimuserver/utils/BfCrypt.hpp>
 #include <gimuserver/utils/JsonFile.hpp>
 
+#include <algorithm>
+#include <unordered_map>
+
 /*!
 * Builds a JSON
 * @param[in] d Template class to write
@@ -92,6 +95,43 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_initrsp.help_sub = LoadJson<HelpSubMstCache>(mstRoot, "help_sub_mst.json").data;
 		m_initrsp.url = LoadJson<UrlMstCache>(mstRoot, "url_mst.json").data;
 		m_initrsp.challenge = LoadJson<ChallengeMstCache>(mstRoot, "challenge_mst.json").data;
+
+		// Keep one Frontier Hunter event running.
+		//
+		// All 97 rows are real 2014-2022 event windows and every one of them is
+		// long over against a 2026 clock — the newest, id 97, ended
+		// 2022-04-27.  With no live event the Survey Office has nothing to show
+		// and, on the working theory, no Hunter Orb allowance either (the orbs
+		// are Frontier Hunter's currency, which Frontier Gate shares — see the
+		// in-game intro at content/event/randall_FG.txt).
+		//
+		// Same call as the Frontier Gate windows: this is an offline
+		// preservation server with no event calendar, so the newest event is
+		// advertised as permanently running rather than the catalog being left
+		// entirely in the past.  Only the LAST row is touched; the other 96 keep
+		// their historical windows so the event history stays intact.
+		//
+		// To go back to authentic windows, delete this block — nothing else
+		// depends on it.
+		if (!m_initrsp.challenge.empty())
+		{
+			auto& active = m_initrsp.challenge.back();
+			const auto opened = std::chrono::time_point_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::from_time_t(1420070400));   // 2015-01-01
+			const auto closes = std::chrono::time_point_cast<std::chrono::milliseconds>(
+				std::chrono::system_clock::from_time_t(2145916800));   // 2038-01-01
+
+			active.start_data = opened;
+			active.end_data = closes;
+			active.cnt_start_data = opened;
+			active.cnt_end_data = closes;
+			active.rank_start_data = opened;
+			active.rank_end_data = closes;
+			m_activeChallengeId = active.id;
+
+			LOG_INFO << "ServerCache: Frontier Hunter event " << active.id
+			         << " advertised as running (all 97 rows expired by 2022)";
+		}
 		m_initrsp.challenge_hr = LoadJson<ChallengeHrMstCache>(mstRoot, "challenge_hr_mst.json").data;
 		m_initrsp.challenge_mis = LoadJson<ChallengeMisMstCache>(mstRoot, "chlng_mission_mst.json").data;
 		m_initrsp.challenge_grade = LoadJson<ChallengeGradeMstCache>(mstRoot, "chlng_mission_grade_mst.json").data;
@@ -168,6 +208,69 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		// AREA remain unported; no response class in the export).
 		m_frontierGateMst = LoadJson<FrontierGateMstCache>(mstRoot, "frontier_gate_mst.json").data;
 		m_frontierGateSupportMst = LoadJson<FrontierGateSupportMstCache>(mstRoot, "frontier_gate_support_mst.json").data;
+
+		// Build the dungeon -> missions index, then drop the rows.  Only the id
+		// and dungeon_id columns survive; see missionsByDungeon() for why this
+		// is not the mission_mst cache that c49782e removed.
+		{
+			const auto missions = LoadJson<MissionMstCache>(mstRoot, "mission_mst.json").data;
+			for (const auto& mission : missions)
+				m_missionsByDungeon[mission.dungeon_id].push_back(mission.id);
+			for (auto& [dungeonId, ids] : m_missionsByDungeon)
+				std::sort(ids.begin(), ids.end());
+			LOG_INFO << "ServerCache: indexed " << missions.size() << " missions across "
+			         << m_missionsByDungeon.size() << " dungeons";
+
+			// Everything PermitPlace must allow for Frontier Gate to be
+			// enterable.  UserInfo's dense ranges cover the Grand Gaia
+			// numbering space only, and Frontier Gate lives entirely outside
+			// it: gate 91's mission 9010001 sits in land 99, area 3000001,
+			// dungeon 9000002 — none of which fall in lands 1-2, areas 1-1000,
+			// missions 1-4000 or dungeons 1-2000.
+			//
+			// Verified 2026-08-07: permitting the gates' dungeons alone was not
+			// enough; the mission loaded its assets and then crashed because
+			// its parent topology was unreachable.  That is the same failure
+			// the area note in UserInfo.cpp describes, one level deeper.
+			//
+			// Collected per gate rather than as a blanket widening so the
+			// permit list grows by the ~100 ids Frontier Gate actually needs
+			// instead of thousands.
+			std::unordered_map<int32_t, const MissionMst*> missionById;
+			missionById.reserve(missions.size());
+			for (const auto& mission : missions)
+				missionById.emplace(mission.id, &mission);
+
+			for (const auto& gate : m_frontierGateMst)
+			{
+				if (gate.dungeon_id != 0)
+					m_frontierGatePermits.dungeons.insert(gate.dungeon_id);
+				if (gate.need_mission_id != 0)
+					m_frontierGatePermits.missions.insert(gate.need_mission_id);
+
+				const auto it = m_missionsByDungeon.find(gate.dungeon_id);
+				if (it == m_missionsByDungeon.end())
+					continue;
+
+				for (const auto missionId : it->second)
+				{
+					m_frontierGatePermits.missions.insert(missionId);
+					const auto mit = missionById.find(missionId);
+					if (mit == missionById.end())
+						continue;
+					if (mit->second->area_id != 0)
+						m_frontierGatePermits.areas.insert(mit->second->area_id);
+					if (mit->second->land_id != 0)
+						m_frontierGatePermits.lands.insert(mit->second->land_id);
+				}
+			}
+
+			LOG_INFO << "ServerCache: Frontier Gate permits — "
+			         << m_frontierGatePermits.lands.size() << " land(s), "
+			         << m_frontierGatePermits.areas.size() << " area(s), "
+			         << m_frontierGatePermits.dungeons.size() << " dungeon(s), "
+			         << m_frontierGatePermits.missions.size() << " mission(s)";
+		}
 
 		// Summoner Unit master data — see mst/summoner.kdl (ARM_LEVEL and
 		// ARM_PASSIVE remain unported; no response class in the export).

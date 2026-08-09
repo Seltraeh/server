@@ -112,6 +112,26 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("5Imq3wC0", CampaignReceipt,      "4DAgP80B");
 	REGISTER("jF9Kkro4", CampaignEnd,          "4X9tBSg8");
 
+	// Frontier Gate.  GroupIds/AES keys from the legacy handler registry; the
+	// remaining five (End cAJp7U4l, Save Ng73nFHJ, Continue uiFIMUH6, Ranking
+	// 26zW90oG, Restart v0m1FU0g, Retry 9pzHMBzq) are listed in
+	// tools/ida/audits/dPM7oJDl_audit.txt and land with tier 3.
+	// Survey Office hub — the Frontier Gate entrance sits behind it, so without
+	// this the client errors before it ever requests M17pPotk.
+	REGISTER("nUAW2B0a", ChallengeBase,        "uE5Tsv6P");
+	REGISTER("2Kxi7rIB", ChallengeRanking,     "v1PzNE9f");
+	// Generic shop spend — reached by the Frontier Gate "use 1 Gem to restore
+	// Hunter Orbs" prompt.  Currently logs the body to capture ShopUseType.
+	REGISTER("xe8tiSf4", ShopUse,              "qthMXTQSkz3KfH9R");
+	REGISTER("M17pPotk", FrontierGateInfo,     "sochkegz");
+	REGISTER("l3lkDBSc", FrontierGateStart,    "vYPCD34q");
+	// Run control — the Continue / Pause / Retire prompt between floors.
+	REGISTER("uiFIMUH6", FrontierGateContinue, "ZiosS4cd");
+	REGISTER("Ng73nFHJ", FrontierGateSave,     "4SdtoczN");
+	REGISTER("cAJp7U4l", FrontierGateEnd,      "Vvpy7qZR");
+	REGISTER("9pzHMBzq", FrontierGateRetry,    "njsKMqGT");
+	REGISTER("v0m1FU0g", FrontierGateRestart,  "whb7Y2wX");
+
 	REGISTER("gLRIn74v", FixGiftInfo,          "15gTE9ft");
 
 	// World-map / Grand Gaia entry sequence stubs.

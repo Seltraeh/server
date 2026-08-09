@@ -2,6 +2,10 @@
 
 #include "ServerConfig.hpp"
 
+#include <map>
+#include <set>
+#include <vector>
+
 /*!
 * Cache of the server
 */
@@ -145,6 +149,58 @@ public:
 	*/
 	inline const auto& frontierGateMst() const { return m_frontierGateMst; }
 	inline const auto& frontierGateSupportMst() const { return m_frontierGateSupportMst; }
+
+	/*!
+	* Dungeon -> its mission ids, ascending.  A DERIVED INDEX over
+	* F_MISSION_MST, not the table itself: only the id and dungeon_id columns
+	* are kept, so this is ~1500 small vectors rather than 3433 full rows.
+	*
+	* Exists because FrontierGateInfo needs two things the gate catalog cannot
+	* answer and deploy/archive/mission.json does not cover (it holds a handful
+	* of Grand Gaia missions; Frontier Gate's live in the 3000xxx space):
+	*   - the gate's ENTRY mission id, which the client requires before it will
+	*     render a quest tile at all (verified 2026-08-07 with a live client:
+	*     entries with an empty j28VNcUW do not appear on the select screen);
+	*   - the gate's battle count, which is simply how many missions its dungeon
+	*     holds, and which the tile prints as "Battles N".
+	*
+	* Note the full mission_mst vector was deliberately dropped in c49782e as
+	* unconsumed (PR #31 review).  This is not that cache coming back — it is a
+	* two-column topology index with a named consumer.  If FrontierGateInfo
+	* stops needing it, delete it.
+	*/
+	inline const auto& missionsByDungeon() const { return m_missionsByDungeon; }
+
+	/*!
+	* Id of the Frontier Hunter event currently advertised as running.
+	*
+	* Every row in challenge_mst.json (F_FROGATE's sibling, F_FROHUN_MST) is a
+	* real 2014-2022 window and all of them have expired, so Setup() keeps the
+	* newest one open and records its id here.  ChallengeBase returns it as the
+	* active event under cvg8hzp9.  0 when the table is empty.
+	*/
+	inline int32_t activeChallengeId() const { return m_activeChallengeId; }
+
+	/*!
+	* Ids PermitPlace must allow before a Frontier Gate run can be entered.
+	*
+	* UserInfo injects dense id ranges that cover the Grand Gaia numbering space
+	* only; Frontier Gate lives outside it entirely (gate 91's mission 9010001
+	* is land 99, area 3000001, dungeon 9000002).  Permitting the gates'
+	* dungeons alone was not enough -- the mission fetched its assets and then
+	* crashed because its parent land/area were unreachable.
+	*
+	* Collected per gate at boot so the permit list grows by the ~100 ids
+	* Frontier Gate needs rather than by a blanket widening.
+	*/
+	struct FrontierGatePermits
+	{
+		std::set<int32_t> lands;
+		std::set<int32_t> areas;
+		std::set<int32_t> dungeons;
+		std::set<int32_t> missions;
+	};
+	inline const FrontierGatePermits& frontierGatePermits() const { return m_frontierGatePermits; }
 
 	/*!
 	* Summoner Unit master data — the player avatar's level curve, per-element
@@ -310,6 +366,17 @@ private:
 	// Frontier Gate — mst/frontier_gate.kdl
 	std::vector<FrontierGateMst> m_frontierGateMst;
 	std::vector<FrontierGateSupportMst> m_frontierGateSupportMst;
+
+	// dungeon_id -> ascending mission ids.  Derived index over F_MISSION_MST;
+	// the rows themselves are not retained.  Consumer: FrontierGateInfo.
+	std::map<int32_t, std::vector<int32_t>> m_missionsByDungeon;
+
+	// Frontier Hunter event kept open by Setup().  Consumer: ChallengeBase.
+	int32_t m_activeChallengeId = 0;
+
+	// Land/area/dungeon/mission ids Frontier Gate needs permitted.
+	// Consumer: UserInfo's PermitPlace injection.
+	FrontierGatePermits m_frontierGatePermits;
 
 	// Summoner Unit — mst/summoner.kdl
 	std::vector<SummonerAbilityMst> m_summonerAbilityMst;

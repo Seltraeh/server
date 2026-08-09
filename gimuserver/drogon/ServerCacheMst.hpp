@@ -31,6 +31,9 @@ auto_cache("bpD29eiQ", VideoAdRegion)
 auto_cache("j129kD6r", VideoAdInfo)
 auto_cache("1IR86sAv", GachaInfoMst)
 auto_cache("3aDk1xk7", ExcludedDungeonMissionMst)
+// Loaded only to build ServerCache's dungeon -> missions index; the rows are
+// discarded afterwards.  See ServerCache::missionsByDungeon().
+auto_cache("oXeC1Ak9", MissionMst)
 auto_cache("JYFGe9y6", UnitExpPatternMst)
 auto_cache("8f0bCciN", ReceipeMst)
 auto_cache("6CTU8m2v", TrophyMst)

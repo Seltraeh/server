@@ -314,6 +314,146 @@ static void RegisterMigrations(MigrationMap& map)
 	migrate("06082026_DropLeaderSkillIdColumn", {
 		p->execSqlSync("ALTER TABLE user_units DROP COLUMN leader_skill_id;");
 	});
+
+	// Frontier Gate — per-user, per-gate progress.  Feeds FrontierGateInfo
+	// (M17pPotk) response key dPM7oJDl; see tools/ida/audits/dPM7oJDl_audit.txt
+	// and tools/FRONTIER_GATE_STATE_MODEL.md.
+	//
+	// Deliberately NARROWER than the 11-field packet (handbook §6.15.0 — the
+	// KDL is the wire vocabulary and should be maximal, the schema is state and
+	// should be minimal).  Four of the packet's fields are intentionally absent:
+	//
+	//   start_date / end_date  — the gate's availability window is already in
+	//       FrontierGateMst (qA7M9EjP / SzV0Nps7, 94 rows).  §6.15 rule 3: if
+	//       the cache can answer, a per-user copy is a second source that drifts.
+	//   progress_max           — likewise derivable from the gate definition,
+	//       AND its name is only MEDIUM confidence (see below).
+	//   ranking                — no leaderboard exists single-player, and the
+	//       client gates the display behind FrontierGateMst::getRankingDispFlg.
+	//
+	// 69bpUIXR/progress_max and 2wHGmJqm/ranking are named from vtable slot
+	// position, not from a real setter, and could be swapped for one another.
+	// Persisting a column under a name we cannot yet prove is exactly the debt
+	// §6.15 warns about, so neither gets a column until a capture settles it.
+	//
+	// To delete this table later: it is consumed only by FrontierGateInfo.cpp.
+	migrate("07082026_CreateUserFrontierGatesTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_frontier_gates ("
+			"user_id         TEXT    NOT NULL,"
+			"frogate_id      INTEGER NOT NULL,"
+			"state           INTEGER NOT NULL DEFAULT 0,"
+			"progress        INTEGER NOT NULL DEFAULT 0,"
+			"score           INTEGER NOT NULL DEFAULT 0,"
+			"mission_id      TEXT    NOT NULL DEFAULT '',"
+			"sel_support_id  INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, frogate_id)"
+			");"
+		);
+	});
+
+	// Frontier Gate tier 2 — the active run.  Feeds FrontierGateStart's
+	// response key Mg8K8Y1a (FrontierGateNumResponse).
+	//
+	// ONE ROW PER USER, and the row's EXISTENCE is the "run in progress" flag —
+	// which is why there is no `active` column and no separate suspended-info
+	// table.  FrontierGateSuspendedInfoResponse (gmeGFd2s) carries exactly one
+	// field, hBNPQAU0, so "is there a run and on which gate" is a projection of
+	// this row rather than state of its own.  Ending a run deletes the row.
+	//
+	// frogate_num is a SERVER-OWNED run handle.  FrontierGateEnd/Continue/Retry
+	// read it back out of the client's shared FrontierGateNum singleton
+	// (FrontierGateNum::getFrogateNum) and echo it as their 2FQdEbG3, so the
+	// client never authors it — it is opaque to the client and only has to be
+	// stable for the life of the run.
+	//
+	// The three power-up rates in the packet get NO columns: the client parses
+	// them with StrToFloat and divides by 100, but where the server is supposed
+	// to source them (gate MST battle params? the support effect?) is not
+	// decoded, so there is nothing to store.  The handler returns the neutral
+	// 100 (= x1.0).  Add columns only once a real source is identified.
+	//
+	// To delete this table later: consumed only by FrontierGateStart.cpp.
+	// One-off scene intros the client has already played.
+	//
+	// The client reports these as a trailing-comma list in its login envelope
+	// under 9yVsu21R — "randall," on the world map, growing to
+	// "randall,frontiergate_v2," once Frontier Gate has been entered (captured
+	// 2026-08-07 from DungeonEventUpdate requests).  LoginInfoResp carries the
+	// same key back as user_special_scenario_info, so the round trip is what
+	// keeps an intro marked as seen.
+	//
+	// Until now LoginInfoReq did not even declare the key, so the value was
+	// dropped by the lenient read and nothing was ever echoed — which is the
+	// working theory for why the Frontier Gate intro replays every session.
+	//
+	// One TEXT column rather than a row-per-scene table: the client hands us
+	// the whole list every request and reads the whole list back, so there is
+	// no per-scene query to serve and normalising it would only add a join.
+	// Distinct from user_scenarios, which holds numeric F_SCENARIO_MST ids for
+	// GetScenarioPlayingInfo — a different mechanism that the client does not
+	// appear to consult on this path (0 VRfsv4e3 calls in a full FG session).
+	migrate("07082026_AddSpecialScenarioInfo", {
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN special_scenario_info TEXT NOT NULL DEFAULT '';");
+	});
+
+	// Hunter Orbs — the Frontier Gate / Frontier Hunter attempt currency.
+	//
+	// The client calls these fight points: UserTeamInfo carries YS2JG9no
+	// (fight_point) and 9m5FWR8q (max_fight_point), which the Survey Office
+	// header renders as the "Hunter Orbs" x/y counter.  Nothing populated them,
+	// so both went out as 0 and every gate answered "You have no Hunter Orbs
+	// left" — verified 2026-08-07 in a live UserInfo capture.
+	//
+	// Two columns, and both pass the §6.15 test: they are mutable per-user
+	// state (spent on an attempt, restored by a gem or by time), the client
+	// demonstrably blocks the feature without them, and no MST can answer them
+	// — F_USER_LEVEL_MST has no fight-point column, unlike energy.
+	//
+	// Deliberately NOT added: a regeneration timestamp.  defines_mst gives the
+	// cadence (recover_time_fight = 3600s, one orb per hour; frohun uses
+	// 10800s) but energy regeneration is itself still a static placeholder in
+	// this server, so orb regen lands with it rather than growing a column now.
+	//
+	// Seeded at 3/3 rather than the 1/1 the client showed: the real cap source
+	// is not decoded, and 3 gives room to exercise spend-and-restore.
+	migrate("07082026_AddFightPointColumns", {
+		p->execSqlSync("ALTER TABLE user_info ADD COLUMN fight_point INTEGER NOT NULL DEFAULT 3;");
+		p->execSqlSync("ALTER TABLE user_info ADD COLUMN max_fight_point INTEGER NOT NULL DEFAULT 3;");
+	});
+
+	migrate("07082026_CreateUserFrontierGateRunTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_frontier_gate_run ("
+			"user_id         TEXT    NOT NULL PRIMARY KEY,"
+			"frogate_id      INTEGER NOT NULL,"
+			"frogate_num     INTEGER NOT NULL DEFAULT 0,"
+			"mission_status  INTEGER NOT NULL DEFAULT 0,"
+			"sel_support_id  INTEGER NOT NULL DEFAULT 0"
+			");"
+		);
+	});
+
+	// The run's party, kept so a continued or retried floor still has one.
+	//
+	// Only FrontierGateStart and FrontierGateSave carry the party (MxmCpDRC +
+	// 52xDBRGr); Continue sends nothing and Retry sends the deck alone.  With
+	// nothing stored, continuing to the next floor left the client with an
+	// empty FrontierGateUserUnitInfoList — the party vanished and the leader
+	// showed as dead (observed 2026-08-07).
+	//
+	// Stored as two JSON blobs rather than normalised rows: the client hands us
+	// the whole party and reads the whole party back, so there is no per-member
+	// query to serve and a deck/unit table would only add joins.  Same call as
+	// special_scenario_info.  If a future feature needs per-member queries
+	// (rewards by unit, say), normalise then.
+	migrate("07082026_AddFrontierGateRunParty", {
+		p->execSqlSync(
+			"ALTER TABLE user_frontier_gate_run ADD COLUMN party_deck_json TEXT NOT NULL DEFAULT '';");
+		p->execSqlSync(
+			"ALTER TABLE user_frontier_gate_run ADD COLUMN party_units_json TEXT NOT NULL DEFAULT '';");
+	});
 }
 
 /*!

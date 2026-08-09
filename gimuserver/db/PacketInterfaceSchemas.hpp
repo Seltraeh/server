@@ -31,6 +31,14 @@ PacketInterfaceFor<::LoginInfoResp>::fields()
 			.update = true,
 			.insert = true,
 		}),
+		// Echoes back the one-off scene intros the client told us it has played
+		// (9yVsu21R).  DungeonEventUpdate stores what the client reports; this
+		// sends it back in the login envelope so the intros stay marked seen.
+		// Read-only here: the write goes through DungeonEventUpdate, which is
+		// the only request observed to carry the list.
+		field<&::LoginInfoResp::user_special_scenario_info>("special_scenario_info", {
+			.read = true,
+		}),
 	};
 }
 
@@ -57,6 +65,21 @@ PacketInterfaceFor<::UserTeamInfo>::fields()
 			.insert = true,
 		}),
 		field<&::UserTeamInfo::energy>("energy", {
+			.read = true,
+			.update = true,
+			.insert = true,
+		}),
+		// Hunter Orbs — the Frontier Gate / Frontier Hunter attempt currency.
+		// The client's own name for them is fight points; the Survey Office
+		// header renders the pair as an x/y counter.  Both were 0 on the wire
+		// until these were mapped, which is what produced "You have no Hunter
+		// Orbs left" on every gate.
+		field<&::UserTeamInfo::fight_point>("fight_point", {
+			.read = true,
+			.update = true,
+			.insert = true,
+		}),
+		field<&::UserTeamInfo::max_fight_point>("max_fight_point", {
 			.read = true,
 			.update = true,
 			.insert = true,
