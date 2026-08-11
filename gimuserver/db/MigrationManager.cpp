@@ -512,6 +512,30 @@ static void RegisterMigrations(MigrationMap& map)
 		p->execSqlSync(
 			"ALTER TABLE user_info ADD COLUMN scenario_info TEXT NOT NULL DEFAULT '';");
 	});
+
+	// The pre-mission battle-item loadout (the 5 slots on the quest-prep
+	// screen).  Previously nowhere: ItemEdit acked and discarded the
+	// selection, and UserInfo synthesised the equip list by walking the
+	// whole warehouse and emitting EVERY battle consumable the player owned,
+	// so the slots came back full of whatever happened to be in inventory
+	// order and the player's actual choice never survived.
+	//
+	// Keyed by (user_id, disp_order) — disp_order IS the slot, taken
+	// verbatim from the wire.  ItemEditRequest::createBody emits two runs
+	// into the same 71U5wzhI group: the main loadout at slot 0..n and a
+	// second run at slot+100, so the +100 band is stored as-is rather than
+	// being folded into the first.
+	migrate("11082026_CreateUserEquipItemsTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_equip_items ("
+			"user_id     TEXT    NOT NULL,"
+			"disp_order  INTEGER NOT NULL,"
+			"item_id     INTEGER NOT NULL,"
+			"item_num    INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, disp_order)"
+			");"
+		);
+	});
 }
 
 /*!

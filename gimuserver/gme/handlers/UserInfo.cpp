@@ -102,19 +102,6 @@ HANDLEF(UserInfo)
 		"user_items",
 		{ db::Lookup("user_id", identity.userId) })).data;
 
-	const auto& itemMst = theServer()->cache().itemMst();
-	const auto isBattleConsumable = [&itemMst](uint32_t itemId) {
-		for (const auto& m : itemMst)
-		{
-			if (m.id == itemId)
-			{
-				return m.item_type == 1;
-			}
-		}
-		return false;
-	};
-
-	uint32_t equipSlot = 0;
 	std::vector<UserWarehouseInfo> visibleStacks;
 	visibleStacks.reserve(warehouse.size());
 	for (auto& stack : warehouse)
@@ -136,18 +123,35 @@ HANDLEF(UserInfo)
 			});
 		}
 
-		if (isBattleConsumable(stack.item_id))
-		{
-			resp.equip_info.push_back(UserEquipItemInfo{
-				.item_id = stack.item_id,
-				.disp_order = equipSlot++,
-				.item_num = stack.item_num,
-			});
-		}
-
 		visibleStacks.push_back(std::move(stack));
 	}
 	resp.warehouse_info = std::move(visibleStacks);
+
+	// Battle-item loadout (71U5wzhI) — the 5 slots on the quest-prep screen.
+	//
+	// This is REPORTED, never derived.  It used to be synthesised here by
+	// walking the warehouse and emitting every item whose ItemMst.item_type
+	// was 1, numbering the slots by inventory order — so the prep screen came
+	// back stuffed with whatever consumables the player happened to own and the
+	// loadout they actually picked was nowhere.  ItemEdit (ruoB7bD8) now
+	// persists the player's choice and this reads it back verbatim, slot
+	// numbers included (createBody uses a +100 band for its second run, so the
+	// stored disp_order is echoed rather than renumbered).
+	{
+		const auto rows = co_await db->execSqlCoro(
+			"SELECT disp_order, item_id, item_num FROM user_equip_items"
+			" WHERE user_id=$1 ORDER BY disp_order;",
+			identity.userId);
+		resp.equip_info.reserve(rows.size());
+		for (const auto& row : rows)
+		{
+			resp.equip_info.push_back(UserEquipItemInfo{
+				.item_id    = row["item_id"].as<uint32_t>(),
+				.disp_order = row["disp_order"].as<uint32_t>(),
+				.item_num   = row["item_num"].as<uint32_t>(),
+			});
+		}
+	}
 
 	// Cleared-mission history (UT1SVg59) — THE progression driver.  The client
 	// evaluates feature unlocks against this list: F_FUNCTION_RELEASE_MST rows
