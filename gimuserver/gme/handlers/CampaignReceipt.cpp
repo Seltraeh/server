@@ -151,7 +151,7 @@ HANDLEF(CampaignReceipt)
                 for (int32_t i = 0; i < rw.target_cnt; ++i)
                     co_await gme::addUserUnit(theDb(), identity, *unit);
                 LOG_INFO << "CampaignReceipt: granted unit " << rw.target_id
-                         << " x" << rw.target_cnt << " (" << rw.name << ")";
+                         << " x" << rw.target_cnt << " (" << rw.message << ")";
                 break;
             }
             case 4:
@@ -161,7 +161,7 @@ HANDLEF(CampaignReceipt)
                     static_cast<uint32_t>(rw.target_id),
                     static_cast<uint32_t>(rw.target_cnt));
                 LOG_INFO << "CampaignReceipt: granted item " << rw.target_id
-                         << " x" << rw.target_cnt << " (" << rw.name << ")";
+                         << " x" << rw.target_cnt << " (" << rw.message << ")";
                 break;
             default:
                 LOG_WARN << "CampaignReceipt: present_type " << rw.present_type

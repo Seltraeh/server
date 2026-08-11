@@ -175,7 +175,7 @@ HANDLEF(CampaignStart)
             e.present_type = rw.present_type;
             e.target_id    = std::to_string(rw.target_id);
             e.target_cnt   = rw.target_cnt;
-            e.target_param = rw.param;
+            e.target_param = rw.target_param;
             e.reward_type  = rw.reward_type;
             resp.reward_bonus.emplace_back(std::move(e));
         }
