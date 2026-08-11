@@ -344,7 +344,10 @@ HANDLEF(UserInfo)
         bool first = true;
         auto add = [&](std::string_view key, int64_t id) { append(s, first, key, id); };
 
-        for (int i = 1; i <= 2; ++i) add("9C64Qwe0", i); // lands (cutscene gate)
+        // NOTE: Grand Gaia lands are NOT emitted here.  They are derived per
+        // request from the areas the progression gate actually permits — see
+        // the land block below.  Only the special-space lands (Frontier Gate,
+        // Vortex) are static, and they are added by their own collectors.
 
         for (int i = 1; i <= 100; ++i) add("0Cq2AlXW", i); // gates, incl. 99 (Vortex)
 
@@ -435,6 +438,29 @@ HANDLEF(UserInfo)
 
         size_t gatedAreas = 0, gatedDungeons = 0, gatedMissions = 0;
 
+        // Lands are derived from the areas we permit, never hardcoded.
+        //
+        // They used to be a static range 1-2, which was wrong in BOTH
+        // directions.  Land 2 holds exactly one area — Cordelica (20000),
+        // which needs mission 234 — so on an early save the client rendered
+        // an empty Cordelica shell on the world map with nothing enterable
+        // inside it.  Meanwhile land 100 owns area 20100 (need 0, always
+        // open), so the gate permitted that area/dungeon/mission while its
+        // parent land was never permitted — the same orphaned-topology bug
+        // the Frontier Gate block above exists to fix, one layer up.
+        //
+        // Deriving keeps the two in lockstep by construction: a land appears
+        // exactly when it has something to enter, and widens on its own as
+        // areas unlock.  This supersedes the old "widen lands incrementally
+        // once Cordelica's click-crash is solved" TODO — an empty land shell
+        // was very likely that crash.
+        //
+        // Lands are also the cutscene gate (§6.9): each visible land plays
+        // its mapN-open.txt intro on first entry.  Deriving means a fresh
+        // save sees exactly Mistral's intro, because Mistral is the only
+        // Grand Gaia land with a satisfied area.
+        std::set<int32_t> permittedLands;
+
         for (const auto& area : cache.areaMst())
         {
             if (area.area_id <= 0 || area.area_id >= kSpecialIdFloor)
@@ -443,7 +469,12 @@ HANDLEF(UserInfo)
                 continue;
             append(permitPlace, first, "VjCY7rX4", area.area_id);
             ++gatedAreas;
+            if (area.land_id > 0)
+                permittedLands.insert(area.land_id);
         }
+
+        for (const auto landId : permittedLands)
+            append(permitPlace, first, "9C64Qwe0", landId);
 
         for (const auto& dungeon : cache.dungeonMst())
         {
@@ -493,9 +524,18 @@ HANDLEF(UserInfo)
             }
         }
 
+        std::string landList;
+        for (const auto landId : permittedLands)
+        {
+            if (!landList.empty())
+                landList += ',';
+            landList += std::to_string(landId);
+        }
+
         LOG_INFO << "UserInfo: progression gate — " << cleared.size()
                  << " mission(s) cleared, permitting " << gatedAreas << " area(s), "
-                 << gatedDungeons << " dungeon(s), " << gatedMissions << " mission(s)";
+                 << gatedDungeons << " dungeon(s), " << gatedMissions << " mission(s)"
+                 << ", land(s) [" << landList << "]";
 
         // Vortex.  Gate 99 and the always-open topology are in kPermitBase; only
         // the weekday rotation has to be rebuilt per request, because a server
@@ -510,10 +550,10 @@ HANDLEF(UserInfo)
     if (pos != std::string::npos)
     {
         buffer.replace(pos, kEmptyPermit.size(), permitPlace);
-        LOG_INFO << "UserInfo: PermitPlace injected — areas 1-1000, "
-                    "lands 1-2 (cutscene gate), gates 1-100, "
-                    "missions 1-4000, dungeons 1-2000, plus Frontier Gate; Vortex open, "
-                    "rotation " << kDayNames[weekdayIndex]
+        LOG_INFO << "UserInfo: PermitPlace injected — Grand Gaia areas/lands/"
+                    "dungeons/missions gated on progress (see the line above), "
+                    "gates 1-100, plus Frontier Gate; Vortex open, rotation "
+                 << kDayNames[weekdayIndex]
                  << " = " << today.dungeons.size() << " dungeon(s)"
                  << " (" << permitPlace.size() << " bytes)";
     }
