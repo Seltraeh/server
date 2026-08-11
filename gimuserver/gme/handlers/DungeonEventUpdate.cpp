@@ -31,26 +31,45 @@ HANDLEF(DungeonEventUpdate)
             LOG_WARN << "DungeonEventUpdate: parse error: " << glz::format_error(ec, json);
     }
 
+    // Two independent markers ride in on this request and BOTH have to be kept.
+    //
+    // 9yVsu21R (special_scenario_info) is the named-intro list — "randall,
+    // frontiergate_v2,challenge,".  N4XVE1uA (scenario_info) is a separate
+    // composite marker the client grows the same way; it was observed going
+    // from "|0,0" to "0,0@0@2@1&|0,0" across sessions.  Only the first was
+    // stored until now, so UserInfo echoed N4XVE1uA back as "" every login and
+    // whatever it tracks replayed on every visit to the world map.
+    //
+    // Both are stored verbatim.  The client sends the complete marker every
+    // time and only extends it, so a union would be machinery for no
+    // behavioural difference; a shorter incoming value is treated as
+    // authoritative.  N4XVE1uA's internal format is not decoded and is not
+    // parsed here — round-tripping an opaque blob needs no schema.
     const auto& reported = req.login_info.special_scenario_info;
-    if (!reported.empty())
+    const auto& reportedScenario = req.login_info.scenario_info.value_or(std::string{});
+
+    if (!reported.empty() || !reportedScenario.empty())
     {
         try
         {
             const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
-            co_await db::DatabaseInterface::update(
-                theDb(),
-                "user_info",
-                {
-                    db::Data("special_scenario_info", reported),
-                    db::Lookup("id", identity.userId),
-                });
-            LOG_INFO << "DungeonEventUpdate: stored scene-intro list \"" << reported << "\"";
+
+            db::Cells cells{ db::Lookup("id", identity.userId) };
+            if (!reported.empty())
+                cells.emplace_back(db::Data("special_scenario_info", reported));
+            if (!reportedScenario.empty())
+                cells.emplace_back(db::Data("scenario_info", reportedScenario));
+
+            co_await db::DatabaseInterface::update(theDb(), "user_info", cells);
+
+            LOG_INFO << "DungeonEventUpdate: stored scene-intro list \"" << reported
+                     << "\", scenario marker \"" << reportedScenario << "\"";
         }
         catch (const std::exception& ex)
         {
             // Empty OK regardless — this is a best-effort side effect and the
             // client hard-crashes out of the cutscene if the request fails.
-            LOG_WARN << "DungeonEventUpdate: could not store scene-intro list: " << ex.what();
+            LOG_WARN << "DungeonEventUpdate: could not store scenario state: " << ex.what();
         }
     }
 

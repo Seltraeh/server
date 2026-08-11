@@ -4,8 +4,36 @@
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
+#include <algorithm>
 #include <ctime>
 #include <set>
+
+// The Vortex's gate id in GateMst (MST_DUNGEONS_GATE_99_NAME, type 1).  Held
+// out of PermitPlace's dense gate range so entry can be gated on progress.
+static constexpr int kVortexGateId = 99;
+
+// Boundary between Grand Gaia's numbering and everything else.  Grand Gaia's
+// areas, dungeons and missions all sit below this; Vortex (100000+), Frontier
+// Hunter (1000000+), Frontier Gate (3000000+), Trial and Grand Quest sit above
+// it and are permitted by their own blocks.  The progression gate only applies
+// below the floor, so a special subsystem is never accidentally swept into it.
+static constexpr int32_t kSpecialIdFloor = 100000;
+
+// The Vortex lock's requirement, expressed the only way the client can hold it.
+//
+// FeatureGatingHandler::shouldGateLocked is hard-wired to a level comparison —
+//     if (LevelGatingInfo::getFeatureID(v) == featureId)
+//         return UserTeamInfo::getLv(...) < LevelGatingInfo::getRequiredLevel(v);
+// — so there is no way to express "mission not cleared".  We carry the mission
+// condition as a level nobody reaches.  Neither drawing path renders the
+// number, so it is never shown to the player; it is a sentinel, not a setting.
+static constexpr uint32_t kVortexLockRequiredLevel = 9999;
+
+// Requirement type.  MUST be 1: FeatureGatingHandler::addObj bails with
+//     if (FeatureGateMst::getReqID(a2) != 1) return CCObject::release(a2);
+// before it can build the LevelGatingInfo, so any other value silently
+// discards the gate.  Not a choice — the only value that works.
+static constexpr uint32_t kVortexLockReqId = 1;
 
 HANDLEF(UserInfo)
 {
@@ -127,38 +155,11 @@ HANDLEF(UserInfo)
 	// the hardcoded early-feature gates (town etc.) key off the same set plus
 	// tutorial_status.  Backed by user_campaign_missions state=2 rows, written
 	// by MissionEnd and CampaignBattleEnd.
-	{
-		const auto rows = co_await db->execSqlCoro(
-			"SELECT mission_id, clear_count, last_cleared_at"
-			" FROM user_campaign_missions WHERE user_id = $1 AND state = 2;",
-			identity.userId);
-		for (const auto& row : rows)
-		{
-			::UserClearMissionInfo cleared = {};
-			cleared.user_id = identity.userId;
-			try
-			{
-				cleared.mission_id = std::stoi(row["mission_id"].as<std::string>());
-			}
-			catch (...)
-			{
-				continue;
-			}
-			cleared.clear_cnt = row["clear_count"].as<int32_t>();
-			if (const auto epoch = row["last_cleared_at"].as<int64_t>(); epoch > 0)
-			{
-				// setClearDate is a string setter; "YYYY-MM-DD hh:mm:ss" until a
-				// capture proves otherwise (KDL doc marks it UNVERIFIED).
-				std::tm tmv = {};
-				const time_t t = static_cast<time_t>(epoch);
-				localtime_s(&tmv, &t);
-				char buf[24] = {};
-				std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmv);
-				cleared.clear_date = buf;
-			}
-			resp.clear_mission_info.push_back(std::move(cleared));
-		}
-	}
+	//
+	// Shared with UpdateInfoLight via gme::getClearedMissions — the poll has to
+	// report the identical set or a mid-session refresh would contradict the
+	// login snapshot.
+	resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
 
 	// Favorited/locked units (3kcmQy7B) — UnitFavorite persists the flag;
 	// reporting it back makes locks survive a reload.
@@ -226,6 +227,30 @@ HANDLEF(UserInfo)
     resp.summoner_journal.user_id = identity.userId;
     resp.signal_key.key = "5EdKHavF";
 
+    // Vortex dungeon keys (eFU7Qtb0).  UserInfo is where the client first
+    // learns how many Metal / Jewel keys it holds and whether today's is
+    // claimable — the Administration Office badge is drawn from this before
+    // GetDistributeDungeonKeyInfo is ever sent.
+    //
+    // Also seeds the per-user rows on first read, so accounts that predate the
+    // dungeon-key table pick them up on their next login.
+    resp.dungeon_key_info = co_await gme::dungeonKeyState(db, identity);
+
+    // Vortex progression.  Computed here, BEFORE serialisation, because the
+    // The Vortex is NOT gated.  It is always permitted, and the server sends no
+    // FeatureGatingInfo for it.
+    //
+    // This reverses an earlier progression change of ours.  We had withheld the
+    // Vortex until a Mistral story mission was cleared and tried to draw
+    // vortex_quest_locked.png over the tiles.  Two independent things say that
+    // was wrong: the shipped GateMst gives gate 99 need_mission_id 0 (where
+    // Ishgria's gate 2 has 1577), and footage of the live game near shutdown
+    // shows the Vortex neither locked nor gated.  The lock art exists in the
+    // binary and in level_lock/, but the live game did not use it here.
+    //
+    // Feature gating itself is a real, game-wide system — see handbook §8.40;
+    // it drives Randall town, Daily Task, the Arena/Home "NEW" badges and the
+    // level-up unlock popups.  Only the Vortex rows are gone.
 
     std::string buffer{};
     const auto& ec2 = glz::write_json(resp, buffer);
@@ -279,25 +304,49 @@ HANDLEF(UserInfo)
     // catalog references — 94 gates contribute ~150 entries, against the ~7100
     // the dense ranges already emit.
     static constexpr std::string_view kEmptyPermit = R"("yXNM8kL3":[])";
-    static const std::string kFullPermit = []() {
+
+    // Appends one {"<key>":"<id>"} permit entry.  `first` guards the comma; the
+    // static base below always emits at least one entry, so the per-request
+    // suffix can assume it is never the first.
+    const auto append = [](std::string& s, bool& first, std::string_view key, int64_t id) {
+        if (!first) s += ',';
+        s += "{\"";
+        s += key;
+        s += "\":\"";
+        s += std::to_string(id);
+        s += "\"}";
+        first = false;
+    };
+
+    // Everything that never changes between requests, built once and reused.
+    // Deliberately left UNCLOSED — the Vortex weekday rotation is appended per
+    // request below and the ']' goes on after it.
+    // PROGRESSION GATE (added 2026-08-09).  The dense ranges described above
+    // permitted the WHOLE Grand Gaia numbering space unconditionally, which is
+    // why every Mistral area and every mission inside it showed up as "NEW" on
+    // a save with nothing cleared.  The real game reveals one dungeon at a
+    // time.
+    //
+    // The rule is in the data: MissionMst, DungeonMst and AreaMst all carry
+    // need_mission_id (HSRhkf70), and Mistral is a strict chain through it —
+    // mission 1 need 0, 2 need 1, 10 need 2, ... 85 need 84; dungeon 20 need
+    // 12, 30 need 23; area "Morgan" need 85.  So the gated topology is emitted
+    // per request against the player's cleared set instead of as a static
+    // range.  Restricted to ids below kSpecialIdFloor: everything above it is
+    // Vortex / Frontier Gate / Trial, which have their own blocks below and
+    // must not be swept in here.
+    //
+    // Only the parts that cannot vary by progress stay static.
+    static const std::string kPermitBase = [&append]() {
         std::string s;
-        s.reserve(220'000);
+        s.reserve(32'000);
         s += R"("yXNM8kL3":[)";
         bool first = true;
-        auto add = [&](std::string_view key, int64_t id) {
-            if (!first) s += ',';
-            s += "{\"";
-            s += key;
-            s += "\":\"";
-            s += std::to_string(id);
-            s += "\"}";
-            first = false;
-        };
-        for (int i = 1; i <= 1000; ++i) add("VjCY7rX4", i); // areas    (topology)
-        for (int i = 1; i <=    2; ++i) add("9C64Qwe0", i); // lands    (cutscene gate)
-        for (int i = 1; i <=  100; ++i) add("0Cq2AlXW", i); // gates
-        for (int i = 1; i <= 4000; ++i) add("j28VNcUW", i); // missions
-        for (int i = 1; i <= 2000; ++i) add("MHx05sXt", i); // dungeons
+        auto add = [&](std::string_view key, int64_t id) { append(s, first, key, id); };
+
+        for (int i = 1; i <= 2; ++i) add("9C64Qwe0", i); // lands (cutscene gate)
+
+        for (int i = 1; i <= 100; ++i) add("0Cq2AlXW", i); // gates, incl. 99 (Vortex)
 
         // Frontier Gate's own topology.  Collected at boot in ServerCache — see
         // frontierGatePermits() for why the gates' dungeons alone were not
@@ -311,22 +360,198 @@ HANDLEF(UserInfo)
         for (const auto id : fg.dungeons) add("MHx05sXt", id);
         for (const auto id : fg.missions) add("j28VNcUW", id);
 
-        s += ']';
+        // VORTEX (added 2026-08-08): the same story a third time.  Vortex is
+        // gate 99 / land 99 with area ids 100000-101800, dungeons 100000-102920
+        // and missions 100000-102923 — so 88 of 88 areas, 104 of 104 dungeons
+        // and 292 of 292 missions sat outside the dense ranges above.  Nothing
+        // was permitted, so the Vortex rendered with no tiles at all.
+        //
+        // Collected at boot in ServerCache (see vortexPermits()) and scoped to
+        // the Vortex block rather than all of land 99, which would also open
+        // Frontier Hunter, Trial and Grand Quest.  ~494 entries.
+        //
+        // Only the always-open content lives here.  The weekday rotation is
+        // appended per request below, since this base is built once.
+        const auto& vx = theServer()->cache().vortexPermits();
+        for (const auto id : vx.lands)    add("9C64Qwe0", id);
+        for (const auto id : vx.areas)    add("VjCY7rX4", id);
+        for (const auto id : vx.dungeons) add("MHx05sXt", id);
+        for (const auto id : vx.missions) add("j28VNcUW", id);
+
         return s;
     }();
+
+    // Today's Vortex rotation.  Appended per request rather than baked into the
+    // static base above: a server left running across midnight would otherwise
+    // keep yesterday's dungeon open until it was restarted.
+    //
+    // Local time, not UTC — the rotation is what the player sees as "today",
+    // and the rest of the server already reads wall-clock local time (see
+    // GimuServer::tryOpenHttpDumpLog).  tm_wday is 0 = Sunday, so it is
+    // remapped to the 0 = Monday indexing vortexDayPermits() uses.
+    // std::localtime shares a static buffer, matching existing usage; a torn
+    // read across midnight would at worst serve the wrong day for one request.
+    const auto now = std::time(nullptr);
+    const auto local = *std::localtime(&now);
+    const size_t weekdayIndex = static_cast<size_t>((local.tm_wday + 6) % 7);
+
+    static constexpr std::string_view kDayNames[] = {
+        "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+    };
+
+    const auto& today = theServer()->cache().vortexDayPermits(weekdayIndex);
+    std::string permitPlace = kPermitBase;
+    {
+        bool first = false; // the base always emitted entries
+
+        // --- Grand Gaia, gated on progress -------------------------------
+        std::set<int32_t> cleared;
+        for (const auto& done : resp.clear_mission_info)
+            cleared.insert(done.mission_id);
+
+        const auto& cache = theServer()->cache();
+        const auto& needs = cache.missionNeeds();
+
+        // ANY prerequisite satisfied is enough, not ALL.  99% of rows carry a
+        // single id so the distinction is moot there; the 36 comma-pair rows
+        // are the open question, and this is the direction that fails SAFE —
+        // guessing ALL on something that meant ANY would make content
+        // permanently unreachable, which on a preservation server is the worse
+        // error.  // UNVERIFIED: no capture distinguishes the two.
+        const auto satisfied = [&cleared](const auto& list) {
+            if (list.empty())
+                return true;
+            bool anyReal = false;
+            for (const auto need : list)
+            {
+                if (need == 0)
+                    return true;         // 0 = no prerequisite
+                anyReal = true;
+                if (cleared.count(need))
+                    return true;
+            }
+            return !anyReal;
+        };
+
+        size_t gatedAreas = 0, gatedDungeons = 0, gatedMissions = 0;
+
+        for (const auto& area : cache.areaMst())
+        {
+            if (area.area_id <= 0 || area.area_id >= kSpecialIdFloor)
+                continue;
+            if (!satisfied(area.need_mission_id))
+                continue;
+            append(permitPlace, first, "VjCY7rX4", area.area_id);
+            ++gatedAreas;
+        }
+
+        for (const auto& dungeon : cache.dungeonMst())
+        {
+            if (dungeon.dungeon_id <= 0 || dungeon.dungeon_id >= kSpecialIdFloor)
+                continue;
+            if (!satisfied(dungeon.need_mission_id))
+                continue;
+            append(permitPlace, first, "MHx05sXt", dungeon.dungeon_id);
+            ++gatedDungeons;
+
+            // Missions live under their dungeon.  A mission with no entry in
+            // missionNeeds() has no prerequisite and is always available.
+            const auto it = cache.missionsByDungeon().find(dungeon.dungeon_id);
+            if (it == cache.missionsByDungeon().end())
+                continue;
+
+            // THE ENTRY MISSION IS ALWAYS PERMITTED.  Access is controlled at
+            // the DUNGEON level; the chain inside it only controls order.
+            //
+            // Without this a dungeon can be visible with nothing enterable:
+            // Mistral's first playable dungeon holds missions 10/11/12, and
+            // mission 10 needs mission 2 — which lives in the tutorial dungeon.
+            // A save whose clear history was wiped (debug `resetmap`, or any
+            // account that never recorded the tutorial) therefore saw the
+            // dungeon rendered with an empty quest list, which the client
+            // labels "CLEAR".  Same for dungeon 80: it only becomes visible
+            // once mission 73 is cleared, and its own first mission 81 needs
+            // exactly that, so permitting it adds nothing that the dungeon
+            // gate did not already allow.
+            //
+            // m_missionsByDungeon is sorted ascending at boot, and mission ids
+            // ascend with disp_order within a dungeon, so front() is the entry.
+            const auto entryMission = it->second.empty() ? 0 : it->second.front();
+
+            for (const auto missionId : it->second)
+            {
+                if (missionId <= 0 || missionId >= kSpecialIdFloor)
+                    continue;
+                if (missionId != entryMission)
+                {
+                    const auto need = needs.find(missionId);
+                    if (need != needs.end() && !satisfied(need->second))
+                        continue;
+                }
+                append(permitPlace, first, "j28VNcUW", missionId);
+                ++gatedMissions;
+            }
+        }
+
+        LOG_INFO << "UserInfo: progression gate — " << cleared.size()
+                 << " mission(s) cleared, permitting " << gatedAreas << " area(s), "
+                 << gatedDungeons << " dungeon(s), " << gatedMissions << " mission(s)";
+
+        // Vortex.  Gate 99 and the always-open topology are in kPermitBase; only
+        // the weekday rotation has to be rebuilt per request, because a server
+        // running across midnight would otherwise keep serving yesterday's list.
+        for (const auto id : today.dungeons) append(permitPlace, first, "MHx05sXt", id);
+        for (const auto id : today.missions) append(permitPlace, first, "j28VNcUW", id);
+
+        permitPlace += ']';
+    }
 
     const auto pos = buffer.find(kEmptyPermit);
     if (pos != std::string::npos)
     {
-        buffer.replace(pos, kEmptyPermit.size(), kFullPermit);
+        buffer.replace(pos, kEmptyPermit.size(), permitPlace);
         LOG_INFO << "UserInfo: PermitPlace injected — areas 1-1000, "
                     "lands 1-2 (cutscene gate), gates 1-100, "
-                    "missions 1-4000, dungeons 1-2000 ("
-                 << kFullPermit.size() << " bytes)";
+                    "missions 1-4000, dungeons 1-2000, plus Frontier Gate; Vortex open, "
+                    "rotation " << kDayNames[weekdayIndex]
+                 << " = " << today.dungeons.size() << " dungeon(s)"
+                 << " (" << permitPlace.size() << " bytes)";
     }
     else
         LOG_WARN << "UserInfo: yXNM8kL3 token not found in serialised buffer — PermitPlace not injected";
 
+    // Emit per-user Unit Selector Gacha info (CGHaOZda) so the "use ticket"
+    // button appears on selector banners. Hypothesis (from the CGHaOZda readParam
+    // audit + handbook §7.11.5-7, which investigated but never solved the hidden
+    // button): the client gates the button on a non-empty UnitSelectorGachaUserInfo
+    // array, and our server never emitted it — this is the untried fix. Each entry
+    // is {XIvaD6Jp selector_id, H6k1LIxC remaining count}.
+    //
+    // EXPERIMENT: emits every selector from the catalog with count 1 to test
+    // whether emitting CGHaOZda at all restores the button. Once confirmed, narrow
+    // to the selectors the user actually holds V2 tickets for, with real counts.
+    {
+        const auto& selectors = theServer()->cache().unitSelectorGacha();
+        std::string sel = R"("CGHaOZda":[)";
+        bool first = true;
+        for (const auto& s : selectors)
+        {
+            if (!first) sel += ',';
+            sel += R"({"XIvaD6Jp":")" + std::to_string(s.selector_id)
+                 + R"(","H6k1LIxC":"1"})";
+            first = false;
+        }
+        sel += ']';
+
+        // Insert as a top-level field before the closing brace of the root object.
+        const auto pos = buffer.rfind('}');
+        if (pos != std::string::npos && !selectors.empty())
+        {
+            buffer.insert(pos, "," + sel);
+            LOG_INFO << "UserInfo: emitted CGHaOZda selector info for "
+                     << selectors.size() << " selectors (button-visibility experiment)";
+        }
+    }
 
     co_return HandleResult::success(buffer);
 }

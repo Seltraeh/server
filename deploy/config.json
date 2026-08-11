@@ -64,7 +64,12 @@
 					"initial_bcoins": 0,
 					// Client render-loop cap delivered to the offline-proxy via
 					// GET /offline_mod/fps_cap. 0 disables the client-side cap.
-					"fps_cap": 60
+					"fps_cap": 60,
+					// Vortex weekday rotation: when true, Sat/Sun open every
+					// weekday dungeon instead of only 100300 "Garden of God".
+					// The shipped MST only describes the latter, so this is off
+					// by default -- flip it for the remembered live behaviour.
+					"vortex_weekend_opens_all": false
                 }
             }
         }

@@ -8,6 +8,63 @@
 #include <algorithm>
 #include <unordered_map>
 
+// Vortex topology bounds, used to collect m_vortexPermits at boot.
+//
+// Land 99 is the catch-all "special content" land shared by Vortex, Frontier
+// Hunter (area 1000000+), Frontier Gate (3000000+) and Grand Quest (5000000+);
+// the Vortex block itself is the low area range.  Verified against
+// deploy/mst/area_mst.json: 88 land-99 areas sit below 200000 (100000
+// "Gathering of Souls" .. 101800 "In the Name of Thunder") and the next one up
+// is 700000 "A Dark Ritual", so the cut is wide.
+static constexpr int32_t kVortexLandId = 99;
+static constexpr int32_t kVortexAreaIdMax = 200000;
+
+/*!
+* Weekday mask for a Vortex dungeon, from its banner filename.
+*
+* Bit 0 = Monday .. bit 6 = Sunday; 0 means "no weekday token", i.e. the
+* dungeon is not part of the rotation and stays permanently open.
+*
+* The banner is the ONLY day signal the shipped data carries — DungeonMst has
+* no day column.  It arrives in the field the KDL calls `room_asset`
+* (hash 21VKZo0E), which is a misnomer: every Vortex row holds an
+* `sp_quest_banner_*.png`, not a room asset.  Left alone rather than renamed
+* because renaming means regenerating all.hpp through the submodule.
+*
+* Real values are `sp_quest_banner_monday.png`, `..._monday2.png`,
+* `..._thursday2.png`, `..._weekend2.png` and friends, so the day token is
+* matched as a prefix and any trailing revision digit ignored.  Verified
+* against deploy/mst/dungeon_mst.json: of the 110 Vortex dungeons exactly 7
+* match, and no non-weekday banner begins with a weekday token.
+*/
+static uint8_t VortexDayMaskFromBanner(std::string_view banner)
+{
+	static constexpr std::string_view kPrefix = "sp_quest_banner_";
+	if (!banner.starts_with(kPrefix))
+		return 0;
+	banner.remove_prefix(kPrefix.size());
+
+	struct DayToken { std::string_view token; uint8_t mask; };
+	static constexpr DayToken kDays[] = {
+		{ "monday",    1 << 0 },
+		{ "tuesday",   1 << 1 },
+		{ "wednesday", 1 << 2 },
+		{ "thursday",  1 << 3 },
+		{ "friday",    1 << 4 },
+		{ "saturday",  1 << 5 },
+		{ "sunday",    1 << 6 },
+		// The shipped data has no saturday/sunday banners; the weekend is a
+		// single dungeon carrying this token.
+		{ "weekend",   (1 << 5) | (1 << 6) },
+	};
+
+	for (const auto& [token, mask] : kDays)
+		if (banner.starts_with(token))
+			return mask;
+
+	return 0;
+}
+
 /*!
 * Builds a JSON
 * @param[in] d Template class to write
@@ -39,6 +96,10 @@ void ServerCache::Setup(const Json::Value& serverObj)
 	// the proxy's compile-time default); 0 disables the cap entirely.
 	m_serverConfig.fpsCap = serverObj.get("fps_cap", 60u).asUInt();
 
+	// See ServerConfig::vortexWeekendOpensAll — off by default because the
+	// shipped MST gives the weekend its own dungeon rather than opening the
+	// weekday ones.
+	m_serverConfig.vortexWeekendOpensAll = serverObj.get("vortex_weekend_opens_all", false).asBool();
 
 	{
 		GameDls dls{};
@@ -215,7 +276,19 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		{
 			const auto missions = LoadJson<MissionMstCache>(mstRoot, "mission_mst.json").data;
 			for (const auto& mission : missions)
+			{
 				m_missionsByDungeon[mission.dungeon_id].push_back(mission.id);
+
+				// Prerequisites, for PermitPlace's progression gate.  Kept as
+				// its own index for the same reason as the one above: the
+				// rows themselves are dropped, and this is two ints wide.
+				std::vector<int32_t> needs;
+				for (const auto need : mission.need_mission_id)
+					if (need != 0)
+						needs.push_back(need);
+				if (!needs.empty())
+					m_missionNeeds.emplace(mission.id, std::move(needs));
+			}
 			for (auto& [dungeonId, ids] : m_missionsByDungeon)
 				std::sort(ids.begin(), ids.end());
 			LOG_INFO << "ServerCache: indexed " << missions.size() << " missions across "
@@ -247,6 +320,12 @@ void ServerCache::Setup(const Json::Value& serverObj)
 					m_frontierGatePermits.dungeons.insert(gate.dungeon_id);
 				if (gate.need_mission_id != 0)
 					m_frontierGatePermits.missions.insert(gate.need_mission_id);
+
+				// Guard the 0 case as well as the miss: MissionMst's sentinel
+				// row is id 0 in dungeon 0, so a gate with no dungeon would
+				// otherwise pull that sentinel into the permit list.
+				if (gate.dungeon_id == 0)
+					continue;
 
 				const auto it = m_missionsByDungeon.find(gate.dungeon_id);
 				if (it == m_missionsByDungeon.end())
@@ -311,6 +390,95 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_gateMst = LoadJson<GateMstCache>(mstRoot, "gate_mst.json").data;
 		m_areaMst = LoadJson<AreaMstCache>(mstRoot, "area_mst.json").data;
 		m_dungeonMst = LoadJson<DungeonMstCache>(mstRoot, "dungeon_mst.json").data;
+
+		// Everything PermitPlace must allow before the Vortex draws a tile.
+		// See vortexPermits() for why this is scoped rather than a widening.
+		//
+		// Runs here, after the geography load, rather than in the mission block
+		// above: the mission rows are dropped there, but m_missionsByDungeon
+		// survives and is all this needs to walk dungeon -> missions.
+		{
+			for (const auto& area : m_areaMst)
+				if (area.land_id == kVortexLandId && area.area_id < kVortexAreaIdMax)
+					m_vortexPermits.areas.insert(area.area_id);
+
+			for (const auto& dungeon : m_dungeonMst)
+			{
+				if (dungeon.land_id != kVortexLandId || dungeon.area_id >= kVortexAreaIdMax)
+					continue;
+
+				// The area is permitted unconditionally even for a rotating
+				// dungeon, so the area tile stays put and only the dungeon
+				// inside it comes and goes.
+				m_vortexPermits.areas.insert(dungeon.area_id);
+
+				const auto dayMask = VortexDayMaskFromBanner(dungeon.room_asset);
+
+				// Not in the rotation -> permanently open.
+				if (dayMask == 0)
+					m_vortexPermits.dungeons.insert(dungeon.dungeon_id);
+
+				const auto it = m_missionsByDungeon.find(dungeon.dungeon_id);
+				const auto* missionIds =
+					it == m_missionsByDungeon.end() ? nullptr : &it->second;
+
+				if (dayMask == 0)
+				{
+					if (missionIds)
+						for (const auto missionId : *missionIds)
+							m_vortexPermits.missions.insert(missionId);
+					continue;
+				}
+
+				for (size_t day = 0; day < m_vortexDayPermits.size(); ++day)
+				{
+					if ((dayMask & (1u << day)) == 0)
+						continue;
+
+					auto& permits = m_vortexDayPermits[day];
+					permits.dungeons.insert(dungeon.dungeon_id);
+					if (missionIds)
+						for (const auto missionId : *missionIds)
+							permits.missions.insert(missionId);
+				}
+			}
+
+			// Player recollection is that weekends opened every weekday
+			// dungeon; the shipped MST only gives the weekend its own.  Fold
+			// Mon-Fri into Sat/Sun when the operator asks for the former.
+			if (m_serverConfig.vortexWeekendOpensAll)
+			{
+				for (size_t day = 5; day < m_vortexDayPermits.size(); ++day)
+					for (size_t weekday = 0; weekday < 5; ++weekday)
+					{
+						m_vortexDayPermits[day].dungeons.insert(
+							m_vortexDayPermits[weekday].dungeons.begin(),
+							m_vortexDayPermits[weekday].dungeons.end());
+						m_vortexDayPermits[day].missions.insert(
+							m_vortexDayPermits[weekday].missions.begin(),
+							m_vortexDayPermits[weekday].missions.end());
+					}
+			}
+
+			if (!m_vortexPermits.areas.empty())
+				m_vortexPermits.lands.insert(kVortexLandId);
+
+			LOG_INFO << "ServerCache: Vortex permits — "
+			         << m_vortexPermits.lands.size() << " land(s), "
+			         << m_vortexPermits.areas.size() << " area(s), "
+			         << m_vortexPermits.dungeons.size() << " always-open dungeon(s), "
+			         << m_vortexPermits.missions.size() << " always-open mission(s)";
+
+			static constexpr std::string_view kDayNames[] = {
+				"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
+			};
+			for (size_t day = 0; day < m_vortexDayPermits.size(); ++day)
+				LOG_INFO << "ServerCache: Vortex rotation " << kDayNames[day] << " — "
+				         << m_vortexDayPermits[day].dungeons.size() << " dungeon(s), "
+				         << m_vortexDayPermits[day].missions.size() << " mission(s)"
+				         << (m_serverConfig.vortexWeekendOpensAll && day >= 5
+				             ? "  (weekend-opens-all)" : "");
+		}
 
 		// Shop / medal / help / fixed-PvP singletons — see mst/shop.kdl.
 		m_shopItemMst = LoadJson<ShopItemMstCache>(mstRoot, "shop_item_mst.json").data;

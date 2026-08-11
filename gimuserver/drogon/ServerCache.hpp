@@ -2,6 +2,7 @@
 
 #include "ServerConfig.hpp"
 
+#include <array>
 #include <map>
 #include <set>
 #include <vector>
@@ -41,6 +42,15 @@ public:
 	* @return User info response
 	*/
 	inline const auto& userInfoResp() const { return m_userrsp; }
+
+	/*!
+	* Vortex dungeon-key catalog (Metal / Jewel / Imp).
+	*
+	* A view onto the copy already held for the Initialize response rather than
+	* a second vector — the client is sent this table verbatim, so there is only
+	* ever one authoritative copy.  Consumers: the DungeonKey handlers.
+	*/
+	inline const auto& dungeonKeyMst() const { return m_initrsp.dungeon_keys; }
 
 	/*!
 	* Gets the cached summon list response.
@@ -172,6 +182,19 @@ public:
 	inline const auto& missionsByDungeon() const { return m_missionsByDungeon; }
 
 	/*!
+	* mission id -> the missions that must be cleared before it unlocks.
+	*
+	* Only missions WITH a prerequisite appear; an absent entry means the
+	* mission is available from the start. Derived from MissionMst's
+	* need_mission_id, the same field AreaMst and DungeonMst use, which encodes
+	* Grand Gaia's progression graph (Mistral runs 1 -> 2 -> 10 -> ... -> 85,
+	* and area "Morgan" needs 85).
+	*
+	* Consumer: UserInfo's PermitPlace progression gate.
+	*/
+	inline const auto& missionNeeds() const { return m_missionNeeds; }
+
+	/*!
 	* Id of the Frontier Hunter event currently advertised as running.
 	*
 	* Every row in challenge_mst.json (F_FROGATE's sibling, F_FROHUN_MST) is a
@@ -193,14 +216,65 @@ public:
 	* Collected per gate at boot so the permit list grows by the ~100 ids
 	* Frontier Gate needs rather than by a blanket widening.
 	*/
-	struct FrontierGatePermits
+	struct TopologyPermits
 	{
 		std::set<int32_t> lands;
 		std::set<int32_t> areas;
 		std::set<int32_t> dungeons;
 		std::set<int32_t> missions;
 	};
-	inline const FrontierGatePermits& frontierGatePermits() const { return m_frontierGatePermits; }
+	inline const TopologyPermits& frontierGatePermits() const { return m_frontierGatePermits; }
+
+	/*!
+	* Ids PermitPlace must allow before the Vortex (gate 99) renders any tile.
+	*
+	* Same failure as Frontier Gate above, one subsystem over: Vortex content
+	* lives in land 99 with area ids 100000-101999, dungeon ids 100000-102999
+	* and mission ids 100000-102999, so **every** one of its 88 areas, 104
+	* dungeons and 292 missions falls outside UserInfo's dense Grand Gaia
+	* ranges (lands 1-2, areas 1-1000, dungeons 1-2000, missions 1-4000).
+	* Nothing was permitted, so the client had nothing to draw -- the reported
+	* "no tiles in Vortex".
+	*
+	* Land 99 is not Vortex alone: it is the catch-all "special content" land
+	* that also holds Frontier Hunter (area 1000000+), Frontier Gate (3000000+)
+	* and Grand Quest (5000000+).  Scoped to area id < 200000 so this permits
+	* the Vortex block only -- 494 entries against the ~7100 the dense ranges
+	* already emit -- rather than blanket-opening every special subsystem.
+	*
+	* This set is the ALWAYS-OPEN portion: the land, every Vortex area, and the
+	* 103 dungeons that carry no weekday banner (collab/event/frog/goddess
+	* content, plus the two key-gated parades).  The 7 weekday dungeons live in
+	* vortexDayPermits() instead.
+	*/
+	inline const TopologyPermits& vortexPermits() const { return m_vortexPermits; }
+
+	/*!
+	* The Vortex weekday rotation, indexed 0 = Monday .. 6 = Sunday.
+	*
+	* Only dungeons and missions -- the parent areas are permitted
+	* unconditionally by vortexPermits() so the area tile stays on the map and
+	* only the dungeon tile inside it appears and disappears, which is how the
+	* rotation reads in-game.
+	*
+	* The schedule is NOT in any MST: DungeonMst has no day column (every one
+	* was checked).  The only day signal the shipped data carries is the banner
+	* filename -- sp_quest_banner_{monday,tuesday,...,weekend}N.png -- so that
+	* is what this is derived from at boot.  Seven dungeons match:
+	*
+	*   Mon  100000 Gathering of Souls    Mon  100050 Souls Training Ground
+	*   Tue  100100 Faerie Paradise       Wed  100200 Cave of Greed
+	*   Thu  100500 Golden Slumberland    Fri  100400 Remains of Eternity
+	*   Sat+Sun 100300 Garden of God
+	*
+	* Note the shipped data gives the weekend its OWN dungeon rather than
+	* opening the weekday ones -- see ServerConfig::vortexWeekendOpensAll for
+	* the switch that overrides that.
+	*/
+	inline const TopologyPermits& vortexDayPermits(size_t weekdayIndex) const
+	{
+		return m_vortexDayPermits.at(weekdayIndex);
+	}
 
 	/*!
 	* Summoner Unit master data — the player avatar's level curve, per-element
@@ -371,12 +445,25 @@ private:
 	// the rows themselves are not retained.  Consumer: FrontierGateInfo.
 	std::map<int32_t, std::vector<int32_t>> m_missionsByDungeon;
 
+	// mission id -> prerequisite mission ids.  Only missions that HAVE a
+	// prerequisite are present.  Consumer: UserInfo's PermitPlace gate.
+	std::map<int32_t, std::vector<int32_t>> m_missionNeeds;
+
 	// Frontier Hunter event kept open by Setup().  Consumer: ChallengeBase.
 	int32_t m_activeChallengeId = 0;
 
 	// Land/area/dungeon/mission ids Frontier Gate needs permitted.
 	// Consumer: UserInfo's PermitPlace injection.
-	FrontierGatePermits m_frontierGatePermits;
+	TopologyPermits m_frontierGatePermits;
+
+	// Land/area/dungeon/mission ids the Vortex (gate 99) needs permitted.
+	// Consumer: UserInfo's PermitPlace injection.
+	TopologyPermits m_vortexPermits;
+
+	// The Vortex weekday rotation, 0 = Monday .. 6 = Sunday.  Dungeons and
+	// missions only; areas stay in m_vortexPermits.
+	// Consumer: UserInfo's PermitPlace injection.
+	std::array<TopologyPermits, 7> m_vortexDayPermits;
 
 	// Summoner Unit — mst/summoner.kdl
 	std::vector<SummonerAbilityMst> m_summonerAbilityMst;

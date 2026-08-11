@@ -39,6 +39,13 @@ PacketInterfaceFor<::LoginInfoResp>::fields()
 		field<&::LoginInfoResp::user_special_scenario_info>("special_scenario_info", {
 			.read = true,
 		}),
+		// N4XVE1uA — the composite scenario marker, the sibling of
+		// special_scenario_info above.  Read-only here for the same reason:
+		// DungeonEventUpdate owns the write, this just echoes it back so the
+		// client sees its own state again next login.
+		field<&::LoginInfoResp::user_scenario_info>("scenario_info", {
+			.read = true,
+		}),
 	};
 }
 
@@ -363,6 +370,46 @@ PacketInterfaceFor<::UserPartyDeckInfo>::fields()
 		}),
 		field<&::UserPartyDeckInfo::disp_order>("disp_order", {
 			.read = true,
+			.insert = true,
+		}),
+	};
+}
+
+/*!
+* Database mapping for Vortex dungeon keys stored in user_dungeon_keys.
+*
+* Only the durable columns are declared.  receipt_possible_flg and
+* next_receipt_possible_date are response-only — they are recomputed from the
+* calendar on every request (see gme::dungeonKeyState) and deliberately have no
+* column, so they must not participate in read/insert/update.  cnt is omitted
+* entirely while its semantic is unresolved.
+*/
+template <>
+inline PacketInterfaceFor<::UserDungeonKeyInfo>::Fields
+PacketInterfaceFor<::UserDungeonKeyInfo>::fields()
+{
+	return {
+		field<&::UserDungeonKeyInfo::user_id>("user_id", {
+			.read = true,
+			.insert = true,
+		}),
+		field<&::UserDungeonKeyInfo::dungeon_key_id>("dungeon_key_id", {
+			.read = true,
+			.insert = true,
+		}),
+		field<&::UserDungeonKeyInfo::possession>("possession", {
+			.read = true,
+			.update = true,
+			.insert = true,
+		}),
+		field<&::UserDungeonKeyInfo::last_receipt_day>("last_receipt_day", {
+			.read = true,
+			.update = true,
+			.insert = true,
+		}),
+		field<&::UserDungeonKeyInfo::active_type>("active_type", {
+			.read = true,
+			.update = true,
 			.insert = true,
 		}),
 	};

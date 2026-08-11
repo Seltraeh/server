@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
 // UnitEvo — evolve a unit into its next form.
@@ -25,8 +26,12 @@
 
 // The response struct (UnitEvoResp) and its entries (EvoResultEntry under
 // I82p0wCL, the shared UnitReinforceEntry under xZH6EIQ7) are generated from
-// packet-generator/assets/net/{handlers,unit}.kdl.  unit_update rides
-// UserUnitInfo under qC2tJs4E; team_info rides UserTeamInfo under fEi17cnx.
+// packet-generator/assets/net/{handlers,unit}.kdl.  unit_refresh rides
+// UserUnitInfo under 4ceMWH6k; team_info rides UserTeamInfo under fEi17cnx.
+//
+// NOTE: this handler must NOT populate ope_result (1ZbHB6Im).  UnitOpeResult is
+// a singleton whose only scene consumer is UnitMixPlayScene::parseMixResult —
+// the evolution result screen reads UnitEvoInfo (I82p0wCL) instead.
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -196,51 +201,47 @@ HANDLEF(UnitEvo)
     UnitEvoResp resp = {};
 
     {
+        // UnitOpeEvoResponse::readParam builds a UnitEvoInfo from five keys and
+        // commits it with UnitEvoInfoList::addObject.  All five verified against
+        // the strcmp chain — do not infer these from field order.
         EvoResultEntry er = {};
-        er.evolved_unit_id = targetMstId;   // pn16CNah — the unit it evolved INTO
-        er.user_unit_id    = baseId;         // edy7fq3L — DB instance id
-        er.orig_mst_id     = origMstId;      // t9FEW2KC — original ("before") MST id for evo animation
+        er.evolved_unit_id     = targetMstId;  // pn16CNah — setUnitID, the form evolved INTO
+        er.user_unit_id        = baseId;       // edy7fq3L — setUserUnitID
+        er.orig_mst_id         = origMstId;    // t9FEW2KC — setUnitIDBefore, drives the evo animation
+        er.user_unit_id_before = baseId;       // u1ECvfg8 — setUserUnitIDBefore; we evolve the row
+                                               //            in place, so it is the same instance
+        // er.evolution_type   — dV3qji4I / setEvolutionType.  Domain undecoded;
+        //                       left at 0 rather than guessed.  See EvoResultEntry.
         resp.evo_result.emplace_back(er);
     }
 
-    {
-        UserUnitInfo ud = {};
-        ud.user_id             = std::string(kUserId);
-        ud.user_unit_id        = br["user_unit_id"].as<int32_t>();
-        ud.unit_id             = targetMstId;
-        ud.unit_type_id        = br["unit_type_id"].as<int32_t>();
-        ud.unit_lvl             = 1;
-        ud.exp                 = 0;
-        ud.total_exp           = 0;
-        ud.base_hp             = targetMst->min_hp;
-        ud.add_hp              = keepAddHp;
-        ud.ext_hp              = br["ext_hp"].as<int32_t>();
-        ud.limit_over_hp       = br["limit_over_hp"].as<int32_t>();
-        ud.base_atk            = targetMst->min_atk;
-        ud.add_atk             = keepAddAtk;
-        ud.ext_atk             = br["ext_atk"].as<int32_t>();
-        ud.limit_over_atk      = br["limit_over_atk"].as<int32_t>();
-        ud.base_def            = targetMst->min_def;
-        ud.add_def             = keepAddDef;
-        ud.ext_def             = br["ext_def"].as<int32_t>();
-        ud.limit_over_def      = br["limit_over_def"].as<int32_t>();
-        ud.base_rec           = targetMst->min_rec;
-        ud.add_rec            = keepAddHeal;
-        ud.ext_rec            = br["ext_rec"].as<int32_t>();
-        ud.limit_over_rec     = br["limit_over_rec"].as<int32_t>();
-        ud.element             = newElement;
-        ud.leader_skill_id     = targetMst->leader_skill_id;
-        ud.bb_id            = std::to_string(targetMst->skill_id);
-        ud.bb_lvl            = 1;
-        ud.sbb_id      = std::to_string(targetMst->extra_skill_id);
-        ud.sbb_lvl      = 0;
-        ud.equipitem_id        = br["eqip_item_id"].as<int32_t>();
-        ud.equipitem_frame_id  = br["eqip_item_frame_id"].as<int32_t>();
-        ud.equipitem_id2       = br["eqip_item_id2"].as<int32_t>();
-        ud.equipitem_frame_id2 = br["eqip_item_frame_id2"].as<int32_t>();
-        ud.is_new            = true;
-        resp.unit_update.emplace_back(std::move(ud));
-    }
+    // FULL-REPLACE THE UNIT CACHE (4ceMWH6k), exactly as UnitMix does.
+    //
+    // This replaces a hand-assembled UserUnitInfo that went out under qC2tJs4E,
+    // which was wrong twice over:
+    //
+    //   1. qC2tJs4E is INSERT-IF-ABSENT.  readParam's tail asks
+    //      UserUnitInfoList::exist() and returns WITHOUT committing when the
+    //      client already owns the unit — and evolution updates the row in
+    //      place, so the id is always already owned.  The entry was discarded
+    //      every time; the evolved form only appeared after a trip to Home.
+    //   2. Hand-assembly silently drops fields that are not plain columns.
+    //      `received_order` is the known one: the schema maps it onto the
+    //      user_unit_id column, so nothing in a SELECT looks missing and it
+    //      goes out as 0.  Reading back through PacketInterfaceFor gives the
+    //      byte-identical shape login sends, and cannot drift as fields are
+    //      added to UserUnitInfo.
+    //
+    // The DB writes above have already landed, so this reflects the evolved
+    // unit_id, the reset level/exp, the new base stats and the deleted
+    // materials.
+    resp.unit_refresh = std::move((co_await db::PacketInterfaceFor<::UserUnitInfo>::read(
+        theDb(),
+        "user_units",
+        { db::Lookup("user_id", std::string(kUserId)) })).data);
+
+    LOG_INFO << "UnitEvo: full-replace unit cache — " << resp.unit_refresh->size()
+             << " unit(s) under 4ceMWH6k";
 
     resp.team_info = std::move(
         (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());

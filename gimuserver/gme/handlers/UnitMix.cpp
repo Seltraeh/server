@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 #include <cmath>
 
@@ -48,6 +49,21 @@ static int unitMix_expForLevel(const std::vector<UnitExpPatternMst>& pat,
         acc += e.need_exp;
     }
     return acc;
+}
+
+// A unit's base stat at a given level.  BF scales linearly from the MST's
+// min (level 1) to its max (max_lv); user_units stores only the min, so the
+// level scaling has to be recomputed here.
+//
+// // UNVERIFIED: the rounding.  Linear interpolation is the established BF
+// formula, but whether the client floors or rounds at each step has not been
+// checked against a capture — an off-by-one in a displayed stat is cosmetic,
+// and the structure of the payload is what matters (see buildLvupStatus).
+static int unitMix_statAtLevel(int minV, int maxV, int level, int maxLv)
+{
+    if (maxLv <= 1 || level <= 1) return minV;
+    if (level >= maxLv)           return maxV;
+    return minV + (int)((double)(maxV - minV) * (double)(level - 1) / (double)(maxLv - 1));
 }
 
 // Highest level reachable with totalExp under maxLevel cap.
@@ -200,6 +216,12 @@ HANDLEF(UnitMix)
     const int levelExpFlr = unitMix_expForLevel(expPat, expPatternId, newLevel);
     const int newExp      = newTotalExp - levelExpFlr;
 
+    // The BEFORE side of the result screen.  Derived the same way as the after
+    // side so the two are guaranteed consistent: the row stores total_exp, not
+    // a level, so the pre-fusion level is whatever that total maps to.
+    const int oldLevel    = unitMix_levelFromExp(expPat, expPatternId, maxLevel, baseTotalExp);
+    const int oldExp      = baseTotalExp - unitMix_expForLevel(expPat, expPatternId, oldLevel);
+
     LOG_INFO << "UnitMix: unit=" << baseId << " mst=" << baseMstId
              << " totalExp " << baseTotalExp << "+" << gainedExp << "=" << newTotalExp
              << " lv->" << newLevel << "/" << maxLevel;
@@ -262,45 +284,158 @@ HANDLEF(UnitMix)
     }
 
     // Incremental unit cache update.
+    //
+    // Read back through PacketInterfaceFor<UserUnitInfo> rather than
+    // hand-assembling the entry.  This is the SAME read UserInfo uses at login,
+    // and login is the one path the client provably accepts — so building the
+    // entry any other way is guessing at a shape we already have.
+    //
+    // Hand-assembly is how the level stopped showing after a fusion: the entry
+    // was 47 fields and complete-looking, but `received_order` (Bvkx8s6M) was
+    // never assigned and so went out as 0, where login sends 1000.  It is not
+    // a column — the schema maps it onto `user_unit_id` — so there was nothing
+    // in the SELECT to notice was missing.  Any field added to UserUnitInfo in
+    // future would have silently defaulted the same way.
+    //
+    // The DB writes above have already landed, so this read reflects the new
+    // level, exp and total_exp.
+    //
+    // FULL-REPLACE THE UNIT CACHE (4ceMWH6k).  Confirmed working in-client
+    // 2026-08-10: the fusion menu shows the new level and the fodder are gone,
+    // with no trip to Home.
+    //
+    // We deliberately do NOT echo the base unit under qC2tJs4E.  That key is
+    // INSERT-IF-ABSENT: readParam's tail asks UserUnitInfoList::exist() and
+    // returns without committing when the client already owns the unit, so for
+    // a fusion base it is a guaranteed no-op.
+    //
+    // 4ceMWH6k is the only key that can change an owned unit, because its
+    // readParam calls removeAllObjects() first — which is also why it must
+    // carry the WHOLE roster, not just the fused unit.
+    //
+    // It is needed because the client has no local apply path of its own: it
+    // never writes the fused unit (no UserUnitInfo mutator is reachable from a
+    // fusion scene) and never drops the fodder (removeObject's only real callers
+    // are the FrontierGate/FGPlus friend lists; removeObjectWithUserUnitID has
+    // none), and it issues no request after the fusion.
+    //
+    // The historical objection was that removeAllObjects release()s every
+    // CCObject in the list, dangling any raw UserUnitInfo* a live scene holds —
+    // it soft-locked the result screen once.  That build also sent
+    // lvup_status "1", which crashes parseMixResult by itself; with the ritual
+    // payload correct, this key is fine here.  If a future scene does start
+    // soft-locking on it, that is the mechanism to suspect.
+    resp.unit_refresh = std::move((co_await db::PacketInterfaceFor<::UserUnitInfo>::read(
+        theDb(),
+        "user_units",
+        { db::Lookup("user_id", std::string(kUserId)) })).data);
+
+    LOG_INFO << "UnitMix: full-replace unit cache — " << resp.unit_refresh->size()
+             << " unit(s) under 4ceMWH6k";
+
+    // THE RESULT SCREEN (1ZbHB6Im).  This is what actually drives the xp-bar
+    // sweep and the level-up flourish, and the server had never sent it — the
+    // screen rendered the unit and then sat there with nothing to animate.
+    // Every field here is a before/after pair for exactly that reason.
     {
-        UserUnitInfo ud = {};
-        ud.user_id            = std::string(kUserId);
-        ud.user_unit_id       = br["user_unit_id"].as<int32_t>();
-        ud.unit_id            = baseMstIdInt;
-        ud.unit_type_id       = br["unit_type_id"].as<int32_t>();
-        ud.unit_lvl            = newLevel;
-        ud.exp                = newExp;
-        ud.total_exp          = newTotalExp;
-        ud.base_hp            = br["base_hp"].as<int32_t>();
-        ud.add_hp             = br["add_hp"].as<int32_t>();
-        ud.ext_hp             = br["ext_hp"].as<int32_t>();
-        ud.limit_over_hp      = br["limit_over_hp"].as<int32_t>();
-        ud.base_atk           = br["base_atk"].as<int32_t>();
-        ud.add_atk            = br["add_atk"].as<int32_t>();
-        ud.ext_atk            = br["ext_atk"].as<int32_t>();
-        ud.limit_over_atk     = br["limit_over_atk"].as<int32_t>();
-        ud.base_def           = br["base_def"].as<int32_t>();
-        ud.add_def            = br["add_def"].as<int32_t>();
-        ud.ext_def            = br["ext_def"].as<int32_t>();
-        ud.limit_over_def     = br["limit_over_def"].as<int32_t>();
-        ud.base_rec          = br["base_rec"].as<int32_t>();
-        ud.add_rec           = br["add_rec"].as<int32_t>();
-        ud.ext_rec           = br["ext_rec"].as<int32_t>();
-        ud.limit_over_rec    = br["limit_over_rec"].as<int32_t>();
-        ud.element            = br["element"].as<std::string>();
-        // Species data: read from the MST rather than a stored copy.  The
-        // column was dropped -- see 06082026_DropLeaderSkillIdColumn.
-        ud.leader_skill_id    = baseMstData ? baseMstData->leader_skill_id : 0;
-        ud.bb_id           = std::to_string(br["skill_id"].as<int32_t>());
-        ud.bb_lvl           = br["skill_lv"].as<int32_t>();
-        ud.sbb_id     = std::to_string(br["extra_skill_id"].as<int32_t>());
-        ud.sbb_lvl     = br["extra_skill_lv"].as<int32_t>();
-        ud.equipitem_id       = br["eqip_item_id"].as<int32_t>();
-        ud.equipitem_frame_id = br["eqip_item_frame_id"].as<int32_t>();
-        ud.equipitem_id2      = br["eqip_item_id2"].as<int32_t>();
-        ud.equipitem_frame_id2= br["eqip_item_frame_id2"].as<int32_t>();
-        ud.is_new           = true;
-        resp.unit_update.emplace_back(std::move(ud));
+        UnitOpeResult r = {};
+        r.unit_id       = baseMstId;
+        r.user_unit_id  = std::to_string(baseId);
+        r.zel           = zelCost;
+        r.exp           = gainedExp;
+        r.success_type  = 0;                    // normal result; see the KDL note
+        r.before_lv     = oldLevel;
+        r.after_lv      = newLevel;
+        r.before_exp    = oldExp;
+        r.after_exp     = newExp;
+
+        // Fusion does not change any of these, but the screen reads before and
+        // after for each, so send them equal rather than leaving them at zero —
+        // a 0/0 pair would read as "dropped to nothing" on any stat the UI
+        // chooses to flourish.
+        const auto skillLv      = br["skill_lv"].as<int32_t>();
+        const auto extraSkillLv = br["extra_skill_lv"].as<int32_t>();
+        const auto eqpFrame     = br["eqip_item_frame_id"].as<int32_t>();
+        const auto eqpFrame2    = br["eqip_item_frame_id2"].as<int32_t>();
+
+        r.before_skill_lv         = skillLv;
+        r.after_skill_lv          = skillLv;
+        r.before_extra_skill_lv   = extraSkillLv;
+        r.after_extra_skill_lv    = extraSkillLv;
+        r.before_eqp_frame_id     = eqpFrame;
+        r.after_eqp_frame_id      = eqpFrame;
+        r.before_eqp_frame_id2    = eqpFrame2;
+        r.after_eqp_frame_id2     = eqpFrame2;
+
+        // FE and DBB are not implemented; equal zeroes are the honest "no
+        // change" for a feature that does not exist yet.
+        r.before_fe_bp = r.after_fe_bp = 0;
+        r.before_max_fe_bp = r.after_max_fe_bp = 0;
+        r.before_dbb_skill_level = r.after_dbb_skill_level = 0;
+
+        // THE STAT TABLE.  lvup_status and param_up_state are a matched pair
+        // and must be built together — decoded from parseMixResult:
+        //
+        //   lvup_status    strtok(s, ",")  -> one MixResultStatus per chunk,
+        //                  each chunk "lv:hp:atk:def:heal"
+        //   param_up_state parseList(':')  -> a single "lv:hp:atk:def:heal";
+        //                  its lv is looked up AGAINST that table
+        //
+        // Sent empty, the client falls back to building ONE row from the unit
+        // it is displaying — at the OLD level — which is why the bar moved but
+        // no stats or level-up ever appeared.  And param_up_state alone would
+        // look up a level absent from that one-row table, leaving `v119 = 0`
+        // and dereferencing it (`MixResultStatus::getHp(v119)`) — the crash.
+        //
+        // So: emit a row for every level from before to after, then point
+        // param_up_state at the final one.
+        {
+            const auto statRow = [&](int lv) {
+                const int hp   = unitMix_statAtLevel(br["base_hp"].as<int32_t>(),
+                                     baseMstData ? baseMstData->max_hp : br["base_hp"].as<int32_t>(),
+                                     lv, maxLevel)
+                                 + br["add_hp"].as<int32_t>() + br["ext_hp"].as<int32_t>()
+                                 + br["limit_over_hp"].as<int32_t>();
+                const int atk  = unitMix_statAtLevel(br["base_atk"].as<int32_t>(),
+                                     baseMstData ? baseMstData->max_atk : br["base_atk"].as<int32_t>(),
+                                     lv, maxLevel)
+                                 + br["add_atk"].as<int32_t>() + br["ext_atk"].as<int32_t>()
+                                 + br["limit_over_atk"].as<int32_t>();
+                const int def  = unitMix_statAtLevel(br["base_def"].as<int32_t>(),
+                                     baseMstData ? baseMstData->max_def : br["base_def"].as<int32_t>(),
+                                     lv, maxLevel)
+                                 + br["add_def"].as<int32_t>() + br["ext_def"].as<int32_t>()
+                                 + br["limit_over_def"].as<int32_t>();
+                const int rec  = unitMix_statAtLevel(br["base_rec"].as<int32_t>(),
+                                     baseMstData ? baseMstData->max_rec : br["base_rec"].as<int32_t>(),
+                                     lv, maxLevel)
+                                 + br["add_rec"].as<int32_t>() + br["ext_rec"].as<int32_t>()
+                                 + br["limit_over_rec"].as<int32_t>();
+                return std::to_string(lv) + ':' + std::to_string(hp) + ':'
+                     + std::to_string(atk) + ':' + std::to_string(def) + ':'
+                     + std::to_string(rec);
+            };
+
+            std::string table;
+            for (int lv = oldLevel; lv <= newLevel; ++lv)
+            {
+                if (!table.empty()) table += ',';
+                table += statRow(lv);
+            }
+            r.lvup_status    = table;
+            r.param_up_state = statRow(newLevel);
+        }
+
+        // FE is not implemented; empty is the honest "no allocation".  These
+        // are plain string setters with no list parsing behind them.
+        r.before_fe_info = "";
+        r.after_fe_info  = "";
+
+        resp.ope_result.push_back(std::move(r));
+
+        LOG_INFO << "UnitMix: result lv " << oldLevel << "->" << newLevel
+                 << " exp " << oldExp << "->" << newExp
+                 << " (+" << gainedExp << "), lvup=" << r.lvup_status;
     }
 
     resp.team_info = std::move(

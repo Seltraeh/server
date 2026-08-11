@@ -142,6 +142,13 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("rCB7ZI8x", UpdateEventInfo,        "L1o4eGbi");
 	REGISTER("5o8ZlDGX", Chronology,             "SNrhAG29");
 
+	// Vortex dungeon keys (Metal / Jewel Parade).  GroupIds and AES keys from
+	// the legacy handler registry, where all three were empty-OK stubs.
+	// All answer with the key inventory under eFU7Qtb0 — see DungeonKey.cpp.
+	REGISTER("1mr9UsYz", GetDistributeDungeonKeyInfo, "r0ZA3pn5");
+	REGISTER("WCJE0xe2", DungeonKeyReceipt,           "V4pfQo5C");
+	REGISTER("aGT5S6qZ", DungeonKeyUse,               "3rPx6tTw");
+
 	}
 }
 

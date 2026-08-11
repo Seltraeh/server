@@ -590,5 +590,81 @@ inline drogon::Task<db::InterfaceResult<UserIdentity>> getUserIdentity(
 	};
 }
 
+/*!
+* Reads the caller's cleared-mission history (UT1SVg59).
+*
+* THE progression driver: the client evaluates feature unlocks against this
+* list, and the server's own PermitPlace progression gate reads the same set so
+* the two agree. Backed by user_campaign_missions rows with state=2, written by
+* MissionEnd and CampaignBattleEnd.
+*
+* Shared by UserInfo and UpdateInfoLight — both have to report the identical
+* set or a refresh would contradict the login snapshot.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved user identity to read.
+* @return One entry per cleared mission, ready to serialise under UT1SVg59.
+*/
+inline drogon::Task<std::vector<::UserClearMissionInfo>> getClearedMissions(
+	const db::Database database,
+	const UserIdentity identity)
+{
+	std::vector<::UserClearMissionInfo> cleared{};
+
+	const auto rows = co_await database->execSqlCoro(
+		"SELECT mission_id, clear_count, last_cleared_at"
+		" FROM user_campaign_missions WHERE user_id = $1 AND state = 2;",
+		identity.userId);
+
+	for (const auto& row : rows)
+	{
+		::UserClearMissionInfo entry = {};
+		entry.user_id = identity.userId;
+		try
+		{
+			entry.mission_id = std::stoi(row["mission_id"].as<std::string>());
+		}
+		catch (...)
+		{
+			continue;
+		}
+		entry.clear_cnt = row["clear_count"].as<int32_t>();
+		if (const auto epoch = row["last_cleared_at"].as<int64_t>(); epoch > 0)
+		{
+			// setClearDate is a string setter; "YYYY-MM-DD hh:mm:ss" until a
+			// capture proves otherwise (KDL doc marks it UNVERIFIED).
+			std::tm tmv = {};
+			const time_t t = static_cast<time_t>(epoch);
+			localtime_s(&tmv, &t);
+			char buf[24] = {};
+			std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmv);
+			entry.clear_date = buf;
+		}
+		cleared.push_back(std::move(entry));
+	}
+
+	co_return cleared;
+}
+
+/*!
+* Reads the caller's Vortex dungeon-key inventory, seeding any row DungeonKeyMst
+* declares that the player does not have yet.
+*
+* The two derived response fields — receipt_possible_flg and
+* next_receipt_possible_date — are computed against the local calendar on every
+* call rather than stored, so the result is only valid for the request that
+* asked for it.  See the 08082026_CreateUserDungeonKeysTable migration.
+*
+* Declared here rather than defined inline because the calendar helpers it
+* needs are private to the translation unit.  Defined in
+* gme/handlers/DungeonKey.cpp; consumed there and by UserInfo.
+*
+* @param db Database client or transaction to use.
+* @param identity Resolved user identity to read.
+* @return One entry per DungeonKeyMst row, ready to serialise under eFU7Qtb0.
+*/
+drogon::Task<std::vector<::UserDungeonKeyInfo>> dungeonKeyState(
+	const db::Database db,
+	const UserIdentity identity);
 
 }

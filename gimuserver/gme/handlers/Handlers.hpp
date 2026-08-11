@@ -134,4 +134,7 @@ namespace GmeHandlers
 	HANDLE(UpdatePermitPlaceInfo);
 	HANDLE(UpdateEventInfo);
 	HANDLE(Chronology);
+	HANDLE(GetDistributeDungeonKeyInfo);
+	HANDLE(DungeonKeyReceipt);
+	HANDLE(DungeonKeyUse);
 }

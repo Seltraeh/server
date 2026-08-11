@@ -454,6 +454,64 @@ static void RegisterMigrations(MigrationMap& map)
 		p->execSqlSync(
 			"ALTER TABLE user_frontier_gate_run ADD COLUMN party_units_json TEXT NOT NULL DEFAULT '';");
 	});
+
+	// Vortex dungeon keys — one row per (user, DungeonKeyMst.id), i.e. three
+	// rows per player (Metal / Jewel / Imp).  Feeds eFU7Qtb0
+	// (UserDungeonKeyInfoResponse) out of UserInfo and all three dungeon-key
+	// handlers.  Field semantics: tools/ida/audits/eFU7Qtb0_audit.txt.
+	//
+	// ONLY THE DURABLE STATE GETS COLUMNS.  Two of the response's six confirmed
+	// fields are derived and are computed per request instead:
+	//   receipt_possible_flg (g85qMNxf)       — "can I claim right now", a pure
+	//       function of today's weekday vs DungeonKeyMst.distribute_days,
+	//       last_receipt_day, and possession vs possession_limit.
+	//   next_receipt_possible_date (b6QR1CH5) — the next weekday in
+	//       distribute_days after today.
+	// Storing either would go stale the moment the clock crossed midnight
+	// without a write, which is the whole failure mode a day-gated feature has
+	// to avoid.  §6.15: no column without a reason it must persist.
+	//
+	// active_type (BY8fZ7M1) DOES get a column: it records which parade tier
+	// the player last opened, which nothing else can reconstruct.
+	//
+	// cnt (H6k1LIxC) gets NO column — its semantic is still unresolved (see the
+	// audit), the KDL leaves it optional, and it is omitted from the wire.
+	// Add a column only once an IDA run names it.
+	//
+	// To delete this table later: it is consumed by DungeonKey.cpp and by
+	// UserInfo's dungeon_key_info population.
+	migrate("08082026_CreateUserDungeonKeysTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_dungeon_keys ("
+			"user_id          TEXT    NOT NULL,"
+			"dungeon_key_id   INTEGER NOT NULL,"
+			"possession       INTEGER NOT NULL DEFAULT 0,"
+			"last_receipt_day INTEGER NOT NULL DEFAULT 0,"
+			"active_type      INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, dungeon_key_id)"
+			");"
+		);
+	});
+
+	// The OTHER half of the cutscene state.
+	//
+	// LoginInfo carries two scenario fields and only one of them was being
+	// persisted.  9yVsu21R (special_scenario_info) is the comma list of named
+	// one-off intros — "randall,frontiergate_v2,challenge," — and has worked
+	// since the Frontier Gate pass.  N4XVE1uA is a separate composite marker
+	// the client also grows across sessions (observed going from "|0,0" to
+	// "0,0@0@2@1&|0,0" as content was seen), and it was never stored: UserInfo
+	// echoed back "" on every login, so whatever it tracks replayed forever.
+	//
+	// Stored verbatim, exactly like special_scenario_info: the client sends the
+	// whole marker every time and only ever extends it, so there is nothing to
+	// merge.  The format is NOT decoded — '&' and '|' separated groups of
+	// comma/at-joined ints — and deliberately not parsed, because round-tripping
+	// an opaque blob needs no schema.
+	migrate("09082026_AddUserScenarioInfo", {
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN scenario_info TEXT NOT NULL DEFAULT '';");
+	});
 }
 
 /*!
