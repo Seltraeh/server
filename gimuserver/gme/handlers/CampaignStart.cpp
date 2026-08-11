@@ -148,5 +148,41 @@ HANDLEF(CampaignStart)
         resp.mission_decks.emplace_back(md);
     }
 
+    // Reward-bonus list (p04iC2wr) — the "what you can earn" panel.  Emitted
+    // for the missions this user can actually see, so the payload tracks the
+    // mission list above instead of shipping all 371 MST rows.
+    //
+    // The wire shape is CampaignRewardBonusInfoResponse, whose six setters
+    // (RewardID/PresentType/TargetID/TargetCnt/TargetParam/RewardType) are the
+    // client-facing subset of GrandMissionRewardMst — same six hashes, so this
+    // is a straight projection with no invented fields.
+    {
+        std::set<int32_t> visible;
+        for (const auto& m : resp.missions)
+        {
+            try { visible.insert(std::stoi(m.mission_id)); }
+            catch (const std::exception&) {}
+        }
+
+        const auto& rewardMst = theServer()->cache().grandMissionRewardMst();
+        for (const auto& rw : rewardMst)
+        {
+            if (!visible.contains(rw.mission_id))
+                continue;
+
+            CampaignRewardBonusEntry e{};
+            e.reward_id    = std::to_string(rw.id);
+            e.present_type = rw.present_type;
+            e.target_id    = std::to_string(rw.target_id);
+            e.target_cnt   = rw.target_cnt;
+            e.target_param = rw.param;
+            e.reward_type  = rw.reward_type;
+            resp.reward_bonus.emplace_back(std::move(e));
+        }
+
+        LOG_INFO << "CampaignStart: " << resp.missions.size() << " mission(s), "
+                 << resp.reward_bonus.size() << " reward-bonus row(s)";
+    }
+
     co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
