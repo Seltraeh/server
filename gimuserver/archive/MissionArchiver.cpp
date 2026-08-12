@@ -2,6 +2,7 @@
 
 #include "UnitArchiver.hpp"
 
+#include <gimuserver/App.hpp>
 #include <gimuserver/utils/JsonFile.hpp>
 #include <gimuserver/utils/Random.hpp>
 
@@ -84,6 +85,56 @@ std::string MissionArchiver::encodeAIAction(const Action& action)
 	return stream.str();
 }
 
+uint32_t MissionArchiver::rollUnitType()
+{
+	// F_UNIT_TYPE_MST.appearance_rate is the game's own distribution over the
+	// six personality types — 23/23/22/22/10/0, summing to exactly 100, with
+	// Rex at 0 because it is never handed out by a normal drop.  Rolling
+	// against it means an authored mission does not have to hardcode a type,
+	// and each play of the same mission can award a different one.
+	const auto& types = theServer()->cache().unitTypeMst();
+
+	double total = 0.0;
+	for (const auto& t : types)
+	{
+		total += parseRate(t.appearance_rate);
+	}
+	if (total <= 0.0)
+	{
+		return 1;   // no usable rates — fall back to Lord
+	}
+
+	// RandomUInt is integral, so roll in hundredths of a percent to keep the
+	// 22-vs-23 split honest rather than rounding it away.
+	auto ticket = static_cast<double>(RandomUInt(1, static_cast<uint32_t>(total * 100.0))) / 100.0;
+	for (const auto& t : types)
+	{
+		const auto rate = parseRate(t.appearance_rate);
+		if (rate <= 0.0)
+		{
+			continue;
+		}
+		if (ticket <= rate)
+		{
+			return static_cast<uint32_t>(t.unit_type_id);
+		}
+		ticket -= rate;
+	}
+	return 1;
+}
+
+double MissionArchiver::parseRate(const std::string& rate)
+{
+	try
+	{
+		return std::stod(rate);
+	}
+	catch (const std::exception&)
+	{
+		return 0.0;
+	}
+}
+
 std::string MissionArchiver::encodeUnitDrop(size_t monsterIdx, const BattleMonster& monster)
 {
 	if (monster.unit_drop_id == 0 || RandomUInt(1, 100) > monster.unit_drop_chance)
@@ -91,12 +142,19 @@ std::string MissionArchiver::encodeUnitDrop(size_t monsterIdx, const BattleMonst
 		return "";
 	}
 
+	// unit_drop_type 0 means "let the server pick", so the author does not have
+	// to hardcode Lord/Anima/… and a replay can award a different variant.  The
+	// roll happens here, per mission start, alongside the drop roll above.
+	const auto dropType = monster.unit_drop_type == 0
+		? rollUnitType()
+		: monster.unit_drop_type;
+
 	return std::format(
 		"{}:0:{}:{}:{}",
 		monsterIdx,
 		monster.unit_drop_id,
 		monster.unit_drop_level,
-		monster.unit_drop_type);
+		dropType);
 }
 
 std::string MissionArchiver::encodeTreasureDrop(size_t monsterIdx, const BattleMonster& monster)

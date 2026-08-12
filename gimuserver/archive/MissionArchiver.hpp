@@ -143,6 +143,23 @@ private:
 	static std::string encodeUnitDrop(size_t monsterIdx, const BattleMonster& monster);
 
 	/*!
+	* Rolls a unit personality type using F_UNIT_TYPE_MST's own appearance
+	* rates (23/23/22/22/10/0 — Rex never rolls).  Used when a mission's
+	* unit_drop_type is 0, i.e. the author asked for a random variant.
+	*
+	* @return Unit type id 1-6; 1 (Lord) if the MST has no usable rates.
+	*/
+	static uint32_t rollUnitType();
+
+	/*!
+	* Parses an F_UNIT_TYPE_MST decimal rate string ("23.00") to a double.
+	*
+	* @param rate The decimal string.
+	* @return The parsed value, or 0.0 when it does not parse.
+	*/
+	static double parseRate(const std::string& rate);
+
+	/*!
 	* Selects and encodes the treasure drop for one mission monster.
 	*
 	* Treasure rolls are resolved server-side. The client only receives the final
