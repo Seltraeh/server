@@ -117,6 +117,16 @@ namespace GmeHandlers
 	HANDLE(CampaignBattleEnd);
 	HANDLE(CampaignReceipt);
 	HANDLE(CampaignEnd);
+	HANDLE(ChallengeBase);
+	HANDLE(ChallengeRanking);
+	HANDLE(ShopUse);
+	HANDLE(FrontierGateInfo);
+	HANDLE(FrontierGateStart);
+	HANDLE(FrontierGateContinue);
+	HANDLE(FrontierGateSave);
+	HANDLE(FrontierGateEnd);
+	HANDLE(FrontierGateRetry);
+	HANDLE(FrontierGateRestart);
 	HANDLE(FixGiftInfo);
 	HANDLE(DungeonEventUpdate);
 	HANDLE(GetScenarioPlayingInfo);

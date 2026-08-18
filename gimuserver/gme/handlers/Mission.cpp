@@ -179,10 +179,26 @@ HANDLEF(MissionEnd)
 	}
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).data;
-	const auto missionRecord = MissionArchiver::instance().lookup(req.mission_num.serial_id);
+
+	// Same battle-content fallback as MissionStart — without it a mission that
+	// STARTS on template content would fail on completion instead, which is a
+	// worse failure: the player fights the battle and then loses the result.
+	// See the block in MissionStart for why only content is substituted.
+	auto missionRecord = MissionArchiver::instance().lookup(req.mission_num.serial_id);
 	if (!missionRecord)
 	{
-		co_return HandleResult::error("Archive error", "Unable to find mission record");
+		missionRecord = MissionArchiver::instance().lookup(10);
+		if (!missionRecord)
+		{
+			co_return HandleResult::error("Archive error", "Unable to find mission record");
+		}
+		// Relabelled for the same reason as MissionStart — the result screen
+		// reads the mission back out of the response.
+		missionRecord->id = req.mission_num.serial_id;
+
+		LOG_WARN << "MissionEnd: mission " << req.mission_num.serial_id
+		         << " has no authored battle content; using the template record "
+		            "relabelled as this mission";
 	}
 
 	MissionEndResp resp{};
@@ -375,13 +391,71 @@ HANDLEF(MissionStart)
 		co_return HandleResult::error("Deserialization error", error);
 	}
 
-	const auto missionRecord = MissionArchiver::instance().lookup(req.start_info.mission_id);
-	if (!missionRecord)
+	// BATTLE-CONTENT FALLBACK.
+	//
+	// deploy/archive/mission.json is the authored battle content — waves, AIs,
+	// monsters, battle groups — and it currently holds THREE missions (1, 2,
+	// 10).  Every other mission in the game has metadata in mission_mst.json
+	// but no authored fight, so starting one used to fail outright with
+	// "Archive error" (Frontier Gate hit this on mission 9010001 "Panache",
+	// 2026-08-07).
+	//
+	// Rather than block every unauthored mission, serve a template mission's
+	// content so the flow is exercisable.  This is the existing known
+	// limitation — "all missions use mission 10's enemy data" — made explicit
+	// and applied where it was previously an error.
+	//
+	// CRITICAL: only the CONTENT comes from the template.  resp.start_info is
+	// echoed from the request below, so the response still names the mission the
+	// client asked for.  Handbook §3.1 is the story of what happens otherwise:
+	// answering mission 11 with "mission 10" crashed the client outright.
+	//
+	// Replace this with real authored content per mission — that is what the
+	// mission editor exists for.  When the archive covers a mission, nothing
+	// here runs.
+	constexpr MissionArchiver::MissionId kTemplateMissionId = 10;
+
+	auto missionRecord = MissionArchiver::instance().lookup(req.start_info.mission_id);
+	const bool usingTemplate = !missionRecord;
+	if (usingTemplate)
 	{
-		co_return HandleResult::error("Archive error", "Unable to find mission record");
+		missionRecord = MissionArchiver::instance().lookup(kTemplateMissionId);
+		if (!missionRecord)
+		{
+			// The template itself is missing, so the archive is unusable.
+			co_return HandleResult::error("Archive error", "Unable to find mission record");
+		}
+		// RELABEL THE TEMPLATE AS THE REQUESTED MISSION.
+		//
+		// populatePacket stamps record.id into BattleGroupMst::mission_id and
+		// MissionNumInfo::serial_id.  Left alone, the response would carry
+		// start_info for mission 9010001 while every battle group and the
+		// mission_num claimed mission 10 — the client resolves the mission it
+		// asked for, finds battle data belonging to a different one, and dies
+		// during load.  That is handbook §3.1's mismatch crash exactly, and it
+		// is what echoing start_info alone did NOT fix (verified 2026-08-07: FG
+		// downloaded its assets and then crashed with a clean server log).
+		//
+		// Safe because the archive contract is explicit that the SERVER owns
+		// these ids: "Client battle group ids and encoded AI/drop wire strings
+		// are generated while formatting a mission-start response"
+		// (MissionArchiver.hpp).  The client does not require the group ids its
+		// own MST lists — only that the response is internally consistent about
+		// which mission it describes.
+		missionRecord->id = req.start_info.mission_id;
+
+		LOG_WARN << "MissionStart: mission " << req.start_info.mission_id
+		         << " has no authored battle content; serving mission "
+		         << kTemplateMissionId << "'s waves relabelled as this mission";
 	}
 
-	if (missionRecord->energy_cost > 0)
+	// Energy is only consumed for a mission we actually have data for.  The
+	// template's cost belongs to mission 10, not to whatever was requested, and
+	// charging a made-up amount is the §3.4 anti-pattern; the real per-mission
+	// cost lives in the archive (handbook §6.15 rule 3), which by definition
+	// does not have this one.  Frontier Gate in particular spends Hunter Orbs
+	// (Aube) client-side rather than energy — see §6.16.
+	if (!usingTemplate && missionRecord->energy_cost > 0)
 	{
 		const auto identity = (co_await gme::getUserIdentity(
 			theDb(),

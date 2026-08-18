@@ -5,6 +5,7 @@
 #include <gimuserver/gme/common/Common.hpp>
 
 #include <ctime>
+#include <set>
 
 HANDLEF(UserInfo)
 {
@@ -264,13 +265,26 @@ HANDLEF(UserInfo)
     //   F_MISSION_MST 1118 entries, 3433 count   → 1-4000
     //   F_DUNGEON_MST 1002 entries, 1532 count   → 1-2000
     // The client silently ignores entries for IDs that don't exist in its local MST.
+    //
+    // FRONTIER GATE (added 2026-08-07): the dense ranges above cover the Grand
+    // Gaia numbering space and NOTHING ELSE.  Frontier Gate's backing ids live
+    // in a completely different space — its dungeons are 3000001..800000015 and
+    // its prerequisite missions 80000001..100016020 — so **0 of 94 gates** had
+    // a permitted dungeon or mission.  The client owns the rows (dungeon_mst
+    // contains 3000001, mission_mst contains 80000001); nothing permitted them.
+    // That is the same failure the area note above describes, one layer down.
+    //
+    // These cannot be covered by widening the ranges: enumerating to 800000015
+    // is not a payload anyone wants.  Instead permit exactly the ids the gate
+    // catalog references — 94 gates contribute ~150 entries, against the ~7100
+    // the dense ranges already emit.
     static constexpr std::string_view kEmptyPermit = R"("yXNM8kL3":[])";
     static const std::string kFullPermit = []() {
         std::string s;
-        s.reserve(200'000);
+        s.reserve(220'000);
         s += R"("yXNM8kL3":[)";
         bool first = true;
-        auto add = [&](std::string_view key, int id) {
+        auto add = [&](std::string_view key, int64_t id) {
             if (!first) s += ',';
             s += "{\"";
             s += key;
@@ -284,6 +298,19 @@ HANDLEF(UserInfo)
         for (int i = 1; i <=  100; ++i) add("0Cq2AlXW", i); // gates
         for (int i = 1; i <= 4000; ++i) add("j28VNcUW", i); // missions
         for (int i = 1; i <= 2000; ++i) add("MHx05sXt", i); // dungeons
+
+        // Frontier Gate's own topology.  Collected at boot in ServerCache — see
+        // frontierGatePermits() for why the gates' dungeons alone were not
+        // enough: a gate's MISSION also has a land and an area, and gate 91's
+        // mission 9010001 is land 99 / area 3000001, both far outside the dense
+        // ranges above.  Without those the mission downloaded its assets and
+        // then crashed with its parent topology unreachable.
+        const auto& fg = theServer()->cache().frontierGatePermits();
+        for (const auto id : fg.lands)    add("9C64Qwe0", id);
+        for (const auto id : fg.areas)    add("VjCY7rX4", id);
+        for (const auto id : fg.dungeons) add("MHx05sXt", id);
+        for (const auto id : fg.missions) add("j28VNcUW", id);
+
         s += ']';
         return s;
     }();
@@ -299,6 +326,7 @@ HANDLEF(UserInfo)
     }
     else
         LOG_WARN << "UserInfo: yXNM8kL3 token not found in serialised buffer — PermitPlace not injected";
+
 
     co_return HandleResult::success(buffer);
 }
