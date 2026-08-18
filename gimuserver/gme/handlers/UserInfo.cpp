@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/archive/GachaArchiver.hpp>
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
@@ -222,6 +223,26 @@ HANDLEF(UserInfo)
 			});
 		}
 	}
+
+    // Summon catalog (1IR86sAv doors + IBs49NiH banner rail).  Identical to
+    // what GachaList returns, and deliberately duplicated here.
+    //
+    // The tutorial never performs a GachaList round trip: tuto15.txt drives
+    // `change_gacha_top_scene` straight from the script, so
+    // SummonsCategorizationScene opens with whatever the client already holds.
+    // With these sent only on GachaList, GachaCategoryMstList and GachaInfoList
+    // were both empty at that moment and tapping Summon crashed the client with
+    // no request reaching us at all — the last thing logged was a successful
+    // BadgeInfo, and dlc_404.log was clean.
+    //
+    // Sending them from UserInfo works because the key -> response-class
+    // registry is global: GameResponseParser::getResponseObject (0x1392568)
+    // maps `1IR86sAv` to GachaInfoResponse and `IBs49NiH` to
+    // GachaCategoryMstResponse regardless of which handler's payload carries
+    // them.  Initialize already pushes the raw 1305-row gacha MST at 5Y4GJeo3
+    // the same way.
+    resp.gacha_info = GachaArchiver::instance().populateAllPackets();
+    resp.gacha_categories = theServer()->cache().gachaListRsp().gacha_categories;
 
     resp.campaign_info.current_day = 1;
     resp.campaign_info.total_days = 96;

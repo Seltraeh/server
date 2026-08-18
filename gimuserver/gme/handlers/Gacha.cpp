@@ -14,6 +14,11 @@
 namespace
 {
 
+// Gate 2000 — the client labels type 20000 "Tutorial Gacha" and it is the only
+// row with that type across all 1305 gacha_mst rows.  Tutorial-only: shown in
+// the banner rail while the tutorial runs, hidden afterwards.
+constexpr int32_t kTutorialGachaId = 2000;
+
 /*!
 * Picks a summon animation effect id for a summoned unit rarity.
 *
@@ -76,12 +81,26 @@ HANDLEF(GachaAction)
 		co_return HandleResult::error("Unsupported", "Summon tickets are not implemented");
 	}
 
-	// Obviously, we can't summon 0 times.
-	const auto count = req.gacha_action_info.request_count;
-	if (count == 0)
-	{
-		co_return HandleResult::error("Invalid request count", "Request count must be at least 1");
-	}
+	// A count of 0 means one pull, not a bad request.
+	//
+	// `a329kbl8` is written straight from UserState::noOfGachaRequests, and
+	// that value has exactly one writer on the summon path:
+	// SummonsDetailScene::touchBegan, which does setNumberOfGachaRequest(1)
+	// when the player presses the single-summon button (the other three
+	// callers are GachaActionScene::checkConnectResult and GachaSummaryScene,
+	// which reset it to 0).  The tutorial never goes through that press —
+	// tuto15.txt drives `change_gacha_action_scene` from the script — so the
+	// count arrives as the 0 it was last reset to:
+	//
+	//     "1IR86sAv":[{"7Ffmi96v":"2000","a329kbl8":"0","324b023k":"0"}]
+	//
+	// The gate id is correct in that payload, so this is not a parse failure
+	// and not a client bug to route around: no response field influences
+	// noOfGachaRequests, it is pure client state.  Rejecting 0 makes the
+	// free-summon tutorial unfinishable, so clamp it to a single pull.  The
+	// currency check below still applies, so this cannot be used to summon
+	// for free.
+	const auto count = std::max<uint32_t>(req.gacha_action_info.request_count, 1);
 
 	// Find the summon gate and determine the cost.
 	const auto gachaRecord = GachaArchiver::instance().lookup(req.gacha_action_info.gacha_id);
@@ -216,10 +235,37 @@ HANDLEF(GachaList)
 		co_return HandleResult::error("Deserialization error", fmte);
 	}
 
-	// Just reuse the static response that we've cached.
+	// The Tutorial Gacha (gate 2000, type 20000 — the client's own label, see
+	// GachaActionScene::initConnect) is a TUTORIAL-ONLY door.  tuto15 drives the
+	// player into it by tapping a fixed screen position, so it has to be in the
+	// banner rail while the tutorial runs — but leaving it there afterwards is
+	// wrong twice over: it displaces the large event banner from the top of the
+	// rail, and opening it outside the tutorial crashes the client.
+	//
+	// So it is filtered out once the player reports the tutorial finished.  The
+	// rail then returns to its original order with the event tile first.
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+	bool tutorialDone = true;
+	{
+		const auto rows = co_await theDb()->execSqlCoro(
+			"SELECT tutorial_end_flag FROM user_info WHERE id = $1;", identity.userId);
+		if (!rows.empty())
+			tutorialDone = rows[0]["tutorial_end_flag"].as<int32_t>() != 0;
+	}
+
 	GachaListResp resp = theServer()->cache().gachaListRsp();
 	resp.gacha_info = GachaArchiver::instance().populateAllPackets();
 	resp.signal_key = req.signal_key;
+
+	if (tutorialDone)
+	{
+		std::erase_if(resp.gacha_categories, [](const GachaCategory& c) {
+			return c.gacha_id_list == std::to_string(kTutorialGachaId);
+		});
+		std::erase_if(resp.gacha_info, [](const GachaInfoMst& g) {
+			return g.id == kTutorialGachaId;
+		});
+	}
 
 	std::string buffer;
 	const auto& ec2 = glz::write_json(resp, buffer);

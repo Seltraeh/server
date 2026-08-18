@@ -138,6 +138,27 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("BjAt1D6b", DungeonEventUpdate,     "k5EiNe9x");
 	REGISTER("VRfsv4e3", GetScenarioPlayingInfo, "Bh4WqR01");
 	REGISTER("R38qvphm", RaidUpScenarioInfo,     "72EyFbW8");
+
+	// Present box.  Recovered with tools/ida/groupid_key_pair_audit.py: in
+	// .rodata each handler occupies a block laid out as
+	//     <GroupId>\0<AesKey>\0 actionSymbol <field keys...> <ClassName>
+	// with the key ALWAYS at GroupId+9 (8 chars + NUL).  That offset held for
+	// 10/10 known-good pairs used as controls, and PresentReceipt's block also
+	// contains `o6uWU0Z7` — the exact group key its createBody emits — which
+	// independently confirms the attribution.
+	REGISTER("nhjvB52R", PresentList,    "6F9sMzBxEv8jXpau");
+	REGISTER("bV5xa0ZW", PresentReceipt, "X2QFqAKfomPIg3rG");
+
+	// Achievements.  This is the request the gift-tab screen actually fires —
+	// YPBU7MD8 is GetAchievementInfo, NOT the present list (§4.2).  It answers
+	// empty for now; registering it stops the unhandled-GroupId error from
+	// killing the screen before its other requests run.
+	REGISTER("YPBU7MD8", GetAchievementInfo, "AKjzyZ81");
+
+	// Brave Points & Rewards.  NOTE the 7-character key — every other key here
+	// is 8 or 16, and this one is correct: confirmed by a live decrypt.  It also
+	// lives outside the aligned handler table (see DailyTask.cpp).
+	REGISTER("m7g0Ekb5", DailyTaskUserInfo, "Hd8c3Y6");
 	REGISTER("1MJT6L3W", UpdatePermitPlaceInfo,  "3zip5Htw");
 	REGISTER("rCB7ZI8x", UpdateEventInfo,        "L1o4eGbi");
 	REGISTER("5o8ZlDGX", Chronology,             "SNrhAG29");

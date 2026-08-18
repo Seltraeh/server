@@ -131,6 +131,20 @@ namespace GmeHandlers
 	HANDLE(DungeonEventUpdate);
 	HANDLE(GetScenarioPlayingInfo);
 	HANDLE(RaidUpScenarioInfo);
+
+	// Present box.  Declared and implemented, NOT yet registered — PresentList
+	// is GroupId YPBU7MD8 but its AES key is unknown, and PresentReceipt's
+	// GroupId is unknown too.  See the header comment in Present.cpp for how to
+	// recover both.
+	HANDLE(PresentList);
+	HANDLE(PresentReceipt);
+
+	// Achievements.  Registered, but answers empty until the four response
+	// classes are decoded — see the header comment in Achievement.cpp.
+	HANDLE(GetAchievementInfo);
+
+	// Brave Points & Rewards (daily tasks / milestones / BP prize shop).
+	HANDLE(DailyTaskUserInfo);
 	HANDLE(UpdatePermitPlaceInfo);
 	HANDLE(UpdateEventInfo);
 	HANDLE(Chronology);

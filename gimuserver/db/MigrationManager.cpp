@@ -293,28 +293,6 @@ static void RegisterMigrations(MigrationMap& map)
 			"RENAME COLUMN limit_over_heal TO limit_over_rec;");
 	});
 
-	// Drops two columns that failed the "do we understand it, does the client
-	// need it" test (handbook §6.15).  fe_bp / fe_max_usable_bp were only ever
-	// INSERTed as the literals 100 and 200 and read straight back into the
-	// packet — never computed from anything, never consumed by any handler,
-	// and Frontier Evolution is not implemented.  The packet FIELDS stay in the
-	// KDL, so the client still receives the keys (defaulting to 0); only the
-	// per-user persistence goes.  Re-add them with the subsystem that needs
-	// them, at which point the values will mean something.
-	migrate("06082026_DropUnusedFeBpColumns", {
-		p->execSqlSync("ALTER TABLE user_units DROP COLUMN fe_bp;");
-		p->execSqlSync("ALTER TABLE user_units DROP COLUMN fe_max_usable_bp;");
-	});
-
-	// leader_skill_id is SPECIES data: every copy of a unit has the same leader
-	// skill, so it belongs to UnitMst, not to a per-user row.  UnitEvo already
-	// sourced it from targetMst; UnitMix now does the same instead of copying
-	// the stored duplicate.  The packet field stays — the client still gets the
-	// key — only the redundant per-user copy goes.
-	migrate("06082026_DropLeaderSkillIdColumn", {
-		p->execSqlSync("ALTER TABLE user_units DROP COLUMN leader_skill_id;");
-	});
-
 	// Frontier Gate — per-user, per-gate progress.  Feeds FrontierGateInfo
 	// (M17pPotk) response key dPM7oJDl; see tools/ida/audits/dPM7oJDl_audit.txt
 	// and tools/FRONTIER_GATE_STATE_MODEL.md.
@@ -536,6 +514,88 @@ static void RegisterMigrations(MigrationMap& map)
 			");"
 		);
 	});
+
+	// tutorial_end_flag (sv6BEI8X).  Previously DERIVED in getLoginInfo as
+	// `tutorial_status >= 12`.  That threshold was this fork's own invention —
+	// the legacy server's Tutorial{Update,Skip} handlers are both empty stubs,
+	// so nothing was ported — and the tutorial does not end at 12: the
+	// client-bundled scripts run to tuto16.txt, with tuto13 = item use,
+	// tuto14 = battle UI, tuto15 = the free summon, tuto16 = farewell.
+	// Deriving the flag at 12 reports "tutorial over" with four scripts still
+	// pending, and makes the status pointer untestable (any status >= 12 forces
+	// the flag true).
+	//
+	// The client already answers this for us: every login envelope carries
+	// sv6BEI8X next to 9sQM2XcN.  Store what the client reports and echo it
+	// back, the same treatment scenario_info gets above, rather than inferring
+	// it from a threshold nobody verified.
+	//
+	// Backfilled with the old derivation so existing accounts keep the state
+	// they already had.
+	migrate("14082026_AddTutorialEndFlag", {
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN tutorial_end_flag INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync(
+			"UPDATE user_info SET tutorial_end_flag = 1 WHERE tutorial_status >= 12;");
+	});
+
+	// Backfill the starting battle-item loadout.
+	//
+	// CreateUser now seeds a user_equip_items slot-0 row with the tutorial
+	// potion, but that only fires for accounts created after the fix.  Accounts
+	// made between 11082026_CreateUserEquipItemsTable (which turned equip_info
+	// into a verbatim read of that table) and the fix own the potion in
+	// user_items yet have an empty loadout — and tuto1.txt blocks forever on
+	// `change_item_scene:tuto_use_item` when the in-battle item menu is empty.
+	//
+	// Only touches accounts with NO loadout at all, so a player who has since
+	// arranged their own slots through ItemEdit is left alone.
+	migrate("14082026_SeedTutorialBattleItemLoadout", {
+		p->execSqlSync(
+			"INSERT INTO user_equip_items (user_id, disp_order, item_id, item_num)"
+			" SELECT i.user_id, 0, i.item_id, 1"
+			" FROM user_items i"
+			" WHERE i.item_id = 20000 AND i.item_num > 0"
+			"   AND NOT EXISTS ("
+			"     SELECT 1 FROM user_equip_items e WHERE e.user_id = i.user_id);");
+	});
+
+	// The present box (sEA41vFK / UserPresentInfoResponse).
+	//
+	// Columns mirror the decoded readParam setters one-for-one so the handler
+	// never has to translate: PresentID/PresentType/TargetID/TargetCnt/
+	// TargetParam/ReceiptType/PresentDate/ReceiptDate/IsReceipt.  The two
+	// *DateStr display fields are deliberately NOT stored — they are formatted
+	// from their epoch siblings at send time, so the pair can never disagree.
+	//
+	// present_type shares the campaign reward vocabulary (same 30Kw4WBa hash
+	// CampaignReceipt dispatches on): 3 = zel, 8 = gem, 6 = unit,
+	// 4/5/7 = item/material/sphere.
+	//
+	// present_id is the autoincrement rowid rendered as a string on the wire;
+	// PresentReceipt echoes it straight back, so it only has to be stable and
+	// unique per user.
+	migrate("15082026_CreateUserPresentsTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_presents ("
+			"present_id   INTEGER PRIMARY KEY AUTOINCREMENT,"
+			"user_id      TEXT    NOT NULL,"
+			"present_type INTEGER NOT NULL,"
+			"target_id    TEXT    NOT NULL DEFAULT '',"
+			"target_cnt   INTEGER NOT NULL DEFAULT 1,"
+			"target_param TEXT    NOT NULL DEFAULT '',"
+			"receipt_type INTEGER NOT NULL DEFAULT 0,"
+			"description  TEXT    NOT NULL DEFAULT '',"
+			"present_date INTEGER NOT NULL DEFAULT 0,"
+			"receipt_date INTEGER NOT NULL DEFAULT 0,"
+			"is_receipt   INTEGER NOT NULL DEFAULT 0"
+			");"
+		);
+		p->execSqlSync(
+			"CREATE INDEX IF NOT EXISTS idx_user_presents_user"
+			" ON user_presents (user_id, is_receipt);");
+	});
+
 }
 
 /*!

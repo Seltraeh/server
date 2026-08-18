@@ -14,8 +14,25 @@ namespace
 constexpr uint32_t kFirstTutorialMission = 1;
 constexpr uint32_t kSecondTutorialMission = 2;
 
+// Tutorial CHAPTER ids (9sQM2XcN), not script numbers — the client maps one to
+// the other in GameUtils::getTutorialScriptFile (0x1EB8758), and the mapping is
+// NOT the identity:
+//
+//     chapter 1-9   -> tuto1-9.txt
+//     chapter 50-54 -> tuto10-14.txt
+//     chapter 10    -> tuto15.txt   (the free-summon tutorial)
+//     chapter 11    -> tuto16.txt   (Tilith's farewell)
+//     chapter 12    -> tuto17.txt   (does not exist -> nothing plays = done)
+//
+// So chapter 10 below is deliberate and load-bearing: clearing mission 2 is what
+// arms the summon tutorial.  Do not "tidy" these into a contiguous sequence.
 constexpr uint8_t kFirstTutorialCheckpoint = 2;
 constexpr uint8_t kSecondTutorialCheckpoint = 10;
+
+// What Karl hands over in tuto15.txt ("You received 5 Gems"), which is exactly
+// the cost of summon gate 2000 — the gate the client itself labels
+// "Tutorial Gacha" (type 20000, GachaActionScene::initConnect @ 0x16988C0).
+constexpr uint32_t kTutorialSummonGems = 5;
 
 std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 {
@@ -273,14 +290,23 @@ HANDLEF(MissionEnd)
 			}
 			else if (req.mission_num.serial_id == kSecondTutorialMission)
 			{
-				(co_await db::DatabaseInterface::update(
-					transaction,
-					"user_info",
-					{
-						db::Data("tutorial_status", kSecondTutorialCheckpoint),
-						db::Lookup("gumi_user_id", identity.gumiUserId),
-						db::Lookup("id", identity.userId),
-					})).nonEmpty();
+				// Chapter 10 arms the free-summon tutorial, and tuto15.txt opens
+				// with Karl handing over the gems for it ("You received 5 Gems",
+				// then "Now summon yourself a strong Unit!").  The script only
+				// draws that message — the balance has to come from here, or the
+				// player reaches the summon gate unable to pay for it.
+				//
+				// Guarded on `tutorial_status < 10` so the two writes happen
+				// exactly once: MissionEnd runs again on every replay of mission
+				// 2, and an unguarded `gems + 5` would pay out each time.
+				co_await transaction->execSqlCoro(
+					"UPDATE user_info"
+					" SET tutorial_status = $1, gems = gems + $2"
+					" WHERE gumi_user_id = $3 AND id = $4 AND tutorial_status < $1;",
+					kSecondTutorialCheckpoint,
+					kTutorialSummonGems,
+					identity.gumiUserId,
+					identity.userId);
 			}
 
 			// Record the clear in the mission clear-history

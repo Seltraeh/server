@@ -75,10 +75,25 @@ bool UnitArchiver::populatePacket(
 	unit.unit_id = unitRecord.id;
 	unit.unit_lvl = 1;
 	unit.unit_type_id = unit_type_id;
+
+	// Brave Burst.  bb_id is unit_mst's skill_id (nj9Lw7mV) and every value in
+	// the archive is checked to exist in skill_mst — a unit whose id is not a
+	// real skill gets an empty string rather than a dangling reference, because
+	// the client resolves this against its own skill table.  Materials and
+	// enhancers (Ghosts, Frogs, Imps, Metals) legitimately have none.
+	//
+	// sbb_id is honoured rather than forced empty.  It used to be hardcoded to
+	// "" here, and correctly so at the time: every archived value was fabricated
+	// (110011-style ids that exist nowhere in skill_mst's 33381 rows).  Those
+	// have been cleared, so the field can be trusted again.  It is still empty
+	// for everything currently archived — unit_mst carries exactly one skill per
+	// unit, and Super Brave Burst is a 5-star-and-up mechanic, so no 3-star
+	// summon pool has one.  The plumbing is here for when higher-rarity units
+	// are archived with a verified SBB.
 	unit.bb_id = unitRecord.bb_id;
-	unit.bb_lvl = 1;
-	unit.sbb_id = "";
-	unit.sbb_lvl = 0;
+	unit.bb_lvl = unitRecord.bb_id.empty() ? 0 : 1;
+	unit.sbb_id = unitRecord.sbb_id;
+	unit.sbb_lvl = unitRecord.sbb_id.empty() ? 0 : 1;
 	unit.base_hp = stats.hp;
 	unit.base_atk = stats.atk;
 	unit.base_def = stats.def;

@@ -7,6 +7,7 @@
 
 #include <drogon/orm/DbClient.h>
 
+#include <chrono>
 #include <cstdint>
 #include <mutex>
 #include <optional>
@@ -92,6 +93,96 @@ inline drogon::Task<db::InterfaceResult<UserUnitInfo>> addUserUnit(
 		.data = std::move(packet),
 		.affected = result.affected,
 	};
+}
+
+/*!
+* Queues a present in the user's present box.
+*
+* Presents are the deferred half of the reward system: the grant is recorded
+* now and the payout happens when the player claims it in the present box
+* (PresentReceipt), which is what lets the client say "Gifts have been awarded
+* to you.  Visit your presents box to receive them."
+*
+* presentType follows the same vocabulary CampaignReceipt dispatches on (wire
+* hash 30Kw4WBa): 3 = zel, 8 = gem, 6 = unit, 4/5/7 = item/material/sphere.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved user identity to grant to.
+* @param presentType What the present pays out.
+* @param targetId Rewarded entity id, interpreted per presentType ("" for currency).
+* @param targetCnt Quantity, or the currency amount.
+* @param receiptType Claim-processing selector echoed back by PresentReceipt.
+*/
+inline drogon::Task<void> addUserPresent(
+	const db::Database database,
+	const UserIdentity identity,
+	const int32_t presentType,
+	const std::string targetId,
+	const int32_t targetCnt,
+	const int32_t receiptType = 0,
+	const std::string description = {})
+{
+	const auto now = static_cast<int64_t>(std::chrono::duration_cast<std::chrono::seconds>(
+		std::chrono::system_clock::now().time_since_epoch()).count());
+
+	co_await database->execSqlCoro(
+		"INSERT INTO user_presents"
+		" (user_id, present_type, target_id, target_cnt, receipt_type, description, present_date)"
+		" VALUES ($1, $2, $3, $4, $5, $6, $7);",
+		identity.userId, presentType, targetId, targetCnt, receiptType, description, now);
+
+	co_return;
+}
+
+/*!
+* Provisions this user's town: one lv-1 row per town facility and location.
+*
+* The town is NOT created lazily anywhere else.  UserInfo reports
+* town_facility_info / town_location_info / town_location_detail straight from
+* these two tables, and the three arrays must travel together with matching
+* cardinality or the town scene loader null-derefs (handbook §6.8).  Before this
+* existed the only writers were TownFacilityUpdate — which needs a working town
+* already — and the debug CLI's `unlocktown`, so a natural playthrough reached
+* the town with zero rows and the client crashed on entry with no server-side
+* error.  That also blocks the summon tutorial: tuto15.txt routes through
+* `change_town_top_scene` on its way to the summon gate.
+*
+* Facilities with id >= 1000 are Event Bazaar entries the client has no bundled
+* sprites for — seeding them crashes the town scene on load (handbook §3.3), so
+* they are skipped here exactly as the CLI skips them.
+*
+* Idempotent: INSERT OR IGNORE against (user_id, facility_id) /
+* (user_id, location_id), so re-running never disturbs upgrades already made.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved user identity to provision.
+*/
+inline drogon::Task<void> provisionTown(
+	const db::Database database,
+	const UserIdentity identity)
+{
+	const auto& init = theServer()->cache().initializeResp();
+
+	for (const auto& facility : init.town_facility)
+	{
+		if (facility.id >= 1000)
+			continue;
+
+		co_await database->execSqlCoro(
+			"INSERT OR IGNORE INTO user_town_facilities (user_id, facility_id, lv)"
+			" VALUES ($1, $2, 1);",
+			identity.userId, facility.id);
+	}
+
+	for (const auto& location : init.town_location)
+	{
+		co_await database->execSqlCoro(
+			"INSERT OR IGNORE INTO user_town_locations (user_id, location_id, lv)"
+			" VALUES ($1, $2, 1);",
+			identity.userId, location.id);
+	}
+
+	co_return;
 }
 
 /*!
@@ -456,10 +547,11 @@ inline drogon::Task<db::InterfaceResult<LoginInfoResp>> getLoginInfo(
 		});
 	auto packet = std::move(result.nonEmpty().front());
 
-	// The database stores tutorial_status. Before a login-info packet is sent back,
-	// handlers keep tutorial_end_flag consistent with that status. In the current
-	// server model, status 12 or greater means the tutorial is complete.
-	packet.tutorial_end_flag = packet.tutorial_status >= 12;
+	// tutorial_status (9sQM2XcN) and tutorial_end_flag (sv6BEI8X) are both read
+	// straight from user_info now.  The flag used to be derived here as
+	// `tutorial_status >= 12`, which ended the tutorial four scripts early and
+	// made the status pointer impossible to test independently; TutorialUpdate
+	// persists what the client reports instead (14082026_AddTutorialEndFlag).
 
 	co_return db::InterfaceResult<LoginInfoResp>{
 		.data = std::move(packet),

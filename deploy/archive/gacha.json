@@ -1,202 +1,975 @@
 [
-    {
-        "id":  1000,
-        "priority":  1,
-        "background":  "gacha_normal_bg_img_20141121.png",
-        "pool":  [
-                     {
-                         "unit_id":  10202,
-                         "weight":  100,
-                         "name":  "Fire Ghost"
-                     },
-                     {
-                         "unit_id":  20202,
-                         "weight":  100,
-                         "name":  "Water Ghost"
-                     },
-                     {
-                         "unit_id":  30202,
-                         "weight":  100,
-                         "name":  "Earth Ghost"
-                     },
-                     {
-                         "unit_id":  40202,
-                         "weight":  100,
-                         "name":  "Thunder Ghost"
-                     },
-                     {
-                         "unit_id":  50202,
-                         "weight":  100,
-                         "name":  "Light Ghost"
-                     },
-                     {
-                         "unit_id":  60132,
-                         "weight":  100,
-                         "name":  "Metal Ghost"
-                     },
-                     {
-                         "unit_id":  10203,
-                         "weight":  30,
-                         "name":  "Fire King"
-                     },
-                     {
-                         "unit_id":  20203,
-                         "weight":  30,
-                         "name":  "Water King"
-                     },
-                     {
-                         "unit_id":  30203,
-                         "weight":  30,
-                         "name":  "Earth King"
-                     },
-                     {
-                         "unit_id":  40203,
-                         "weight":  30,
-                         "name":  "Thunder King"
-                     },
-                     {
-                         "unit_id":  50203,
-                         "weight":  30,
-                         "name":  "Light King"
-                     },
-                     {
-                         "unit_id":  60133,
-                         "weight":  30,
-                         "name":  "Metal King"
-                     },
-                     {
-                         "unit_id":  10204,
-                         "weight":  10,
-                         "name":  "Fire God"
-                     },
-                     {
-                         "unit_id":  20204,
-                         "weight":  10,
-                         "name":  "Water God"
-                     },
-                     {
-                         "unit_id":  30204,
-                         "weight":  10,
-                         "name":  "Earth God"
-                     },
-                     {
-                         "unit_id":  40204,
-                         "weight":  10,
-                         "name":  "Thunder God"
-                     },
-                     {
-                         "unit_id":  50204,
-                         "weight":  10,
-                         "name":  "Light God"
-                     },
-                     {
-                         "unit_id":  60134,
-                         "weight":  10,
-                         "name":  "Metal God"
-                     },
-                     {
-                         "unit_id":  10344,
-                         "weight":  5,
-                         "name":  "Fire Crystal"
-                     },
-                     {
-                         "unit_id":  20334,
-                         "weight":  5,
-                         "name":  "Water Crystal"
-                     },
-                     {
-                         "unit_id":  30324,
-                         "weight":  5,
-                         "name":  "Earth Crystal"
-                     },
-                     {
-                         "unit_id":  40324,
-                         "weight":  5,
-                         "name":  "Thunder Crystal"
-                     },
-                     {
-                         "unit_id":  50364,
-                         "weight":  5,
-                         "name":  "Light Crystal"
-                     },
-                     {
-                         "unit_id":  60334,
-                         "weight":  5,
-                         "name":  "Dark Crystal"
-                     },
-                     {
-                         "unit_id":  50131,
-                         "weight":  600,
-                         "name":  "Jewel Ghost"
-                     },
-                     {
-                         "unit_id":  50132,
-                         "weight":  180,
-                         "name":  "Jewel King"
-                     },
-                     {
-                         "unit_id":  50133,
-                         "weight":  60,
-                         "name":  "Jewel God"
-                     },
-                     {
-                         "unit_id":  10452,
-                         "weight":  20,
-                         "name":  "Power Imp Pakpak"
-                     },
-                     {
-                         "unit_id":  20442,
-                         "weight":  20,
-                         "name":  "Guard Imp Ganju"
-                     },
-                     {
-                         "unit_id":  30432,
-                         "weight":  20,
-                         "name":  "Healing Imp Fwahl"
-                     },
-                     {
-                         "unit_id":  40432,
-                         "weight":  20,
-                         "name":  "Vigor Imp Molin"
-                     },
-                     {
-                         "unit_id":  20302,
-                         "weight":  30,
-                         "name":  "Sphere Frog"
-                     },
-                     {
-                         "unit_id":  10312,
-                         "weight":  80,
-                         "name":  "Burst Frog"
-                     }
-                 ]
-    },
-    {
-        "id":  11960,
-        "priority":  1,
-        "caption_msg":  "\u003ccenter\u003e[\u003ccolor=255:255:0\u003eRare Summon: All Star Units!\u003c/color\u003e]\u003cbr\u003eSummon \u003ccolor=255:0:0\u003e3~4*\u003c/color\u003e units! \u003ccolor=0:255:0\u003eIncreased Rates\u003c/color\u003e for featured units \u003ccolor=192:192:192\u003eZellha\u003c/color\u003e, \u003ccolor=128:0:128\u003eElza\u003c/color\u003e and \u003ccolor=0:0:255\u003eElimo\u003c/color\u003e! \u003ccolor=255:255:0\u003e\u003cbr\u003eSummon now!\u003c/color\u003e\u003ccenter\u003e",
-        "detail_msg":  "\u003ccenter\u003eSummon units with \u003ccolor=255:0:0\u003e3* and 4*\u003c/color\u003e rarity! \u003ccolor=0:255:0\u003eIncreased Rates\u003c/color\u003e for daily featured units!\u003cbr\u003eEnjoy \u003ccolor=255:255:0\u003eSUMMON\u003c/color\u003e for \u003ccolor=255:255:0\u003e3 gems\u003c/color\u003e!\u003ccenter\u003e",
-        "pool":  [
-                     {
-                         "unit_id":  10011,
-                         "weight":  100,
-                         "name":  "Fencer Vargas"
-                     },
-                     {
-                         "unit_id":  20011,
-                         "weight":  100,
-                         "name":  "Selena"
-                     },
-                     {
-                         "unit_id":  30011,
-                         "weight":  100,
-                         "name":  "Pikeman Lance"
-                     },
-                     {
-                         "unit_id":  40011,
-                         "weight":  100,
-                         "name":  "Warrior Eze"
-                     }
-                 ]
-    }
+  {
+    "id": 1000,
+    "priority": 1,
+    "background": "gacha_normal_bg_img_20141121.png",
+    "pool": [
+      {
+        "unit_id": 10202,
+        "weight": 100,
+        "name": "Fire Ghost"
+      },
+      {
+        "unit_id": 20202,
+        "weight": 100,
+        "name": "Water Ghost"
+      },
+      {
+        "unit_id": 30202,
+        "weight": 100,
+        "name": "Earth Ghost"
+      },
+      {
+        "unit_id": 40202,
+        "weight": 100,
+        "name": "Thunder Ghost"
+      },
+      {
+        "unit_id": 50202,
+        "weight": 100,
+        "name": "Light Ghost"
+      },
+      {
+        "unit_id": 60132,
+        "weight": 100,
+        "name": "Metal Ghost"
+      },
+      {
+        "unit_id": 10203,
+        "weight": 30,
+        "name": "Fire King"
+      },
+      {
+        "unit_id": 20203,
+        "weight": 30,
+        "name": "Water King"
+      },
+      {
+        "unit_id": 30203,
+        "weight": 30,
+        "name": "Earth King"
+      },
+      {
+        "unit_id": 40203,
+        "weight": 30,
+        "name": "Thunder King"
+      },
+      {
+        "unit_id": 50203,
+        "weight": 30,
+        "name": "Light King"
+      },
+      {
+        "unit_id": 60133,
+        "weight": 30,
+        "name": "Metal King"
+      },
+      {
+        "unit_id": 10204,
+        "weight": 10,
+        "name": "Fire God"
+      },
+      {
+        "unit_id": 20204,
+        "weight": 10,
+        "name": "Water God"
+      },
+      {
+        "unit_id": 30204,
+        "weight": 10,
+        "name": "Earth God"
+      },
+      {
+        "unit_id": 40204,
+        "weight": 10,
+        "name": "Thunder God"
+      },
+      {
+        "unit_id": 50204,
+        "weight": 10,
+        "name": "Light God"
+      },
+      {
+        "unit_id": 60134,
+        "weight": 10,
+        "name": "Metal God"
+      },
+      {
+        "unit_id": 10344,
+        "weight": 5,
+        "name": "Fire Crystal"
+      },
+      {
+        "unit_id": 20334,
+        "weight": 5,
+        "name": "Water Crystal"
+      },
+      {
+        "unit_id": 30324,
+        "weight": 5,
+        "name": "Earth Crystal"
+      },
+      {
+        "unit_id": 40324,
+        "weight": 5,
+        "name": "Thunder Crystal"
+      },
+      {
+        "unit_id": 50364,
+        "weight": 5,
+        "name": "Light Crystal"
+      },
+      {
+        "unit_id": 60334,
+        "weight": 5,
+        "name": "Dark Crystal"
+      },
+      {
+        "unit_id": 50131,
+        "weight": 600,
+        "name": "Jewel Ghost"
+      },
+      {
+        "unit_id": 50132,
+        "weight": 180,
+        "name": "Jewel King"
+      },
+      {
+        "unit_id": 50133,
+        "weight": 60,
+        "name": "Jewel God"
+      },
+      {
+        "unit_id": 10452,
+        "weight": 20,
+        "name": "Power Imp Pakpak"
+      },
+      {
+        "unit_id": 20442,
+        "weight": 20,
+        "name": "Guard Imp Ganju"
+      },
+      {
+        "unit_id": 30432,
+        "weight": 20,
+        "name": "Healing Imp Fwahl"
+      },
+      {
+        "unit_id": 40432,
+        "weight": 20,
+        "name": "Vigor Imp Molin"
+      },
+      {
+        "unit_id": 20302,
+        "weight": 30,
+        "name": "Sphere Frog"
+      },
+      {
+        "unit_id": 10312,
+        "weight": 80,
+        "name": "Burst Frog"
+      }
+    ]
+  },
+  {
+    "id": 2000,
+    "priority": 1,
+    "caption_msg": "<center>[<color=255:255:0>Rare Summon</color>]<br>Summon a <color=255:0:0>3★</color> unit!<center>",
+    "detail_msg": "<center>Chance to get any <color=255:0:0>3★</color> unit from SUMMON!<br>Enjoy <color=255:255:0>SUMMON</color> for <color=255:255:0>5 gems</color>!<center>",
+    "pool": [
+      {
+        "unit_id": 10012,
+        "weight": 100,
+        "name": "MST_UNIT_10012_NAME"
+      },
+      {
+        "unit_id": 10022,
+        "weight": 100,
+        "name": "MST_UNIT_10022_NAME"
+      },
+      {
+        "unit_id": 10032,
+        "weight": 100,
+        "name": "MST_UNIT_10032_NAME"
+      },
+      {
+        "unit_id": 10042,
+        "weight": 100,
+        "name": "MST_UNIT_10042_NAME"
+      },
+      {
+        "unit_id": 10052,
+        "weight": 100,
+        "name": "MST_UNIT_10052_NAME"
+      },
+      {
+        "unit_id": 10062,
+        "weight": 100,
+        "name": "MST_UNIT_10062_NAME"
+      },
+      {
+        "unit_id": 10072,
+        "weight": 100,
+        "name": "MST_UNIT_10072_NAME"
+      },
+      {
+        "unit_id": 10082,
+        "weight": 100,
+        "name": "MST_UNIT_10082_NAME"
+      },
+      {
+        "unit_id": 10092,
+        "weight": 100,
+        "name": "Firedrake"
+      },
+      {
+        "unit_id": 10102,
+        "weight": 100,
+        "name": "Knight Agni"
+      },
+      {
+        "unit_id": 10112,
+        "weight": 100,
+        "name": "Phoenix"
+      },
+      {
+        "unit_id": 10122,
+        "weight": 100,
+        "name": "Lava"
+      },
+      {
+        "unit_id": 10142,
+        "weight": 100,
+        "name": "MST_UNIT_10142_NAME"
+      },
+      {
+        "unit_id": 10152,
+        "weight": 100,
+        "name": "Lancia"
+      },
+      {
+        "unit_id": 10162,
+        "weight": 100,
+        "name": "Lorand"
+      },
+      {
+        "unit_id": 10172,
+        "weight": 100,
+        "name": "MST_UNIT_10172_NAME"
+      },
+      {
+        "unit_id": 10182,
+        "weight": 100,
+        "name": "MST_UNIT_10182_NAME"
+      },
+      {
+        "unit_id": 10212,
+        "weight": 100,
+        "name": "Drake Chief Aisha"
+      },
+      {
+        "unit_id": 10222,
+        "weight": 100,
+        "name": "MST_UNIT_10222_NAME"
+      },
+      {
+        "unit_id": 10262,
+        "weight": 100,
+        "name": "MST_UNIT_10262_NAME"
+      },
+      {
+        "unit_id": 10302,
+        "weight": 100,
+        "name": "MST_UNIT_10302_NAME"
+      },
+      {
+        "unit_id": 10612,
+        "weight": 100,
+        "name": "MST_UNIT_10612_NAME"
+      },
+      {
+        "unit_id": 10622,
+        "weight": 100,
+        "name": "MST_UNIT_10622_NAME"
+      },
+      {
+        "unit_id": 10722,
+        "weight": 100,
+        "name": "MST_UNIT_10722_NAME"
+      },
+      {
+        "unit_id": 10922,
+        "weight": 100,
+        "name": "Ｆ‐２型フラムロ"
+      },
+      {
+        "unit_id": 20012,
+        "weight": 100,
+        "name": "MST_UNIT_20012_NAME"
+      },
+      {
+        "unit_id": 20022,
+        "weight": 100,
+        "name": "MST_UNIT_20022_NAME"
+      },
+      {
+        "unit_id": 20032,
+        "weight": 100,
+        "name": "MST_UNIT_20032_NAME"
+      },
+      {
+        "unit_id": 20042,
+        "weight": 100,
+        "name": "MST_UNIT_20042_NAME"
+      },
+      {
+        "unit_id": 20052,
+        "weight": 100,
+        "name": "MST_UNIT_20052_NAME"
+      },
+      {
+        "unit_id": 20062,
+        "weight": 100,
+        "name": "MST_UNIT_20062_NAME"
+      },
+      {
+        "unit_id": 20072,
+        "weight": 100,
+        "name": "MST_UNIT_20072_NAME"
+      },
+      {
+        "unit_id": 20082,
+        "weight": 100,
+        "name": "MST_UNIT_20082_NAME"
+      },
+      {
+        "unit_id": 20092,
+        "weight": 100,
+        "name": "Undine"
+      },
+      {
+        "unit_id": 20102,
+        "weight": 100,
+        "name": "Knight Sergio"
+      },
+      {
+        "unit_id": 20112,
+        "weight": 100,
+        "name": "Leviathan"
+      },
+      {
+        "unit_id": 20122,
+        "weight": 100,
+        "name": "Captain Mega"
+      },
+      {
+        "unit_id": 20142,
+        "weight": 100,
+        "name": "MST_UNIT_20142_NAME"
+      },
+      {
+        "unit_id": 20152,
+        "weight": 100,
+        "name": "Elimo"
+      },
+      {
+        "unit_id": 20162,
+        "weight": 100,
+        "name": "Dean"
+      },
+      {
+        "unit_id": 20172,
+        "weight": 100,
+        "name": "MST_UNIT_20172_NAME"
+      },
+      {
+        "unit_id": 20182,
+        "weight": 100,
+        "name": "MST_UNIT_20182_NAME"
+      },
+      {
+        "unit_id": 20212,
+        "weight": 100,
+        "name": "Twin Gem Rickel"
+      },
+      {
+        "unit_id": 20222,
+        "weight": 100,
+        "name": "MST_UNIT_20222_NAME"
+      },
+      {
+        "unit_id": 20262,
+        "weight": 100,
+        "name": "MST_UNIT_20262_NAME"
+      },
+      {
+        "unit_id": 20582,
+        "weight": 100,
+        "name": "MST_UNIT_20582_NAME"
+      },
+      {
+        "unit_id": 20592,
+        "weight": 100,
+        "name": "MST_UNIT_20592_NAME"
+      },
+      {
+        "unit_id": 20662,
+        "weight": 100,
+        "name": "MST_UNIT_20662_NAME"
+      },
+      {
+        "unit_id": 20862,
+        "weight": 100,
+        "name": "巡監機ドレース"
+      },
+      {
+        "unit_id": 20892,
+        "weight": 100,
+        "name": "凍狼ゾルフ"
+      },
+      {
+        "unit_id": 30012,
+        "weight": 100,
+        "name": "MST_UNIT_30012_NAME"
+      },
+      {
+        "unit_id": 30022,
+        "weight": 100,
+        "name": "MST_UNIT_30022_NAME"
+      },
+      {
+        "unit_id": 30032,
+        "weight": 100,
+        "name": "MST_UNIT_30032_NAME"
+      },
+      {
+        "unit_id": 30042,
+        "weight": 100,
+        "name": "MST_UNIT_30042_NAME"
+      },
+      {
+        "unit_id": 30052,
+        "weight": 100,
+        "name": "MST_UNIT_30052_NAME"
+      },
+      {
+        "unit_id": 30062,
+        "weight": 100,
+        "name": "MST_UNIT_30062_NAME"
+      },
+      {
+        "unit_id": 30072,
+        "weight": 100,
+        "name": "MST_UNIT_30072_NAME"
+      },
+      {
+        "unit_id": 30082,
+        "weight": 100,
+        "name": "MST_UNIT_30082_NAME"
+      },
+      {
+        "unit_id": 30092,
+        "weight": 100,
+        "name": "Dryad"
+      },
+      {
+        "unit_id": 30102,
+        "weight": 100,
+        "name": "Princess Lidith"
+      },
+      {
+        "unit_id": 30112,
+        "weight": 100,
+        "name": "Great Tree Alneu"
+      },
+      {
+        "unit_id": 30122,
+        "weight": 100,
+        "name": "Gunner Douglas"
+      },
+      {
+        "unit_id": 30142,
+        "weight": 100,
+        "name": "MST_UNIT_30142_NAME"
+      },
+      {
+        "unit_id": 30152,
+        "weight": 100,
+        "name": "Pixy Leore"
+      },
+      {
+        "unit_id": 30162,
+        "weight": 100,
+        "name": "Edea"
+      },
+      {
+        "unit_id": 30172,
+        "weight": 100,
+        "name": "MST_UNIT_30172_NAME"
+      },
+      {
+        "unit_id": 30182,
+        "weight": 100,
+        "name": "MST_UNIT_30182_NAME"
+      },
+      {
+        "unit_id": 30212,
+        "weight": 100,
+        "name": "Twins Il & Mina"
+      },
+      {
+        "unit_id": 30222,
+        "weight": 100,
+        "name": "MST_UNIT_30222_NAME"
+      },
+      {
+        "unit_id": 30262,
+        "weight": 100,
+        "name": "MST_UNIT_30262_NAME"
+      },
+      {
+        "unit_id": 30572,
+        "weight": 100,
+        "name": "MST_UNIT_30572_NAME"
+      },
+      {
+        "unit_id": 30582,
+        "weight": 100,
+        "name": "MST_UNIT_30582_NAME"
+      },
+      {
+        "unit_id": 30662,
+        "weight": 100,
+        "name": "MST_UNIT_30662_NAME"
+      },
+      {
+        "unit_id": 30822,
+        "weight": 100,
+        "name": "ＢＧ‐Ｅ７５０"
+      },
+      {
+        "unit_id": 30932,
+        "weight": 100,
+        "name": "魔塊メガラム"
+      },
+      {
+        "unit_id": 40012,
+        "weight": 100,
+        "name": "MST_UNIT_40012_NAME"
+      },
+      {
+        "unit_id": 40022,
+        "weight": 100,
+        "name": "MST_UNIT_40022_NAME"
+      },
+      {
+        "unit_id": 40032,
+        "weight": 100,
+        "name": "MST_UNIT_40032_NAME"
+      },
+      {
+        "unit_id": 40042,
+        "weight": 100,
+        "name": "MST_UNIT_40042_NAME"
+      },
+      {
+        "unit_id": 40052,
+        "weight": 100,
+        "name": "MST_UNIT_40052_NAME"
+      },
+      {
+        "unit_id": 40062,
+        "weight": 100,
+        "name": "MST_UNIT_40062_NAME"
+      },
+      {
+        "unit_id": 40072,
+        "weight": 100,
+        "name": "MST_UNIT_40072_NAME"
+      },
+      {
+        "unit_id": 40082,
+        "weight": 100,
+        "name": "MST_UNIT_40082_NAME"
+      },
+      {
+        "unit_id": 40092,
+        "weight": 100,
+        "name": "Thunderbird"
+      },
+      {
+        "unit_id": 40102,
+        "weight": 100,
+        "name": "Sky Knight Falma"
+      },
+      {
+        "unit_id": 40112,
+        "weight": 100,
+        "name": "Behemoth"
+      },
+      {
+        "unit_id": 40122,
+        "weight": 100,
+        "name": "Emilia"
+      },
+      {
+        "unit_id": 40142,
+        "weight": 100,
+        "name": "MST_UNIT_40142_NAME"
+      },
+      {
+        "unit_id": 40152,
+        "weight": 100,
+        "name": "Tinkerer Elulu"
+      },
+      {
+        "unit_id": 40162,
+        "weight": 100,
+        "name": "Loch"
+      },
+      {
+        "unit_id": 40172,
+        "weight": 100,
+        "name": "MST_UNIT_40172_NAME"
+      },
+      {
+        "unit_id": 40182,
+        "weight": 100,
+        "name": "MST_UNIT_40182_NAME"
+      },
+      {
+        "unit_id": 40212,
+        "weight": 100,
+        "name": "Bolt Pike Amy"
+      },
+      {
+        "unit_id": 40222,
+        "weight": 100,
+        "name": "MST_UNIT_40222_NAME"
+      },
+      {
+        "unit_id": 40262,
+        "weight": 100,
+        "name": "MST_UNIT_40262_NAME"
+      },
+      {
+        "unit_id": 40552,
+        "weight": 100,
+        "name": "MST_UNIT_40552_NAME"
+      },
+      {
+        "unit_id": 40562,
+        "weight": 100,
+        "name": "MST_UNIT_40562_NAME"
+      },
+      {
+        "unit_id": 40632,
+        "weight": 100,
+        "name": "MST_UNIT_40632_NAME"
+      },
+      {
+        "unit_id": 40802,
+        "weight": 100,
+        "name": "棘機獣ラズビット"
+      },
+      {
+        "unit_id": 50012,
+        "weight": 100,
+        "name": "MST_UNIT_50012_NAME"
+      },
+      {
+        "unit_id": 50022,
+        "weight": 100,
+        "name": "MST_UNIT_50022_NAME"
+      },
+      {
+        "unit_id": 50032,
+        "weight": 100,
+        "name": "MST_UNIT_50032_NAME"
+      },
+      {
+        "unit_id": 50042,
+        "weight": 100,
+        "name": "MST_UNIT_50042_NAME"
+      },
+      {
+        "unit_id": 50052,
+        "weight": 100,
+        "name": "MST_UNIT_50052_NAME"
+      },
+      {
+        "unit_id": 50061,
+        "weight": 100,
+        "name": "MST_UNIT_50061_NAME"
+      },
+      {
+        "unit_id": 50072,
+        "weight": 100,
+        "name": "MST_UNIT_50072_NAME"
+      },
+      {
+        "unit_id": 50082,
+        "weight": 100,
+        "name": "Valkyrie"
+      },
+      {
+        "unit_id": 50092,
+        "weight": 100,
+        "name": "Cowboy Heidt"
+      },
+      {
+        "unit_id": 50102,
+        "weight": 100,
+        "name": "Wyvern"
+      },
+      {
+        "unit_id": 50112,
+        "weight": 100,
+        "name": "Knight Will"
+      },
+      {
+        "unit_id": 50142,
+        "weight": 100,
+        "name": "MST_UNIT_50142_NAME"
+      },
+      {
+        "unit_id": 50152,
+        "weight": 100,
+        "name": "Knight Aem"
+      },
+      {
+        "unit_id": 50162,
+        "weight": 100,
+        "name": "Eight Blade Sefia"
+      },
+      {
+        "unit_id": 50172,
+        "weight": 100,
+        "name": "MST_UNIT_50172_NAME"
+      },
+      {
+        "unit_id": 50182,
+        "weight": 100,
+        "name": "MST_UNIT_50182_NAME"
+      },
+      {
+        "unit_id": 50242,
+        "weight": 100,
+        "name": "MST_UNIT_50242_NAME"
+      },
+      {
+        "unit_id": 50292,
+        "weight": 100,
+        "name": "MST_UNIT_50292_NAME"
+      },
+      {
+        "unit_id": 50672,
+        "weight": 100,
+        "name": "MST_UNIT_50672_NAME"
+      },
+      {
+        "unit_id": 50682,
+        "weight": 100,
+        "name": "MST_UNIT_50682_NAME"
+      },
+      {
+        "unit_id": 50802,
+        "weight": 100,
+        "name": "MST_UNIT_50802_NAME"
+      },
+      {
+        "unit_id": 51112,
+        "weight": 100,
+        "name": "霊狐ギン"
+      },
+      {
+        "unit_id": 51192,
+        "weight": 100,
+        "name": "奉竜ラプター"
+      },
+      {
+        "unit_id": 60012,
+        "weight": 100,
+        "name": "MST_UNIT_60012_NAME"
+      },
+      {
+        "unit_id": 60022,
+        "weight": 100,
+        "name": "MST_UNIT_60022_NAME"
+      },
+      {
+        "unit_id": 60032,
+        "weight": 100,
+        "name": "MST_UNIT_60032_NAME"
+      },
+      {
+        "unit_id": 60042,
+        "weight": 100,
+        "name": "MST_UNIT_60042_NAME"
+      },
+      {
+        "unit_id": 60052,
+        "weight": 100,
+        "name": "MST_UNIT_60052_NAME"
+      },
+      {
+        "unit_id": 60062,
+        "weight": 100,
+        "name": "MST_UNIT_60062_NAME"
+      },
+      {
+        "unit_id": 60072,
+        "weight": 100,
+        "name": "MST_UNIT_60072_NAME"
+      },
+      {
+        "unit_id": 60082,
+        "weight": 100,
+        "name": "Vampire"
+      },
+      {
+        "unit_id": 60092,
+        "weight": 100,
+        "name": "Shida"
+      },
+      {
+        "unit_id": 60102,
+        "weight": 100,
+        "name": "Memetes"
+      },
+      {
+        "unit_id": 60112,
+        "weight": 100,
+        "name": "Alice"
+      },
+      {
+        "unit_id": 60152,
+        "weight": 100,
+        "name": "MST_UNIT_60152_NAME"
+      },
+      {
+        "unit_id": 60162,
+        "weight": 100,
+        "name": "Lemia"
+      },
+      {
+        "unit_id": 60172,
+        "weight": 100,
+        "name": "Kikuri"
+      },
+      {
+        "unit_id": 60182,
+        "weight": 100,
+        "name": "MST_UNIT_60182_NAME"
+      },
+      {
+        "unit_id": 60192,
+        "weight": 100,
+        "name": "MST_UNIT_60192_NAME"
+      },
+      {
+        "unit_id": 60212,
+        "weight": 100,
+        "name": "MST_UNIT_60212_NAME"
+      },
+      {
+        "unit_id": 60262,
+        "weight": 100,
+        "name": "MST_UNIT_60262_NAME"
+      },
+      {
+        "unit_id": 60682,
+        "weight": 100,
+        "name": "MST_UNIT_60682_NAME"
+      },
+      {
+        "unit_id": 60692,
+        "weight": 100,
+        "name": "MST_UNIT_60692_NAME"
+      },
+      {
+        "unit_id": 60822,
+        "weight": 100,
+        "name": "MST_UNIT_60822_NAME"
+      },
+      {
+        "unit_id": 61072,
+        "weight": 100,
+        "name": "幽魔サヨリ"
+      },
+      {
+        "unit_id": 810003,
+        "weight": 100,
+        "name": "MST_UNIT_810003_NAME"
+      },
+      {
+        "unit_id": 810212,
+        "weight": 100,
+        "name": "Nice Burny"
+      },
+      {
+        "unit_id": 820003,
+        "weight": 100,
+        "name": "MST_UNIT_820003_NAME"
+      },
+      {
+        "unit_id": 830003,
+        "weight": 100,
+        "name": "MST_UNIT_830003_NAME"
+      },
+      {
+        "unit_id": 840003,
+        "weight": 100,
+        "name": "MST_UNIT_840003_NAME"
+      },
+      {
+        "unit_id": 850003,
+        "weight": 100,
+        "name": "MST_UNIT_850003_NAME"
+      },
+      {
+        "unit_id": 850013,
+        "weight": 100,
+        "name": "MST_UNIT_850013_NAME"
+      },
+      {
+        "unit_id": 860003,
+        "weight": 100,
+        "name": "MST_UNIT_860003_NAME"
+      },
+      {
+        "unit_id": 860013,
+        "weight": 100,
+        "name": "MST_UNIT_860013_NAME"
+      }
+    ]
+  },
+  {
+    "id": 11960,
+    "priority": 1,
+    "caption_msg": "<center>[<color=255:255:0>Rare Summon: All Star Units!</color>]<br>Summon <color=255:0:0>3~4*</color> units! <color=0:255:0>Increased Rates</color> for featured units <color=192:192:192>Zellha</color>, <color=128:0:128>Elza</color> and <color=0:0:255>Elimo</color>! <color=255:255:0><br>Summon now!</color><center>",
+    "detail_msg": "<center>Summon units with <color=255:0:0>3* and 4*</color> rarity! <color=0:255:0>Increased Rates</color> for daily featured units!<br>Enjoy <color=255:255:0>SUMMON</color> for <color=255:255:0>3 gems</color>!<center>",
+    "pool": [
+      {
+        "unit_id": 10011,
+        "weight": 100,
+        "name": "Fencer Vargas"
+      },
+      {
+        "unit_id": 20011,
+        "weight": 100,
+        "name": "Selena"
+      },
+      {
+        "unit_id": 30011,
+        "weight": 100,
+        "name": "Pikeman Lance"
+      },
+      {
+        "unit_id": 40011,
+        "weight": 100,
+        "name": "Warrior Eze"
+      }
+    ]
+  }
 ]

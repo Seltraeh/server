@@ -31,6 +31,15 @@ PacketInterfaceFor<::LoginInfoResp>::fields()
 			.update = true,
 			.insert = true,
 		}),
+		// sv6BEI8X — reported by the client in every login envelope, stored by
+		// TutorialUpdate, echoed back here.  Was derived from tutorial_status
+		// until 14082026_AddTutorialEndFlag; see that migration for why the
+		// threshold was wrong.
+		field<&::LoginInfoResp::tutorial_end_flag>("tutorial_end_flag", {
+			.read = true,
+			.update = true,
+			.insert = true,
+		}),
 		// Echoes back the one-off scene intros the client told us it has played
 		// (9yVsu21R).  DungeonEventUpdate stores what the client reports; this
 		// sends it back in the login envelope so the intros stay marked seen.
