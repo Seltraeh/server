@@ -596,6 +596,40 @@ static void RegisterMigrations(MigrationMap& map)
 			" ON user_presents (user_id, is_receipt);");
 	});
 
+	// Harvest state for the four town resource tiles.  Lives on the existing
+	// location row because it is 1:1 with it — UserTownLocationDetail (s8TCo2MS)
+	// and UserTownLocationInfo (yj46Q2xw) are the same (user, location) key.
+	//
+	// The server pre-rolls a whole period of drops into drop_info and the client
+	// replays them tap by tap, so these three columns ARE the tile: without them
+	// every tile reports 0 taps forever and never sparkles.  See
+	// tools/TOWN_STATE_MODEL.md.
+	migrate("18082026_AddTownLocationHarvestState", {
+		// Unix seconds the current harvest period began; 0 = never rolled.
+		p->execSqlSync(
+			"ALTER TABLE user_town_locations ADD COLUMN period_start INTEGER NOT NULL DEFAULT 0");
+		// Taps REMAINING, matching the client's own decTapCnt semantics.
+		p->execSqlSync(
+			"ALTER TABLE user_town_locations ADD COLUMN tap_cnt INTEGER NOT NULL DEFAULT 0");
+		// "<itemId>:<zel>:<karma>,..." — one element per tap of this period.
+		p->execSqlSync(
+			"ALTER TABLE user_town_locations ADD COLUMN drop_info TEXT NOT NULL DEFAULT ''");
+	});
+
+	// Per-recipe craft tally behind PermitRecipe.craft_count (H6k1LIxC).  The
+	// client bumps its own copy after each craft (GameUtils::updatePermitRecipe),
+	// so the count has to survive a relaunch to stay in step.
+	migrate("18082026_CreateUserRecipeCraftsTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_recipe_crafts ("
+			"user_id     TEXT    NOT NULL,"
+			"recipe_id   INTEGER NOT NULL,"
+			"craft_count INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, recipe_id)"
+			");"
+		);
+	});
+
 }
 
 /*!

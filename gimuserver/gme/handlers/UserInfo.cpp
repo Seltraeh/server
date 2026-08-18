@@ -183,46 +183,30 @@ HANDLEF(UserInfo)
 		}
 	}
 
+	// The cleared-mission set, derived once.  It gates the town below and the
+	// Grand Gaia half of PermitPlace further down, and the two must agree —
+	// they are the same progression signal read twice.
+	std::set<int32_t> clearedMissions;
+	for (const auto& done : resp.clear_mission_info)
+		clearedMissions.insert(done.mission_id);
+
 	// Town state — the three arrays travel together (§6.8): every location in
 	// town_location_info needs a matching town_location_detail entry or the
-	// town scene loader null-derefs.  Rows are provisioned by the town unlock
-	// (CLI `unlocktown` for now); a fresh account has none and sends empty
-	// arrays, which the client treats as town-not-available.
-	{
-		const auto facilityRows = co_await db->execSqlCoro(
-			"SELECT facility_id, lv, karma FROM user_town_facilities WHERE user_id = $1;",
-			identity.userId);
-		for (const auto& row : facilityRows)
-		{
-			resp.town_facility_info.push_back(UserTownFacilityInfo{
-				.user_id = identity.userId,
-				.facility_id = row["facility_id"].as<int32_t>(),
-				.lv = row["lv"].as<int32_t>(),
-				.karma = row["karma"].as<int32_t>(),
-			});
-		}
+	// town scene loader null-derefs.  Rows are provisioned by provisionTown.
+	//
+	// The detail array is the resource tiles' live harvest state, and this is
+	// the only place the client ever learns it: a fresh period is rolled here
+	// when the last one has aged out, because there is no other request that
+	// runs on entering town.  Field semantics in tools/TOWN_STATE_MODEL.md.
+	resp.town_facility_info = co_await gme::Town::facilityState(db, identity);
+	co_await gme::Town::locationState(
+		db, identity, clearedMissions, resp.town_location_info, resp.town_location_detail);
 
-		const auto locationRows = co_await db->execSqlCoro(
-			"SELECT location_id, lv, karma FROM user_town_locations WHERE user_id = $1;",
-			identity.userId);
-		for (const auto& row : locationRows)
-		{
-			const auto locationId = row["location_id"].as<int32_t>();
-			resp.town_location_info.push_back(UserTownLocationInfo{
-				.user_id = identity.userId,
-				.location_id = locationId,
-				.lv = row["lv"].as<int32_t>(),
-				.karma = row["karma"].as<int32_t>(),
-			});
-			resp.town_location_detail.push_back(UserTownLocationDetail{
-				.user_id = identity.userId,
-				.unk = locationId,
-				.unk2 = {},  // epoch — tap period not yet started
-				.unk3 = 0,   // no taps accumulated
-				.unk4 = "",
-			});
-		}
-	}
+	// Synthesis menu (51yQrDBR).  MyTownItemListScene::setRecipeList and its
+	// sphere counterpart iterate PermitRecipeInfoList and nothing else, so an
+	// absent list is exactly why both Synthesis facilities have been rendering
+	// empty.  Derived from the player's facility levels.
+	resp.permit_receipes = co_await gme::Town::permittedRecipes(db, identity, clearedMissions);
 
     // Summon catalog (1IR86sAv doors + IBs49NiH banner rail).  Identical to
     // what GachaList returns, and deliberately duplicated here.
@@ -433,9 +417,7 @@ HANDLEF(UserInfo)
         bool first = false; // the base always emitted entries
 
         // --- Grand Gaia, gated on progress -------------------------------
-        std::set<int32_t> cleared;
-        for (const auto& done : resp.clear_mission_info)
-            cleared.insert(done.mission_id);
+        const auto& cleared = clearedMissions;
 
         const auto& cache = theServer()->cache();
         const auto& needs = cache.missionNeeds();

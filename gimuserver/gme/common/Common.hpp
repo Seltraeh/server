@@ -3,6 +3,7 @@
 #include <gimuserver/archive/UnitArchiver.hpp>
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Energy.hpp>
+#include <gimuserver/gme/common/Town.hpp>
 #include <gimuserver/utils/Random.hpp>
 
 #include <drogon/orm/DbClient.h>
@@ -135,7 +136,7 @@ inline drogon::Task<void> addUserPresent(
 }
 
 /*!
-* Provisions this user's town: one lv-1 row per town facility and location.
+* Provisions this user's town: one base-level row per town facility and location.
 *
 * The town is NOT created lazily anywhere else.  UserInfo reports
 * town_facility_info / town_location_info / town_location_detail straight from
@@ -146,6 +147,18 @@ inline drogon::Task<void> addUserPresent(
 * the town with zero rows and the client crashed on entry with no server-side
 * error.  That also blocks the summon tutorial: tuto15.txt routes through
 * `change_town_top_scene` on its way to the summon gate.
+*
+* EVERY facility and location is seeded, including the ones the player has not
+* unlocked yet.  The mission gate is enforced client-side against
+* need_mission_id (MyTownTopScene::isOpen / setLocationInfo), and a location
+* with no row is skipped by the render loop outright — so withholding rows
+* hides those tiles permanently instead of locking them.  Town::locationState
+* is what keeps a locked tile inert.
+*
+* The base level is per-facility, not a flat 1: facilities 1 and 2 (sphere and
+* item synthesis) have level rows from 1, but 3-6 only ever have a lv 0 row, and
+* seeding those at 1 makes TownFacilityLvMstList::getObjectWithKey miss so the
+* upgrade screen draws an empty detail panel.
 *
 * Facilities with id >= 1000 are Event Bazaar entries the client has no bundled
 * sprites for — seeding them crashes the town scene on load (handbook §3.3), so
@@ -163,23 +176,41 @@ inline drogon::Task<void> provisionTown(
 {
 	const auto& init = theServer()->cache().initializeResp();
 
+	// Batched: one statement each rather than one await per row, so a fresh
+	// account does not make eleven sequential round trips on the
+	// single-connection SQLite pool (handbook §6.14).  Every value is MST data
+	// or a server-minted id, so there is no injection surface.
+	std::string facilitySql;
 	for (const auto& facility : init.town_facility)
 	{
 		if (facility.id >= 1000)
 			continue;
 
-		co_await database->execSqlCoro(
-			"INSERT OR IGNORE INTO user_town_facilities (user_id, facility_id, lv)"
-			" VALUES ($1, $2, 1);",
-			identity.userId, facility.id);
+		facilitySql += facilitySql.empty()
+			? "INSERT OR IGNORE INTO user_town_facilities (user_id, facility_id, lv) VALUES "
+			: ",";
+		facilitySql += "('" + identity.userId + "'," + std::to_string(facility.id) + ","
+			+ std::to_string(Town::facilityBaseLevel(facility.id)) + ")";
 	}
 
+	if (!facilitySql.empty())
+	{
+		co_await database->execSqlCoro(facilitySql + ";");
+	}
+
+	std::string locationSql;
 	for (const auto& location : init.town_location)
 	{
-		co_await database->execSqlCoro(
-			"INSERT OR IGNORE INTO user_town_locations (user_id, location_id, lv)"
-			" VALUES ($1, $2, 1);",
-			identity.userId, location.id);
+		locationSql += locationSql.empty()
+			? "INSERT OR IGNORE INTO user_town_locations (user_id, location_id, lv) VALUES "
+			: ",";
+		locationSql += "('" + identity.userId + "'," + std::to_string(location.id) + ","
+			+ std::to_string(Town::locationBaseLevel(location.id)) + ")";
+	}
+
+	if (!locationSql.empty())
+	{
+		co_await database->execSqlCoro(locationSql + ";");
 	}
 
 	co_return;
