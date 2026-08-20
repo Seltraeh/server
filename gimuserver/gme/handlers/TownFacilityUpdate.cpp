@@ -4,7 +4,9 @@
 #include <gimuserver/gme/common/Common.hpp>
 
 #include <algorithm>
+#include <set>
 #include <string>
+#include <vector>
 
 // TownFacilityUpdate (8v43tz7g) — fired when the player confirms a batch of
 // facility/location upgrades.  The client sends the COMPLETE desired new state
@@ -122,5 +124,42 @@ HANDLEF(TownFacilityUpdate)
         }
     }
 
-    co_return HandleResult::success("{}");
+    // Report back the two lists the upgrade just invalidated.
+    //
+    // The client recomputed its own facility/location levels before sending, so
+    // those need no echo.  These two it cannot derive:
+    //
+    //   * the synthesis menu — PermitRecipeInfoList is otherwise filled once
+    //     from UserInfo, so a facility that just unlocked new recipes showed
+    //     none of them until the next relaunch.  That was the whole "I levelled
+    //     Synthesis and no new recipe tiles appeared" report.
+    //   * the tile harvest state — Town::locationState re-rolls a levelled-up
+    //     tile's remaining taps against its new drop pool, and drop_item_info is
+    //     server-authored.
+    //
+    // Both response classes replace their list wholesale: readParam calls
+    // removeAllObjects() at (row 0, field 0) and addObject() on each row's last
+    // field, with no per-row operation code to get wrong (contrast the present
+    // box, handbook §6.20).  Emitting them from here works because
+    // GameResponseParser::getResponseObject is a global key -> class registry
+    // (§7.12.4), so the keys dispatch the same regardless of which handler
+    // carried them.
+    TownFacilityUpdateResp resp{};
+    {
+        std::set<int32_t> cleared;
+        for (const auto& done : co_await gme::getClearedMissions(theDb(), identity))
+        {
+            cleared.insert(done.mission_id);
+        }
+
+        resp.permit_receipes = co_await gme::Town::permittedRecipes(theDb(), identity, cleared);
+
+        std::vector<::UserTownLocationInfo> unusedInfo;
+        co_await gme::Town::locationState(
+            theDb(), identity, cleared, unusedInfo, resp.town_location_detail);
+    }
+
+    std::string buffer{};
+    glz::write_json(resp, buffer);
+    co_return HandleResult::success(buffer);
 }

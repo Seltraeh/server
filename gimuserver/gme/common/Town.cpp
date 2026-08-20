@@ -194,6 +194,36 @@ std::string rollTap(const TownLocationLvMst& level, const std::vector<DropChance
 	return std::to_string(itemId) + ':' + std::to_string(zel) + ':' + std::to_string(karma);
 }
 
+/// Rolls `tapCnt` drop entries at a tile's current level, replacing dropInfo.
+///
+/// Split out of rollPeriod so an upgrade can refresh loot the player has not
+/// collected yet without also handing them a fresh tap allowance.  The list is
+/// rebuilt to exactly tapCnt entries, which keeps getCollectItemInfo's
+/// `count - tap_cnt` index pointing at the next tap.
+void rollDrops(const int32_t locationId, const int32_t lv, const int32_t tapCnt,
+	std::string& dropInfo)
+{
+	dropInfo.clear();
+
+	const auto* level = locationLevelRow(locationId, lv);
+	if (!level)
+	{
+		LOG_WARN << "Town: no TownLocationLvMst row for location " << locationId
+			<< " lv " << lv << "; tile will not sparkle";
+		return;
+	}
+
+	const auto pool = dropPool(locationId, lv);
+	for (int32_t i = 0; i < tapCnt; ++i)
+	{
+		if (i)
+		{
+			dropInfo += ',';
+		}
+		dropInfo += rollTap(*level, pool);
+	}
+}
+
 /// Rolls a whole harvest period: a tap allowance plus its pre-rolled loot.
 void rollPeriod(const int32_t locationId, const int32_t lv, int32_t& tapCnt, std::string& dropInfo)
 {
@@ -218,15 +248,7 @@ void rollPeriod(const int32_t locationId, const int32_t lv, int32_t& tapCnt, std
 	tapCnt = static_cast<int32_t>(RandomUInt(
 		static_cast<uint32_t>(std::max(lo, 1)), static_cast<uint32_t>(hi)));
 
-	const auto pool = dropPool(locationId, lv);
-	for (int32_t i = 0; i < tapCnt; ++i)
-	{
-		if (i)
-		{
-			dropInfo += ',';
-		}
-		dropInfo += rollTap(*level, pool);
-	}
+	rollDrops(locationId, lv, tapCnt, dropInfo);
 }
 
 /// Formats a Unix timestamp the way the client's datetime codec reads it.
@@ -321,7 +343,7 @@ drogon::Task<void> Town::locationState(
 	std::vector<::UserTownLocationDetail>& detail)
 {
 	const auto rows = co_await database->execSqlCoro(
-		"SELECT location_id, lv, karma, period_start, tap_cnt, drop_info"
+		"SELECT location_id, lv, karma, period_start, tap_cnt, drop_info, period_lv"
 		" FROM user_town_locations WHERE user_id = $1 ORDER BY location_id;",
 		identity.userId);
 
@@ -344,6 +366,7 @@ drogon::Task<void> Town::locationState(
 		auto tapCnt = row["tap_cnt"].as<int32_t>();
 		auto dropInfo = row["drop_info"].as<std::string>();
 		auto periodStart = row["period_start"].as<int64_t>();
+		const auto periodLv = row["period_lv"].as<int32_t>();
 
 		const auto& locations = theServer()->cache().initializeResp().town_location;
 		const auto found = std::find_if(locations.begin(), locations.end(),
@@ -355,19 +378,39 @@ drogon::Task<void> Town::locationState(
 		// Roll a new period once the old one has aged out.  Locked tiles are
 		// left empty: the client hides them, and a stockpile waiting behind the
 		// gate would dump a full period the instant the mission is cleared.
-		if (unlocked && now - periodStart >= kHarvestPeriodSeconds)
+		const bool expired = now - periodStart >= kHarvestPeriodSeconds;
+
+		// An upgrade mid-period is the other reason to roll.  Drops are
+		// pre-rolled a whole period ahead, so without this the player keeps
+		// harvesting the old level's pool and the upgrade looks like it did
+		// nothing at all.  Only the REMAINING taps are re-rolled and the clock
+		// is left alone: upgrading buys better loot, never a free refill.
+		const bool levelChanged = !expired && lv != periodLv && tapCnt > 0;
+
+		if (unlocked && (expired || levelChanged))
 		{
-			periodStart = now;
-			rollPeriod(locationId, lv, tapCnt, dropInfo);
+			if (expired)
+			{
+				periodStart = now;
+				rollPeriod(locationId, lv, tapCnt, dropInfo);
+			}
+			else
+			{
+				rollDrops(locationId, lv, tapCnt, dropInfo);
+				LOG_INFO << "Town: location " << locationId << " re-rolled " << tapCnt
+					<< " remaining tap(s) at its new level " << lv
+					<< " (period was rolled at lv " << periodLv << ")";
+			}
 
 			refreshSql += refreshSql.empty()
 				? "INSERT INTO user_town_locations"
-				  " (user_id, location_id, lv, karma, period_start, tap_cnt, drop_info) VALUES "
+				  " (user_id, location_id, lv, karma, period_start, tap_cnt, drop_info, period_lv)"
+				  " VALUES "
 				: ",";
 			refreshSql += "('" + identity.userId + "'," + std::to_string(locationId) + ","
 				+ std::to_string(lv) + "," + std::to_string(row["karma"].as<int32_t>()) + ","
 				+ std::to_string(periodStart) + "," + std::to_string(tapCnt) + ",'"
-				+ dropInfo + "')";
+				+ dropInfo + "'," + std::to_string(lv) + ")";
 		}
 		else if (!unlocked)
 		{
@@ -401,7 +444,7 @@ drogon::Task<void> Town::locationState(
 		co_await database->execSqlCoro(refreshSql
 			+ " ON CONFLICT(user_id, location_id) DO UPDATE SET"
 			  " period_start=excluded.period_start, tap_cnt=excluded.tap_cnt,"
-			  " drop_info=excluded.drop_info;");
+			  " drop_info=excluded.drop_info, period_lv=excluded.period_lv;");
 	}
 
 	co_return;

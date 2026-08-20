@@ -616,6 +616,16 @@ static void RegisterMigrations(MigrationMap& map)
 			"ALTER TABLE user_town_locations ADD COLUMN drop_info TEXT NOT NULL DEFAULT ''");
 	});
 
+	// The tile level the current period was rolled at.  Drops are pre-rolled a
+	// whole period ahead, so upgrading a tile mid-period would otherwise leave
+	// the player harvesting the old level's pool until the period expired —
+	// the upgrade appears to do nothing.  Town::locationState compares this
+	// against the live level and re-rolls the remaining taps when they differ.
+	migrate("18082026_AddTownLocationPeriodLevel", {
+		p->execSqlSync(
+			"ALTER TABLE user_town_locations ADD COLUMN period_lv INTEGER NOT NULL DEFAULT 0");
+	});
+
 	// Per-recipe craft tally behind PermitRecipe.craft_count (H6k1LIxC).  The
 	// client bumps its own copy after each craft (GameUtils::updatePermitRecipe),
 	// so the count has to survive a relaunch to stay in step.
