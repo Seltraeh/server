@@ -53,22 +53,48 @@ HANDLEF(Initialize)
 
 	resp.summoner_journal.user_id = identity.userId;
 
-	// Daily Spin (the Rewards menu's task_dailyloginspin tile).  The two count
-	// fields are load-bearing and were both left at 0, which closed the screen
-	// the instant it opened: DailyLoginScene::updateEvent state 1 @0xE52FDC is
+	// Daily Spin (the Rewards menu's task_dailyloginspin tile).
+	//
+	// ⚠ `user_current_count` IS "spins ALREADY USED today", and it is what
+	// decides whether the HOME SCREEN force-opens the wheel.  This is not a
+	// cosmetic counter — get it wrong and the player cannot reach Home at all.
+	//
+	//     DailyLoginRewardsUserInfo::isDailyLoginAvailable @0x1CC8278
+	//       if (this->[0x24]) return false;   // one-shot per-session latch
+	//       this->[0x24] = 1;
+	//       return this->[0x1c] < 1;          // user_current_count < 1
+	//
+	// and its ONLY two callers are HomeScene2::updateEvent @0x16F2D9C and
+	// AnotherHomeScene::updateEvent @0x16E5128 — so any value below 1 means
+	// "hasn't spun today", and Home pushes the wheel over itself on every
+	// login.  The scene then only leaves by DailyLoginScene::updateEvent
+	// state 1 @0xE52FDC:
 	//
 	//     if (getUserCurrentCount() < getUserLimitCount()) stay open;
 	//     else -> state 7 -> getLastHomeSceneID() -> changeSceneWithSceneID()
 	//
-	// and `0 >= 0` reads as "you have used every spin", so the wheel appeared
-	// as an overlay on Home and vanished a frame later.  Field mapping is from
-	// tools/ida/audits/Drudr2w5_audit.txt, resolved by matching each store's
-	// offset against the getters (setters are inlined, so the readParam names
-	// nothing): 35JXN4Ay -> +0x1c getUserCurrentCount,
-	// 5xStG99s -> +0x20 getUserLimitCount.
+	// With 0/0 that exits immediately, which is the "overlay on Home that
+	// blips out" symptom.  With 0/1 it stays open forever, because the only
+	// thing that can raise `current` is a DailyLogin (4aClzokO) reply we do
+	// not implement yet — that locked the client out of Home entirely.
+	//
+	// So we report the day's spin as ALREADY USED (1 of 1).  Home stops
+	// force-opening the wheel, and the tile in the Rewards menu correctly
+	// shows the exhausted state.  This is a truthful resting point for a
+	// server that cannot yet run a spin, NOT a placeholder to leave forever:
+	// see the handbook §7.14 for what implementing it actually needs, the
+	// short version being that DailyLoginRewardsMstList::addObject has exactly
+	// one caller (DailyLoginRewardsMstResponse::readParam), so the reward
+	// catalogue is server-supplied and we have never sent it.
+	//
+	// Field mapping is from tools/ida/audits/Drudr2w5_audit.txt.  Every setter
+	// in that readParam is inlined, so each key was resolved by matching the
+	// offset it stores to against the getters: 35JXN4Ay -> +0x1c
+	// getUserCurrentCount, 5xStG99s -> +0x20 getUserLimitCount,
+	// outas79f -> +0x60 getNextRewardId.
 	resp.daily_login_rewards.id = 1;
 	resp.daily_login_rewards.current_day = 1;
-	resp.daily_login_rewards.user_current_count = 0;
+	resp.daily_login_rewards.user_current_count = 1;
 	resp.daily_login_rewards.user_spin_limit_count = 1;
 	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
 
