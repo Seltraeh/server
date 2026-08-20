@@ -1,0 +1,8092 @@
+{
+ "scenario_mst": [
+  {
+   "mC1JcVM9": "10001",
+   "ctAd91iQ": "Start of the Journey",
+   "tw0vkye4": "map1-dungeon1.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10002",
+   "ctAd91iQ": "Unit Compatibility",
+   "tw0vkye4": "map1-dungeon2.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10003",
+   "ctAd91iQ": "Equipment Matters",
+   "tw0vkye4": "map1-dungeon3.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10004",
+   "ctAd91iQ": "Battle Technique",
+   "tw0vkye4": "map1-dungeon4.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10005",
+   "ctAd91iQ": "Leadership",
+   "tw0vkye4": "map1-dungeon5.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10006",
+   "ctAd91iQ": "I'm Not Afraid!",
+   "tw0vkye4": "map1-dungeon6.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10007",
+   "ctAd91iQ": "Mistral Liberated",
+   "tw0vkye4": "map1-dungeon7.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10008",
+   "ctAd91iQ": "Onto New Lands",
+   "tw0vkye4": "map1-ending.txt",
+   "VgU78CYj": "10100"
+  },
+  {
+   "mC1JcVM9": "10009",
+   "ctAd91iQ": "Reunion with Karl",
+   "tw0vkye4": "map2-dungeon1.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10010",
+   "ctAd91iQ": "Beautiful Swordswoman",
+   "tw0vkye4": "map2-dungeon2.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10011",
+   "ctAd91iQ": "Graham's Subordinate",
+   "tw0vkye4": "map2-dungeon3.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10012",
+   "ctAd91iQ": "Karl's Pursuit",
+   "tw0vkye4": "map2-dungeon4.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10013",
+   "ctAd91iQ": "Abaddon & Graham",
+   "tw0vkye4": "map2-dungeon5.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10014",
+   "ctAd91iQ": "Refusal",
+   "tw0vkye4": "map2-dungeon6.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10015",
+   "ctAd91iQ": "For My Comrades",
+   "tw0vkye4": "map2-dungeon7.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10016",
+   "ctAd91iQ": "To the Enemy Base",
+   "tw0vkye4": "map2-ending.txt",
+   "VgU78CYj": "11001"
+  },
+  {
+   "mC1JcVM9": "10017",
+   "ctAd91iQ": "No Slacking Off!",
+   "tw0vkye4": "map3-dungeon1.txt",
+   "VgU78CYj": "11002"
+  },
+  {
+   "mC1JcVM9": "10018",
+   "ctAd91iQ": "A Bad Omen",
+   "tw0vkye4": "map3-dungeon2.txt",
+   "VgU78CYj": "11002"
+  },
+  {
+   "mC1JcVM9": "10019",
+   "ctAd91iQ": "Bluffing",
+   "tw0vkye4": "map3-dungeon3.txt",
+   "VgU78CYj": "11002"
+  },
+  {
+   "mC1JcVM9": "10020",
+   "ctAd91iQ": "The Curse",
+   "tw0vkye4": "map3-dungeon4.txt",
+   "VgU78CYj": "11002"
+  },
+  {
+   "mC1JcVM9": "10021",
+   "ctAd91iQ": "A Promise",
+   "tw0vkye4": "map3-dungeon5.txt",
+   "VgU78CYj": "11002"
+  },
+  {
+   "mC1JcVM9": "10022",
+   "ctAd91iQ": "Something to Protect",
+   "tw0vkye4": "map3-dungeon7.txt",
+   "VgU78CYj": "11002"
+  },
+  {
+   "mC1JcVM9": "10023",
+   "ctAd91iQ": "Fall of the Creator",
+   "tw0vkye4": "map3-ending.txt",
+   "VgU78CYj": "11002"
+  },
+  {
+   "mC1JcVM9": "10100",
+   "ctAd91iQ": "The Plot Begins",
+   "tw0vkye4": "map4-open.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10101",
+   "ctAd91iQ": "Demon Slayer Lugina",
+   "tw0vkye4": "map4-dungeon1.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10102",
+   "ctAd91iQ": "Elgaia Affairs",
+   "tw0vkye4": "map4-dungeon2.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10103",
+   "ctAd91iQ": "The Summoner Army",
+   "tw0vkye4": "map4-dungeon3.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10104",
+   "ctAd91iQ": "Paris's Request",
+   "tw0vkye4": "map4-dungeon4.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10105",
+   "ctAd91iQ": "That Snob!",
+   "tw0vkye4": "map4-dungeon5.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10106",
+   "ctAd91iQ": "A Giant God",
+   "tw0vkye4": "map4-dungeon6.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10107",
+   "ctAd91iQ": "Enthusiastic Lugina",
+   "tw0vkye4": "map4-dungeon7.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10108",
+   "ctAd91iQ": "Eriole's Motives",
+   "tw0vkye4": "map4-ending.txt",
+   "VgU78CYj": "10101"
+  },
+  {
+   "mC1JcVM9": "10200",
+   "ctAd91iQ": "Knight Supervisor",
+   "tw0vkye4": "map5-open.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10201",
+   "ctAd91iQ": "Cardes the Malevolent",
+   "tw0vkye4": "map5-dungeon1.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10202",
+   "ctAd91iQ": "Road to Palmyna",
+   "tw0vkye4": "map5-dungeon2.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10203",
+   "ctAd91iQ": "A Mysterious Man",
+   "tw0vkye4": "map5-dungeon3.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10204",
+   "ctAd91iQ": "His Name is Zebra",
+   "tw0vkye4": "map5-dungeon4.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10205",
+   "ctAd91iQ": "A Mysterious Elder",
+   "tw0vkye4": "map5-dungeon5.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10206",
+   "ctAd91iQ": "Unknown Force",
+   "tw0vkye4": "map5-dungeon6.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10207",
+   "ctAd91iQ": "Amdahl's Last Emperor",
+   "tw0vkye4": "map5-dungeon7.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10208",
+   "ctAd91iQ": "Seria & Elder Grah",
+   "tw0vkye4": "map5-ending.txt",
+   "VgU78CYj": "11010"
+  },
+  {
+   "mC1JcVM9": "10209",
+   "ctAd91iQ": "Ruins of the Past",
+   "tw0vkye4": "map6-open.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10210",
+   "ctAd91iQ": "Hardworking Tilith",
+   "tw0vkye4": "map6-dungeon1.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10211",
+   "ctAd91iQ": "The Sky Fort Restored",
+   "tw0vkye4": "map6-dungeon2.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10212",
+   "ctAd91iQ": "Amdahl's History",
+   "tw0vkye4": "map6-dungeon3.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10213",
+   "ctAd91iQ": "Zebra & a Dark Figure",
+   "tw0vkye4": "map6-dungeon4.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10214",
+   "ctAd91iQ": "Reassuring Support",
+   "tw0vkye4": "map6-dungeon5.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10215",
+   "ctAd91iQ": "Penetrating the Fort",
+   "tw0vkye4": "map6-dungeon6.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10216",
+   "ctAd91iQ": "Zebra vs. Tilith",
+   "tw0vkye4": "map6-dungeon7.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10217",
+   "ctAd91iQ": "Zebra & Grahdens",
+   "tw0vkye4": "map6-ending.txt",
+   "VgU78CYj": "11011"
+  },
+  {
+   "mC1JcVM9": "10218",
+   "ctAd91iQ": "The Battlefield",
+   "tw0vkye4": "map7-open.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10219",
+   "ctAd91iQ": "The Unraveling Seal",
+   "tw0vkye4": "map7-dungeon1.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10220",
+   "ctAd91iQ": "4 Heroes of Palmyna",
+   "tw0vkye4": "map7-dungeon2.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10221",
+   "ctAd91iQ": "Eccentric Seria",
+   "tw0vkye4": "map7-dungeon3.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10222",
+   "ctAd91iQ": "The Gods' Rampage",
+   "tw0vkye4": "map7-dungeon4.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10223",
+   "ctAd91iQ": "Grahdens's Doubts",
+   "tw0vkye4": "map7-dungeon5.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10224",
+   "ctAd91iQ": "The Entrance to Hades",
+   "tw0vkye4": "map7-dungeon6.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10225",
+   "ctAd91iQ": "Battling Cardes",
+   "tw0vkye4": "map7-dungeon7.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10226",
+   "ctAd91iQ": "The Goddess Reborn",
+   "tw0vkye4": "map7-ending.txt",
+   "VgU78CYj": "10102"
+  },
+  {
+   "mC1JcVM9": "10300",
+   "ctAd91iQ": "The Search",
+   "tw0vkye4": "map8-open.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10301",
+   "ctAd91iQ": "Lugina's Mission",
+   "tw0vkye4": "map8-dungeon1.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10302",
+   "ctAd91iQ": "An Ambition for Two",
+   "tw0vkye4": "map8-dungeon2.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10303",
+   "ctAd91iQ": "Lugina's Training",
+   "tw0vkye4": "map8-dungeon3.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10304",
+   "ctAd91iQ": "The Hall's Dark Side",
+   "tw0vkye4": "map8-dungeon4.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10305",
+   "ctAd91iQ": "Lugina's Motivation",
+   "tw0vkye4": "map8-dungeon5.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10306",
+   "ctAd91iQ": "Paris's Motivation",
+   "tw0vkye4": "map8-dungeon6.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10307",
+   "ctAd91iQ": "Last Warning",
+   "tw0vkye4": "map8-dungeon7.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10308",
+   "ctAd91iQ": "Lugina's Defeat",
+   "tw0vkye4": "map8-dungeon7-2.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10309",
+   "ctAd91iQ": "Paris's Resolution",
+   "tw0vkye4": "map8-dungeon8.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10310",
+   "ctAd91iQ": "Destructive Power",
+   "tw0vkye4": "map8-ending.txt",
+   "VgU78CYj": "10103"
+  },
+  {
+   "mC1JcVM9": "10400",
+   "ctAd91iQ": "Double Journey",
+   "tw0vkye4": "map9-open.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10401",
+   "ctAd91iQ": "Comrades",
+   "tw0vkye4": "map9-dungeon1.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10402",
+   "ctAd91iQ": "Karl's Past",
+   "tw0vkye4": "map9-dungeon2.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10403",
+   "ctAd91iQ": "Disciple Mare",
+   "tw0vkye4": "map9-dungeon3.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10404",
+   "ctAd91iQ": "Trapped Seria",
+   "tw0vkye4": "map9-dungeon4.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10405",
+   "ctAd91iQ": "Grahdens & Karl",
+   "tw0vkye4": "map9-dungeon5.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10406",
+   "ctAd91iQ": "Stealthy Tilith",
+   "tw0vkye4": "map9-dungeon6.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10407",
+   "ctAd91iQ": "Granvalm the White",
+   "tw0vkye4": "map9-dungeon7.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10408",
+   "ctAd91iQ": "Unexpected Helper",
+   "tw0vkye4": "map9-ending.txt",
+   "VgU78CYj": "11040"
+  },
+  {
+   "mC1JcVM9": "10409",
+   "ctAd91iQ": "Be Grateful",
+   "tw0vkye4": "map10-open.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10410",
+   "ctAd91iQ": "Lugina's Best Effort",
+   "tw0vkye4": "map10-dungeon1.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10411",
+   "ctAd91iQ": "Mobilizing Again",
+   "tw0vkye4": "map10-dungeon2.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10412",
+   "ctAd91iQ": "Mare the Trickster",
+   "tw0vkye4": "map10-dungeon3.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10413",
+   "ctAd91iQ": "Mare's Memories",
+   "tw0vkye4": "map10-dungeon4.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10414",
+   "ctAd91iQ": "Opposing Forces",
+   "tw0vkye4": "map10-dungeon5.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10415",
+   "ctAd91iQ": "Counterattack",
+   "tw0vkye4": "map10-dungeon6.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10416",
+   "ctAd91iQ": "The Rescue",
+   "tw0vkye4": "map10-dungeon7.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10417",
+   "ctAd91iQ": "Captured Grahdens",
+   "tw0vkye4": "map10-ending.txt",
+   "VgU78CYj": "11041"
+  },
+  {
+   "mC1JcVM9": "10418",
+   "ctAd91iQ": "Ancient Battlefield",
+   "tw0vkye4": "map11-open.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10419",
+   "ctAd91iQ": "Search Party Assemble",
+   "tw0vkye4": "map11-dungeon1.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10420",
+   "ctAd91iQ": "Suspicious Actions",
+   "tw0vkye4": "map11-dungeon2.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10421",
+   "ctAd91iQ": "Whose Summoner?",
+   "tw0vkye4": "map11-dungeon3.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10422",
+   "ctAd91iQ": "Lugina & Seria",
+   "tw0vkye4": "map11-dungeon4.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10423",
+   "ctAd91iQ": "Paris's Doubts",
+   "tw0vkye4": "map11-dungeon5.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10424",
+   "ctAd91iQ": "They Never Change",
+   "tw0vkye4": "map11-dungeon6.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10425",
+   "ctAd91iQ": "Zevalhua the Supreme",
+   "tw0vkye4": "map11-dungeon7.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10426",
+   "ctAd91iQ": "The Secret of Birth",
+   "tw0vkye4": "map11-ending.txt",
+   "VgU78CYj": "11042"
+  },
+  {
+   "mC1JcVM9": "10500",
+   "ctAd91iQ": "The Last Fallen God",
+   "tw0vkye4": "map12-open.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10501",
+   "ctAd91iQ": "A Common Cause",
+   "tw0vkye4": "map12-dungeon1.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10502",
+   "ctAd91iQ": "Disciple Zurg",
+   "tw0vkye4": "map12-dungeon2.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10503",
+   "ctAd91iQ": "Zurg's Truth",
+   "tw0vkye4": "map12-dungeon3.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10504",
+   "ctAd91iQ": "Humans' Foolishness",
+   "tw0vkye4": "map12-dungeon4.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10505",
+   "ctAd91iQ": "Lucius's Will",
+   "tw0vkye4": "map12-dungeon5.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10506",
+   "ctAd91iQ": "Zurg's Interrogation",
+   "tw0vkye4": "map12-dungeon6.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10507",
+   "ctAd91iQ": "Gods Block the Path",
+   "tw0vkye4": "map12-dungeon7.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10508",
+   "ctAd91iQ": "Two Choices",
+   "tw0vkye4": "map12-ending.txt",
+   "VgU78CYj": "11050"
+  },
+  {
+   "mC1JcVM9": "10509",
+   "ctAd91iQ": "The Worried Goddess",
+   "tw0vkye4": "map13-open.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10510",
+   "ctAd91iQ": "United Summoners",
+   "tw0vkye4": "map13-dungeon1.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10511",
+   "ctAd91iQ": "Zurg's Invitation",
+   "tw0vkye4": "map13-dungeon2.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10512",
+   "ctAd91iQ": "Tilith's Request",
+   "tw0vkye4": "map13-dungeon3.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10513",
+   "ctAd91iQ": "The Imperial Guard",
+   "tw0vkye4": "map13-dungeon4.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10514",
+   "ctAd91iQ": "Truth of the Fallen",
+   "tw0vkye4": "map13-dungeon5.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10515",
+   "ctAd91iQ": "Summoners' Will",
+   "tw0vkye4": "map13-dungeon6.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10516",
+   "ctAd91iQ": "Insulted Zurg",
+   "tw0vkye4": "map13-dungeon7.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10517",
+   "ctAd91iQ": "Lucius's Instructions",
+   "tw0vkye4": "map13-ending.txt",
+   "VgU78CYj": "10105"
+  },
+  {
+   "mC1JcVM9": "10518",
+   "ctAd91iQ": "The Decisive Battle",
+   "tw0vkye4": "map14-open.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10519",
+   "ctAd91iQ": "Afla Dilith's Power",
+   "tw0vkye4": "map14-dungeon1.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10520",
+   "ctAd91iQ": "Grahdens's Inquiries",
+   "tw0vkye4": "map14-dungeon2.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10521",
+   "ctAd91iQ": "Karl's Thoughts",
+   "tw0vkye4": "map14-dungeon3.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10522",
+   "ctAd91iQ": "The Desired Future",
+   "tw0vkye4": "map14-dungeon4.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10523",
+   "ctAd91iQ": "Dark Figure's Warning",
+   "tw0vkye4": "map14-dungeon5.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10524",
+   "ctAd91iQ": "Road to the Beast God",
+   "tw0vkye4": "map14-dungeon6.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10525",
+   "ctAd91iQ": "Tilith's Resolution",
+   "tw0vkye4": "map14-dungeon7.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10526",
+   "ctAd91iQ": "Endless Battle",
+   "tw0vkye4": "map14-ending.txt",
+   "VgU78CYj": "11052"
+  },
+  {
+   "mC1JcVM9": "10600",
+   "ctAd91iQ": "Optimum Target",
+   "tw0vkye4": "map15-open.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10601",
+   "ctAd91iQ": "Friend or Foe?",
+   "tw0vkye4": "map15-dungeon1.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10602",
+   "ctAd91iQ": "Ready for Questioning",
+   "tw0vkye4": "map15-dungeon2.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10603",
+   "ctAd91iQ": "World Leader",
+   "tw0vkye4": "map15-dungeon2-2.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10604",
+   "ctAd91iQ": "Tesla's Warning",
+   "tw0vkye4": "map15-dungeon3.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10605",
+   "ctAd91iQ": "Their Past",
+   "tw0vkye4": "map15-dungeon4.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10606",
+   "ctAd91iQ": "The Guard's Struggle",
+   "tw0vkye4": "map15-dungeon5.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10607",
+   "ctAd91iQ": "Tesla's Sentence",
+   "tw0vkye4": "map15-dungeon5-2.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10608",
+   "ctAd91iQ": "Paris's Determination",
+   "tw0vkye4": "map15-dungeon7.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10609",
+   "ctAd91iQ": "World Changer",
+   "tw0vkye4": "map15-dungeon8.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10610",
+   "ctAd91iQ": "Ambition's End",
+   "tw0vkye4": "map15-ending.txt",
+   "VgU78CYj": "10106"
+  },
+  {
+   "mC1JcVM9": "10700",
+   "ctAd91iQ": "The Place Indicated",
+   "tw0vkye4": "map16-open.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10701",
+   "ctAd91iQ": "Approaching Fate",
+   "tw0vkye4": "map16-dungeon1.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10702",
+   "ctAd91iQ": "Interfering Goddess",
+   "tw0vkye4": "map16-dungeon2.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10703",
+   "ctAd91iQ": "Tilith's Motives",
+   "tw0vkye4": "map16-dungeon2-2.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10704",
+   "ctAd91iQ": "Prudent Choice",
+   "tw0vkye4": "map16-dungeon3.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10705",
+   "ctAd91iQ": "Gods & Disciples",
+   "tw0vkye4": "map16-dungeon4.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10706",
+   "ctAd91iQ": "Ark's Trial",
+   "tw0vkye4": "map16-dungeon5.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10707",
+   "ctAd91iQ": "Battle Preparations",
+   "tw0vkye4": "map16-dungeon5-2.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10708",
+   "ctAd91iQ": "The Oracle Knight",
+   "tw0vkye4": "map16-dungeon6.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10709",
+   "ctAd91iQ": "Humanity's Hope",
+   "tw0vkye4": "map16-dungeon7.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10710",
+   "ctAd91iQ": "Facing Lucius",
+   "tw0vkye4": "map16-dungeon8.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "10711",
+   "ctAd91iQ": "With the Goddess",
+   "tw0vkye4": "map16-ending.txt",
+   "VgU78CYj": "10107"
+  },
+  {
+   "mC1JcVM9": "11000",
+   "ctAd91iQ": "Descent to Ishgria",
+   "tw0vkye4": "map17-open.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11001",
+   "ctAd91iQ": "The New Summoner",
+   "tw0vkye4": "map17-dungeon1.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11002",
+   "ctAd91iQ": "A War Demon Emerges",
+   "tw0vkye4": "map17-dungeon2.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11003",
+   "ctAd91iQ": "Settled Destination",
+   "tw0vkye4": "map17-dungeon2-2.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11004",
+   "ctAd91iQ": "Changing a Country",
+   "tw0vkye4": "map17-dungeon3.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11005",
+   "ctAd91iQ": "Friends' Advance",
+   "tw0vkye4": "map17-dungeon4.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11006",
+   "ctAd91iQ": "The First Summoner",
+   "tw0vkye4": "map17-dungeon5.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11007",
+   "ctAd91iQ": "Revival",
+   "tw0vkye4": "map17-dungeon6.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11008",
+   "ctAd91iQ": "Unexpected Pastime",
+   "tw0vkye4": "map17-dungeon7.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11009",
+   "ctAd91iQ": "Stage of Battle",
+   "tw0vkye4": "map17-dungeon8.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11010",
+   "ctAd91iQ": "Indicated Path",
+   "tw0vkye4": "map17-ending.txt",
+   "VgU78CYj": "10200"
+  },
+  {
+   "mC1JcVM9": "11100",
+   "ctAd91iQ": "The Second Region",
+   "tw0vkye4": "map18-open.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11101",
+   "ctAd91iQ": "Broken Communication",
+   "tw0vkye4": "map18-dungeon1.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11102",
+   "ctAd91iQ": "The Goddess Mora",
+   "tw0vkye4": "map18-dungeon2.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11103",
+   "ctAd91iQ": "Friends' Whereabouts",
+   "tw0vkye4": "map18-dungeon3.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11104",
+   "ctAd91iQ": "Paris's Curiosity",
+   "tw0vkye4": "map18-dungeon4_3.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11105",
+   "ctAd91iQ": "Curiosity Takes Over",
+   "tw0vkye4": "map18-dungeon5.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11106",
+   "ctAd91iQ": "The Goddess's Trap",
+   "tw0vkye4": "map18-dungeon5-2.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11107",
+   "ctAd91iQ": "Within the Abyss",
+   "tw0vkye4": "map18-dungeon5-3.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11108",
+   "ctAd91iQ": "The Real Plan",
+   "tw0vkye4": "map18-dungeon6.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11109",
+   "ctAd91iQ": "Guile Demon Mora",
+   "tw0vkye4": "map18-dungeon7.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11110",
+   "ctAd91iQ": "The Eight Demons",
+   "tw0vkye4": "map18-ending.txt",
+   "VgU78CYj": "10201"
+  },
+  {
+   "mC1JcVM9": "11200",
+   "ctAd91iQ": "Tilith's Sermon",
+   "tw0vkye4": "map19-open.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11201",
+   "ctAd91iQ": "Beiorg's Location",
+   "tw0vkye4": "map19-dungeon1.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11202",
+   "ctAd91iQ": "Mora's Prediction",
+   "tw0vkye4": "map19-dungeon2.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11203",
+   "ctAd91iQ": "Six Armors' Lab",
+   "tw0vkye4": "map19-dungeon3.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11204",
+   "ctAd91iQ": "Beiorg's Attack",
+   "tw0vkye4": "map19-dungeon4.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11205",
+   "ctAd91iQ": "Six Scattered Armors",
+   "tw0vkye4": "map19-dungeon4-2.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11206",
+   "ctAd91iQ": "Round Two",
+   "tw0vkye4": "map19-dungeon5.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11207",
+   "ctAd91iQ": "Demonic Manipulation",
+   "tw0vkye4": "map19-dungeon5-2.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11208",
+   "ctAd91iQ": "Searching for Owen",
+   "tw0vkye4": "map19-dungeon6.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11209",
+   "ctAd91iQ": "Destructive Actions",
+   "tw0vkye4": "map19-dungeon7.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11210",
+   "ctAd91iQ": "Karl's Warning",
+   "tw0vkye4": "map19-ending.txt",
+   "VgU78CYj": "10202"
+  },
+  {
+   "mC1JcVM9": "11300",
+   "ctAd91iQ": "女神の励まし",
+   "tw0vkye4": "map20-open.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11301",
+   "ctAd91iQ": "最初の召喚師",
+   "tw0vkye4": "map20-dungeon1.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11302",
+   "ctAd91iQ": "召喚老の威圧",
+   "tw0vkye4": "map20-dungeon1-2.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11303",
+   "ctAd91iQ": "召喚老への恐怖",
+   "tw0vkye4": "map20-dungeon2.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11304",
+   "ctAd91iQ": "不気味な敵",
+   "tw0vkye4": "map20-dungeon3.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11305",
+   "ctAd91iQ": "過去を持つ魔神",
+   "tw0vkye4": "map20-dungeon3-2.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11306",
+   "ctAd91iQ": "オーンの叱責",
+   "tw0vkye4": "map20-dungeon4.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11307",
+   "ctAd91iQ": "カルの悩み",
+   "tw0vkye4": "map20-dungeon5.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11308",
+   "ctAd91iQ": "召喚老を恨む者",
+   "tw0vkye4": "map20-dungeon6.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11309",
+   "ctAd91iQ": "グラデンスの想い",
+   "tw0vkye4": "map20-dungeon7.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11310",
+   "ctAd91iQ": "イシュグリア先遣隊",
+   "tw0vkye4": "map20-ending.txt",
+   "VgU78CYj": "10203"
+  },
+  {
+   "mC1JcVM9": "11400",
+   "ctAd91iQ": "モーラからの情報",
+   "tw0vkye4": "map21-open.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11401",
+   "ctAd91iQ": "召喚老の同行",
+   "tw0vkye4": "map21-dungeon1.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11402",
+   "ctAd91iQ": "オーンの威圧",
+   "tw0vkye4": "map21-dungeon2.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11403",
+   "ctAd91iQ": "落石の罠再び",
+   "tw0vkye4": "map21-dungeon3.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11404",
+   "ctAd91iQ": "先遣隊の生存者",
+   "tw0vkye4": "map21-dungeon4.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11405",
+   "ctAd91iQ": "ミーファとグラデンス",
+   "tw0vkye4": "map21-dungeon4-2.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11406",
+   "ctAd91iQ": "カルとグラデンス",
+   "tw0vkye4": "map21-dungeon5.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11407",
+   "ctAd91iQ": "ミーファの想い",
+   "tw0vkye4": "map21-dungeon6.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11408",
+   "ctAd91iQ": "知られざる計画",
+   "tw0vkye4": "map21-dungeon7.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11409",
+   "ctAd91iQ": "連邦から来た男",
+   "tw0vkye4": "map21-ending.txt",
+   "VgU78CYj": "10204"
+  },
+  {
+   "mC1JcVM9": "11500",
+   "ctAd91iQ": "ティリスの不安",
+   "tw0vkye4": "map22-open.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11501",
+   "ctAd91iQ": "ルジーナの失踪",
+   "tw0vkye4": "map22-dungeon1.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11502",
+   "ctAd91iQ": "アム＝ユノスについて",
+   "tw0vkye4": "map22-dungeon2.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11503",
+   "ctAd91iQ": "イシュグリアに眠る力",
+   "tw0vkye4": "map22-dungeon3.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11504",
+   "ctAd91iQ": "カルナ・マスタについて",
+   "tw0vkye4": "map22-dungeon4.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11505",
+   "ctAd91iQ": "アクラスの意志",
+   "tw0vkye4": "map22-dungeon5.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11506",
+   "ctAd91iQ": "カルナ・マスタの封印",
+   "tw0vkye4": "map22-dungeon6.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11507",
+   "ctAd91iQ": "アム＝ユノスの誘い",
+   "tw0vkye4": "map22-dungeon7.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11508",
+   "ctAd91iQ": "ミーファ対オーン",
+   "tw0vkye4": "map22-dungeon7-2.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11509",
+   "ctAd91iQ": "ミーファの居場所",
+   "tw0vkye4": "map22-ending.txt",
+   "VgU78CYj": "10205"
+  },
+  {
+   "mC1JcVM9": "11600",
+   "ctAd91iQ": "竜が棲む地",
+   "tw0vkye4": "map23-open.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11601",
+   "ctAd91iQ": "不足するもの",
+   "tw0vkye4": "map23-dungeon1.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11602",
+   "ctAd91iQ": "竜徒の警告",
+   "tw0vkye4": "map23-dungeon1-2.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11603",
+   "ctAd91iQ": "カルの目的",
+   "tw0vkye4": "map23-dungeon2.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11604",
+   "ctAd91iQ": "モーラの決意",
+   "tw0vkye4": "map23-dungeon3.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11605",
+   "ctAd91iQ": "パリスの悩み",
+   "tw0vkye4": "map23-dungeon4.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11606",
+   "ctAd91iQ": "魔神の力の解放",
+   "tw0vkye4": "map23-dungeon5.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11607",
+   "ctAd91iQ": "再びカルとともに",
+   "tw0vkye4": "map23-dungeon5-2.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11608",
+   "ctAd91iQ": "ルジーナの剣技",
+   "tw0vkye4": "map23-dungeon6.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11609",
+   "ctAd91iQ": "見えない思惑",
+   "tw0vkye4": "map23-dungeon6-2.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11610",
+   "ctAd91iQ": "魔神の流儀",
+   "tw0vkye4": "map23-dungeon7.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11611",
+   "ctAd91iQ": "謀略の始まり",
+   "tw0vkye4": "map23-ending.txt",
+   "VgU78CYj": "10206"
+  },
+  {
+   "mC1JcVM9": "11700",
+   "ctAd91iQ": "最後の魔神を追って",
+   "tw0vkye4": "map24-open.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11701",
+   "ctAd91iQ": "モーラの意思",
+   "tw0vkye4": "map24-dungeon1.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11702",
+   "ctAd91iQ": "目的の相違",
+   "tw0vkye4": "map24-dungeon2.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11703",
+   "ctAd91iQ": "魔神たちの封印",
+   "tw0vkye4": "map24-dungeon2-2.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11704",
+   "ctAd91iQ": "モーラの敷いた道",
+   "tw0vkye4": "map24-dungeon3.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11705",
+   "ctAd91iQ": "シュスイの相手",
+   "tw0vkye4": "map24-dungeon4.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11706",
+   "ctAd91iQ": "満身創痍のシュスイ",
+   "tw0vkye4": "map24-dungeon4-2.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11707",
+   "ctAd91iQ": "武神が遺したもの",
+   "tw0vkye4": "map24-dungeon4-3.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11708",
+   "ctAd91iQ": "戦いの先に待つのは",
+   "tw0vkye4": "map24-dungeon5.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11709",
+   "ctAd91iQ": "リオメルグの苦言",
+   "tw0vkye4": "map24-dungeon6.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11710",
+   "ctAd91iQ": "罠だらけの城",
+   "tw0vkye4": "map24-dungeon7.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11711",
+   "ctAd91iQ": "モーラとセリアの対話",
+   "tw0vkye4": "map24-dungeon7-2.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11712",
+   "ctAd91iQ": "女神再臨",
+   "tw0vkye4": "map24-dungeon7-3.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11713",
+   "ctAd91iQ": "おかえりなさい",
+   "tw0vkye4": "map24-ending.txt",
+   "VgU78CYj": "10207"
+  },
+  {
+   "mC1JcVM9": "11800",
+   "ctAd91iQ": "仲間とともに",
+   "tw0vkye4": "map25-open.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11801",
+   "ctAd91iQ": "門の前で待つ存在",
+   "tw0vkye4": "map25-dungeon1.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11802",
+   "ctAd91iQ": "ルジーナの懸念",
+   "tw0vkye4": "map25-dungeon2.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11803",
+   "ctAd91iQ": "アークの守るべきもの",
+   "tw0vkye4": "map25-dungeon2-2.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11804",
+   "ctAd91iQ": "敗残の召喚老",
+   "tw0vkye4": "map25-dungeon2-3.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11805",
+   "ctAd91iQ": "召喚術が消える",
+   "tw0vkye4": "map25-dungeon3.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11806",
+   "ctAd91iQ": "カロンの試練",
+   "tw0vkye4": "map25-dungeon4.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11807",
+   "ctAd91iQ": "巫女の力",
+   "tw0vkye4": "map25-dungeon4-2.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11808",
+   "ctAd91iQ": "アークの想い",
+   "tw0vkye4": "map25-dungeon5.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11809",
+   "ctAd91iQ": "望み続けた声",
+   "tw0vkye4": "map25-dungeon5-2.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11810",
+   "ctAd91iQ": "召喚術が消えても",
+   "tw0vkye4": "map25-dungeon6.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11811",
+   "ctAd91iQ": "最終決戦軍議",
+   "tw0vkye4": "map25-dungeon7.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11812",
+   "ctAd91iQ": "アークの頼み",
+   "tw0vkye4": "map25-dungeon7-2.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11813",
+   "ctAd91iQ": "頼るべきもの",
+   "tw0vkye4": "map25-dungeon7-3.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11814",
+   "ctAd91iQ": "呼び起こされた力",
+   "tw0vkye4": "map25-dungeon7-4.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11815",
+   "ctAd91iQ": "２人のフロンティア",
+   "tw0vkye4": "map25-ending.txt",
+   "VgU78CYj": "10208"
+  },
+  {
+   "mC1JcVM9": "11900",
+   "ctAd91iQ": "訪れた場所は……",
+   "tw0vkye4": "map26-open.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11901",
+   "ctAd91iQ": "アークの決意",
+   "tw0vkye4": "map26-dungeon1.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11902",
+   "ctAd91iQ": "仲間たちとの約束",
+   "tw0vkye4": "map26-dungeon1-2.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11903",
+   "ctAd91iQ": "モーラの助言",
+   "tw0vkye4": "map26-dungeon2.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11904",
+   "ctAd91iQ": "罪と罰",
+   "tw0vkye4": "map26-dungeon2-2.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11905",
+   "ctAd91iQ": "迫り来る次なる罪",
+   "tw0vkye4": "map26-dungeon3.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11906",
+   "ctAd91iQ": "後悔を越えて",
+   "tw0vkye4": "map26-dungeon3-2.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11907",
+   "ctAd91iQ": "解き放たれる呪縛",
+   "tw0vkye4": "map26-dungeon3-3.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11908",
+   "ctAd91iQ": "再会する２人",
+   "tw0vkye4": "map26-dungeon4.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11909",
+   "ctAd91iQ": "君とともに生きたい",
+   "tw0vkye4": "map26-ending.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11910",
+   "ctAd91iQ": "決別できぬ過去",
+   "tw0vkye4": "map26-dungeon_ex_open.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "11911",
+   "ctAd91iQ": "すべては日々の中に",
+   "tw0vkye4": "map26-dungeon_ex_clear.txt",
+   "VgU78CYj": "10209"
+  },
+  {
+   "mC1JcVM9": "12000",
+   "ctAd91iQ": "遙かなる異界",
+   "tw0vkye4": "map101-open1.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12001",
+   "ctAd91iQ": "機械の世界",
+   "tw0vkye4": "map101-open2.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12002",
+   "ctAd91iQ": "初めての戦い",
+   "tw0vkye4": "map101-dungeon1.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12003",
+   "ctAd91iQ": "レダとの邂逅",
+   "tw0vkye4": "map101-dungeon1-2.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12004",
+   "ctAd91iQ": "ベクタスの現状",
+   "tw0vkye4": "map101-dungeon2.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12005",
+   "ctAd91iQ": "機械人形からの依頼",
+   "tw0vkye4": "map101-dungeon3.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12006",
+   "ctAd91iQ": "２体の機械人形",
+   "tw0vkye4": "map101-dungeon3-2.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12007",
+   "ctAd91iQ": "ハチとタル",
+   "tw0vkye4": "map101-dungeon4.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12008",
+   "ctAd91iQ": "謎の敵との遭遇",
+   "tw0vkye4": "map101-dungeon4-2.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12009",
+   "ctAd91iQ": "召喚の力の回復",
+   "tw0vkye4": "map101-dungeon4-3_lib.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12010",
+   "ctAd91iQ": "太古からの音",
+   "tw0vkye4": "map101-dungeon5.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12011",
+   "ctAd91iQ": "先行するアベル機関",
+   "tw0vkye4": "map101-dungeon6.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12012",
+   "ctAd91iQ": "再襲撃",
+   "tw0vkye4": "map101-dungeon7.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12013",
+   "ctAd91iQ": "現れた男",
+   "tw0vkye4": "map101-dungeon7-2.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12014",
+   "ctAd91iQ": "封神儀",
+   "tw0vkye4": "map101-ending.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12015",
+   "ctAd91iQ": "遺された場所",
+   "tw0vkye4": "map101-dungeon_ex_open.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12016",
+   "ctAd91iQ": "かつてのマスター",
+   "tw0vkye4": "map101-dungeon_ex_clear.txt",
+   "VgU78CYj": "10300"
+  },
+  {
+   "mC1JcVM9": "12100",
+   "ctAd91iQ": "氷雪の世界",
+   "tw0vkye4": "map102-open.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12101",
+   "ctAd91iQ": "湖に囲まれた城",
+   "tw0vkye4": "map102-dungeon1.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12102",
+   "ctAd91iQ": "バリウラの末裔",
+   "tw0vkye4": "map102-dungeon1-2.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12103",
+   "ctAd91iQ": "末裔たちの今",
+   "tw0vkye4": "map102-dungeon2.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12104",
+   "ctAd91iQ": "ルチアナとの邂逅",
+   "tw0vkye4": "map102-dungeon3.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12105",
+   "ctAd91iQ": "極域への岐路",
+   "tw0vkye4": "map102-dungeon3-2.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12106",
+   "ctAd91iQ": "分かり合う方法",
+   "tw0vkye4": "map102-dungeon4.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12107",
+   "ctAd91iQ": "知ろうとすること",
+   "tw0vkye4": "map102-dungeon5.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12108",
+   "ctAd91iQ": "現れしもの",
+   "tw0vkye4": "map102-dungeon6.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12109",
+   "ctAd91iQ": "相克する力",
+   "tw0vkye4": "map102-dungeon6-2.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12110",
+   "ctAd91iQ": "思わぬ遭遇戦",
+   "tw0vkye4": "map102-dungeon7.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12111",
+   "ctAd91iQ": "アベル機関の暗躍",
+   "tw0vkye4": "map102-dungeon7-2.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12112",
+   "ctAd91iQ": "辿り着いた禁域",
+   "tw0vkye4": "map102-dungeon8.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12113",
+   "ctAd91iQ": "人とか神とか関係なく",
+   "tw0vkye4": "map102-dungeon8-2.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12114",
+   "ctAd91iQ": "復活の封神狼",
+   "tw0vkye4": "map102-ending_lib.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12115",
+   "ctAd91iQ": "バリウラの遺物",
+   "tw0vkye4": "map102-dungeon_ex1_open.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12116",
+   "ctAd91iQ": "遙かなる伝承",
+   "tw0vkye4": "map102-dungeon_ex1_clear.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12117",
+   "ctAd91iQ": "限られた緑の地",
+   "tw0vkye4": "map102-dungeon_ex2_open.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12118",
+   "ctAd91iQ": "ヴィランシルの守護神",
+   "tw0vkye4": "map102-dungeon_ex2_clear.txt",
+   "VgU78CYj": "10301"
+  },
+  {
+   "mC1JcVM9": "12200",
+   "ctAd91iQ": "セリアとの再会",
+   "tw0vkye4": "map103-open.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12201",
+   "ctAd91iQ": "それぞれの動向",
+   "tw0vkye4": "map103-dungeon1.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12202",
+   "ctAd91iQ": "救出",
+   "tw0vkye4": "map103-dungeon1-2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12203",
+   "ctAd91iQ": "スズネとの出会い",
+   "tw0vkye4": "map103-dungeon1-3.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12204",
+   "ctAd91iQ": "現れた仲間と刺客",
+   "tw0vkye4": "map103-dungeon2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12205",
+   "ctAd91iQ": "この国の情勢",
+   "tw0vkye4": "map103-dungeon2-2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12206",
+   "ctAd91iQ": "無惨な戦場",
+   "tw0vkye4": "map103-dungeon3.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12207",
+   "ctAd91iQ": "待ち伏せ",
+   "tw0vkye4": "map103-dungeon4.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12208",
+   "ctAd91iQ": "この笛の音は……！",
+   "tw0vkye4": "map103-dungeon4-2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12209",
+   "ctAd91iQ": "謎の女剣士",
+   "tw0vkye4": "map103-dungeon5.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12210",
+   "ctAd91iQ": "与えられた“手がかり”",
+   "tw0vkye4": "map103-dungeon5-2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12211",
+   "ctAd91iQ": "カゲヌイの奇襲",
+   "tw0vkye4": "map103-dungeon6.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12212",
+   "ctAd91iQ": "救援再び",
+   "tw0vkye4": "map103-dungeon6-2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12213",
+   "ctAd91iQ": "たどり着いた先",
+   "tw0vkye4": "map103-dungeon7.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12214",
+   "ctAd91iQ": "黒幕",
+   "tw0vkye4": "map103-dungeon7-2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12215",
+   "ctAd91iQ": "ラカを追って",
+   "tw0vkye4": "map103-dungeon8.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12216",
+   "ctAd91iQ": "対決",
+   "tw0vkye4": "map103-dungeon8-2.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12217",
+   "ctAd91iQ": "混沌と破壊を司るモノ",
+   "tw0vkye4": "map103-dungeon8-3.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12218",
+   "ctAd91iQ": "主君の権利と義務",
+   "tw0vkye4": "map103-ending_lib.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12219",
+   "ctAd91iQ": "怪物寺の騒動",
+   "tw0vkye4": "map103-dungeon_ex2_open.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12220",
+   "ctAd91iQ": "怪物の正体",
+   "tw0vkye4": "map103-dungeon_ex2_clear.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12221",
+   "ctAd91iQ": "ミョウケイの頼み",
+   "tw0vkye4": "map103-dungeon_ex1_open.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12222",
+   "ctAd91iQ": "名匠の一振り",
+   "tw0vkye4": "map103-dungeon_ex1_clear.txt",
+   "VgU78CYj": "10302"
+  },
+  {
+   "mC1JcVM9": "12300",
+   "ctAd91iQ": "グラデンスの出迎え",
+   "tw0vkye4": "map104-open.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12301",
+   "ctAd91iQ": "封神儀の現在",
+   "tw0vkye4": "map104-dungeon1.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12302",
+   "ctAd91iQ": "魔動人形の世界",
+   "tw0vkye4": "map104-dungeon2.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12303",
+   "ctAd91iQ": "遭遇戦",
+   "tw0vkye4": "map104-dungeon2-2.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12304",
+   "ctAd91iQ": "脅威からの撤退",
+   "tw0vkye4": "map104-dungeon2-3.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12305",
+   "ctAd91iQ": "再戦の予感",
+   "tw0vkye4": "map104-dungeon3.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12306",
+   "ctAd91iQ": "かりそめの協力",
+   "tw0vkye4": "map104-dungeon3-2.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12307",
+   "ctAd91iQ": "共闘の終焉",
+   "tw0vkye4": "map104-dungeon3-3.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12308",
+   "ctAd91iQ": "封神儀の反応",
+   "tw0vkye4": "map104-dungeon4.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12309",
+   "ctAd91iQ": "グラデンスとラナス",
+   "tw0vkye4": "map104-dungeon4-2.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12310",
+   "ctAd91iQ": "再来する脅威",
+   "tw0vkye4": "map104-dungeon5.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12311",
+   "ctAd91iQ": "進むべき方針",
+   "tw0vkye4": "map104-dungeon5-2.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12312",
+   "ctAd91iQ": "思わぬ遭遇",
+   "tw0vkye4": "map104-dungeon6.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12313",
+   "ctAd91iQ": "中心部へ",
+   "tw0vkye4": "map104-dungeon7.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12314",
+   "ctAd91iQ": "正面衝突",
+   "tw0vkye4": "map104-dungeon7-2.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12315",
+   "ctAd91iQ": "現れた助勢",
+   "tw0vkye4": "map104-dungeon7-3.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12316",
+   "ctAd91iQ": "立ちはだかる巨壁",
+   "tw0vkye4": "map104-dungeon7-4.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12317",
+   "ctAd91iQ": "奪われる封神の力",
+   "tw0vkye4": "map104-ending.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12318",
+   "ctAd91iQ": "ロッカザルムの追加調査",
+   "tw0vkye4": "map104-dungeon_ex_open.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12319",
+   "ctAd91iQ": "人形たちの墓標",
+   "tw0vkye4": "map104-dungeon_ex_clear.txt",
+   "VgU78CYj": "10303"
+  },
+  {
+   "mC1JcVM9": "12400",
+   "ctAd91iQ": "最後の封神儀",
+   "tw0vkye4": "map105-open.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12401",
+   "ctAd91iQ": "カルの提案",
+   "tw0vkye4": "map105-dungeon1.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12402",
+   "ctAd91iQ": "現れたニ神",
+   "tw0vkye4": "map105-dungeon2.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12403",
+   "ctAd91iQ": "悌神皇アルザ・マスタ",
+   "tw0vkye4": "map105-dungeon2-2.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12404",
+   "ctAd91iQ": "真の召喚の力",
+   "tw0vkye4": "map105-dungeon3.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12405",
+   "ctAd91iQ": "不意の遭遇",
+   "tw0vkye4": "map105-dungeon3-2.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12406",
+   "ctAd91iQ": "共鳴暴走",
+   "tw0vkye4": "map105-dungeon4.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12407",
+   "ctAd91iQ": "争奪戦",
+   "tw0vkye4": "map105-dungeon4-2.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12408",
+   "ctAd91iQ": "ラナスの過去",
+   "tw0vkye4": "map105-dungeon5.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12409",
+   "ctAd91iQ": "二極激突",
+   "tw0vkye4": "map105-dungeon6.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12410",
+   "ctAd91iQ": "折れぬ覚悟",
+   "tw0vkye4": "map105-dungeon6-2.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12411",
+   "ctAd91iQ": "召喚老たちの休息",
+   "tw0vkye4": "map105-dungeon6-3.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12412",
+   "ctAd91iQ": "激戦の予感",
+   "tw0vkye4": "map105-dungeon7.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12413",
+   "ctAd91iQ": "決戦の地へ",
+   "tw0vkye4": "map105-dungeon8.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12414",
+   "ctAd91iQ": "遙かなる怨念",
+   "tw0vkye4": "map105-dungeon8-2.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12415",
+   "ctAd91iQ": "顕現する大神",
+   "tw0vkye4": "map105-dungeon8-3.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12416",
+   "ctAd91iQ": "真の召喚の力",
+   "tw0vkye4": "map105-ending.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12417",
+   "ctAd91iQ": "二神のケジメ",
+   "tw0vkye4": "map105-dungeon_ex1_open.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12418",
+   "ctAd91iQ": "残された神々",
+   "tw0vkye4": "map105-dungeon_ex1_clear.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12419",
+   "ctAd91iQ": "忌まわしき絆",
+   "tw0vkye4": "map105-dungeon_ex2_open.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12420",
+   "ctAd91iQ": "悌神皇",
+   "tw0vkye4": "map105-dungeon_ex2_clear.txt",
+   "VgU78CYj": "10304"
+  },
+  {
+   "mC1JcVM9": "12500",
+   "ctAd91iQ": "ウォーロンの計画",
+   "tw0vkye4": "map106-open.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12501",
+   "ctAd91iQ": "未来への密命",
+   "tw0vkye4": "map106-dungeon1.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12502",
+   "ctAd91iQ": "追う者と追われる者",
+   "tw0vkye4": "map106-dungeon2.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12503",
+   "ctAd91iQ": "追い詰められた者たち",
+   "tw0vkye4": "map106-dungeon2-2.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12504",
+   "ctAd91iQ": "信奉者の野望",
+   "tw0vkye4": "map106-dungeon3.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12505",
+   "ctAd91iQ": "メルの困惑",
+   "tw0vkye4": "map106-dungeon3-2.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12506",
+   "ctAd91iQ": "造られし者",
+   "tw0vkye4": "map106-dungeon4.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12507",
+   "ctAd91iQ": "２つの過去",
+   "tw0vkye4": "map106-dungeon5.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12508",
+   "ctAd91iQ": "呪縛",
+   "tw0vkye4": "map106-dungeon6.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12509",
+   "ctAd91iQ": "作られし未来",
+   "tw0vkye4": "map106-dungeon6-2.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12510",
+   "ctAd91iQ": "新たなる時代の幕開け",
+   "tw0vkye4": "map106-ending_lib.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "12511",
+   "ctAd91iQ": "追憶",
+   "tw0vkye4": "map106-staffroll_lib.txt",
+   "VgU78CYj": "10305"
+  },
+  {
+   "mC1JcVM9": "20000",
+   "ctAd91iQ": "Mountain Demon",
+   "tw0vkye4": "map1-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20001",
+   "ctAd91iQ": "The Demon's Past",
+   "tw0vkye4": "map1-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20002",
+   "ctAd91iQ": "Sticky & Slimy",
+   "tw0vkye4": "map4-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20003",
+   "ctAd91iQ": "Lin's Dislikes",
+   "tw0vkye4": "map4-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20004",
+   "ctAd91iQ": "Gigantic Demon",
+   "tw0vkye4": "map6-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20005",
+   "ctAd91iQ": "Mysterious Ruins",
+   "tw0vkye4": "map6-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20006",
+   "ctAd91iQ": "Lin's Bad Premonition",
+   "tw0vkye4": "map8-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20007",
+   "ctAd91iQ": "Fallen God Lagzal",
+   "tw0vkye4": "map8-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20008",
+   "ctAd91iQ": "Hidden in the Dungeon",
+   "tw0vkye4": "map10-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20009",
+   "ctAd91iQ": "End of a Tyrant",
+   "tw0vkye4": "map10-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20010",
+   "ctAd91iQ": "Seabed Romance",
+   "tw0vkye4": "map14-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20011",
+   "ctAd91iQ": "The Sea God's Legend",
+   "tw0vkye4": "map14-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20012",
+   "ctAd91iQ": "Concrete Details",
+   "tw0vkye4": "map15-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20013",
+   "ctAd91iQ": "Lin's Wish",
+   "tw0vkye4": "map15-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20014",
+   "ctAd91iQ": "Dark Legacy",
+   "tw0vkye4": "map16-dungeon_ex_open.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "20015",
+   "ctAd91iQ": "Waiting vs. Awaited",
+   "tw0vkye4": "map16-dungeon_ex_clear.txt",
+   "VgU78CYj": "20000"
+  },
+  {
+   "mC1JcVM9": "21000",
+   "ctAd91iQ": "War Demon's Power",
+   "tw0vkye4": "map17-dungeon_ex_open.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21001",
+   "ctAd91iQ": "Broken Seal",
+   "tw0vkye4": "map17-dungeon_ex_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21002",
+   "ctAd91iQ": "Guile Demon's Power",
+   "tw0vkye4": "map18-dungeon_ex_open.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21003",
+   "ctAd91iQ": "Bewildering Shadow",
+   "tw0vkye4": "map18-dungeon_ex_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21004",
+   "ctAd91iQ": "Sight Demon's Power",
+   "tw0vkye4": "map19-dungeon_ex_open.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21005",
+   "ctAd91iQ": "Vanishing Seal",
+   "tw0vkye4": "map19-dungeon_ex_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21010",
+   "ctAd91iQ": "Calamity Demon's Power",
+   "tw0vkye4": "map22-dungeon_ex_open.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21011",
+   "ctAd91iQ": "Mirfah's Request",
+   "tw0vkye4": "map22-dungeon_ex1_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21012",
+   "ctAd91iQ": "Mirfah's Vision",
+   "tw0vkye4": "map22-dungeon_ex2_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21013",
+   "ctAd91iQ": "封魔導神の力",
+   "tw0vkye4": "map23-dungeon_ex_open.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21014",
+   "ctAd91iQ": "迷いを振り払うために",
+   "tw0vkye4": "map23-dungeon_ex1_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21015",
+   "ctAd91iQ": "パリスの感謝",
+   "tw0vkye4": "map23-dungeon_ex2_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21016",
+   "ctAd91iQ": "私の目指す強さ",
+   "tw0vkye4": "map24-dungeon_ex_open.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21017",
+   "ctAd91iQ": "バリュオンの真の力",
+   "tw0vkye4": "map24-dungeon_ex1_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "21018",
+   "ctAd91iQ": "召喚師カル",
+   "tw0vkye4": "map24-dungeon_ex2_clear.txt",
+   "VgU78CYj": "20001"
+  },
+  {
+   "mC1JcVM9": "30000",
+   "ctAd91iQ": "Seria the Bully",
+   "tw0vkye4": "arena01.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30001",
+   "ctAd91iQ": "Got Connections?",
+   "tw0vkye4": "arena02.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30002",
+   "ctAd91iQ": "Anyone Could Do That",
+   "tw0vkye4": "arena03.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30003",
+   "ctAd91iQ": "Irritated Seria",
+   "tw0vkye4": "arena04.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30004",
+   "ctAd91iQ": "Seria Apologizes?",
+   "tw0vkye4": "arena05.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30005",
+   "ctAd91iQ": "A Higher Being",
+   "tw0vkye4": "arena06.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30006",
+   "ctAd91iQ": "Impromptu Promise",
+   "tw0vkye4": "arena07.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30007",
+   "ctAd91iQ": "Former Comrades",
+   "tw0vkye4": "arena08.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30008",
+   "ctAd91iQ": "Honest Compliments",
+   "tw0vkye4": "arena09.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30009",
+   "ctAd91iQ": "Competing for Ranks",
+   "tw0vkye4": "arena10.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30010",
+   "ctAd91iQ": "Seria's Mix-Up",
+   "tw0vkye4": "arena11.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30011",
+   "ctAd91iQ": "Pride in Power",
+   "tw0vkye4": "arena12.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30012",
+   "ctAd91iQ": "Seria's Motivation",
+   "tw0vkye4": "arena13.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30013",
+   "ctAd91iQ": "Seria's Promotion",
+   "tw0vkye4": "arena14.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30014",
+   "ctAd91iQ": "Promise of the Past",
+   "tw0vkye4": "arena15.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30015",
+   "ctAd91iQ": "Summoners' Strategy",
+   "tw0vkye4": "arena16.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30016",
+   "ctAd91iQ": "Undone by Battle",
+   "tw0vkye4": "arena17.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30017",
+   "ctAd91iQ": "Seria's Doubts",
+   "tw0vkye4": "arena18.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30018",
+   "ctAd91iQ": "Meaning of Strength",
+   "tw0vkye4": "arena19.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30019",
+   "ctAd91iQ": "Worthy Friends",
+   "tw0vkye4": "arena20.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30020",
+   "ctAd91iQ": "Seria's Provocation",
+   "tw0vkye4": "arena21.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30021",
+   "ctAd91iQ": "Relationships",
+   "tw0vkye4": "arena22.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30022",
+   "ctAd91iQ": "Grahdens's Birthday?",
+   "tw0vkye4": "arena23.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30023",
+   "ctAd91iQ": "Looking for a Fight",
+   "tw0vkye4": "arena24.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30024",
+   "ctAd91iQ": "Interfering Seria",
+   "tw0vkye4": "arena25.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30025",
+   "ctAd91iQ": "First Impressions",
+   "tw0vkye4": "arena26.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "30026",
+   "ctAd91iQ": "Similar Comrades...?",
+   "tw0vkye4": "arena27.txt",
+   "VgU78CYj": "30000"
+  },
+  {
+   "mC1JcVM9": "40000",
+   "ctAd91iQ": "Demon Slayer Missions",
+   "tw0vkye4": "raid_op.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40001",
+   "ctAd91iQ": "Unexpected Rival",
+   "tw0vkye4": "raid_01_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40002",
+   "ctAd91iQ": "Proud Summoners",
+   "tw0vkye4": "raid_01_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40003",
+   "ctAd91iQ": "Ex-Demon Slayer Pride",
+   "tw0vkye4": "raid_02_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40004",
+   "ctAd91iQ": "Elder Owen",
+   "tw0vkye4": "raid_02_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40005",
+   "ctAd91iQ": "Owen's Request",
+   "tw0vkye4": "raid_03_1_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40006",
+   "ctAd91iQ": "Intense Rage",
+   "tw0vkye4": "raid_03_1_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40007",
+   "ctAd91iQ": "Noah's Provocation",
+   "tw0vkye4": "raid_03_2_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40008",
+   "ctAd91iQ": "Elise's Plea",
+   "tw0vkye4": "raid_03_2_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40009",
+   "ctAd91iQ": "A Worthy Rival",
+   "tw0vkye4": "raid_03_3_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40010",
+   "ctAd91iQ": "Phantom of the Past",
+   "tw0vkye4": "raid_03_3_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40011",
+   "ctAd91iQ": "Slaying Yugreia",
+   "tw0vkye4": "raid_04_1_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40012",
+   "ctAd91iQ": "Demonic Agitation",
+   "tw0vkye4": "raid_04_1_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40013",
+   "ctAd91iQ": "Vexed Noah",
+   "tw0vkye4": "raid_04_2_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40014",
+   "ctAd91iQ": "Cooperation",
+   "tw0vkye4": "raid_04_2_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40015",
+   "ctAd91iQ": "Surprise Attack",
+   "tw0vkye4": "raid_04_3_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40016",
+   "ctAd91iQ": "Noah and Elise",
+   "tw0vkye4": "raid_04_3_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40017",
+   "ctAd91iQ": "Friendly Competition",
+   "tw0vkye4": "raid_05_1_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40018",
+   "ctAd91iQ": "Change of Heart",
+   "tw0vkye4": "raid_05_1_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40019",
+   "ctAd91iQ": "Breaking Seals",
+   "tw0vkye4": "raid_05_2_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40020",
+   "ctAd91iQ": "Rivals?",
+   "tw0vkye4": "raid_05_2_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40021",
+   "ctAd91iQ": "Demons Show Themselves",
+   "tw0vkye4": "raid_05_3_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "40022",
+   "ctAd91iQ": "Aspirations",
+   "tw0vkye4": "raid_05_3_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "50000",
+   "ctAd91iQ": "Grand Quest System",
+   "tw0vkye4": "grand_op.txt",
+   "VgU78CYj": "50000"
+  },
+  {
+   "mC1JcVM9": "50001",
+   "ctAd91iQ": "Memoirs of the Great War",
+   "tw0vkye4": "grand_op2.txt",
+   "VgU78CYj": "50200"
+  },
+  {
+   "mC1JcVM9": "50101",
+   "ctAd91iQ": "Karl's Request",
+   "tw0vkye4": "grand_01_op.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50102",
+   "ctAd91iQ": "Off to Slay the Dragon",
+   "tw0vkye4": "grand_01_01.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50103",
+   "ctAd91iQ": "Repelling the Dragon",
+   "tw0vkye4": "grand_01_02.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50104",
+   "ctAd91iQ": "Chasing the Dragon",
+   "tw0vkye4": "grand_01_03.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50105",
+   "ctAd91iQ": "Seria Catches Up",
+   "tw0vkye4": "grand_01_04.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50106",
+   "ctAd91iQ": "Lin's Message",
+   "tw0vkye4": "grand_01_05.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50107",
+   "ctAd91iQ": "Grand Gaia's Treasures",
+   "tw0vkye4": "grand_01_06.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50108",
+   "ctAd91iQ": "Karl Repels the Dragon",
+   "tw0vkye4": "grand_01_07.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50109",
+   "ctAd91iQ": "Karl Chases the Dragon",
+   "tw0vkye4": "grand_01_08.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50110",
+   "ctAd91iQ": "The Dragon's Nest",
+   "tw0vkye4": "grand_01_09.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50111",
+   "ctAd91iQ": "Injured Karl",
+   "tw0vkye4": "grand_01_10.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50112",
+   "ctAd91iQ": "Medical Attention",
+   "tw0vkye4": "grand_01_11.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50113",
+   "ctAd91iQ": "The Chase Ends",
+   "tw0vkye4": "grand_01_12.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50114",
+   "ctAd91iQ": "The Chase Continues",
+   "tw0vkye4": "grand_01_13.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50115",
+   "ctAd91iQ": "Slayed the Dragon!",
+   "tw0vkye4": "grand_01_14.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50116",
+   "ctAd91iQ": "Seria VS. the Dragon",
+   "tw0vkye4": "grand_01_15.txt",
+   "VgU78CYj": "51000"
+  },
+  {
+   "mC1JcVM9": "50200",
+   "ctAd91iQ": "Unexpected Calling",
+   "tw0vkye4": "grand_02_op.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50201",
+   "ctAd91iQ": "Three Paths",
+   "tw0vkye4": "grand_02_01.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50202",
+   "ctAd91iQ": "About the Empress",
+   "tw0vkye4": "grand_02_02.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50203",
+   "ctAd91iQ": "Finding Treasure",
+   "tw0vkye4": "grand_02_03.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50204",
+   "ctAd91iQ": "Treasure Contents",
+   "tw0vkye4": "grand_02_04.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50205",
+   "ctAd91iQ": "Master Trap Maker",
+   "tw0vkye4": "grand_02_05.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50206",
+   "ctAd91iQ": "Open the Chest",
+   "tw0vkye4": "grand_02_06.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50207",
+   "ctAd91iQ": "Lugina Trapped",
+   "tw0vkye4": "grand_02_07.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50208",
+   "ctAd91iQ": "A Piece of Stone?",
+   "tw0vkye4": "grand_02_08.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50209",
+   "ctAd91iQ": "Fury of the Empress",
+   "tw0vkye4": "grand_02_09.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50210",
+   "ctAd91iQ": "Three Headed Dragon",
+   "tw0vkye4": "grand_02_10.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50211",
+   "ctAd91iQ": "Who Will Proceed?",
+   "tw0vkye4": "grand_02_11.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50212",
+   "ctAd91iQ": "Broken Lithograph",
+   "tw0vkye4": "grand_02_12.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50213",
+   "ctAd91iQ": "Treasure's Reflection",
+   "tw0vkye4": "grand_02_13.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50214",
+   "ctAd91iQ": "Treasure's Greed",
+   "tw0vkye4": "grand_02_14.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50215",
+   "ctAd91iQ": "Treasure's Pain",
+   "tw0vkye4": "grand_02_15.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50216",
+   "ctAd91iQ": "Last Trial",
+   "tw0vkye4": "grand_02_16.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50217",
+   "ctAd91iQ": "Empress's \"Treasure\"",
+   "tw0vkye4": "grand_02_17.txt",
+   "VgU78CYj": "51001"
+  },
+  {
+   "mC1JcVM9": "50300",
+   "ctAd91iQ": "Request for Help",
+   "tw0vkye4": "grand_03_op.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50301",
+   "ctAd91iQ": "Straightforward Favor",
+   "tw0vkye4": "grand_03_01.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50302",
+   "ctAd91iQ": "Graham's Preliminaries",
+   "tw0vkye4": "grand_03_02.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50303",
+   "ctAd91iQ": "Worthy Playmate",
+   "tw0vkye4": "grand_03_03.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50304",
+   "ctAd91iQ": "Demon's Punishment",
+   "tw0vkye4": "grand_03_04.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50305",
+   "ctAd91iQ": "Smells Like a Trap",
+   "tw0vkye4": "grand_03_05.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50306",
+   "ctAd91iQ": "Friends' Foe",
+   "tw0vkye4": "grand_03_06.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50307",
+   "ctAd91iQ": "A Demon Calls",
+   "tw0vkye4": "grand_03_07.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50308",
+   "ctAd91iQ": "The Best Trap Yet",
+   "tw0vkye4": "grand_03_08.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50309",
+   "ctAd91iQ": "Blown Away",
+   "tw0vkye4": "grand_03_09.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50310",
+   "ctAd91iQ": "Sneak Attack",
+   "tw0vkye4": "grand_03_10.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50311",
+   "ctAd91iQ": "Deception Loving Demon",
+   "tw0vkye4": "grand_03_11.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50312",
+   "ctAd91iQ": "Another Provocation",
+   "tw0vkye4": "grand_03_12.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50313",
+   "ctAd91iQ": "Building Confidence",
+   "tw0vkye4": "grand_03_13.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50314",
+   "ctAd91iQ": "Signs of the Awakening",
+   "tw0vkye4": "grand_03_14.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50315",
+   "ctAd91iQ": "The Real Graham",
+   "tw0vkye4": "grand_03_15.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50316",
+   "ctAd91iQ": "Unbeatable Demon",
+   "tw0vkye4": "grand_03_16.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50317",
+   "ctAd91iQ": "First Place",
+   "tw0vkye4": "grand_03_17.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50318",
+   "ctAd91iQ": "Unfulfilled Revenge",
+   "tw0vkye4": "grand_03_18.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50319",
+   "ctAd91iQ": "Believing in Friendship",
+   "tw0vkye4": "grand_03_19.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50320",
+   "ctAd91iQ": "Power of Three",
+   "tw0vkye4": "grand_03_20.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50321",
+   "ctAd91iQ": "Deepest Wish",
+   "tw0vkye4": "grand_03_21.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50322",
+   "ctAd91iQ": "Before Celebrating",
+   "tw0vkye4": "grand_03_22.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50323",
+   "ctAd91iQ": "Graham's True Nature",
+   "tw0vkye4": "grand_03_23.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50324",
+   "ctAd91iQ": "Friends' Trust",
+   "tw0vkye4": "grand_03_24.txt",
+   "VgU78CYj": "51002"
+  },
+  {
+   "mC1JcVM9": "50400",
+   "ctAd91iQ": "Seria's Recklessness",
+   "tw0vkye4": "grand_04_op.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50401",
+   "ctAd91iQ": "Three Routes",
+   "tw0vkye4": "grand_04_01.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50402",
+   "ctAd91iQ": "Tilith's Protection",
+   "tw0vkye4": "grand_04_02.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50403",
+   "ctAd91iQ": "Meeting Elder Grah",
+   "tw0vkye4": "grand_04_03.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50404",
+   "ctAd91iQ": "Running into Lugina",
+   "tw0vkye4": "grand_04_04.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50405",
+   "ctAd91iQ": "Seria's Ignorance",
+   "tw0vkye4": "grand_04_05.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50406",
+   "ctAd91iQ": "Didn't Know That!",
+   "tw0vkye4": "grand_04_06.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50407",
+   "ctAd91iQ": "Thank Me with Tears!",
+   "tw0vkye4": "grand_04_07.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50408",
+   "ctAd91iQ": "Worried About Seria",
+   "tw0vkye4": "grand_04_08.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50409",
+   "ctAd91iQ": "Bearing a Burden",
+   "tw0vkye4": "grand_04_09.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50410",
+   "ctAd91iQ": "Quit Messing Around!",
+   "tw0vkye4": "grand_04_10.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50411",
+   "ctAd91iQ": "Revoking Remarks",
+   "tw0vkye4": "grand_04_11.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50412",
+   "ctAd91iQ": "Blade of Farewells",
+   "tw0vkye4": "grand_04_12.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50413",
+   "ctAd91iQ": "Help Me!",
+   "tw0vkye4": "grand_04_13.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50414",
+   "ctAd91iQ": "Worried About Me",
+   "tw0vkye4": "grand_04_14.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50415",
+   "ctAd91iQ": "Learning to Trust",
+   "tw0vkye4": "grand_04_15.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50416",
+   "ctAd91iQ": "Maybe You're Right",
+   "tw0vkye4": "grand_04_16.txt",
+   "VgU78CYj": "51003"
+  },
+  {
+   "mC1JcVM9": "50500",
+   "ctAd91iQ": "Grahdens's Request",
+   "tw0vkye4": "grand_05_op.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50501",
+   "ctAd91iQ": "Training Aide",
+   "tw0vkye4": "grand_05_01.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50502",
+   "ctAd91iQ": "Windswept Town",
+   "tw0vkye4": "grand_05_02.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50503",
+   "ctAd91iQ": "Inferno Forest",
+   "tw0vkye4": "grand_05_03.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50504",
+   "ctAd91iQ": "Halcyon Plains",
+   "tw0vkye4": "grand_05_04.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50505",
+   "ctAd91iQ": "Stormswept Metropolis",
+   "tw0vkye4": "grand_05_05.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50506",
+   "ctAd91iQ": "Mashreed's Presence",
+   "tw0vkye4": "grand_05_06.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50507",
+   "ctAd91iQ": "Need More Time",
+   "tw0vkye4": "grand_05_07.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50508",
+   "ctAd91iQ": "Strong Opponent",
+   "tw0vkye4": "grand_05_08.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50509",
+   "ctAd91iQ": "At the Front Lines",
+   "tw0vkye4": "grand_05_09.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50510",
+   "ctAd91iQ": "Winged Demon",
+   "tw0vkye4": "grand_05_10.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50511",
+   "ctAd91iQ": "Mashreed Flees",
+   "tw0vkye4": "grand_05_11.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50512",
+   "ctAd91iQ": "The Real Battle",
+   "tw0vkye4": "grand_05_12.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50513",
+   "ctAd91iQ": "Prepare for Battle!",
+   "tw0vkye4": "grand_05_13.txt",
+   "VgU78CYj": "51004"
+  },
+  {
+   "mC1JcVM9": "50600",
+   "ctAd91iQ": "Request for an Escort",
+   "tw0vkye4": "grand_06_op.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50601",
+   "ctAd91iQ": "The Survey Begins!",
+   "tw0vkye4": "grand_06_01.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50602",
+   "ctAd91iQ": "Cloth Melting Mucus",
+   "tw0vkye4": "grand_06_02.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50603",
+   "ctAd91iQ": "Coiling Tentacles",
+   "tw0vkye4": "grand_06_03.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50604",
+   "ctAd91iQ": "Cloth Shredding Beak",
+   "tw0vkye4": "grand_06_04.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50605",
+   "ctAd91iQ": "Last Survey Area",
+   "tw0vkye4": "grand_06_05.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50606",
+   "ctAd91iQ": "Counterattack's Effect",
+   "tw0vkye4": "grand_06_06.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50607",
+   "ctAd91iQ": "Tarnished Reputation",
+   "tw0vkye4": "grand_06_07.txt",
+   "VgU78CYj": "51005"
+  },
+  {
+   "mC1JcVM9": "50700",
+   "ctAd91iQ": "Childhood Memories",
+   "tw0vkye4": "grand_07_op.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50701",
+   "ctAd91iQ": "Temple of Illusions",
+   "tw0vkye4": "grand_07_01.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50702",
+   "ctAd91iQ": "Zebra Reappears",
+   "tw0vkye4": "grand_07_02.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50703",
+   "ctAd91iQ": "Demon's Abilities",
+   "tw0vkye4": "grand_07_03.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50704",
+   "ctAd91iQ": "Mare Reappears",
+   "tw0vkye4": "grand_07_04.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50705",
+   "ctAd91iQ": "Humanity's Limits",
+   "tw0vkye4": "grand_07_05.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50706",
+   "ctAd91iQ": "Zurg Reappears",
+   "tw0vkye4": "grand_07_06.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50707",
+   "ctAd91iQ": "Manifested Fears",
+   "tw0vkye4": "grand_07_07.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50708",
+   "ctAd91iQ": "Four Great Powers",
+   "tw0vkye4": "grand_07_08.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50709",
+   "ctAd91iQ": "Four Fallen Gods",
+   "tw0vkye4": "grand_07_09.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50710",
+   "ctAd91iQ": "Bitter Reunion",
+   "tw0vkye4": "grand_07_10.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50711",
+   "ctAd91iQ": "Eriole Vanishes",
+   "tw0vkye4": "grand_07_11.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50712",
+   "ctAd91iQ": "Resentful Meeting",
+   "tw0vkye4": "grand_07_12.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50713",
+   "ctAd91iQ": "Tesla Vanishes",
+   "tw0vkye4": "grand_07_13.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50714",
+   "ctAd91iQ": "Eriole's Temptation",
+   "tw0vkye4": "grand_07_14.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50715",
+   "ctAd91iQ": "Friendship for All",
+   "tw0vkye4": "grand_07_15.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50716",
+   "ctAd91iQ": "Not Fooled by Visions",
+   "tw0vkye4": "grand_07_16.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50717",
+   "ctAd91iQ": "My Own Power...",
+   "tw0vkye4": "grand_07_17.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50718",
+   "ctAd91iQ": "My Ideal World",
+   "tw0vkye4": "grand_07_18.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50719",
+   "ctAd91iQ": "Growing Fear",
+   "tw0vkye4": "grand_07_19.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50720",
+   "ctAd91iQ": "Paris Moves On",
+   "tw0vkye4": "grand_07_20.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50721",
+   "ctAd91iQ": "Doubts & Expectations",
+   "tw0vkye4": "grand_07_21.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50722",
+   "ctAd91iQ": "Follow Your Own Path",
+   "tw0vkye4": "grand_07_22.txt",
+   "VgU78CYj": "51006"
+  },
+  {
+   "mC1JcVM9": "50800",
+   "ctAd91iQ": "Noel & Rhynt's Secret",
+   "tw0vkye4": "grand_08_op.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50801",
+   "ctAd91iQ": "Abandoned Metropolis",
+   "tw0vkye4": "grand_08_01.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50802",
+   "ctAd91iQ": "Fake Lugina",
+   "tw0vkye4": "grand_08_02.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50803",
+   "ctAd91iQ": "Impostor's Escape",
+   "tw0vkye4": "grand_08_03.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50804",
+   "ctAd91iQ": "Reply to Provocation",
+   "tw0vkye4": "grand_08_04.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50805",
+   "ctAd91iQ": "Lugina's Real Power",
+   "tw0vkye4": "grand_08_05.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50806",
+   "ctAd91iQ": "Lin's Demon Intel",
+   "tw0vkye4": "grand_08_06.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50807",
+   "ctAd91iQ": "Karl's Guess",
+   "tw0vkye4": "grand_08_07.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50808",
+   "ctAd91iQ": "The Demon Nebulous",
+   "tw0vkye4": "grand_08_08.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50809",
+   "ctAd91iQ": "Two Luginas",
+   "tw0vkye4": "grand_08_09.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50810",
+   "ctAd91iQ": "Lugina's Personality",
+   "tw0vkye4": "grand_08_10.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50811",
+   "ctAd91iQ": "Meeting Fake Lugina",
+   "tw0vkye4": "grand_08_11.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50812",
+   "ctAd91iQ": "Fake Lugina Attacks",
+   "tw0vkye4": "grand_08_12.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50813",
+   "ctAd91iQ": "Noel's Miscalculation",
+   "tw0vkye4": "grand_08_13.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50814",
+   "ctAd91iQ": "Karl Waits for Lugina",
+   "tw0vkye4": "grand_08_14.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50815",
+   "ctAd91iQ": "Karl's Defense",
+   "tw0vkye4": "grand_08_15.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50816",
+   "ctAd91iQ": "Exploding Antagonism",
+   "tw0vkye4": "grand_08_16.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50817",
+   "ctAd91iQ": "Lugina VS. Karl",
+   "tw0vkye4": "grand_08_17.txt",
+   "VgU78CYj": "51007"
+  },
+  {
+   "mC1JcVM9": "50900",
+   "ctAd91iQ": "Gathered Soldiers",
+   "tw0vkye4": "grand_09_op2.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50901",
+   "ctAd91iQ": "Edea Speaks",
+   "tw0vkye4": "grand_09_01.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50902",
+   "ctAd91iQ": "Two Advance",
+   "tw0vkye4": "grand_09_05.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50903",
+   "ctAd91iQ": "Four Unite",
+   "tw0vkye4": "grand_09_06.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50904",
+   "ctAd91iQ": "Edea's Faith",
+   "tw0vkye4": "grand_09_07.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50905",
+   "ctAd91iQ": "Zebra's Rage",
+   "tw0vkye4": "grand_09_02.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50906",
+   "ctAd91iQ": "Zebra Withdraws",
+   "tw0vkye4": "grand_09_03.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50907",
+   "ctAd91iQ": "Damage Report",
+   "tw0vkye4": "grand_09_04.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50908",
+   "ctAd91iQ": "Before the Last Battle",
+   "tw0vkye4": "grand_09_08.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50909",
+   "ctAd91iQ": "Cardes the Menace",
+   "tw0vkye4": "grand_09_10.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "50910",
+   "ctAd91iQ": "Unbearable Sacrifice",
+   "tw0vkye4": "grand_09_11.txt",
+   "VgU78CYj": "52000"
+  },
+  {
+   "mC1JcVM9": "51000",
+   "ctAd91iQ": "Edea's Heartbeat",
+   "tw0vkye4": "grand_10_op.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51001",
+   "ctAd91iQ": "Soldiers' Fight",
+   "tw0vkye4": "grand_10_01.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51002",
+   "ctAd91iQ": "Loch's Commands",
+   "tw0vkye4": "grand_10_02.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51003",
+   "ctAd91iQ": "Angry Disciple",
+   "tw0vkye4": "grand_10_03.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51004",
+   "ctAd91iQ": "Unexpected Situation",
+   "tw0vkye4": "grand_10_04.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51005",
+   "ctAd91iQ": "Dean's Question",
+   "tw0vkye4": "grand_10_05.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51006",
+   "ctAd91iQ": "Mad Swordsman",
+   "tw0vkye4": "grand_10_06.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51007",
+   "ctAd91iQ": "Battle Spirit Revival",
+   "tw0vkye4": "grand_10_07.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51008",
+   "ctAd91iQ": "Price for the Seal",
+   "tw0vkye4": "grand_10_08.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51009",
+   "ctAd91iQ": "Edea Awakens",
+   "tw0vkye4": "grand_10_09.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51010",
+   "ctAd91iQ": "Seal of Four",
+   "tw0vkye4": "grand_10_10.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51011",
+   "ctAd91iQ": "Lafdranya's Will",
+   "tw0vkye4": "grand_10_11.txt",
+   "VgU78CYj": "52001"
+  },
+  {
+   "mC1JcVM9": "51100",
+   "ctAd91iQ": "You're \"Crabby\"!",
+   "tw0vkye4": "grand_11_op.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51101",
+   "ctAd91iQ": "I Get It, More or Less",
+   "tw0vkye4": "grand_11_01.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51102",
+   "ctAd91iQ": "That's an Order!",
+   "tw0vkye4": "grand_11_02.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51103",
+   "ctAd91iQ": "I Said I'm Going!",
+   "tw0vkye4": "grand_11_03.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51104",
+   "ctAd91iQ": "Come With Me!",
+   "tw0vkye4": "grand_11_04.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51105",
+   "ctAd91iQ": "Let's Become Friends",
+   "tw0vkye4": "grand_11_05.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51106",
+   "ctAd91iQ": "Disappointment",
+   "tw0vkye4": "grand_11_06.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51107",
+   "ctAd91iQ": "Looking for a Fight?",
+   "tw0vkye4": "grand_11_07.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51108",
+   "ctAd91iQ": "The Name is Zelban!",
+   "tw0vkye4": "grand_11_08.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51109",
+   "ctAd91iQ": "No Longer Interested",
+   "tw0vkye4": "grand_11_09.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51110",
+   "ctAd91iQ": "Look Over Here!",
+   "tw0vkye4": "grand_11_10.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51111",
+   "ctAd91iQ": "Knight of Freedom",
+   "tw0vkye4": "grand_11_11.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51112",
+   "ctAd91iQ": "Can't Do It Alone",
+   "tw0vkye4": "grand_11_12.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51113",
+   "ctAd91iQ": "I Can Help You",
+   "tw0vkye4": "grand_11_13.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51114",
+   "ctAd91iQ": "I'm Not a Loser!",
+   "tw0vkye4": "grand_11_14.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51115",
+   "ctAd91iQ": "No Need for Help",
+   "tw0vkye4": "grand_11_15.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51116",
+   "ctAd91iQ": "Can't Be Ignored",
+   "tw0vkye4": "grand_11_16.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51117",
+   "ctAd91iQ": "Where to Next?",
+   "tw0vkye4": "grand_11_17.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51118",
+   "ctAd91iQ": "Of Course I'll Win!",
+   "tw0vkye4": "grand_11_18.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51119",
+   "ctAd91iQ": "I Shall Destroy",
+   "tw0vkye4": "grand_11_19.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51120",
+   "ctAd91iQ": "I'm Not Like You All!",
+   "tw0vkye4": "grand_11_20.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51121",
+   "ctAd91iQ": "It's Different Now!",
+   "tw0vkye4": "grand_11_21.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51122",
+   "ctAd91iQ": "Code 666",
+   "tw0vkye4": "grand_11_22.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51123",
+   "ctAd91iQ": "Crabby! Wait!",
+   "tw0vkye4": "grand_11_23.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51124",
+   "ctAd91iQ": "Mi...che...le...",
+   "tw0vkye4": "grand_11_24.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51125",
+   "ctAd91iQ": "You're Funny Sometimes",
+   "tw0vkye4": "grand_11_25.txt",
+   "VgU78CYj": "52002"
+  },
+  {
+   "mC1JcVM9": "51300",
+   "ctAd91iQ": "エリーゼの休暇",
+   "tw0vkye4": "grand_13_op.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51301",
+   "ctAd91iQ": "出発する２組",
+   "tw0vkye4": "grand_13_01.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51302",
+   "ctAd91iQ": "興味津々な２人",
+   "tw0vkye4": "grand_13_02.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51303",
+   "ctAd91iQ": "ノアとエリーゼの関係",
+   "tw0vkye4": "grand_13_03.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51304",
+   "ctAd91iQ": "予想外のルート",
+   "tw0vkye4": "grand_13_04.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51305",
+   "ctAd91iQ": "呪傷",
+   "tw0vkye4": "grand_13_05.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51306",
+   "ctAd91iQ": "意外な先客",
+   "tw0vkye4": "grand_13_06.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51307",
+   "ctAd91iQ": "追いついたノア",
+   "tw0vkye4": "grand_13_07.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51308",
+   "ctAd91iQ": "登山中止",
+   "tw0vkye4": "grand_13_08.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51309",
+   "ctAd91iQ": "発現する呪い",
+   "tw0vkye4": "grand_13_09.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51310",
+   "ctAd91iQ": "エリーゼの願い",
+   "tw0vkye4": "grand_13_10.txt",
+   "VgU78CYj": "51008"
+  },
+  {
+   "mC1JcVM9": "51400",
+   "ctAd91iQ": "イシュグリアへの旅立ち",
+   "tw0vkye4": "grand_14_op.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51401",
+   "ctAd91iQ": "神徒のお告げ",
+   "tw0vkye4": "grand_14_01.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51402",
+   "ctAd91iQ": "戦力の二分",
+   "tw0vkye4": "grand_14_02.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51403",
+   "ctAd91iQ": "メイリスの感じた違和感",
+   "tw0vkye4": "grand_14_03.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51404",
+   "ctAd91iQ": "問答無用の戦い",
+   "tw0vkye4": "grand_14_04.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51405",
+   "ctAd91iQ": "クレアの決意",
+   "tw0vkye4": "grand_14_05.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51406",
+   "ctAd91iQ": "行く手を阻むシュスイ",
+   "tw0vkye4": "grand_14_06.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51407",
+   "ctAd91iQ": "メイリスの帰還",
+   "tw0vkye4": "grand_14_07.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51408",
+   "ctAd91iQ": "しつこい追跡者",
+   "tw0vkye4": "grand_14_08.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51409",
+   "ctAd91iQ": "ディアナの気持ち",
+   "tw0vkye4": "grand_14_09.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51410",
+   "ctAd91iQ": "クェイドとディアナ",
+   "tw0vkye4": "grand_14_10.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51411",
+   "ctAd91iQ": "メイリスの一時帰還",
+   "tw0vkye4": "grand_14_11.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51412",
+   "ctAd91iQ": "クェイドの迷い",
+   "tw0vkye4": "grand_14_12.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51413",
+   "ctAd91iQ": "魔神と神徒の邂逅",
+   "tw0vkye4": "grand_14_13.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51414",
+   "ctAd91iQ": "グレアムの戯れ",
+   "tw0vkye4": "grand_14_14.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51415",
+   "ctAd91iQ": "ラグルヴォートとの戦い",
+   "tw0vkye4": "grand_14_15.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51416",
+   "ctAd91iQ": "メイリスの分断",
+   "tw0vkye4": "grand_14_16.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51417",
+   "ctAd91iQ": "彼らの信じた道",
+   "tw0vkye4": "grand_14_17.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51418",
+   "ctAd91iQ": "クェイドという男",
+   "tw0vkye4": "grand_14_18.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51419",
+   "ctAd91iQ": "再集結の時",
+   "tw0vkye4": "grand_14_19.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51420",
+   "ctAd91iQ": "メイリスの答え",
+   "tw0vkye4": "grand_14_20.txt",
+   "VgU78CYj": "52003"
+  },
+  {
+   "mC1JcVM9": "51700",
+   "ctAd91iQ": "イシュグリア先遣隊",
+   "tw0vkye4": "grand_17_op.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51701",
+   "ctAd91iQ": "辿り着いた異界で",
+   "tw0vkye4": "grand_17_01.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51702",
+   "ctAd91iQ": "再戦の宣言",
+   "tw0vkye4": "grand_17_02.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51703",
+   "ctAd91iQ": "覚悟を決めた戦い",
+   "tw0vkye4": "grand_17_03.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51704",
+   "ctAd91iQ": "俺の……勝ちだ",
+   "tw0vkye4": "grand_17_04.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51705",
+   "ctAd91iQ": "現れた脅威",
+   "tw0vkye4": "grand_17_05.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51706",
+   "ctAd91iQ": "はぐれるアイリス",
+   "tw0vkye4": "grand_17_06.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51707",
+   "ctAd91iQ": "本性を現しなさい…！",
+   "tw0vkye4": "grand_17_07.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51708",
+   "ctAd91iQ": "不意の死",
+   "tw0vkye4": "grand_17_08.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51709",
+   "ctAd91iQ": "戻ってきた者は…？",
+   "tw0vkye4": "grand_17_09.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51710",
+   "ctAd91iQ": "閃光の中で…",
+   "tw0vkye4": "grand_17_10.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51711",
+   "ctAd91iQ": "託す者、託される者",
+   "tw0vkye4": "grand_17_11.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51712",
+   "ctAd91iQ": "最期の一撃",
+   "tw0vkye4": "grand_17_12.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51713",
+   "ctAd91iQ": "幻の帰路",
+   "tw0vkye4": "grand_17_13.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51714",
+   "ctAd91iQ": "生み出された復讐者",
+   "tw0vkye4": "grand_17_14.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51715",
+   "ctAd91iQ": "死中に活を求める",
+   "tw0vkye4": "grand_17_15.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51716",
+   "ctAd91iQ": "召喚されし異端",
+   "tw0vkye4": "grand_17_16.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51717",
+   "ctAd91iQ": "警戒するグリフ",
+   "tw0vkye4": "grand_17_17.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51718",
+   "ctAd91iQ": "強行参戦",
+   "tw0vkye4": "grand_17_18.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51719",
+   "ctAd91iQ": "戦いはこれで終わりだ",
+   "tw0vkye4": "grand_17_19.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51720",
+   "ctAd91iQ": "アイリスの素顔",
+   "tw0vkye4": "grand_17_20.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51721",
+   "ctAd91iQ": "アンタの友達！？",
+   "tw0vkye4": "grand_17_21.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51722",
+   "ctAd91iQ": "詮索する２人",
+   "tw0vkye4": "grand_17_22.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51723",
+   "ctAd91iQ": "思わぬ加勢",
+   "tw0vkye4": "grand_17_23.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51724",
+   "ctAd91iQ": "守ってくれて、ありがとう",
+   "tw0vkye4": "grand_17_24.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51725",
+   "ctAd91iQ": "焦燥の中での戦い",
+   "tw0vkye4": "grand_17_25.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51726",
+   "ctAd91iQ": "ここからが本番",
+   "tw0vkye4": "grand_17_26.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "51727",
+   "ctAd91iQ": "果たされた思い",
+   "tw0vkye4": "grand_17_27.txt",
+   "VgU78CYj": "52004"
+  },
+  {
+   "mC1JcVM9": "52000",
+   "ctAd91iQ": "約束の地へ",
+   "tw0vkye4": "grand_20_op.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52001",
+   "ctAd91iQ": "行路の安全",
+   "tw0vkye4": "grand_20_01.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52002",
+   "ctAd91iQ": "自信を持ちなさい",
+   "tw0vkye4": "grand_20_02.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52003",
+   "ctAd91iQ": "流浪の騎士",
+   "tw0vkye4": "grand_20_03.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52004",
+   "ctAd91iQ": "民衆のこと、頼んだぞ…！",
+   "tw0vkye4": "grand_20_04.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52005",
+   "ctAd91iQ": "現れた神徒",
+   "tw0vkye4": "grand_20_05.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52006",
+   "ctAd91iQ": "絶望などしていない……！！",
+   "tw0vkye4": "grand_20_06.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52007",
+   "ctAd91iQ": "別働隊発見",
+   "tw0vkye4": "grand_20_07.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52008",
+   "ctAd91iQ": "同行する資格",
+   "tw0vkye4": "grand_20_08.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52009",
+   "ctAd91iQ": "共闘",
+   "tw0vkye4": "grand_20_09.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52010",
+   "ctAd91iQ": "自責するアヴァン",
+   "tw0vkye4": "grand_20_10.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52011",
+   "ctAd91iQ": "神徒との戦い",
+   "tw0vkye4": "grand_20_11.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52012",
+   "ctAd91iQ": "ひとまずの勝利",
+   "tw0vkye4": "grand_20_12.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52013",
+   "ctAd91iQ": "迎撃戦",
+   "tw0vkye4": "grand_20_13.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52014",
+   "ctAd91iQ": "想定内のことだよ",
+   "tw0vkye4": "grand_20_14.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52015",
+   "ctAd91iQ": "君はもう立派な戦士です！！",
+   "tw0vkye4": "grand_20_15.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52016",
+   "ctAd91iQ": "アーネルの思い",
+   "tw0vkye4": "grand_20_16.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52017",
+   "ctAd91iQ": "思わぬ援軍",
+   "tw0vkye4": "grand_20_17.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52018",
+   "ctAd91iQ": "神軍の罠",
+   "tw0vkye4": "grand_20_18.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52019",
+   "ctAd91iQ": "罠の先には……",
+   "tw0vkye4": "grand_20_19.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52020",
+   "ctAd91iQ": "希望となる存在",
+   "tw0vkye4": "grand_20_20.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52021",
+   "ctAd91iQ": "指一本触れさせん",
+   "tw0vkye4": "grand_20_21.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52022",
+   "ctAd91iQ": "アイツであれば",
+   "tw0vkye4": "grand_20_22.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52023",
+   "ctAd91iQ": "お前はまだ生きている",
+   "tw0vkye4": "grand_20_24.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52024",
+   "ctAd91iQ": "伝説の老剣士",
+   "tw0vkye4": "grand_20_25.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52025",
+   "ctAd91iQ": "あのバカの真似も悪くない",
+   "tw0vkye4": "grand_20_26.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52026",
+   "ctAd91iQ": "魔神の乱入",
+   "tw0vkye4": "grand_20_27.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52027",
+   "ctAd91iQ": "グレアムの置き土産",
+   "tw0vkye4": "grand_20_28.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52028",
+   "ctAd91iQ": "扉",
+   "tw0vkye4": "grand_20_29.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52029",
+   "ctAd91iQ": "思いを受け継いで…",
+   "tw0vkye4": "grand_20_30.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52030",
+   "ctAd91iQ": "支える者たち",
+   "tw0vkye4": "grand_20_31.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52031",
+   "ctAd91iQ": "最後の仕事",
+   "tw0vkye4": "grand_20_32.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52032",
+   "ctAd91iQ": "新たな世界へ",
+   "tw0vkye4": "grand_20_33.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "52033",
+   "ctAd91iQ": "導きし者たち",
+   "tw0vkye4": "grand_20_34.txt",
+   "VgU78CYj": "52005"
+  },
+  {
+   "mC1JcVM9": "53000",
+   "ctAd91iQ": "苦渋の選択",
+   "tw0vkye4": "grand_21_op.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53001",
+   "ctAd91iQ": "敵軍の動向",
+   "tw0vkye4": "grand_21_01.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53002",
+   "ctAd91iQ": "援軍到着",
+   "tw0vkye4": "grand_21_02.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53003",
+   "ctAd91iQ": "一番を示すために",
+   "tw0vkye4": "grand_21_03.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53004",
+   "ctAd91iQ": "断罪を司る神",
+   "tw0vkye4": "grand_21_04.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53005",
+   "ctAd91iQ": "捨石の役割は果たした",
+   "tw0vkye4": "grand_21_05.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53006",
+   "ctAd91iQ": "お別れを伝えに",
+   "tw0vkye4": "grand_21_06.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53007",
+   "ctAd91iQ": "皇族に伝わる秘宝",
+   "tw0vkye4": "grand_21_07.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53008",
+   "ctAd91iQ": "私の戦い",
+   "tw0vkye4": "grand_21_08.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53009",
+   "ctAd91iQ": "押し寄せる神軍",
+   "tw0vkye4": "grand_21_09.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53010",
+   "ctAd91iQ": "皇帝の計画",
+   "tw0vkye4": "grand_21_10.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53011",
+   "ctAd91iQ": "瞳の奥底に眠るもの",
+   "tw0vkye4": "grand_21_11.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53012",
+   "ctAd91iQ": "罪の螺旋",
+   "tw0vkye4": "grand_21_12.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53013",
+   "ctAd91iQ": "戦場なんかじゃない",
+   "tw0vkye4": "grand_21_13.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53014",
+   "ctAd91iQ": "攻撃される王城",
+   "tw0vkye4": "grand_21_14.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53015",
+   "ctAd91iQ": "帝国の未来を守るため",
+   "tw0vkye4": "grand_21_15.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53016",
+   "ctAd91iQ": "私、嬉しかったの……",
+   "tw0vkye4": "grand_21_16.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53017",
+   "ctAd91iQ": "最後のお願い",
+   "tw0vkye4": "grand_21_17.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53018",
+   "ctAd91iQ": "民のためだけに",
+   "tw0vkye4": "grand_21_18.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53019",
+   "ctAd91iQ": "芽吹かせたもの",
+   "tw0vkye4": "grand_21_19.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "53020",
+   "ctAd91iQ": "兄妹全員の願い",
+   "tw0vkye4": "grand_21_20.txt",
+   "VgU78CYj": "52006"
+  },
+  {
+   "mC1JcVM9": "60009",
+   "ctAd91iQ": "Summoners' Training Ground",
+   "tw0vkye4": "syuurenjyo_tuto00.txt",
+   "VgU78CYj": "60000"
+  },
+  {
+   "mC1JcVM9": "60011",
+   "ctAd91iQ": "バトルルーム",
+   "tw0vkye4": "randall_summon_3.txt",
+   "VgU78CYj": "60000"
+  },
+  {
+   "mC1JcVM9": "80000",
+   "ctAd91iQ": "Pursuer of the Gods 1 of 3",
+   "tw0vkye4": "raid_800_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80004",
+   "ctAd91iQ": "Pursuer of the Gods 2 of 3",
+   "tw0vkye4": "raid_800_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80007",
+   "ctAd91iQ": "Pursuer of the Gods 3 of 3",
+   "tw0vkye4": "raid_800_3.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80100",
+   "ctAd91iQ": "An Ancient Land",
+   "tw0vkye4": "raid_801_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80101",
+   "ctAd91iQ": "War Never Ends",
+   "tw0vkye4": "raid_801_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80103",
+   "ctAd91iQ": "Get to the Gate!",
+   "tw0vkye4": "raid_801_3.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80105",
+   "ctAd91iQ": "The Land of Demi-Gods",
+   "tw0vkye4": "raid_801_5.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80108",
+   "ctAd91iQ": "Exodus",
+   "tw0vkye4": "raid_801_8.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80200",
+   "ctAd91iQ": "Of Wings and Horns",
+   "tw0vkye4": "raid_802_1_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80203",
+   "ctAd91iQ": "White Rabbit",
+   "tw0vkye4": "raid_802_3.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80204",
+   "ctAd91iQ": "Hot and Hotter",
+   "tw0vkye4": "raid_802_4.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80207",
+   "ctAd91iQ": "The Coin Toss",
+   "tw0vkye4": "raid_802_5.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80300",
+   "ctAd91iQ": "Long and Lost",
+   "tw0vkye4": "raid_803_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80301",
+   "ctAd91iQ": "Wild is the Wind",
+   "tw0vkye4": "raid_803_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80302",
+   "ctAd91iQ": "Flesh and Bone",
+   "tw0vkye4": "raid_803_3.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80305",
+   "ctAd91iQ": "The Rising Tide",
+   "tw0vkye4": "raid_803_4.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80306",
+   "ctAd91iQ": "He Who Sold the World",
+   "tw0vkye4": "raid_803_5.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80500",
+   "ctAd91iQ": "Skeletons in the Closet",
+   "tw0vkye4": "raid_805_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80501",
+   "ctAd91iQ": "Meeting a Lonely Wolf",
+   "tw0vkye4": "raid_805_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80502",
+   "ctAd91iQ": "An Outsider Arrives",
+   "tw0vkye4": "raid_805_3.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80503",
+   "ctAd91iQ": "At the Gates of Gunegarth",
+   "tw0vkye4": "raid_805_4.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80504",
+   "ctAd91iQ": "The Price of Oaths",
+   "tw0vkye4": "raid_805_5.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "80505",
+   "ctAd91iQ": "A Small Victory",
+   "tw0vkye4": "raid_805_6.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "85101",
+   "ctAd91iQ": "The Tinkerer’s Deceit P1",
+   "tw0vkye4": "GQX1_1.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85102",
+   "ctAd91iQ": "The Tinkerer’s Deceit P2",
+   "tw0vkye4": "GQX1_2A.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85103",
+   "ctAd91iQ": "The Tinkerer’s Deceit P3",
+   "tw0vkye4": "GQX1_2B.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85104",
+   "ctAd91iQ": "The Tinkerer’s Deceit P4",
+   "tw0vkye4": "GQX1_3A.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85105",
+   "ctAd91iQ": "The Tinkerer’s Deceit P5",
+   "tw0vkye4": "GQX1_3B.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85106",
+   "ctAd91iQ": "The Tinkerer’s Deceit P6",
+   "tw0vkye4": "GQX1_3C.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85107",
+   "ctAd91iQ": "The Tinkerer’s Deceit P7",
+   "tw0vkye4": "GQX1_4A.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85108",
+   "ctAd91iQ": "The Tinkerer’s Deceit P8",
+   "tw0vkye4": "GQX1_4B.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85109",
+   "ctAd91iQ": "The Tinkerer’s Deceit P9",
+   "tw0vkye4": "GQX1_5A.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85110",
+   "ctAd91iQ": "The Tinkerer’s Deceit P10",
+   "tw0vkye4": "GQX1_5B.txt",
+   "VgU78CYj": "85001"
+  },
+  {
+   "mC1JcVM9": "85201",
+   "ctAd91iQ": "Eneroth: Genesis P1",
+   "tw0vkye4": "GQX2_OP.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85202",
+   "ctAd91iQ": "Eneroth: Genesis P2",
+   "tw0vkye4": "GQX2_02.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85203",
+   "ctAd91iQ": "Eneroth: Genesis P3",
+   "tw0vkye4": "GQX2_03.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85204",
+   "ctAd91iQ": "Eneroth: Genesis P4",
+   "tw0vkye4": "GQX2_04.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85205",
+   "ctAd91iQ": "Eneroth: Genesis P5",
+   "tw0vkye4": "GQX2_05.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85206",
+   "ctAd91iQ": "Eneroth: Genesis P6",
+   "tw0vkye4": "GQX2_06.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85207",
+   "ctAd91iQ": "Eneroth: Genesis P7",
+   "tw0vkye4": "GQX2_07.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85208",
+   "ctAd91iQ": "Eneroth: Genesis P8",
+   "tw0vkye4": "GQX2_08.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85209",
+   "ctAd91iQ": "Eneroth: Genesis P9",
+   "tw0vkye4": "GQX2_09.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85210",
+   "ctAd91iQ": "Eneroth: Genesis P10",
+   "tw0vkye4": "GQX2_10.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85211",
+   "ctAd91iQ": "Eneroth: Genesis P11",
+   "tw0vkye4": "GQX2_11.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85212",
+   "ctAd91iQ": "Eneroth: Genesis P12",
+   "tw0vkye4": "GQX2_12.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85213",
+   "ctAd91iQ": "Eneroth: Genesis P13",
+   "tw0vkye4": "GQX2_13.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85214",
+   "ctAd91iQ": "Eneroth: Genesis P14",
+   "tw0vkye4": "GQX2_14.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85215",
+   "ctAd91iQ": "Eneroth: Genesis P15",
+   "tw0vkye4": "GQX2_15.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85216",
+   "ctAd91iQ": "Eneroth: Genesis P16",
+   "tw0vkye4": "GQX2_16.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85217",
+   "ctAd91iQ": "Eneroth: Genesis P17",
+   "tw0vkye4": "GQX2_17.txt",
+   "VgU78CYj": "85002"
+  },
+  {
+   "mC1JcVM9": "85301",
+   "ctAd91iQ": "Battle at the Arch",
+   "tw0vkye4": "GQX3_OP.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85302",
+   "ctAd91iQ": "Broken Hall of Worlds",
+   "tw0vkye4": "GQX3_02.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85303",
+   "ctAd91iQ": "The Sum of Your Fears",
+   "tw0vkye4": "GQX3_03.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85304",
+   "ctAd91iQ": "Debt of Honor",
+   "tw0vkye4": "GQX3_04.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85305",
+   "ctAd91iQ": "Without Its Fears",
+   "tw0vkye4": "GQX3_05.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85306",
+   "ctAd91iQ": "Shattered Mirrors",
+   "tw0vkye4": "GQX3_06.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85307",
+   "ctAd91iQ": "Nobody Home But You",
+   "tw0vkye4": "GQX3_07.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85308",
+   "ctAd91iQ": "Clearly Present Danger",
+   "tw0vkye4": "GQX3_08.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85309",
+   "ctAd91iQ": "A Thousand Bad Ends",
+   "tw0vkye4": "GQX3_BE.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85310",
+   "ctAd91iQ": "Cannot Handle the Truth",
+   "tw0vkye4": "GQX3_GE.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85311",
+   "ctAd91iQ": "Worlds Together, Worlds Apart",
+   "tw0vkye4": "GQX3_TE.txt",
+   "VgU78CYj": "85003"
+  },
+  {
+   "mC1JcVM9": "85400",
+   "ctAd91iQ": "A Stranger's Tale",
+   "tw0vkye4": "GQX4_Intro.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85401",
+   "ctAd91iQ": "Victory",
+   "tw0vkye4": "GQX4_Baelfyr_Act1.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85402",
+   "ctAd91iQ": "Giving Chase",
+   "tw0vkye4": "GQX4_Baelfyr_Act2.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85403",
+   "ctAd91iQ": "Burning the Vale",
+   "tw0vkye4": "GQX4_Baelfyr_Act3.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85404",
+   "ctAd91iQ": "The Dryad's Pain",
+   "tw0vkye4": "GQX4_Baelfyr_Act4.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85405",
+   "ctAd91iQ": "Walking Away",
+   "tw0vkye4": "GQX4_Baelfyr_Act5.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85406",
+   "ctAd91iQ": "Strength and Freedom",
+   "tw0vkye4": "GQX4_Baelfyr_Act6.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85407",
+   "ctAd91iQ": "Lessons from the Past",
+   "tw0vkye4": "GQX4_Baelfyr_End.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85408",
+   "ctAd91iQ": "Visitors from the Other Side",
+   "tw0vkye4": "GQX4_Zeruiah_Bonus.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85409",
+   "ctAd91iQ": "A Common Enemy",
+   "tw0vkye4": "GQX4_Zeruiah_Act1.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85410",
+   "ctAd91iQ": "Epiphany",
+   "tw0vkye4": "GQX4_Zeruiah_Act2.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85411",
+   "ctAd91iQ": "A New Home",
+   "tw0vkye4": "GQX4_Zeruiah_Act3.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85412",
+   "ctAd91iQ": "Wrongness",
+   "tw0vkye4": "GQX4_Zeruiah_Act5.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85413",
+   "ctAd91iQ": "Berserked",
+   "tw0vkye4": "GQX4_Zeruiah_End.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85414",
+   "ctAd91iQ": "Synchronicity",
+   "tw0vkye4": "GQX4_Zeruiah_End_Hard.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85415",
+   "ctAd91iQ": "Sacrifice",
+   "tw0vkye4": "GQX4_Outro_Normal.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85416",
+   "ctAd91iQ": "Final Embrace",
+   "tw0vkye4": "GQX4_Outro_True.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85417",
+   "ctAd91iQ": "Corruption",
+   "tw0vkye4": "GQX4_Alraune_Start.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85418",
+   "ctAd91iQ": "A Last Stand",
+   "tw0vkye4": "GQX4_Alraune_End.txt",
+   "VgU78CYj": "85004"
+  },
+  {
+   "mC1JcVM9": "85419",
+   "ctAd91iQ": "Into Orebus",
+   "tw0vkye4": "RC7_Intro.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85420",
+   "ctAd91iQ": "Certified Hunter",
+   "tw0vkye4": "RC7_Promo_End.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85421",
+   "ctAd91iQ": "Giselle's Task",
+   "tw0vkye4": "RC7_Promo_Start.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85422",
+   "ctAd91iQ": "Your First Hunt",
+   "tw0vkye4": "RC7_Fire_Start.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85423",
+   "ctAd91iQ": "Galea's Log",
+   "tw0vkye4": "RC7_Fire_End.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85424",
+   "ctAd91iQ": "Slippery Spoor",
+   "tw0vkye4": "RC7_Water_Start.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85425",
+   "ctAd91iQ": "Durumn's Log ",
+   "tw0vkye4": "RC7_Water_End.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85426",
+   "ctAd91iQ": "Welcome to the Jungle",
+   "tw0vkye4": "RC7_Earth_Start.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85427",
+   "ctAd91iQ": "Zeis' Log",
+   "tw0vkye4": "RC7_Earth_End.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85428",
+   "ctAd91iQ": "Storm Chasing",
+   "tw0vkye4": "RC7_Thunder_Start.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85429",
+   "ctAd91iQ": "Wannahon's Log",
+   "tw0vkye4": "RC7_Thunder_End.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85430",
+   "ctAd91iQ": "Lightfinder",
+   "tw0vkye4": "RC7_Light_Start.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85431",
+   "ctAd91iQ": "Keres' Log",
+   "tw0vkye4": "RC7_Light_End.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85432",
+   "ctAd91iQ": "The Final Foray",
+   "tw0vkye4": "RC7_Dark_Start.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85433",
+   "ctAd91iQ": "Ceulfan's Log",
+   "tw0vkye4": "RC7_Dark_End.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85434",
+   "ctAd91iQ": "Another Frontier",
+   "tw0vkye4": "RC7_Dichroma.txt",
+   "VgU78CYj": "40001"
+  },
+  {
+   "mC1JcVM9": "85500",
+   "ctAd91iQ": "Light and Dark",
+   "tw0vkye4": "GQX5_Intro.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85501",
+   "ctAd91iQ": "Vivid Dreams",
+   "tw0vkye4": "GQX5_Ep1_1.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85502",
+   "ctAd91iQ": "Deer Friend",
+   "tw0vkye4": "GQX5_Ep1_2a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85503",
+   "ctAd91iQ": "Nightmare's End",
+   "tw0vkye4": "GQX5_Ep1_2b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85504",
+   "ctAd91iQ": "Hunted",
+   "tw0vkye4": "GQX5_Ep2_1.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85505",
+   "ctAd91iQ": "Gambit",
+   "tw0vkye4": "GQX5_Ep2_2.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85506",
+   "ctAd91iQ": "The Sage's Fury",
+   "tw0vkye4": "GQX5_Ep2_3a_1.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85507",
+   "ctAd91iQ": "A Tight Situation",
+   "tw0vkye4": "GQX5_Ep2_3b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85508",
+   "ctAd91iQ": "Crouching Deer, Hidden Dragon",
+   "tw0vkye4": "GQX5_Ep3_1.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85509",
+   "ctAd91iQ": "Burning the Vale, Again",
+   "tw0vkye4": "GQX5_Ep3_2.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85510",
+   "ctAd91iQ": "The Second Vale War",
+   "tw0vkye4": "GQX5_Ep3_3a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85511",
+   "ctAd91iQ": "Within Victory",
+   "tw0vkye4": "GQX5_Ep3_3b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85512",
+   "ctAd91iQ": "Human Sin",
+   "tw0vkye4": "GQX5_Ep4_1a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85513",
+   "ctAd91iQ": "Two Wrongs Make A Right",
+   "tw0vkye4": "GQX5_Ep4_1b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85514",
+   "ctAd91iQ": "His Final Monologue",
+   "tw0vkye4": "GQX5_Ep4_2a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85515",
+   "ctAd91iQ": "The Two-Headed Snake",
+   "tw0vkye4": "GQX5_Ep4_2b_1.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85516",
+   "ctAd91iQ": "Make A Will",
+   "tw0vkye4": "GQX5_Ep5_1a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85517",
+   "ctAd91iQ": "A Goddess Worth Fighting For",
+   "tw0vkye4": "GQX5_Ep5_1b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85518",
+   "ctAd91iQ": "Under The Sea",
+   "tw0vkye4": "GQX5_Ep5_2.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85519",
+   "ctAd91iQ": "The Rise of Naga",
+   "tw0vkye4": "GQX5_Ep5_3a_1.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85520",
+   "ctAd91iQ": "The Encroaching Abyss",
+   "tw0vkye4": "GQX5_Ep5_3b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85521",
+   "ctAd91iQ": "Calm Before The Storm",
+   "tw0vkye4": "GQX5_Ep6_1.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85522",
+   "ctAd91iQ": "The Fallen Sage",
+   "tw0vkye4": "GQX5_Ep6_2a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85523",
+   "ctAd91iQ": "Farewell",
+   "tw0vkye4": "GQX5_Ep6_2b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85524",
+   "ctAd91iQ": " An Unwelcome Surprise",
+   "tw0vkye4": "GQX5_Ep6_3a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85525",
+   "ctAd91iQ": "The Pagoda of Pan'ku",
+   "tw0vkye4": "GQX5_Ep6_3b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85526",
+   "ctAd91iQ": "Confrontation",
+   "tw0vkye4": "GQX5_Ep7_1a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85527",
+   "ctAd91iQ": "Frustrations",
+   "tw0vkye4": "GQX5_Ep7_1b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85528",
+   "ctAd91iQ": "Domination",
+   "tw0vkye4": "GQX5_Ep7_2a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85529",
+   "ctAd91iQ": "Compromise",
+   "tw0vkye4": "GQX5_Ep7_2b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85530",
+   "ctAd91iQ": "The One-Day War",
+   "tw0vkye4": "GQX5_Ep8_1a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85531",
+   "ctAd91iQ": "N'an-Xin Strikes Back",
+   "tw0vkye4": "GQX5_Ep8_1b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85532",
+   "ctAd91iQ": "Art of War",
+   "tw0vkye4": "GQX5_Ep8_2a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85533",
+   "ctAd91iQ": "The Maelstrom Rises",
+   "tw0vkye4": "GQX5_Ep8_2b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85534",
+   "ctAd91iQ": "Loss",
+   "tw0vkye4": "GQX5_Ep9_1a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85535",
+   "ctAd91iQ": "Escalating Conflict",
+   "tw0vkye4": "GQX5_Ep9_1b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85536",
+   "ctAd91iQ": "An Impossible Alliance",
+   "tw0vkye4": "GQX5_Ep9_2a.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85537",
+   "ctAd91iQ": "Belonging",
+   "tw0vkye4": "GQX5_Ep9_2b.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85538",
+   "ctAd91iQ": "Light Eternal",
+   "tw0vkye4": "GQX5_Outro.txt",
+   "VgU78CYj": "85005"
+  },
+  {
+   "mC1JcVM9": "85539",
+   "ctAd91iQ": "Beach Day",
+   "tw0vkye4": "2019_Summer_M1.txt",
+   "VgU78CYj": "87010"
+  },
+  {
+   "mC1JcVM9": "85540",
+   "ctAd91iQ": "Downtown Tour",
+   "tw0vkye4": "2019_Summer_M2.txt",
+   "VgU78CYj": "87010"
+  },
+  {
+   "mC1JcVM9": "85541",
+   "ctAd91iQ": "Forest Hike",
+   "tw0vkye4": "2019_Summer_M3_A.txt",
+   "VgU78CYj": "87010"
+  },
+  {
+   "mC1JcVM9": "85542",
+   "ctAd91iQ": "Miell's Realm",
+   "tw0vkye4": "2019_Summer_M3_End.txt",
+   "VgU78CYj": "87010"
+  },
+  {
+   "mC1JcVM9": "85550",
+   "ctAd91iQ": "Kicking the Nest",
+   "tw0vkye4": "2019_Autumn_M1.txt",
+   "VgU78CYj": "87012"
+  },
+  {
+   "mC1JcVM9": "85551",
+   "ctAd91iQ": "Young Man, Old Soul",
+   "tw0vkye4": "2019_Autumn_M2_A.txt",
+   "VgU78CYj": "87012"
+  },
+  {
+   "mC1JcVM9": "85552",
+   "ctAd91iQ": "Hawkward Situation",
+   "tw0vkye4": "2019_Autumn_M2_B.txt",
+   "VgU78CYj": "87012"
+  },
+  {
+   "mC1JcVM9": "85553",
+   "ctAd91iQ": "Knocking on Wood",
+   "tw0vkye4": "2019_Autumn_M3_A.txt",
+   "VgU78CYj": "87012"
+  },
+  {
+   "mC1JcVM9": "85554",
+   "ctAd91iQ": "Fly-Bye",
+   "tw0vkye4": "2019_Autumn_M3_B.txt",
+   "VgU78CYj": "87012"
+  },
+  {
+   "mC1JcVM9": "85555",
+   "ctAd91iQ": "Pitching the Kinch",
+   "tw0vkye4": "2019_Autumn_M4.txt",
+   "VgU78CYj": "87012"
+  },
+  {
+   "mC1JcVM9": "85560",
+   "ctAd91iQ": "Hungry Ghost",
+   "tw0vkye4": "2019_Halloween_M1.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "85561",
+   "ctAd91iQ": "Hanger Management",
+   "tw0vkye4": "2019_Halloween_M2.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "85562",
+   "ctAd91iQ": "Spirit Buffet",
+   "tw0vkye4": "2019_Halloween_M3.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "85563",
+   "ctAd91iQ": "Peace Offering",
+   "tw0vkye4": "2019_Halloween_M4.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "85564",
+   "ctAd91iQ": "Cause and Correlation",
+   "tw0vkye4": "2019_Halloween_M5.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "85565",
+   "ctAd91iQ": "By Popular Demand",
+   "tw0vkye4": "2019_Halloween_M6A.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "85566",
+   "ctAd91iQ": "Homecoming",
+   "tw0vkye4": "2019_Halloween_M6B.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "85567",
+   "ctAd91iQ": "Second Serving",
+   "tw0vkye4": "2019_Halloween_M7.txt",
+   "VgU78CYj": "87013"
+  },
+  {
+   "mC1JcVM9": "86000",
+   "ctAd91iQ": "Chaos Rising",
+   "tw0vkye4": "UprisingP2_Intro.txt",
+   "VgU78CYj": "100011"
+  },
+  {
+   "mC1JcVM9": "86001",
+   "ctAd91iQ": "To The Sun",
+   "tw0vkye4": "UprisingP2_M1.txt",
+   "VgU78CYj": "100011"
+  },
+  {
+   "mC1JcVM9": "86002",
+   "ctAd91iQ": "Ritual Calling",
+   "tw0vkye4": "UprisingP2_M2.txt",
+   "VgU78CYj": "100011"
+  },
+  {
+   "mC1JcVM9": "86003",
+   "ctAd91iQ": "Tense Reunion",
+   "tw0vkye4": "UprisingP2_M3_A.txt",
+   "VgU78CYj": "100011"
+  },
+  {
+   "mC1JcVM9": "86004",
+   "ctAd91iQ": "Facade",
+   "tw0vkye4": "UprisingP2_M3_B.txt",
+   "VgU78CYj": "100011"
+  },
+  {
+   "mC1JcVM9": "86005",
+   "ctAd91iQ": "Ominous Invitation",
+   "tw0vkye4": "UprisingP2_M4_A.txt",
+   "VgU78CYj": "100011"
+  },
+  {
+   "mC1JcVM9": "86006",
+   "ctAd91iQ": "Stand Together Or Fall",
+   "tw0vkye4": "UprisingP2_M4_B.txt",
+   "VgU78CYj": "100011"
+  },
+  {
+   "mC1JcVM9": "87001",
+   "ctAd91iQ": "Dimensional Survey",
+   "tw0vkye4": "GQX6_Opening.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87002",
+   "ctAd91iQ": "Frontal Assault",
+   "tw0vkye4": "X6_Arc1_Ep1_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87003",
+   "ctAd91iQ": "Hearts of Steel",
+   "tw0vkye4": "X6_Arc1_Ep1_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87004",
+   "ctAd91iQ": "Against the Tides",
+   "tw0vkye4": "X6_Arc1_Ep1_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87005",
+   "ctAd91iQ": "Swept Away",
+   "tw0vkye4": "X6_Arc1_Ep1_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87006",
+   "ctAd91iQ": "Right to Rule",
+   "tw0vkye4": "X6_Arc1_Ep2_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87007",
+   "ctAd91iQ": "Courting Death",
+   "tw0vkye4": "X6_Arc1_Ep2_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87008",
+   "ctAd91iQ": "One to Rule",
+   "tw0vkye4": "X6_Arc1_Ep2_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87009",
+   "ctAd91iQ": "A New Era",
+   "tw0vkye4": "X6_Arc1_Ep2_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87010",
+   "ctAd91iQ": "Unyielding Faith",
+   "tw0vkye4": "X6_Arc1_Ep3_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87011",
+   "ctAd91iQ": "Schism and Sorrow",
+   "tw0vkye4": "X6_Arc1_Ep3_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87012",
+   "ctAd91iQ": "Ill Omens",
+   "tw0vkye4": "X6_Arc1_Ep3_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87013",
+   "ctAd91iQ": "A Queen Is Born",
+   "tw0vkye4": "X6_Arc1_Ep3_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87014",
+   "ctAd91iQ": "Upheaval",
+   "tw0vkye4": "X6_Arc2_Ep1_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87015",
+   "ctAd91iQ": "Grandt",
+   "tw0vkye4": "X6_Arc2_Ep1_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87016",
+   "ctAd91iQ": "The Red Audience",
+   "tw0vkye4": "X6_Arc2_Ep1_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87017",
+   "ctAd91iQ": "An Iron Fist",
+   "tw0vkye4": "X6_Arc2_Ep1_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87018",
+   "ctAd91iQ": "Behind Mother's Back",
+   "tw0vkye4": "X6_Arc2_Ep2_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87019",
+   "ctAd91iQ": "Defiance",
+   "tw0vkye4": "X6_Arc2_Ep2_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87020",
+   "ctAd91iQ": "Skin-Deep",
+   "tw0vkye4": "X6_Arc2_Ep2_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87021",
+   "ctAd91iQ": "Ripples Through Time",
+   "tw0vkye4": "X6_Arc2_Ep2_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87022",
+   "ctAd91iQ": "Shattered Ordeal",
+   "tw0vkye4": "X6_Arc2_Ep3_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87023",
+   "ctAd91iQ": "Twisted Salvation",
+   "tw0vkye4": "X6_Arc2_Ep3_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87024",
+   "ctAd91iQ": "Halcyon Days",
+   "tw0vkye4": "X6_Arc2_Ep3_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87025",
+   "ctAd91iQ": "Unbowed Legacy",
+   "tw0vkye4": "X6_Arc2_Ep3_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87026",
+   "ctAd91iQ": "Back to the Pit",
+   "tw0vkye4": "X6_Arc3_Ep1_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87027",
+   "ctAd91iQ": "Operation Gremlin",
+   "tw0vkye4": "X6_Arc3_Ep1_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87028",
+   "ctAd91iQ": "Whistleblower",
+   "tw0vkye4": "X6_Arc3_Ep1_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87029",
+   "ctAd91iQ": "Escape",
+   "tw0vkye4": "X6_Arc3_Ep1_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87030",
+   "ctAd91iQ": "Renegade",
+   "tw0vkye4": "X6_Arc3_Ep2_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87031",
+   "ctAd91iQ": "Unexpected Reunion",
+   "tw0vkye4": "X6_Arc3_Ep2_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87032",
+   "ctAd91iQ": "Live and Let Live",
+   "tw0vkye4": "X6_Arc3_Ep2_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87033",
+   "ctAd91iQ": "In a Bind",
+   "tw0vkye4": "X6_Arc3_Ep2_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87034",
+   "ctAd91iQ": "Prison Break",
+   "tw0vkye4": "X6_Arc3_Ep3_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87035",
+   "ctAd91iQ": "Red Titan",
+   "tw0vkye4": "X6_Arc3_Ep3_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87036",
+   "ctAd91iQ": "Seeing Double",
+   "tw0vkye4": "X6_Arc3_Ep3_3a.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87037",
+   "ctAd91iQ": "Another Side",
+   "tw0vkye4": "X6_Arc3_Ep3_3b.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87038",
+   "ctAd91iQ": "Visions in Dust",
+   "tw0vkye4": "X6_Arc4_Ep1_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87039",
+   "ctAd91iQ": "A Fox's Tail",
+   "tw0vkye4": "X6_Arc4_Ep1_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87040",
+   "ctAd91iQ": "Choice Words",
+   "tw0vkye4": "X6_Arc4_Ep1_3A.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87041",
+   "ctAd91iQ": "A Deal is a Deal",
+   "tw0vkye4": "X6_Arc4_Ep1_3B.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87042",
+   "ctAd91iQ": "Communion",
+   "tw0vkye4": "X6_Arc4_Ep2_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87043",
+   "ctAd91iQ": "What Remains",
+   "tw0vkye4": "X6_Arc4_Ep2_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87044",
+   "ctAd91iQ": "Drowned Truths",
+   "tw0vkye4": "X6_Arc4_Ep2_3A.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87045",
+   "ctAd91iQ": "A Song for Dust",
+   "tw0vkye4": "X6_Arc4_Ep2_3B.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87046",
+   "ctAd91iQ": "A Memory of Loss",
+   "tw0vkye4": "X6_Arc4_Ep3_1.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87047",
+   "ctAd91iQ": "A Memory of Pain",
+   "tw0vkye4": "X6_Arc4_Ep3_2.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87048",
+   "ctAd91iQ": "A Memory of Regret",
+   "tw0vkye4": "X6_Arc4_Ep3_3A.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87049",
+   "ctAd91iQ": "A Memory of Love",
+   "tw0vkye4": "X6_Arc4_Ep3_3B.txt",
+   "VgU78CYj": "85006"
+  },
+  {
+   "mC1JcVM9": "87100",
+   "ctAd91iQ": "Leads Nowhere",
+   "tw0vkye4": "X7_Opening.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87101",
+   "ctAd91iQ": "Bad Customer Service",
+   "tw0vkye4": "X7_Arc1_Ep1_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87102",
+   "ctAd91iQ": "Hands-On Science",
+   "tw0vkye4": "X7_Arc1_Ep1_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87103",
+   "ctAd91iQ": "Heart-to-Heart",
+   "tw0vkye4": "X7_Arc1_Ep1_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87104",
+   "ctAd91iQ": "Dust to Dust",
+   "tw0vkye4": "X7_Arc1_Ep1_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87105",
+   "ctAd91iQ": "Cryptic Colors",
+   "tw0vkye4": "X7_Arc1_Ep2_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87106",
+   "ctAd91iQ": "The Blasted Heath",
+   "tw0vkye4": "X7_Arc1_Ep2_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87107",
+   "ctAd91iQ": "Shattered Illusion",
+   "tw0vkye4": "X7_Arc1_Ep2_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87108",
+   "ctAd91iQ": "A Convenient Truce",
+   "tw0vkye4": "X7_Arc1_Ep2_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87109",
+   "ctAd91iQ": "Food for Thought",
+   "tw0vkye4": "X7_Arc1_Ep2_HM.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87110",
+   "ctAd91iQ": "Preemptive Paranoia",
+   "tw0vkye4": "X7_Arc2_Ep1_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87111",
+   "ctAd91iQ": "Meeting of a Lifetime",
+   "tw0vkye4": "X7_Arc2_Ep1_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87112",
+   "ctAd91iQ": "Bitterness",
+   "tw0vkye4": "X7_Arc2_Ep1_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87113",
+   "ctAd91iQ": "Another Fragment",
+   "tw0vkye4": "X7_Arc2_Ep1_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87114",
+   "ctAd91iQ": "Unwilled",
+   "tw0vkye4": "X7_Arc2_Ep2_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87115",
+   "ctAd91iQ": "Second Act",
+   "tw0vkye4": "X7_Arc2_Ep2_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87116",
+   "ctAd91iQ": "Divine Wrath",
+   "tw0vkye4": "X7_Arc2_Ep2_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87117",
+   "ctAd91iQ": "Ashes to Ashes",
+   "tw0vkye4": "X7_Arc2_Ep2_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87118",
+   "ctAd91iQ": "Foxhunt",
+   "tw0vkye4": "X7_Arc2_Ep2_HM.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87119",
+   "ctAd91iQ": "A Knight to Remember",
+   "tw0vkye4": "X7_Arc3_Ep1_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87120",
+   "ctAd91iQ": "Captain of My Soul",
+   "tw0vkye4": "X7_Arc3_Ep1_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87121",
+   "ctAd91iQ": "Eye of the Beholder",
+   "tw0vkye4": "X7_Arc3_Ep1_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87122",
+   "ctAd91iQ": "An Eternal Hunt",
+   "tw0vkye4": "X7_Arc3_Ep1_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87123",
+   "ctAd91iQ": "There and Back Again",
+   "tw0vkye4": "X7_Arc3_Ep2_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87124",
+   "ctAd91iQ": "Call to Arms",
+   "tw0vkye4": "X7_Arc3_Ep2_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87125",
+   "ctAd91iQ": "Uneasy Minds",
+   "tw0vkye4": "X7_Arc3_Ep2_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87126",
+   "ctAd91iQ": "The Unravelling",
+   "tw0vkye4": "X7_Arc3_Ep2_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87127",
+   "ctAd91iQ": "Crossing a Line",
+   "tw0vkye4": "X7_Arc4_Ep1_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87128",
+   "ctAd91iQ": "Sleep Paralysis",
+   "tw0vkye4": "X7_Arc4_Ep1_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87129",
+   "ctAd91iQ": "Lightbringers",
+   "tw0vkye4": "X7_Arc4_Ep1_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87130",
+   "ctAd91iQ": "The Price of Knowledge",
+   "tw0vkye4": "X7_Arc4_Ep1_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87131",
+   "ctAd91iQ": "Playing the Game",
+   "tw0vkye4": "X7_Arc4_Ep2_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87132",
+   "ctAd91iQ": "Dust in the Desert",
+   "tw0vkye4": "X7_Arc4_Ep2_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87133",
+   "ctAd91iQ": "Two Roads in a Wood",
+   "tw0vkye4": "X7_Arc4_Ep2_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87134",
+   "ctAd91iQ": "Another Cold Lead",
+   "tw0vkye4": "X7_Arc4_Ep2_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87135",
+   "ctAd91iQ": "Disturbance",
+   "tw0vkye4": "X7_Arc5_Ep1_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87136",
+   "ctAd91iQ": "Memories of a Flood",
+   "tw0vkye4": "X7_Arc5_Ep1_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87137",
+   "ctAd91iQ": "A Body of One's Own",
+   "tw0vkye4": "X7_Arc5_Ep1_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87138",
+   "ctAd91iQ": "Right Place, Wrong Time",
+   "tw0vkye4": "X7_Arc5_Ep1_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87139",
+   "ctAd91iQ": "An Anomalous Color",
+   "tw0vkye4": "X7_Arc5_Ep1_HM.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87140",
+   "ctAd91iQ": "Flow",
+   "tw0vkye4": "X7_Arc5_Ep2_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87141",
+   "ctAd91iQ": "Wander",
+   "tw0vkye4": "X7_Arc5_Ep2_2.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87142",
+   "ctAd91iQ": "Return",
+   "tw0vkye4": "X7_Arc5_Ep2_3A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87143",
+   "ctAd91iQ": "Rebirth",
+   "tw0vkye4": "X7_Arc5_Ep2_3B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87144",
+   "ctAd91iQ": "Cradle to Grave",
+   "tw0vkye4": "X7_Arc6_Ep1_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87145",
+   "ctAd91iQ": "Grave to Memory",
+   "tw0vkye4": "X7_Arc6_Ep1_2A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87146",
+   "ctAd91iQ": "Memory to Silence",
+   "tw0vkye4": "X7_Arc6_Ep1_2B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87147",
+   "ctAd91iQ": "Fate in Hand",
+   "tw0vkye4": "X7_Arc6_Ep2_1.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87148",
+   "ctAd91iQ": "The Path of Silence",
+   "tw0vkye4": "X7_Arc6_Ep2_KA.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87149",
+   "ctAd91iQ": "The End of Sacrifice",
+   "tw0vkye4": "X7_Arc6_Ep2_KB.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87150",
+   "ctAd91iQ": "The Path of Sacrifice",
+   "tw0vkye4": "X7_Arc6_Ep2_SA.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87151",
+   "ctAd91iQ": "The End of Silence",
+   "tw0vkye4": "X7_Arc6_Ep2_SB.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87152",
+   "ctAd91iQ": "Borrowed Time",
+   "tw0vkye4": "X7_Epilogue_A.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "87153",
+   "ctAd91iQ": "Shattered Memory",
+   "tw0vkye4": "X7_Epilogue_B.txt",
+   "VgU78CYj": "85007"
+  },
+  {
+   "mC1JcVM9": "88400",
+   "ctAd91iQ": "Setting the Stage",
+   "tw0vkye4": "raid_804_1.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "88401",
+   "ctAd91iQ": "Sunrise of Despair",
+   "tw0vkye4": "raid_804_2.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "88402",
+   "ctAd91iQ": "Roadside Conversation",
+   "tw0vkye4": "raid_804_3.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "88403",
+   "ctAd91iQ": "A Reason for Rest",
+   "tw0vkye4": "raid_804_4.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "88404",
+   "ctAd91iQ": "An Odd Passion",
+   "tw0vkye4": "raid_804_5.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "88405",
+   "ctAd91iQ": "Half-twisted Truths",
+   "tw0vkye4": "raid_804_6.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "88406",
+   "ctAd91iQ": "A Black Bargain",
+   "tw0vkye4": "raid_804_7.txt",
+   "VgU78CYj": "40000"
+  },
+  {
+   "mC1JcVM9": "90001",
+   "ctAd91iQ": "Raug Phantasm",
+   "tw0vkye4": "FrontierRift_Galardhon_01.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90002",
+   "ctAd91iQ": "Breaching the Nebula P1",
+   "tw0vkye4": "FrontierRift_Galardhon2_01.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90003",
+   "ctAd91iQ": "Breaching the Nebula P2",
+   "tw0vkye4": "FrontierRift_Galardhon2_02.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90004",
+   "ctAd91iQ": "Forgotten Magic P1",
+   "tw0vkye4": "FR5_1.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90005",
+   "ctAd91iQ": "Forgotten Magic P2",
+   "tw0vkye4": "FR5_2.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90006",
+   "ctAd91iQ": "Forgotten Magic P3",
+   "tw0vkye4": "FR5_3.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90007",
+   "ctAd91iQ": "Joy To Ashes P1",
+   "tw0vkye4": "FrontierRift6_Cutscene_01g.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90008",
+   "ctAd91iQ": "Joy To Ashes P2",
+   "tw0vkye4": "FrontierRift6_Cutscene_02f.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90009",
+   "ctAd91iQ": "Joy To Ashes P3",
+   "tw0vkye4": "FrontierRift6_Cutscene_04d.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90010",
+   "ctAd91iQ": "Prologue of War",
+   "tw0vkye4": "FR4_1.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90011",
+   "ctAd91iQ": "First Blood",
+   "tw0vkye4": "FR4_2.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90012",
+   "ctAd91iQ": "Horrors of War",
+   "tw0vkye4": "FR4_3.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90013",
+   "ctAd91iQ": "The War Has Only Just Begun",
+   "tw0vkye4": "FR4_4.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90014",
+   "ctAd91iQ": "The Heavens Lv.1",
+   "tw0vkye4": "FR7_1_1a.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90015",
+   "ctAd91iQ": "The Heavens Lv.2",
+   "tw0vkye4": "FR7_2_1a.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90016",
+   "ctAd91iQ": "The Heavens Lv.3 - Beginning",
+   "tw0vkye4": "FR7_3_1a.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90017",
+   "ctAd91iQ": "The Heavens Lv.3 - End",
+   "tw0vkye4": "FR7_3_2a.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90019",
+   "ctAd91iQ": "Essence of Time Lv.1",
+   "tw0vkye4": "FR8_1.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90020",
+   "ctAd91iQ": "Essence of Time Lv.2",
+   "tw0vkye4": "FR8_2.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90021",
+   "ctAd91iQ": "Essence of Time Lv.3",
+   "tw0vkye4": "FR8_3.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90022",
+   "ctAd91iQ": "Essence of Time Lv.4 - Start",
+   "tw0vkye4": "FR8_4.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90023",
+   "ctAd91iQ": "Essence of Time Lv.4 - End",
+   "tw0vkye4": "FR8_End.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90024",
+   "ctAd91iQ": "Void Mirage Lv.1",
+   "tw0vkye4": "FR9_1.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90025",
+   "ctAd91iQ": "Void Mirage Lv.2",
+   "tw0vkye4": "FR9_2.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90026",
+   "ctAd91iQ": "Void Mirage Lv.3",
+   "tw0vkye4": "FR9_3.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90027",
+   "ctAd91iQ": "Void Mirage Lv.4 - Start",
+   "tw0vkye4": "FR9_4.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90028",
+   "ctAd91iQ": "Void Mirage Lv.4 - End",
+   "tw0vkye4": "FR9_Outro.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90029",
+   "ctAd91iQ": "Drowning Darkness Lv.1",
+   "tw0vkye4": "FR10_1.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90030",
+   "ctAd91iQ": "Drowning Darkness Lv.2",
+   "tw0vkye4": "FR10_2.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90031",
+   "ctAd91iQ": "Drowning Darkness Lv.3",
+   "tw0vkye4": "FR10_3.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90032",
+   "ctAd91iQ": "Drowning Darkness Lv.4 - Start",
+   "tw0vkye4": "FR10_4.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "90033",
+   "ctAd91iQ": "Drowning Darkness Lv.4 - End",
+   "tw0vkye4": "FR10_Outro.txt",
+   "VgU78CYj": "90000"
+  },
+  {
+   "mC1JcVM9": "1000051",
+   "ctAd91iQ": "The 5th Anniversary Trivia!",
+   "tw0vkye4": "Trivia_Start_1.txt",
+   "VgU78CYj": "100005"
+  },
+  {
+   "mC1JcVM9": "1000052",
+   "ctAd91iQ": "Rizky's and Shaly's Send-off",
+   "tw0vkye4": "Trivia_End_1.txt",
+   "VgU78CYj": "100005"
+  },
+  {
+   "mC1JcVM9": "8700101",
+   "ctAd91iQ": "Abyss Rescue Lv. 3",
+   "tw0vkye4": "vday15_M1ED_10.txt",
+   "VgU78CYj": "87001"
+  },
+  {
+   "mC1JcVM9": "8700102",
+   "ctAd91iQ": "Abyss Rescue Lv. 4",
+   "tw0vkye4": "vday15_M2ED_10.txt",
+   "VgU78CYj": "87001"
+  },
+  {
+   "mC1JcVM9": "8700401",
+   "ctAd91iQ": "Cold Awakenings",
+   "tw0vkye4": "xmas2016_01.txt",
+   "VgU78CYj": "87004"
+  },
+  {
+   "mC1JcVM9": "8700402",
+   "ctAd91iQ": "Path of Broken Promises",
+   "tw0vkye4": "xmas2016_02.txt",
+   "VgU78CYj": "87004"
+  },
+  {
+   "mC1JcVM9": "8700403",
+   "ctAd91iQ": "A Tear-Wrapped Reunion",
+   "tw0vkye4": "xmas2016_03.txt",
+   "VgU78CYj": "87004"
+  },
+  {
+   "mC1JcVM9": "8700404",
+   "ctAd91iQ": "Warm Reunions",
+   "tw0vkye4": "xmas2016_04.txt",
+   "VgU78CYj": "87004"
+  },
+  {
+   "mC1JcVM9": "8700405",
+   "ctAd91iQ": "Kitsu's Wandering",
+   "tw0vkye4": "XMAS17_1.txt",
+   "VgU78CYj": "87007"
+  },
+  {
+   "mC1JcVM9": "8700406",
+   "ctAd91iQ": "Linlin and Bjorn's Search",
+   "tw0vkye4": "XMAS17_2.txt",
+   "VgU78CYj": "87007"
+  },
+  {
+   "mC1JcVM9": "8700407",
+   "ctAd91iQ": "Clash",
+   "tw0vkye4": "XMAS17_3.txt",
+   "VgU78CYj": "87007"
+  },
+  {
+   "mC1JcVM9": "8700501",
+   "ctAd91iQ": "Haunting Dreams",
+   "tw0vkye4": "Vday2017_1.txt",
+   "VgU78CYj": "87005"
+  },
+  {
+   "mC1JcVM9": "8700502",
+   "ctAd91iQ": "Dark Shadows 1",
+   "tw0vkye4": "Vday2017_2.txt",
+   "VgU78CYj": "87005"
+  },
+  {
+   "mC1JcVM9": "8700503",
+   "ctAd91iQ": "Dark Shadows 2",
+   "tw0vkye4": "Vday2017_3.txt",
+   "VgU78CYj": "87005"
+  },
+  {
+   "mC1JcVM9": "8700504",
+   "ctAd91iQ": "Dawn Breaking 1",
+   "tw0vkye4": "Vday2017_4.txt",
+   "VgU78CYj": "87005"
+  },
+  {
+   "mC1JcVM9": "8700505",
+   "ctAd91iQ": "Dawn Breaking 2",
+   "tw0vkye4": "Vday2017_5.txt",
+   "VgU78CYj": "87005"
+  },
+  {
+   "mC1JcVM9": "8700601",
+   "ctAd91iQ": "The Hunt Begins",
+   "tw0vkye4": "easter2017_01.txt",
+   "VgU78CYj": "87006"
+  },
+  {
+   "mC1JcVM9": "8700602",
+   "ctAd91iQ": "Persegguted",
+   "tw0vkye4": "easter2017_02.txt",
+   "VgU78CYj": "87006"
+  },
+  {
+   "mC1JcVM9": "8700603",
+   "ctAd91iQ": "Uneggspected Friend",
+   "tw0vkye4": "easter2017_03.txt",
+   "VgU78CYj": "87006"
+  },
+  {
+   "mC1JcVM9": "9999995",
+   "ctAd91iQ": "A Weightless Start",
+   "tw0vkye4": "MHA2018_02.txt",
+   "VgU78CYj": "87008"
+  },
+  {
+   "mC1JcVM9": "9999996",
+   "ctAd91iQ": "Path of a Hero",
+   "tw0vkye4": "MHA2018_03.txt",
+   "VgU78CYj": "87008"
+  },
+  {
+   "mC1JcVM9": "9999997",
+   "ctAd91iQ": "One More Match - Start",
+   "tw0vkye4": "MHA2018_04.txt",
+   "VgU78CYj": "87008"
+  },
+  {
+   "mC1JcVM9": "9999998",
+   "ctAd91iQ": "One More Match - End",
+   "tw0vkye4": "MHA2018_05.txt",
+   "VgU78CYj": "87008"
+  },
+  {
+   "mC1JcVM9": "9999999",
+   "ctAd91iQ": "Ready Hoppity Go",
+   "tw0vkye4": "MHA2018_07.txt",
+   "VgU78CYj": "100001"
+  },
+  {
+   "mC1JcVM9": "10000000",
+   "ctAd91iQ": "All Might Fistfight - Start",
+   "tw0vkye4": "MHA2018_08.txt",
+   "VgU78CYj": "100001"
+  },
+  {
+   "mC1JcVM9": "10000001",
+   "ctAd91iQ": "All Might Fistfight - End",
+   "tw0vkye4": "MHA2018_09.txt",
+   "VgU78CYj": "100001"
+  },
+  {
+   "mC1JcVM9": "10000002",
+   "ctAd91iQ": "Time for Training",
+   "tw0vkye4": "MHA2018_01.txt",
+   "VgU78CYj": "87008"
+  },
+  {
+   "mC1JcVM9": "10000003",
+   "ctAd91iQ": "Escape Through the Gate!",
+   "tw0vkye4": "MHA2018_06.txt",
+   "VgU78CYj": "100001"
+  },
+  {
+   "mC1JcVM9": "10000007",
+   "ctAd91iQ": "Intro",
+   "tw0vkye4": "Halloween2018_Intro.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000008",
+   "ctAd91iQ": "Main Hall",
+   "tw0vkye4": "Halloween2018_Main_Hall.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000009",
+   "ctAd91iQ": "Study",
+   "tw0vkye4": "Halloween2018_Study.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000010",
+   "ctAd91iQ": "Stairwell A",
+   "tw0vkye4": "Halloween2018_Stairwell_A.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000011",
+   "ctAd91iQ": "Stairwell B",
+   "tw0vkye4": "Halloween2018_Stairwell_B.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000012",
+   "ctAd91iQ": "Playroom A",
+   "tw0vkye4": "Halloween2018_Playroom_A.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000013",
+   "ctAd91iQ": "Playroom B",
+   "tw0vkye4": "Halloween2018_Playroom_B.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000014",
+   "ctAd91iQ": "Gallery A",
+   "tw0vkye4": "Halloween2018_Gallery_A.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000015",
+   "ctAd91iQ": "Gallery B",
+   "tw0vkye4": "Halloween2018_Gallery_B2.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000016",
+   "ctAd91iQ": "Master Bedroom A",
+   "tw0vkye4": "Halloween2018_MasterBedroom_A.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000017",
+   "ctAd91iQ": "Master Bedroom B",
+   "tw0vkye4": "Halloween2018_MasterBedroom_B2.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000018",
+   "ctAd91iQ": "Outro",
+   "tw0vkye4": "Halloween2018_Outro_2.txt",
+   "VgU78CYj": "100003"
+  },
+  {
+   "mC1JcVM9": "10000019",
+   "ctAd91iQ": "Fairy Tail II Intro",
+   "tw0vkye4": "FT2_Extended_4A_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000020",
+   "ctAd91iQ": "A Windy Fight A",
+   "tw0vkye4": "FT2_Extended_4B_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000021",
+   "ctAd91iQ": "A Windy Fight B",
+   "tw0vkye4": "FT2_Extended_4C_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000022",
+   "ctAd91iQ": "The Strength of Iron A",
+   "tw0vkye4": "FT2_Extended_5A_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000023",
+   "ctAd91iQ": "The Strength of Iron B",
+   "tw0vkye4": "FT2_Extended_5B_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000024",
+   "ctAd91iQ": "Iron Covered Skies A",
+   "tw0vkye4": "FT2_Extended_6A_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000025",
+   "ctAd91iQ": "Iron Covered Skies B",
+   "tw0vkye4": "FT2_Extended_6B_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000026",
+   "ctAd91iQ": "Fairy Tail II Outro",
+   "tw0vkye4": "FT2_Extended_End_1.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000027",
+   "ctAd91iQ": "The Black Wizard Intro",
+   "tw0vkye4": "FT2_Zeref_1A.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000028",
+   "ctAd91iQ": "The Black Wizard A",
+   "tw0vkye4": "FT2_Zeref_1B.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000029",
+   "ctAd91iQ": "The Black Wizard Outro",
+   "tw0vkye4": "FT2_Zeref_1C.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000030",
+   "ctAd91iQ": "Dragon of Destruction Intro",
+   "tw0vkye4": "FT2_Acnologia_2A.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000031",
+   "ctAd91iQ": "Dragon of Destruction A",
+   "tw0vkye4": "FT2_Acnologia_2B.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000032",
+   "ctAd91iQ": "Dragon of Destruction Outro",
+   "tw0vkye4": "FT2_Acnologia_2C.txt",
+   "VgU78CYj": "100004"
+  },
+  {
+   "mC1JcVM9": "10000601",
+   "ctAd91iQ": "Snowy Sojourn",
+   "tw0vkye4": "Xmas18_Snow_1_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000602",
+   "ctAd91iQ": "Whispers in the Cave",
+   "tw0vkye4": "Xmas18_Snow_2_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000603",
+   "ctAd91iQ": "A Shadowy Meeting - Start",
+   "tw0vkye4": "Xmas18_Snow_Boss_Intro_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000604",
+   "ctAd91iQ": "A Shadowy Meeting - End",
+   "tw0vkye4": "Xmas18_Snow_Boss_Outro_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000605",
+   "ctAd91iQ": "On the Road Again",
+   "tw0vkye4": "Xmas18_Flame_1_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000606",
+   "ctAd91iQ": "A Warm Reunion",
+   "tw0vkye4": "Xmas18_Flame_2_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000607",
+   "ctAd91iQ": "Chasing Shadows - Start",
+   "tw0vkye4": "Xmas18_Flame_3_Boss_Intro_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000608",
+   "ctAd91iQ": "Chasing Shadows - End",
+   "tw0vkye4": "Xmas18_Flame_3_Boss_Outro_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000609",
+   "ctAd91iQ": "Battle for Everyone's Winter - Start",
+   "tw0vkye4": "Xmas18_Harmony_Intro_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000610",
+   "ctAd91iQ": "Battle for Everyone's Winter - End",
+   "tw0vkye4": "Xmas18_Harmony_Outro_a.txt",
+   "VgU78CYj": "100006"
+  },
+  {
+   "mC1JcVM9": "10000701",
+   "ctAd91iQ": "End-of-Life",
+   "tw0vkye4": "Galene_Intro_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000702",
+   "ctAd91iQ": "Overriding Protocol - Start",
+   "tw0vkye4": "Galene_S1_Start_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000703",
+   "ctAd91iQ": "Overriding Protocol - End",
+   "tw0vkye4": "Galene_S1_End_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000704",
+   "ctAd91iQ": "You In My Sights",
+   "tw0vkye4": "Galene_S2_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000705",
+   "ctAd91iQ": "Sneaking Suspicions",
+   "tw0vkye4": "Vektor_Intro_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000706",
+   "ctAd91iQ": "Hacking for Her - Start",
+   "tw0vkye4": "Vektor_S1_Start_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000707",
+   "ctAd91iQ": "Hacking for Her - End",
+   "tw0vkye4": "Vektor_S1_End_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000708",
+   "ctAd91iQ": "Beating the System",
+   "tw0vkye4": "Vektor_S2_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000709",
+   "ctAd91iQ": "Beyond Machine - Start",
+   "tw0vkye4": "CombinedStory_Start_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000710",
+   "ctAd91iQ": "Beyond Machine - End",
+   "tw0vkye4": "CombinedStory_End_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000711",
+   "ctAd91iQ": "Forced Shutdown",
+   "tw0vkye4": "T_Shutdown_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000712",
+   "ctAd91iQ": "Scrapping Security",
+   "tw0vkye4": "T_Scrapping_a.txt",
+   "VgU78CYj": "100007"
+  },
+  {
+   "mC1JcVM9": "10000801",
+   "ctAd91iQ": "Colored Gods",
+   "tw0vkye4": "Easter2019_1c.txt",
+   "VgU78CYj": "100008"
+  },
+  {
+   "mC1JcVM9": "10000802",
+   "ctAd91iQ": "Colored Gods",
+   "tw0vkye4": "Easter2019_1d.txt",
+   "VgU78CYj": "100008"
+  },
+  {
+   "mC1JcVM9": "10000803",
+   "ctAd91iQ": "The Last Judgment",
+   "tw0vkye4": "Easter2019_2c.txt",
+   "VgU78CYj": "100008"
+  },
+  {
+   "mC1JcVM9": "10000804",
+   "ctAd91iQ": "The Last Judgment",
+   "tw0vkye4": "Easter2019_2d.txt",
+   "VgU78CYj": "100008"
+  },
+  {
+   "mC1JcVM9": "10000901",
+   "ctAd91iQ": "Contender Alpha (Start)",
+   "tw0vkye4": "KOF2019_0101.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000902",
+   "ctAd91iQ": "Contender Alpha (End)",
+   "tw0vkye4": "KOF2019_0102.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000903",
+   "ctAd91iQ": "Scion of the Flame",
+   "tw0vkye4": "KOF2019_0201.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000904",
+   "ctAd91iQ": "Legacy of Kagura",
+   "tw0vkye4": "KOF2019_0301.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000905",
+   "ctAd91iQ": "The Sun and The Moon",
+   "tw0vkye4": "KOF2019_0401.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000906",
+   "ctAd91iQ": "The Blood of Iori (Start)",
+   "tw0vkye4": "KOF2019_0501.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000907",
+   "ctAd91iQ": "The Blood of Iori (End)",
+   "tw0vkye4": "KOF2019_0502.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000908",
+   "ctAd91iQ": "Wild Rampage (Start)",
+   "tw0vkye4": "KOF2019_0601.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000909",
+   "ctAd91iQ": "Wild Rampage (End)",
+   "tw0vkye4": "KOF2019_0602.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000910",
+   "ctAd91iQ": "Wild Rampage - Dusk (Start)",
+   "tw0vkye4": "KOF2019_0701.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000911",
+   "ctAd91iQ": "Wild Rampage - Dusk (End)",
+   "tw0vkye4": "KOF2019_0702.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000912",
+   "ctAd91iQ": "Wild Rampage - Dawn (Start)",
+   "tw0vkye4": "KOF2019_0801.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000913",
+   "ctAd91iQ": "Wild Rampage - Dawn (End)",
+   "tw0vkye4": "KOF2019_0802.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000914",
+   "ctAd91iQ": "The Night of the Moon (Start)",
+   "tw0vkye4": "KOF2019_0901.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000915",
+   "ctAd91iQ": "The Night of the Moon (End)",
+   "tw0vkye4": "KOF2019_0902.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000916",
+   "ctAd91iQ": "The Night of the Moon - Earthbound (Start)",
+   "tw0vkye4": "KOF2019_1001.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000917",
+   "ctAd91iQ": "The Night of the Moon - Earthbound (End)",
+   "tw0vkye4": "KOF2019_1002.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000918",
+   "ctAd91iQ": "The Night of the Moon - Voltaic (Start)",
+   "tw0vkye4": "KOF2019_1101.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000919",
+   "ctAd91iQ": "The Night of the Moon - Voltaic (End)",
+   "tw0vkye4": "KOF2019_1102.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000920",
+   "ctAd91iQ": "Ascension (Start)",
+   "tw0vkye4": "KOF2019_1201.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000921",
+   "ctAd91iQ": "Hakkesshu (Start)",
+   "tw0vkye4": "KOF2019_1301.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000922",
+   "ctAd91iQ": "Hakkesshu (End)",
+   "tw0vkye4": "KOF2019_1302.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000923",
+   "ctAd91iQ": "Gaia's Will (Start)",
+   "tw0vkye4": "KOF2019_1401.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10000924",
+   "ctAd91iQ": "Gaia's Will (End)",
+   "tw0vkye4": "KOF2019_1402.txt",
+   "VgU78CYj": "100009"
+  },
+  {
+   "mC1JcVM9": "10001000",
+   "ctAd91iQ": "The Church",
+   "tw0vkye4": "TG_Collab_01a.txt",
+   "VgU78CYj": "87009"
+  },
+  {
+   "mC1JcVM9": "10001001",
+   "ctAd91iQ": "The Gourmet",
+   "tw0vkye4": "TG_Collab_01b.txt",
+   "VgU78CYj": "87009"
+  },
+  {
+   "mC1JcVM9": "10001002",
+   "ctAd91iQ": "The Torture Room",
+   "tw0vkye4": "TG_Collab_02a.txt",
+   "VgU78CYj": "87009"
+  },
+  {
+   "mC1JcVM9": "10001003",
+   "ctAd91iQ": "Jason",
+   "tw0vkye4": "TG_Collab_02b.txt",
+   "VgU78CYj": "87009"
+  },
+  {
+   "mC1JcVM9": "10001010",
+   "ctAd91iQ": "Boisterous Beginnings",
+   "tw0vkye4": "SC2019_00.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001011",
+   "ctAd91iQ": "Jin",
+   "tw0vkye4": "SC2019_J1_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001012",
+   "ctAd91iQ": "Multiple Tracks",
+   "tw0vkye4": "SC2019_J1_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001013",
+   "ctAd91iQ": "A Lead",
+   "tw0vkye4": "SC2019_J2A_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001014",
+   "ctAd91iQ": "Fuu Found",
+   "tw0vkye4": "SC2019_J2A_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001015",
+   "ctAd91iQ": "Fouled Waters",
+   "tw0vkye4": "SC2019_J2B_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001016",
+   "ctAd91iQ": "Clearing the Air",
+   "tw0vkye4": "SC2019_J2B_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001017",
+   "ctAd91iQ": "Mugen",
+   "tw0vkye4": "SC2019_M1_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001018",
+   "ctAd91iQ": "The Village",
+   "tw0vkye4": "SC2019_M1_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001019",
+   "ctAd91iQ": "Zombies?",
+   "tw0vkye4": "SC2019_M2A_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001020",
+   "ctAd91iQ": "Wasabi?",
+   "tw0vkye4": "SC2019_M2A_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001021",
+   "ctAd91iQ": "An Angry Mob",
+   "tw0vkye4": "SC2019_M2B_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001022",
+   "ctAd91iQ": "Full Moon Tonight",
+   "tw0vkye4": "SC2019_M2B_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001023",
+   "ctAd91iQ": "Cover More Ground",
+   "tw0vkye4": "SC2019_S1_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001024",
+   "ctAd91iQ": "No Results",
+   "tw0vkye4": "SC2019_S1_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001025",
+   "ctAd91iQ": "Undead Surprise",
+   "tw0vkye4": "SC2019_S2A_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001026",
+   "ctAd91iQ": "Escaping the Trap",
+   "tw0vkye4": "SC2019_S2A_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001027",
+   "ctAd91iQ": "Confusion",
+   "tw0vkye4": "SC2019_S2B_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001028",
+   "ctAd91iQ": "Finding Shoryu",
+   "tw0vkye4": "SC2019_S2B_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001029",
+   "ctAd91iQ": "Mountain Jewels",
+   "tw0vkye4": "SC2019_Fuu_1.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001030",
+   "ctAd91iQ": "Never Give Up",
+   "tw0vkye4": "SC2019_Fuu_2.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001031",
+   "ctAd91iQ": "Shoryu",
+   "tw0vkye4": "SC2019_Shoryu.txt",
+   "VgU78CYj": "87014"
+  },
+  {
+   "mC1JcVM9": "10001040",
+   "ctAd91iQ": "Warp Dimension",
+   "tw0vkye4": "AUPrologue_W1_Start.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001041",
+   "ctAd91iQ": "Out of the Blue",
+   "tw0vkye4": "AUPrologue_W1_M1A.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001042",
+   "ctAd91iQ": "Untimely Arrival",
+   "tw0vkye4": "AUPrologue_W1_M1B.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001043",
+   "ctAd91iQ": "Explosive Entrance",
+   "tw0vkye4": "AUPrologue_W1_M2A.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001044",
+   "ctAd91iQ": "Another Place",
+   "tw0vkye4": "AUPrologue_W1_M2B.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001045",
+   "ctAd91iQ": "Portalled Out",
+   "tw0vkye4": "AUPrologue_W2_Start.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001046",
+   "ctAd91iQ": "Fragmented Memories",
+   "tw0vkye4": "AUPrologue_W2_M1A.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001047",
+   "ctAd91iQ": "Stardust and Silence",
+   "tw0vkye4": "AUPrologue_W2_M1B.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001048",
+   "ctAd91iQ": "The Price of Peace",
+   "tw0vkye4": "AUPrologue_W2_M2A.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001049",
+   "ctAd91iQ": "Cosmic Thread",
+   "tw0vkye4": "AUPrologue_W2_M2B.txt",
+   "VgU78CYj": "87015"
+  },
+  {
+   "mC1JcVM9": "10001050",
+   "ctAd91iQ": "Proper Posture",
+   "tw0vkye4": "MF_Gortius_Challenge.txt",
+   "VgU78CYj": "87017"
+  },
+  {
+   "mC1JcVM9": "10001051",
+   "ctAd91iQ": "The Hunt",
+   "tw0vkye4": "MF_Gortius_S1.txt",
+   "VgU78CYj": "87017"
+  },
+  {
+   "mC1JcVM9": "10001052",
+   "ctAd91iQ": "New Home",
+   "tw0vkye4": "MF_Gortius_S2.txt",
+   "VgU78CYj": "87017"
+  },
+  {
+   "mC1JcVM9": "10001053",
+   "ctAd91iQ": "An Incident",
+   "tw0vkye4": "MF_Gortius_S3A.txt",
+   "VgU78CYj": "87017"
+  },
+  {
+   "mC1JcVM9": "10001054",
+   "ctAd91iQ": "A Solution",
+   "tw0vkye4": "MF_Gortius_S3B.txt",
+   "VgU78CYj": "87017"
+  },
+  {
+   "mC1JcVM9": "10001055",
+   "ctAd91iQ": "In Memoriam",
+   "tw0vkye4": "MF_Gortius_S4.txt",
+   "VgU78CYj": "87017"
+  },
+  {
+   "mC1JcVM9": "10001056",
+   "ctAd91iQ": "Light of My Eye",
+   "tw0vkye4": "MF_Gortius_S5.txt",
+   "VgU78CYj": "87017"
+  },
+  {
+   "mC1JcVM9": "10001201",
+   "ctAd91iQ": "Family Feud",
+   "tw0vkye4": "UprisingP3_Intro.txt",
+   "VgU78CYj": "100012"
+  },
+  {
+   "mC1JcVM9": "10001202",
+   "ctAd91iQ": "On the Brink",
+   "tw0vkye4": "UprisingP3_M1.txt",
+   "VgU78CYj": "100012"
+  },
+  {
+   "mC1JcVM9": "10001203",
+   "ctAd91iQ": "Ma'at",
+   "tw0vkye4": "UprisingP3_M2_A.txt",
+   "VgU78CYj": "100012"
+  },
+  {
+   "mC1JcVM9": "10001204",
+   "ctAd91iQ": "Family Bonds",
+   "tw0vkye4": "UprisingP3_M2_B.txt",
+   "VgU78CYj": "100012"
+  },
+  {
+   "mC1JcVM9": "10001205",
+   "ctAd91iQ": "Set's Gambit",
+   "tw0vkye4": "UprisingP3_M3_A.txt",
+   "VgU78CYj": "100012"
+  },
+  {
+   "mC1JcVM9": "10001206",
+   "ctAd91iQ": "A World Without Magic",
+   "tw0vkye4": "UprisingP3_M3_B.txt",
+   "VgU78CYj": "100012"
+  },
+  {
+   "mC1JcVM9": "10001301",
+   "ctAd91iQ": "The Savage Lion",
+   "tw0vkye4": "BF2_01_NoelTilith.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001302",
+   "ctAd91iQ": "The Curse Master",
+   "tw0vkye4": "BF2_02_Elhaza.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001303",
+   "ctAd91iQ": "The Warmonger",
+   "tw0vkye4": "BF2_03_Zaad.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001304",
+   "ctAd91iQ": "The Illusionist",
+   "tw0vkye4": "BF2_04_Melfel.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001305",
+   "ctAd91iQ": " Chilling Beauties",
+   "tw0vkye4": "BF2_05_HildaRene.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001306",
+   "ctAd91iQ": "The Silver Knight",
+   "tw0vkye4": "BF2_06_Joshua.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001307",
+   "ctAd91iQ": "The Scorching Blade",
+   "tw0vkye4": "BF2_07_Roy.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001308",
+   "ctAd91iQ": "The Fighting Nun",
+   "tw0vkye4": "BF2_08_Teresa.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001309",
+   "ctAd91iQ": "The Righteous Sheriff",
+   "tw0vkye4": "BF2_09_Gilbert.txt",
+   "VgU78CYj": "100013"
+  },
+  {
+   "mC1JcVM9": "10001601",
+   "ctAd91iQ": "A Sinking Feeling",
+   "tw0vkye4": "MF_Deimos_W1A.txt",
+   "VgU78CYj": "100016"
+  },
+  {
+   "mC1JcVM9": "10001602",
+   "ctAd91iQ": "Scars of the Past",
+   "tw0vkye4": "MF_Deimos_W1B.txt",
+   "VgU78CYj": "100016"
+  },
+  {
+   "mC1JcVM9": "10001603",
+   "ctAd91iQ": "By Design",
+   "tw0vkye4": "MF_Deimos_W2A.txt",
+   "VgU78CYj": "100016"
+  },
+  {
+   "mC1JcVM9": "10001604",
+   "ctAd91iQ": "Faith and Fallacy",
+   "tw0vkye4": "MF_Deimos_W2B.txt",
+   "VgU78CYj": "100016"
+  },
+  {
+   "mC1JcVM9": "10001605",
+   "ctAd91iQ": "Echo of Calamity",
+   "tw0vkye4": "MF_Deimos_W2C.txt",
+   "VgU78CYj": "100016"
+  },
+  {
+   "mC1JcVM9": "10001701",
+   "ctAd91iQ": "Welcome to Paradise",
+   "tw0vkye4": "Summer2020_P1_A.txt",
+   "VgU78CYj": "100017"
+  },
+  {
+   "mC1JcVM9": "10001702",
+   "ctAd91iQ": "And here it all begins",
+   "tw0vkye4": "Summer2020_P1_B.txt",
+   "VgU78CYj": "100017"
+  },
+  {
+   "mC1JcVM9": "10001703",
+   "ctAd91iQ": "Plan B",
+   "tw0vkye4": "Summer2020_P4_A.txt",
+   "VgU78CYj": "100017"
+  },
+  {
+   "mC1JcVM9": "10001704",
+   "ctAd91iQ": "One More to Go",
+   "tw0vkye4": "Summer2020_P4_B.txt",
+   "VgU78CYj": "100017"
+  },
+  {
+   "mC1JcVM9": "10001705",
+   "ctAd91iQ": "Halfway There",
+   "tw0vkye4": "Summer2020_P5.txt",
+   "VgU78CYj": "100017"
+  },
+  {
+   "mC1JcVM9": "10001706",
+   "ctAd91iQ": "So Near yet So Far",
+   "tw0vkye4": "Summer2020_P8_A.txt",
+   "VgU78CYj": "100017"
+  },
+  {
+   "mC1JcVM9": "10001707",
+   "ctAd91iQ": "Goodbye is not Forever",
+   "tw0vkye4": "Summer2020_P8_B.txt",
+   "VgU78CYj": "100017"
+  },
+  {
+   "mC1JcVM9": "10001801",
+   "ctAd91iQ": "Legacy of a Wolf",
+   "tw0vkye4": "Autumn2020_S1.txt",
+   "VgU78CYj": "100018"
+  },
+  {
+   "mC1JcVM9": "10001802",
+   "ctAd91iQ": "Ominous Premonition",
+   "tw0vkye4": "Autumn2020_S2.txt",
+   "VgU78CYj": "100018"
+  },
+  {
+   "mC1JcVM9": "10001803",
+   "ctAd91iQ": "On Sacred Soil",
+   "tw0vkye4": "Autumn2020_S3A.txt",
+   "VgU78CYj": "100018"
+  },
+  {
+   "mC1JcVM9": "10001804",
+   "ctAd91iQ": "Sacrifice",
+   "tw0vkye4": "Autumn2020_S3B.txt",
+   "VgU78CYj": "100018"
+  },
+  {
+   "mC1JcVM9": "10001805",
+   "ctAd91iQ": "One Last Test",
+   "tw0vkye4": "Autumn2020_CA.txt",
+   "VgU78CYj": "100018"
+  },
+  {
+   "mC1JcVM9": "10001806",
+   "ctAd91iQ": "The End of Innocence",
+   "tw0vkye4": "Autumn2020_CB.txt",
+   "VgU78CYj": "100018"
+  },
+  {
+   "mC1JcVM9": "10001901",
+   "ctAd91iQ": "First Flight",
+   "tw0vkye4": "MF_Harakhte_S1.txt",
+   "VgU78CYj": "100019"
+  },
+  {
+   "mC1JcVM9": "10001902",
+   "ctAd91iQ": "A Reason to Fight",
+   "tw0vkye4": "MF_Harakhte_S2.txt",
+   "VgU78CYj": "100019"
+  },
+  {
+   "mC1JcVM9": "10001903",
+   "ctAd91iQ": "Chaos in Sight",
+   "tw0vkye4": "MF_Harakhte_S3A.txt",
+   "VgU78CYj": "100019"
+  },
+  {
+   "mC1JcVM9": "10001904",
+   "ctAd91iQ": "One Last Breath",
+   "tw0vkye4": "MF_Harakhte_S3B.txt",
+   "VgU78CYj": "100019"
+  },
+  {
+   "mC1JcVM9": "10001905",
+   "ctAd91iQ": "Worth of Her Words",
+   "tw0vkye4": "MF_Harakhte_CA.txt",
+   "VgU78CYj": "100019"
+  },
+  {
+   "mC1JcVM9": "10001906",
+   "ctAd91iQ": "Guardian's Calling",
+   "tw0vkye4": "MF_Harakhte_CB.txt",
+   "VgU78CYj": "100019"
+  },
+  {
+   "mC1JcVM9": "10002001",
+   "ctAd91iQ": "Blackout",
+   "tw0vkye4": "Halloween2020_S1.txt",
+   "VgU78CYj": "100020"
+  },
+  {
+   "mC1JcVM9": "10002002",
+   "ctAd91iQ": "Loose Screws",
+   "tw0vkye4": "Halloween2020_S2.txt",
+   "VgU78CYj": "100020"
+  },
+  {
+   "mC1JcVM9": "10002003",
+   "ctAd91iQ": "Flying the Coop",
+   "tw0vkye4": "Halloween2020_S3A.txt",
+   "VgU78CYj": "100020"
+  },
+  {
+   "mC1JcVM9": "10002004",
+   "ctAd91iQ": "Hole in the Fence",
+   "tw0vkye4": "Halloween2020_S3B.txt",
+   "VgU78CYj": "100020"
+  },
+  {
+   "mC1JcVM9": "10002005",
+   "ctAd91iQ": "Room of One's Own",
+   "tw0vkye4": "Halloween2020_CA.txt",
+   "VgU78CYj": "100020"
+  },
+  {
+   "mC1JcVM9": "10002006",
+   "ctAd91iQ": "One Good Turn",
+   "tw0vkye4": "Halloween2020_CB.txt",
+   "VgU78CYj": "100020"
+  },
+  {
+   "mC1JcVM9": "10002101",
+   "ctAd91iQ": "Long Walks",
+   "tw0vkye4": "7thAnniv_T_Daily.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002102",
+   "ctAd91iQ": "Mandatory Vacation",
+   "tw0vkye4": "7thAnniv_T_Main.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002103",
+   "ctAd91iQ": "She Sells Seashells",
+   "tw0vkye4": "7thAnniv_T_S1.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002104",
+   "ctAd91iQ": "Wave Echoes",
+   "tw0vkye4": "7thAnniv_T_S2.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002105",
+   "ctAd91iQ": "Diving Deep",
+   "tw0vkye4": "7thAnniv_T_S3A.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002106",
+   "ctAd91iQ": "Tilith's Plight",
+   "tw0vkye4": "7thAnniv_T_S3B.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002107",
+   "ctAd91iQ": "Into the Maw",
+   "tw0vkye4": "7thAnniv_T_CA.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002108",
+   "ctAd91iQ": "A Wonderful Holiday",
+   "tw0vkye4": "7thAnniv_T_CB.txt",
+   "VgU78CYj": "100021"
+  },
+  {
+   "mC1JcVM9": "10002201",
+   "ctAd91iQ": "Anomaly",
+   "tw0vkye4": "7thAnniv_K_A.txt",
+   "VgU78CYj": "100022"
+  },
+  {
+   "mC1JcVM9": "10002202",
+   "ctAd91iQ": "Mind Link",
+   "tw0vkye4": "7thAnniv_K_B.txt",
+   "VgU78CYj": "100022"
+  },
+  {
+   "mC1JcVM9": "10002301",
+   "ctAd91iQ": "Prologue",
+   "tw0vkye4": "Winter2020_Prologue.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002302",
+   "ctAd91iQ": "Snow Business",
+   "tw0vkye4": "Winter2020_W1_M1.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002303",
+   "ctAd91iQ": "Scattered Pages",
+   "tw0vkye4": "Winter2020_W1_M2.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002304",
+   "ctAd91iQ": "Beary Nasty",
+   "tw0vkye4": "Winter2020_W1_M3A.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002305",
+   "ctAd91iQ": "Voice of the Forest",
+   "tw0vkye4": "Winter2020_W1_M3B.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002306",
+   "ctAd91iQ": "How Rumors Start",
+   "tw0vkye4": "Winter2020_W2_M1.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002307",
+   "ctAd91iQ": "In the Hall of the Dragon Queen",
+   "tw0vkye4": "Winter2020_W2_M2.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002308",
+   "ctAd91iQ": "Dragon's Fire",
+   "tw0vkye4": "Winter2020_W2_M3A.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002309",
+   "ctAd91iQ": "Winter's Fiery Heart",
+   "tw0vkye4": "Winter2020_W2_M3B.txt",
+   "VgU78CYj": "100023"
+  },
+  {
+   "mC1JcVM9": "10002401",
+   "ctAd91iQ": "Interlude",
+   "tw0vkye4": "NY2021_Intro.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002402",
+   "ctAd91iQ": "A Favor to Ask",
+   "tw0vkye4": "NY2021_W1_M1.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002403",
+   "ctAd91iQ": "An Eye for an Eye",
+   "tw0vkye4": "NY2021_W1_M2.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002404",
+   "ctAd91iQ": "A Twist in the Tail",
+   "tw0vkye4": "NY2021_W1_M3A.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002405",
+   "ctAd91iQ": "Guiding Dark",
+   "tw0vkye4": "NY2021_W1_M3B.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002406",
+   "ctAd91iQ": "The Outsider",
+   "tw0vkye4": "NY2021_W2_M1.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002407",
+   "ctAd91iQ": "Riotous Bad Spirits",
+   "tw0vkye4": "NY2021_W2_M2.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002408",
+   "ctAd91iQ": "Fire's Light",
+   "tw0vkye4": "NY2021_W2_M3A.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002409",
+   "ctAd91iQ": "Home Sweet Home",
+   "tw0vkye4": "NY2021_W2_M3B.txt",
+   "VgU78CYj": "100024"
+  },
+  {
+   "mC1JcVM9": "10002501",
+   "ctAd91iQ": "Tangled",
+   "tw0vkye4": "VDay2021_Intro.txt",
+   "VgU78CYj": "100025"
+  },
+  {
+   "mC1JcVM9": "10002502",
+   "ctAd91iQ": "A Place to Call Home",
+   "tw0vkye4": "VDay2021_S1.txt",
+   "VgU78CYj": "100025"
+  },
+  {
+   "mC1JcVM9": "10002503",
+   "ctAd91iQ": "From the Same Cloth",
+   "tw0vkye4": "VDay2021_S2.txt",
+   "VgU78CYj": "100025"
+  },
+  {
+   "mC1JcVM9": "10002504",
+   "ctAd91iQ": "On a Sleeve",
+   "tw0vkye4": "VDay2021_S3A.txt",
+   "VgU78CYj": "100025"
+  },
+  {
+   "mC1JcVM9": "10002505",
+   "ctAd91iQ": "Left Unsaid",
+   "tw0vkye4": "VDay2021_S3B.txt",
+   "VgU78CYj": "100025"
+  },
+  {
+   "mC1JcVM9": "10002506",
+   "ctAd91iQ": "Confrontation",
+   "tw0vkye4": "VDay2021_Boss_A.txt",
+   "VgU78CYj": "100025"
+  },
+  {
+   "mC1JcVM9": "10002507",
+   "ctAd91iQ": "Reconciliation",
+   "tw0vkye4": "VDay2021_Boss_B.txt",
+   "VgU78CYj": "100025"
+  },
+  {
+   "mC1JcVM9": "10002601",
+   "ctAd91iQ": "A Giant Problem",
+   "tw0vkye4": "Spring2021_Intro.txt",
+   "VgU78CYj": "100026"
+  },
+  {
+   "mC1JcVM9": "10002602",
+   "ctAd91iQ": "Dark Days Past",
+   "tw0vkye4": "Spring2021_S1.txt",
+   "VgU78CYj": "100026"
+  },
+  {
+   "mC1JcVM9": "10002603",
+   "ctAd91iQ": "Ever Shadowed",
+   "tw0vkye4": "Spring2021_S2.txt",
+   "VgU78CYj": "100026"
+  },
+  {
+   "mC1JcVM9": "10002604",
+   "ctAd91iQ": "Once Forgotten",
+   "tw0vkye4": "Spring2021_S3A.txt",
+   "VgU78CYj": "100026"
+  },
+  {
+   "mC1JcVM9": "10002605",
+   "ctAd91iQ": "Not My War",
+   "tw0vkye4": "Spring2021_S3B.txt",
+   "VgU78CYj": "100026"
+  },
+  {
+   "mC1JcVM9": "10002606",
+   "ctAd91iQ": "Proving",
+   "tw0vkye4": "Spring2021_Boss_A.txt",
+   "VgU78CYj": "100026"
+  },
+  {
+   "mC1JcVM9": "10002607",
+   "ctAd91iQ": "Repentance",
+   "tw0vkye4": "Spring2021_Boss_B.txt",
+   "VgU78CYj": "100026"
+  },
+  {
+   "mC1JcVM9": "10002701",
+   "ctAd91iQ": "Back to the Lab",
+   "tw0vkye4": "Easter2021_Intro.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002702",
+   "ctAd91iQ": "Mandatory Leave of Absence",
+   "tw0vkye4": "Easter2021_S1.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002703",
+   "ctAd91iQ": "Across the Portal-Sea",
+   "tw0vkye4": "Easter2021_S2.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002704",
+   "ctAd91iQ": "Harebrained and Dangerous",
+   "tw0vkye4": "Easter2021_S3A.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002705",
+   "ctAd91iQ": "The Big Bang",
+   "tw0vkye4": "Easter2021_S3B.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002706",
+   "ctAd91iQ": "Cutting a Deal",
+   "tw0vkye4": "Easter2021_BossE_A.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002707",
+   "ctAd91iQ": "Through the Looking Farce",
+   "tw0vkye4": "Easter2021_BossE_B.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002708",
+   "ctAd91iQ": "Set Phasers to Kill",
+   "tw0vkye4": "Easter2021_BossH.txt",
+   "VgU78CYj": "100027"
+  },
+  {
+   "mC1JcVM9": "10002801",
+   "ctAd91iQ": "You're Invited",
+   "tw0vkye4": "8thAnniv_Start.txt",
+   "VgU78CYj": "100028"
+  },
+  {
+   "mC1JcVM9": "10002802",
+   "ctAd91iQ": "Afterparty",
+   "tw0vkye4": "8thAnniv_End.txt",
+   "VgU78CYj": "100028"
+  },
+  {
+   "mC1JcVM9": "100001501",
+   "ctAd91iQ": "Parallel Festivals",
+   "tw0vkye4": "Trigun2020_M1.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001502",
+   "ctAd91iQ": "A Band-it Party (S)",
+   "tw0vkye4": "Trigun2020_M2_A.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001503",
+   "ctAd91iQ": "A Band-it Party (E)",
+   "tw0vkye4": "Trigun2020_M2_B.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001504",
+   "ctAd91iQ": "Bandits, Bandits Everywhere (S)",
+   "tw0vkye4": "Trigun2020_M3_A.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001505",
+   "ctAd91iQ": "Bandits, Bandits Everywhere (E)",
+   "tw0vkye4": "Trigun2020_M3_B.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001506",
+   "ctAd91iQ": "Meeting Legato (S)",
+   "tw0vkye4": "Trigun2020_M4_A.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001507",
+   "ctAd91iQ": "Meeting Legato (E)",
+   "tw0vkye4": "Trigun2020_M4_B.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001508",
+   "ctAd91iQ": "An Electrifying Appearance (S)",
+   "tw0vkye4": "Trigun2020_M5_A.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001509",
+   "ctAd91iQ": "An Electrifying Appearance (E)",
+   "tw0vkye4": "Trigun2020_M5_B.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001510",
+   "ctAd91iQ": "A Thunderous Ending (S)",
+   "tw0vkye4": "Trigun2020_M6_A.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100001511",
+   "ctAd91iQ": "A Thunderous Ending (E)",
+   "tw0vkye4": "Trigun2020_M6_B.txt",
+   "VgU78CYj": "100015"
+  },
+  {
+   "mC1JcVM9": "100010001",
+   "ctAd91iQ": "Goddess of Life",
+   "tw0vkye4": "UprisingP1_Intro.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010002",
+   "ctAd91iQ": "The Shards of Power",
+   "tw0vkye4": "UprisingP1_Hete_M1.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010003",
+   "ctAd91iQ": "Divine Resonance",
+   "tw0vkye4": "UprisingP1_Hete_M2.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010004",
+   "ctAd91iQ": "The Old Gods' Legacies",
+   "tw0vkye4": "UprisingP1_Hete_M3.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010005",
+   "ctAd91iQ": "Pangs of the Past",
+   "tw0vkye4": "UprisingP1_Rah_M1.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010006",
+   "ctAd91iQ": "A Stranger's Memories",
+   "tw0vkye4": "UprisingP1_Rah_M2.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010007",
+   "ctAd91iQ": "In the Face of Darkness",
+   "tw0vkye4": "UprisingP1_Rah_M3.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010008",
+   "ctAd91iQ": "In Sickness and In Death",
+   "tw0vkye4": "UprisingP1_Aes_M1.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010009",
+   "ctAd91iQ": "The Doom of Love",
+   "tw0vkye4": "UprisingP1_Aes_M2.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010010",
+   "ctAd91iQ": "A Wife's Pain",
+   "tw0vkye4": "UprisingP1_Aes_M3.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010011",
+   "ctAd91iQ": "The Scorpion-Lord",
+   "tw0vkye4": "UprisingP1_Osiris_A.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "100010012",
+   "ctAd91iQ": "Redemption",
+   "tw0vkye4": "UprisingP1_Osiris_B.txt",
+   "VgU78CYj": "100010"
+  },
+  {
+   "mC1JcVM9": "200002001",
+   "ctAd91iQ": "North Hall: Foyer",
+   "tw0vkye4": "VDay2020_Farm_1.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002002",
+   "ctAd91iQ": "North Hall: Inner Chamber",
+   "tw0vkye4": "VDay2020_Farm_2.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002003",
+   "ctAd91iQ": "East Hall: Bronze",
+   "tw0vkye4": "VDay2020_Puzzle_1.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002004",
+   "ctAd91iQ": "East Hall: Silver",
+   "tw0vkye4": "VDay2020_Puzzle_2.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002005",
+   "ctAd91iQ": "East Hall: Gold - Start",
+   "tw0vkye4": "VDay2020_Puzzle_3_A.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002006",
+   "ctAd91iQ": "East Hall: Gold - End",
+   "tw0vkye4": "VDay2020_Puzzle_3_B.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002007",
+   "ctAd91iQ": "South Hall: Cellar - Start",
+   "tw0vkye4": "VDay2020_DM_A.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002008",
+   "ctAd91iQ": "South Hall: Cellar - End",
+   "tw0vkye4": "VDay2020_DM_B.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002009",
+   "ctAd91iQ": "West Hall: Rotunda - Start",
+   "tw0vkye4": "VDay2020_Challenge_A.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "200002010",
+   "ctAd91iQ": "West Hall: Rotunda - End",
+   "tw0vkye4": "VDay2020_Challenge_B.txt",
+   "VgU78CYj": "100014"
+  },
+  {
+   "mC1JcVM9": "830126301",
+   "ctAd91iQ": "Desirous Mochi - Start",
+   "tw0vkye4": "Autumn2018_3a_01_final1.txt",
+   "VgU78CYj": "100002"
+  },
+  {
+   "mC1JcVM9": "830126302",
+   "ctAd91iQ": "Desirous Mochi - End",
+   "tw0vkye4": "Autumn2018_3a_02_final1.txt",
+   "VgU78CYj": "100002"
+  },
+  {
+   "mC1JcVM9": "830126401",
+   "ctAd91iQ": "Moonlight Valediction - Start",
+   "tw0vkye4": "Autumn2018_3b_01_final1.txt",
+   "VgU78CYj": "100002"
+  },
+  {
+   "mC1JcVM9": "830126402",
+   "ctAd91iQ": "Moonlight Valediction - End",
+   "tw0vkye4": "Autumn2018_3b_02_final1.txt",
+   "VgU78CYj": "100002"
+  }
+ ]
+}
