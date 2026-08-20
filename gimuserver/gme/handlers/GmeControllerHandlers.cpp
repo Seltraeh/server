@@ -170,6 +170,17 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("WCJE0xe2", DungeonKeyReceipt,           "V4pfQo5C");
 	REGISTER("aGT5S6qZ", DungeonKeyUse,               "3rPx6tTw");
 
+	// Rewards menu — the Slots / Mystery Chest / Daily Spin tiles.  Every id and
+	// key here was read out of .rodata via each Request class's getRequestID /
+	// getEncodeKey (12-byte functions returning a literal, key at GroupId+9);
+	// none is a guess.  All four are probes that log and answer {} — see
+	// RewardsMenu.cpp for the tile map, the request shapes and the response
+	// classes still to be audited.
+	REGISTER("vChFp73J", SlotAction,      "hm9X6BQj");
+	REGISTER("pAJ2Xesw", MysteryBoxList,  "DaswA3rE");
+	REGISTER("2paswUpR", MysteryBoxClaim, "kadRadU5");
+	REGISTER("4aClzokO", DailyLogin,      "stI81haQ");
+
 	}
 }
 

@@ -151,4 +151,12 @@ namespace GmeHandlers
 	HANDLE(GetDistributeDungeonKeyInfo);
 	HANDLE(DungeonKeyReceipt);
 	HANDLE(DungeonKeyUse);
+
+	// Rewards menu — the tiles that had no handler at all.  Probes for now:
+	// they log the body and answer {}.  See RewardsMenu.cpp for the tile/tag
+	// map and where each request is fired from.
+	HANDLE(SlotAction);
+	HANDLE(MysteryBoxList);
+	HANDLE(MysteryBoxClaim);
+	HANDLE(DailyLogin);
 }
