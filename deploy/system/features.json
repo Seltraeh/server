@@ -29,8 +29,8 @@
     "guild": 1,
     "mystery_chest": 1,
     "name_change_func": 1,
-    "video_ads_slot": 1,
-    "old_video_ads_slot": 0,
+    "video_ads_slots": 0,
+    "old_video_ads_slots": 0,
     "raid_battle_restart": 1,
     "sg_resummon_gacha_enable": 1,
     "gacha_category": 1,
@@ -71,5 +71,5 @@
     "tutorial_skip": 0,
     "unit_type_bonus_skill": 1,
     "va_sp_skill": 1,
-    "video_ads": 1
+    "video_ads": 0
 }

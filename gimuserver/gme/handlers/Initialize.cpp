@@ -53,8 +53,23 @@ HANDLEF(Initialize)
 
 	resp.summoner_journal.user_id = identity.userId;
 
+	// Daily Spin (the Rewards menu's task_dailyloginspin tile).  The two count
+	// fields are load-bearing and were both left at 0, which closed the screen
+	// the instant it opened: DailyLoginScene::updateEvent state 1 @0xE52FDC is
+	//
+	//     if (getUserCurrentCount() < getUserLimitCount()) stay open;
+	//     else -> state 7 -> getLastHomeSceneID() -> changeSceneWithSceneID()
+	//
+	// and `0 >= 0` reads as "you have used every spin", so the wheel appeared
+	// as an overlay on Home and vanished a frame later.  Field mapping is from
+	// tools/ida/audits/Drudr2w5_audit.txt, resolved by matching each store's
+	// offset against the getters (setters are inlined, so the readParam names
+	// nothing): 35JXN4Ay -> +0x1c getUserCurrentCount,
+	// 5xStG99s -> +0x20 getUserLimitCount.
 	resp.daily_login_rewards.id = 1;
 	resp.daily_login_rewards.current_day = 1;
+	resp.daily_login_rewards.user_current_count = 0;
+	resp.daily_login_rewards.user_spin_limit_count = 1;
 	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
 
 	std::string buffer{};
