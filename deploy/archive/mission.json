@@ -320,5 +320,912 @@
                 ]
             }
         ]
+    },
+    {
+        "id": 10,
+        "name": "Start of Adventure",
+        "zel": 900,
+        "karma": 50,
+        "exp": 80,
+        "energy_cost": 3,
+        "stages": [
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 10030,
+                        "name": "Burny",
+                        "unit_id": 10030,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 100,
+                        "treasure_drops": [
+                            {
+                                "target_type": 4,
+                                "weight": 10,
+                                "amount": 100,
+                                "target_id": "10000"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 20030,
+                        "name": "Squirty",
+                        "unit_id": 20030,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    }
+                ]
+            },
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 10030,
+                        "name": "Burny",
+                        "unit_id": 10030,
+                        "position": "179:303",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 10030,
+                        "unit_drop_level": 1,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 50,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 100,
+                        "treasure_drops": [
+                            {
+                                "target_type": 4,
+                                "target_id": "10200",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10202",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10205",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10300",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10301",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10601",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10602",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10603",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "11006",
+                                "weight": 10,
+                                "amount": 1
+                            }
+                        ]
+                    },
+                    {
+                        "id": 50030,
+                        "name": "Glowy",
+                        "unit_id": 50030,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 30030,
+                        "name": "Mossy",
+                        "unit_id": 30030,
+                        "position": "96:352",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    }
+                ]
+            },
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 30030,
+                        "name": "Mossy",
+                        "unit_id": 30030,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 30030,
+                        "unit_drop_level": 1,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 50,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 40030,
+                        "name": "Sparky",
+                        "unit_id": 40030,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 60142,
+                        "name": "Mimic",
+                        "unit_id": 60142,
+                        "position": "96:352",
+                        "hp": 1500,
+                        "atk": 200,
+                        "def": 300,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 60142,
+                        "unit_drop_level": 1,
+                        "unit_drop_type": 0,
+                        "unit_drop_chance": 20,
+                        "zel_max_drop": 200,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 100,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 100,
+                        "treasure_drops": [
+                            {
+                                "target_type": 4,
+                                "target_id": "10200",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10201",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10202",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10205",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10300",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10301",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10601",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10602",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10603",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "11006",
+                                "weight": 10,
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 20030,
+                        "name": "Squirty",
+                        "unit_id": 20030,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 20030,
+                        "unit_drop_level": 1,
+                        "unit_drop_type": 2,
+                        "unit_drop_chance": 50,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 100,
+                        "treasure_drops": [
+                            {
+                                "target_type": 1,
+                                "weight": 10,
+                                "amount": 500,
+                                "target_id": ""
+                            },
+                            {
+                                "target_type": 2,
+                                "weight": 10,
+                                "amount": 250,
+                                "target_id": ""
+                            }
+                        ]
+                    },
+                    {
+                        "id": 60030,
+                        "name": "Gloomy",
+                        "unit_id": 60030,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 40030,
+                        "name": "Sparky",
+                        "unit_id": 40030,
+                        "position": "96:352",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 60142,
+                        "name": "Mimic",
+                        "unit_id": 60142,
+                        "position": "56:277",
+                        "hp": 1500,
+                        "atk": 200,
+                        "def": 300,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 60142,
+                        "unit_drop_level": 1,
+                        "unit_drop_type": 0,
+                        "unit_drop_chance": 20,
+                        "zel_max_drop": 200,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 100,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 100,
+                        "treasure_drops": [
+                            {
+                                "target_type": 4,
+                                "target_id": "10200",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10201",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10202",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10205",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10300",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10301",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10601",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10602",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10603",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "11006",
+                                "weight": 10,
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "is_boss": true,
+                "first_attack_rate": 100,
+                "battle_monsters": [
+                    {
+                        "id": 40031,
+                        "name": "King Sparky",
+                        "unit_id": 40031,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 50,
+                        "treasure_drops": [
+                            {
+                                "target_type": 4,
+                                "target_id": "10200",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10202",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10205",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10300",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10301",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10601",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10602",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "10603",
+                                "weight": 10,
+                                "amount": 1
+                            },
+                            {
+                                "target_type": 4,
+                                "target_id": "11006",
+                                "weight": 10,
+                                "amount": 1
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 11,
+        "name": "Monsters of the Prairie",
+        "zel": 350,
+        "karma": 0,
+        "exp": 25,
+        "energy_cost": 3,
+        "stages": [
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 10030,
+                        "name": "Burny",
+                        "unit_id": 10030,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 20030,
+                        "name": "Squirty",
+                        "unit_id": 20030,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 30030,
+                        "name": "Mossy",
+                        "unit_id": 30030,
+                        "position": "96:352",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    }
+                ]
+            },
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 20030,
+                        "name": "Squirty",
+                        "unit_id": 20030,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 40030,
+                        "name": "Sparky",
+                        "unit_id": 40030,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 30030,
+                        "name": "Mossy",
+                        "unit_id": 30030,
+                        "position": "96:352",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    }
+                ]
+            },
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 50030,
+                        "name": "Glowy",
+                        "unit_id": 50030,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 60030,
+                        "name": "Gloomy",
+                        "unit_id": 60030,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 30030,
+                        "name": "Mossy",
+                        "unit_id": 30030,
+                        "position": "96:352",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    }
+                ]
+            },
+            {
+                "is_boss": false,
+                "first_attack_rate": 0,
+                "battle_monsters": [
+                    {
+                        "id": 20050,
+                        "name": "Merman",
+                        "unit_id": 20050,
+                        "position": "180:302",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    },
+                    {
+                        "id": 10050,
+                        "name": "Goblin",
+                        "unit_id": 10050,
+                        "position": "120:248",
+                        "hp": 1000,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    }
+                ]
+            },
+            {
+                "is_boss": true,
+                "first_attack_rate": 100,
+                "battle_monsters": [
+                    {
+                        "id": 50031,
+                        "name": "King Glowy",
+                        "unit_id": 50031,
+                        "position": "180:302",
+                        "hp": 3300,
+                        "atk": 300,
+                        "def": 100,
+                        "ai_id": 1,
+                        "act_min": 1,
+                        "act_max": 1,
+                        "wait": 5,
+                        "unit_drop_id": 0,
+                        "unit_drop_level": 0,
+                        "unit_drop_type": 1,
+                        "unit_drop_chance": 0,
+                        "zel_max_drop": 10,
+                        "zel_drop_count": 5,
+                        "karma_max_drop": 8,
+                        "karma_drop_count": 5,
+                        "treasure_chest_chance": 0,
+                        "treasure_drops": []
+                    }
+                ]
+            }
+        ]
     }
 ]
