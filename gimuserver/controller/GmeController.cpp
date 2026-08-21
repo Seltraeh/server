@@ -72,6 +72,21 @@ void GmeController::HandleFeatureCheck(const HttpRequestPtr& rq, std::function<v
 	std::string buffer{};
 	const auto& ec = glz::write_json(theServer()->cache().feature(), buffer);
 
+	// Logged like a GME action because whether the CLIENT calls this at all is
+	// an open question, and nothing else records it.  The Slots tile enters its
+	// video-ad path — which needs `video_ads` and `old_video_ads_slots` to be
+	// non-zero — even though this response serves both as unquoted 0, so either
+	// the request never arrives or its values are not being applied.  A file in
+	// deploy/log/ after a client launch settles which (handbook §7.14).
+	//
+	// FeatureManager::requestFeatures @0x1C77368 sends it exactly once per
+	// launch, from InitializeScene::updateEvent, latching on +0x18 — so expect
+	// at most ONE of these per run, early, before the login envelope.
+	DumpLog dump{};
+	theServer()->tryOpenHttpDumpLog("featureCheck", dump);
+	dump << "REQUEST: " << rq->getPath() << "\n";
+	dump << "RESPONSE: " << buffer << "\n";
+
 	if (ec)
 	{
 		LOG_DEBUG << "Cannot serialize featurecheck: " << ec;
