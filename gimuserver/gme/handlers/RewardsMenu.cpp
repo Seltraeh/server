@@ -3,6 +3,7 @@
 
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
+#include <gimuserver/gme/common/BraveSlots.hpp>
 #include <gimuserver/gme/common/MysteryChest.hpp>
 
 // The Rewards menu — the unbuilt tiles.
@@ -78,7 +79,36 @@
 HANDLEF(SlotAction)
 {
 	LOG_INFO << "SlotAction: " << json;
-	co_return HandleResult::success("{}");
+
+	SlotActionReq req{};
+	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+	{
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
+	}
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	SlotActionResp resp{};
+	SlotgameResultInfo result{};
+	if (co_await gme::playBraveSlot(theDb(), identity, result))
+	{
+		resp.results.push_back(std::move(result));
+	}
+	// A refused pull answers with the balance and header rather than an error,
+	// so the machine resynchronises instead of stranding the player.  The
+	// client gates on the medal count itself (RANDALL_SLOTGAME_MEDAL_ERROR), so
+	// this path should only be reached if the two ever disagree.
+
+	resp.medal_info = co_await gme::loadBraveMedals(theDb(), identity);
+	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+
+	std::string buffer{};
+	if (const auto& ec = glz::write_json(resp, buffer); ec)
+	{
+		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+	}
+
+	co_return HandleResult::success(buffer);
 }
 
 // Mystery Chest — list (pAJ2Xesw / DaswA3rE).

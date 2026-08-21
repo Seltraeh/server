@@ -3,6 +3,7 @@
 
 #include <gimuserver/archive/GachaArchiver.hpp>
 #include <gimuserver/db/PacketInterface.hpp>
+#include <gimuserver/gme/common/BraveSlots.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
 #include <algorithm>
@@ -260,6 +261,12 @@ HANDLEF(UserInfo)
     // Feature gating itself is a real, game-wide system — see handbook §8.40;
     // it drives Randall town, Daily Task, the Arena/Home "NEW" badges and the
     // level-up unlock popups.  Only the Vortex rows are gone.
+
+    // Brave Medals — the currency Brave Slots runs on, seeded on first read.
+    // Without this the balance is 0 and RandallSlotActionScene refuses the pull
+    // itself (RANDALL_SLOTGAME_MEDAL_ERROR), so no amount of care in the result
+    // handler makes the machine playable.  See handbook §7.14.
+    resp.medal_info = co_await gme::loadBraveMedals(db, identity);
 
     std::string buffer{};
     const auto& ec2 = glz::write_json(resp, buffer);

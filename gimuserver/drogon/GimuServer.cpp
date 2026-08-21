@@ -4,6 +4,7 @@
 #include <gimuserver/archive/GachaArchiver.hpp>
 #include <gimuserver/archive/MissionArchiver.hpp>
 #include <gimuserver/archive/UnitArchiver.hpp>
+#include <gimuserver/gme/common/BraveSlots.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
 #include <gimuserver/gme/common/MysteryChest.hpp>
 
@@ -58,6 +59,7 @@ void GimuServer::initAndStart(const Json::Value& config)
 	// the archive alongside the other curated tables (handbook §6.15 rule 3).
 	gme::loadDailySpinArchive(server["archive_root"].asString());
 	gme::loadMysteryChestArchive(server["archive_root"].asString());
+	gme::loadBraveSlotArchive(server["archive_root"].asString());
 }
 
 void GimuServer::shutdown() {}

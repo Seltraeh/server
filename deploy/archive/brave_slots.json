@@ -1,0 +1,79 @@
+[
+    {
+        "key": "jackpot_god",
+        "weight": 1,
+        "reels": [81, 81, 81],
+        "prize_type": "1",
+        "prize_rank": "5",
+        "present_type": 6,
+        "target_id": 750003,
+        "target_cnt": 1,
+        "description": "Omni Frog"
+    },
+    {
+        "key": "triple_emperor",
+        "weight": 4,
+        "reels": [3, 3, 3],
+        "prize_type": "1",
+        "prize_rank": "4",
+        "present_type": 6,
+        "target_id": 10313,
+        "target_cnt": 1,
+        "description": "Burst Emperor"
+    },
+    {
+        "key": "triple_sphere",
+        "weight": 10,
+        "reels": [18, 18, 18],
+        "prize_type": "1",
+        "prize_rank": "3",
+        "present_type": 8,
+        "target_id": 0,
+        "target_cnt": 2,
+        "description": "2 Gems"
+    },
+    {
+        "key": "triple_frog",
+        "weight": 20,
+        "reels": [2, 2, 2],
+        "prize_type": "1",
+        "prize_rank": "2",
+        "present_type": 6,
+        "target_id": 10312,
+        "target_cnt": 1,
+        "description": "Burst Frog"
+    },
+    {
+        "key": "triple_item",
+        "weight": 35,
+        "reels": [13, 13, 13],
+        "prize_type": "1",
+        "prize_rank": "1",
+        "present_type": 5,
+        "target_id": 800901,
+        "target_cnt": 5,
+        "description": "Ignis Shard x5"
+    },
+    {
+        "key": "double_medal",
+        "weight": 60,
+        "reels": [82, 82, 1],
+        "prize_type": "1",
+        "prize_rank": "1",
+        "present_type": 3,
+        "target_id": 0,
+        "target_cnt": 10000,
+        "description": "10,000 Zel"
+    },
+    {
+        "key": "no_win",
+        "weight": 170,
+        "reels": [1, 7, 9],
+        "prize_type": "0",
+        "prize_rank": "0",
+        "present_type": 0,
+        "target_id": 0,
+        "target_cnt": 0,
+        "description": "No prize this time."
+    }
+]

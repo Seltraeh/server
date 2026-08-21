@@ -666,6 +666,29 @@ static void RegisterMigrations(MigrationMap& map)
 	//               expired, so the server and the client agree without a flag.
 	//   claimed     1 once opened.  Kept rather than deleted so a chest cannot
 	//               be re-granted to someone who already opened it.
+	// Brave Medals — the currency Brave Slots runs on.
+	//
+	// One row per (user, medal).  The slot machine names the medal it spends in
+	// brave_slots.json's b5yeVr61 ("1"), which reaches the client as
+	// SlotgameInfo::setSlotUseMedal and is looked up through
+	// UserBraveMedalInfoList::getPossessionWithMedalID(string) — so it is an
+	// ID, not a cost.
+	//
+	// Offline there is nothing to earn medals from: the live sources were Brave
+	// Points and events, both unbuilt.  A stock is seeded on first visit
+	// instead, which is why this table exists rather than a userinfo column —
+	// the wire shape is a LIST keyed by medal id and may hold more than one.
+	migrate("21082026_CreateUserBraveMedalsTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_brave_medals ("
+			"user_id    TEXT    NOT NULL,"
+			"medal_id   TEXT    NOT NULL,"
+			"possession INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, medal_id)"
+			");"
+		);
+	});
+
 	migrate("21082026_CreateUserMysteryBoxesTable", {
 		p->execSqlSync(
 			"CREATE TABLE IF NOT EXISTS user_mystery_boxes ("
