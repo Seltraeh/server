@@ -81,20 +81,24 @@ HANDLEF(Initialize)
 	// flow, where userId is deliberately empty, and loading there would insert
 	// a spin row keyed on "".  With no user we report the day as already spun,
 	// which is the one value that cannot trap anybody in the wheel.
-	resp.daily_login_rewards.id = 1;
+	resp.daily_login_rewards.id = gme::dailySpinAnchor(1);
 	resp.daily_login_rewards.current_day = 1;
 	resp.daily_login_rewards.user_current_count = gme::kDailySpinLimit;
 	resp.daily_login_rewards.user_spin_limit_count = gme::kDailySpinLimit;
-	resp.daily_login_rewards.next_reward_id = 1;
+	resp.daily_login_rewards.next_reward_id = gme::dailySpinAnchor(2);
 	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
 
 	if (!identity.userId.empty())
 	{
 		const auto spin = co_await gme::loadDailySpin(theDb(), identity);
-		resp.daily_login_rewards.id = spin.lastRewardId ? spin.lastRewardId : spin.spinDay;
+		// ⚠ These two are REWARD IDS, not day numbers.  The client groups the
+		// wheel by the row this id belongs to, so a day number here draws a
+		// different day's prizes than the spin scores against — sending 7 drew
+		// day 2's wheel (200,000 Karma and all) while the spin ran on day 7.
+		resp.daily_login_rewards.id = gme::dailySpinAnchor(spin.spinDay);
 		resp.daily_login_rewards.current_day = spin.spinDay;
 		resp.daily_login_rewards.user_current_count = spin.spinsUsed;
-		resp.daily_login_rewards.next_reward_id = spin.spinDay;
+		resp.daily_login_rewards.next_reward_id = gme::dailySpinAnchor(spin.spinDay + 1);
 		// Distance to the next guaranteed Gem — the live game gave one on the
 		// first spin of days 7 / 14 / 21 / 28.  Prepended to the message by the
 		// client, giving "N day(s) more to guaranteed Gem!".

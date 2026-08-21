@@ -185,6 +185,10 @@ HANDLEF(DailyLogin)
 	// hangs off), and consumeDailySpin advances spinDay past the row we are
 	// drawing from.  A refused spin awards nothing and keeps the stored reward
 	// id, so it cannot invent a prize for a spin that never happened.
+	// The day being played.  consumeDailySpin advances spinDay, so anything that
+	// has to describe THIS spin has to be captured first.
+	const int32_t spunDay = state.spinDay;
+
 	std::string awarded = "nothing (no spins left)";
 	if (state.spinsUsed < gme::kDailySpinLimit)
 	{
@@ -200,11 +204,16 @@ HANDLEF(DailyLogin)
 	}
 
 	DailyLoginResp resp{};
+	// ⚠ id and next_reward_id are REWARD IDS, not day numbers — the client
+	// groups the wheel by the row the id belongs to, so a day number draws the
+	// wrong day's prizes (§7.14).  current_day IS a day: it is the "Days: N"
+	// label, and it reports the day just played rather than tomorrow's, so the
+	// header does not tick over while the result animation is still running.
 	resp.daily_login_rewards.id = state.lastRewardId;
-	resp.daily_login_rewards.current_day = state.spinDay;
+	resp.daily_login_rewards.current_day = spunDay;
 	resp.daily_login_rewards.user_current_count = state.spinsUsed;
 	resp.daily_login_rewards.user_spin_limit_count = gme::kDailySpinLimit;
-	resp.daily_login_rewards.next_reward_id = state.spinDay;
+	resp.daily_login_rewards.next_reward_id = gme::dailySpinAnchor(spunDay + 1);
 
 	// u8iD6ka7 is prepended to the message by the client (setDay, a STRING
 	// setter at +0x30 — the KDL types it i32::str, which happens to serialise
@@ -212,7 +221,7 @@ HANDLEF(DailyLogin)
 	// 7 / 14 / 21 / 28, so this is the distance to the next such day and the
 	// label reads "N day(s) more to guaranteed Gem!".
 	resp.daily_login_rewards.remaining_days_till_guaranteed_reward =
-		(7 - (state.spinDay % 7)) % 7;
+		(7 - (spunDay % 7)) % 7;
 	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
 
 	std::string buffer{};

@@ -76,6 +76,29 @@ struct DailySpinState
 inline constexpr int32_t kDailySpinLimit = 1;
 
 /*!
+* Number of spaces on the Daily Spin wheel.  Six, and fixed by the artwork.
+*/
+inline constexpr int32_t kDailySpinSpaces = 6;
+
+/*!
+* First reward id of a cycle day — the anchor the client groups the wheel by.
+*
+* ⚠ `XIvaD6Jp` and `outas79f` are REWARD IDS, never day numbers.  The client
+* resolves the id to a row, reads that row's group type, and draws the six
+* spaces of THAT group (`setupSpinWheelRewards` @0xE52740), so putting a day
+* number in either field silently draws the wrong day's prizes: sending 7
+* rendered day 2's wheel, complete with a 200,000 Karma space day 7 does not
+* have, while the spin scored against day 7.
+*
+* @param day Cycle day, 1-based.
+* @return Reward id of that day's first (red) space.
+*/
+inline constexpr int32_t dailySpinAnchor(const int32_t day)
+{
+	return (day - 1) * kDailySpinSpaces;
+}
+
+/*!
 * Loads the Daily Spin reward table from archive_root/daily_login.json.
 *
 * Call once during server setup; the table is authored data, not MST, so it is

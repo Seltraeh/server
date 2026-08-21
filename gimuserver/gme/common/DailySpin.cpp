@@ -30,11 +30,6 @@ int64_t utcDayNow()
 */
 std::vector<DailySpinDay> g_days;
 
-/*!
-* Number of spaces on the wheel.  Six, and fixed by the artwork.
-*/
-constexpr uint32_t kSpaces = 6;
-
 // Display caps, matching the values CampaignReceipt already clamps to.  See
 // handbook §10 for why exceeding them silently renders as zero.
 constexpr int64_t kMaxZelKarma = 99'999'999LL;
@@ -104,7 +99,7 @@ drogon::Task<std::string> awardDailySpin(
 	// Days 7/14/21/28 guarantee a Gem on the first spin of the day; every other
 	// spin picks a space at random, which is what the live game did.
 	const bool guaranteed = row->guaranteed_gem_on_first_spin && state.spinsUsed == 0;
-	const uint32_t space = guaranteed ? 0 : RandomUInt(0, kSpaces - 1);
+	const uint32_t space = guaranteed ? 0 : RandomUInt(0, kDailySpinSpaces - 1);
 
 	// XIvaD6Jp is the prize SELECTOR, and its id space is the client's —
 	// F_SG_DAILYLOGIN_REWARDS_MST is loaded through DataMstManager and is in
@@ -122,8 +117,7 @@ drogon::Task<std::string> awardDailySpin(
 	//
 	// Note this makes day 1's red space id 0, so the client's cycle is
 	// 0-based.  Do NOT "correct" that to 1.
-	state.lastRewardId =
-		static_cast<int32_t>((state.spinDay - 1) * static_cast<int32_t>(kSpaces) + space);
+	state.lastRewardId = dailySpinAnchor(state.spinDay) + static_cast<int32_t>(space);
 
 	if (space >= row->spaces.size())
 	{
