@@ -28,8 +28,19 @@ HANDLEF(ControlCenterEnter)
 {
 	const auto& stored = theServer()->cache().braveSlotsResp();
 
-	// The inner machine config travels as its own JSON document, embedded as a
-	// string — see the note above.
+	// ⚠ ALL THREE FIELDS TRAVEL AS JSON STRINGS, not as nested structures.
+	// readParam runs strlen() then picojson::parse() over each one — C38FmiUn
+	// @0x1447EA8, rY6j0Jvs @0x14486F8, iW62Scdg @0x1448A2C — so each has to be
+	// serialized to its own document and embedded.
+	//
+	// And every value INSIDE them has to be a string.  The client reads the
+	// parsed picojson value at +0x40 as a std::string with NO type check
+	// (@0x1447F74) before handing it to StrToInt, so an unquoted number is read
+	// as a string object that was never constructed.  That is why `zS45RFGb`
+	// and `sE6tyI9i` are `i32::str` rather than `i32::int`: it is not a
+	// cosmetic choice, it decides whether the client survives the reply.
+	::ControlCenterEnterResp resp{};
+
 	std::string gameInfo{};
 	if (const auto& ec = glz::write_json(stored.info, gameInfo); ec)
 	{
@@ -37,12 +48,21 @@ HANDLEF(ControlCenterEnter)
 		LOG_DEBUG << "Gme ControlCenterEnter: cannot serialize slot game info: " << glze;
 		co_return HandleResult::error("Serialization error", glze);
 	}
-
-	::ControlCenterEnterResp resp{};
 	resp.slotgame.game_info = std::move(gameInfo);
-	resp.slotgame.pictures = stored.pictures;
-	// iW62Scdg is the third field SlotgameInfoResponse handles.  We have no reel
-	// definitions to send, so it goes out empty rather than fabricated.
+
+	std::string pictures{};
+	if (const auto& ec = glz::write_json(stored.pictures, pictures); ec)
+	{
+		const auto& glze = glz::format_error(ec, pictures);
+		LOG_DEBUG << "Gme ControlCenterEnter: cannot serialize slot pictures: " << glze;
+		co_return HandleResult::error("Serialization error", glze);
+	}
+	resp.slotgame.pictures = std::move(pictures);
+
+	// We have no reel definitions, so this is an empty JSON ARRAY rather than an
+	// empty string — picojson::parse would fail on "" and the client does not
+	// check the parse result before using it.
+	resp.slotgame.reels = "[]";
 
 	std::string buffer{};
 	const auto& ec = glz::write_json(resp, buffer);
