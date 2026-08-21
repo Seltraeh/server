@@ -22,67 +22,98 @@ namespace
 std::vector<BraveSlotPrize> g_prizes;
 
 /*!
-* Joins the reel stops the way h6smq0WE carries them.
-*
-* Emits the symbol's INDEX in the reel strip rather than its picture id, and
-* that choice is deliberate under uncertainty.  Nothing pins which the client
-* wants, but the two fail very differently: an index the client reads as a
-* picture id merely stops the reel on the wrong symbol, whereas a picture id
-* the client reads as an index runs off the end of a 14-entry strip - ids go up
-* to 82.  The cosmetic failure is the one to risk.
-*
-* The index is a position in the REEL STRIP (iW62Scdg), which is a different
-* order from the picture list — indexing the wrong one lands the reel on an
-* unrelated symbol.  A symbol absent from the strip falls back to 0 rather than
-* pushing an out-of-range value onto the wire.
+* Splits a comma-separated id list.
 */
-std::string joinReels(const std::vector<uint32_t>& reels)
+std::vector<uint32_t> splitIds(const std::string& csv)
 {
-	// Index into the REEL STRIP, not the picture list — the two are different
-	// orders and only the strip is what the reel actually cycles through.
-	// Reel 1's strip stands for all of them; they are authored identical.
-	const auto& stored = theServer()->cache().braveSlotsResp();
-	std::vector<uint32_t> strip;
-	if (!stored.reels.empty())
+	std::vector<uint32_t> out;
+	std::string cur;
+	for (size_t i = 0; i <= csv.size(); ++i)
 	{
-		std::string cur;
-		const auto& data = stored.reels.front().reel_data;
-		for (size_t i = 0; i <= data.size(); ++i)
+		if (i == csv.size() || csv[i] == ',')
 		{
-			if (i == data.size() || data[i] == ',')
+			if (!cur.empty())
 			{
-				if (!cur.empty())
-				{
-					try { strip.push_back(static_cast<uint32_t>(std::stoul(cur))); }
-					catch (const std::exception&) {}
-				}
-				cur.clear();
+				try { out.push_back(static_cast<uint32_t>(std::stoul(cur))); }
+				catch (const std::exception&) {}
 			}
-			else
-			{
-				cur += data[i];
-			}
+			cur.clear();
+		}
+		else
+		{
+			cur += csv[i];
 		}
 	}
+	return out;
+}
+
+/*!
+* Joins the reel stops the way h6smq0WE and D20kuSLy carry them.
+*
+* These are PICTURE IDS.  The client derives the strip position itself:
+* RandallSlotActionScene::stopReelAction @0x1A71E60 walks the reel strip
+* comparing each entry against the target string and uses the position it
+* finds, and getReelPictureFile @0x1A72838 runs StrToInt and then
+* SlotgamePictureInfoList::getObject(id) to pick the sprite.
+*
+* THIS USED TO SEND STRIP INDICES, AND THAT ONE MISTAKE CAUSED BOTH OF THE
+* SLOTS BUGS.  An index is a small integer that sometimes collides with a real
+* picture id and sometimes does not, so it failed two different ways at once:
+*   - symbols 1,7,9 sit at indices 6,7,8, which ARE valid picture ids, so the
+*     reels stopped on the wrong pictures and the popup disagreed with them;
+*   - symbols 81,13,82 sit at indices 0,4,5, which are NOT picture ids, so
+*     getObject @0x1305118 returned xzr and getSlotPictureName dereferenced it.
+* Nothing checks that null, so an undrawable symbol is a hard client crash -
+* which is why one is substituted here rather than sent.
+*/
+std::string joinSymbols(const std::vector<uint32_t>& reels)
+{
+	const auto& stored = theServer()->cache().braveSlotsResp();
+
+	// Reel 1's strip stands for all of them; they are authored identical.
+	const auto strip = stored.reels.empty()
+		? std::vector<uint32_t>{}
+		: splitIds(stored.reels.front().reel_data);
+
+	// `id` is i32::str - int32_t in C++, quoted only on the wire (handbook 3.4).
+	std::vector<uint32_t> drawable;
+	for (const auto& picture : stored.pictures)
+	{
+		drawable.push_back(static_cast<uint32_t>(picture.id));
+	}
+
+	const auto canDraw = [&drawable](const uint32_t symbol) {
+		return std::find(drawable.begin(), drawable.end(), symbol) != drawable.end();
+	};
 
 	std::string out;
-	for (const auto symbol : reels)
+	for (auto symbol : reels)
 	{
-		uint32_t index = 0;
-		for (size_t i = 0; i < strip.size(); ++i)
+		if (!canDraw(symbol))
 		{
-			if (strip[i] == symbol)
-			{
-				index = static_cast<uint32_t>(i);
-				break;
-			}
+			// The first strip symbol the machine can actually draw.  Loud,
+			// because the reels will not read the way they were authored.
+			const auto fallback = std::find_if(strip.begin(), strip.end(), canDraw);
+			const uint32_t safe = fallback == strip.end() ? 0 : *fallback;
+			LOG_ERROR << "BraveSlots: reel symbol " << symbol
+				<< " is not in the picture list - the client would dereference a"
+				   " null SlotgamePictureInfo; substituting " << safe;
+			symbol = safe;
+		}
+		else if (std::find(strip.begin(), strip.end(), symbol) == strip.end())
+		{
+			// Not fatal: stopReelAction falls back to the reel's stored stop
+			// when its search misses.  The reel just lands somewhere else.
+			LOG_WARN << "BraveSlots: reel symbol " << symbol
+				<< " is drawable but absent from the reel strip - the reel will"
+				   " stop somewhere other than where it was authored";
 		}
 
 		if (!out.empty())
 		{
 			out += ',';
 		}
-		out += std::to_string(index);
+		out += std::to_string(symbol);
 	}
 	return out;
 }
@@ -329,11 +360,11 @@ drogon::Task<bool> playBraveSlot(
 		// and the popup crashes positioning prize_detail_unit_image.
 		.prize_data = std::to_string(prize->target_id),
 		.prize_rank = prize->prize_rank,
-		.picture_pattern = joinReels(prize->reels),
+		.picture_pattern = joinSymbols(prize->reels),
 		.effect_sam = "",
 		.effect_type = "0",
 		.effect_param = "0",
-		.reel_stop_num = joinReels(prize->reels),
+		.reel_stop_num = joinSymbols(prize->reels),
 		.medal_num = std::to_string(remaining),
 	};
 
