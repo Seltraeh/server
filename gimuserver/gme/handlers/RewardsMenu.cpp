@@ -180,13 +180,15 @@ HANDLEF(DailyLogin)
 	// from the wiki table against an unverified id mapping would show one
 	// prize and pay a different one, which is worse than paying nothing.
 	//
-	// Only claim a reward when a spin is actually taken.  consumeDailySpin
-	// advances spinDay, so the id has to be read before the call and applied
-	// only on success — otherwise a refused spin reports a prize for a spin
-	// that never happened.
+	// Award BEFORE consuming: awardDailySpin reads spinsUsed to decide whether
+	// this is the day's first spin (which is what the 7/14/21/28 guaranteed Gem
+	// hangs off), and consumeDailySpin advances spinDay past the row we are
+	// drawing from.  A refused spin awards nothing and keeps the stored reward
+	// id, so it cannot invent a prize for a spin that never happened.
+	std::string awarded = "nothing (no spins left)";
 	if (state.spinsUsed < gme::kDailySpinLimit)
 	{
-		state.lastRewardId = state.spinDay;
+		awarded = co_await gme::awardDailySpin(theDb(), identity, state);
 	}
 
 	const bool spun = co_await gme::consumeDailySpin(theDb(), identity, state);
@@ -219,8 +221,10 @@ HANDLEF(DailyLogin)
 		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
 	}
 
-	LOG_INFO << "DailyLogin: user " << identity.userId << " spun day " << state.spinDay
-		<< ", reward id " << state.lastRewardId
-		<< ", used " << state.spinsUsed << "/" << gme::kDailySpinLimit;
+	LOG_INFO << "DailyLogin: user " << identity.userId
+		<< " reward id " << state.lastRewardId
+		<< ", awarded " << awarded
+		<< ", used " << state.spinsUsed << "/" << gme::kDailySpinLimit
+		<< ", next day " << state.spinDay;
 	co_return HandleResult::success(buffer);
 }

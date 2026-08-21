@@ -1,0 +1,1394 @@
+[
+    {
+        "day": 1,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "karma",
+                "name": "Karma",
+                "id": 0,
+                "count": 200000,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Fire Crystal",
+                "id": 10344,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Frog",
+                "id": 10312,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Ignis Shard",
+                "id": 800901,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 2,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "karma",
+                "name": "Karma",
+                "id": 0,
+                "count": 200000,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Water Crystal",
+                "id": 20334,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Frog",
+                "id": 10312,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Algor Shard",
+                "id": 800902,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 3,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "karma",
+                "name": "Karma",
+                "id": 0,
+                "count": 200000,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Earth Crystal",
+                "id": 30324,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Frog",
+                "id": 10312,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Terra Shard",
+                "id": 800903,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 4,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "karma",
+                "name": "Karma",
+                "id": 0,
+                "count": 200000,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Thunder Crystal",
+                "id": 40324,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Frog",
+                "id": 10312,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Fulgur Shard",
+                "id": 800904,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 5,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "karma",
+                "name": "Karma",
+                "id": 0,
+                "count": 200000,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Light Crystal",
+                "id": 50364,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Lux Shard",
+                "id": 800905,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 6,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "karma",
+                "name": "Karma",
+                "id": 0,
+                "count": 200000,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Dark Crystal",
+                "id": 60334,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Umbra Shard",
+                "id": 800906,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 7,
+        "guaranteed_gem_on_first_spin": true,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Almighty Imp Arton",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Geminus Tome",
+                "id": 800908,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Elementum Tome",
+                "id": 800907,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Queen",
+                "id": 750004,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 8,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Experience Token",
+                "id": 120000,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Fire Crystal",
+                "id": 10344,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Ignis Shard",
+                "id": 800901,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 2,
+                "available": false
+            }
+        ]
+    },
+    {
+        "day": 9,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Experience Token",
+                "id": 120000,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Water Crystal",
+                "id": 20334,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Algor Shard",
+                "id": 800902,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 2,
+                "available": false
+            }
+        ]
+    },
+    {
+        "day": 10,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Experience Token",
+                "id": 120000,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Earth Crystal",
+                "id": 30324,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Terra Shard",
+                "id": 800903,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 2,
+                "available": false
+            }
+        ]
+    },
+    {
+        "day": 11,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Experience Token",
+                "id": 120000,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Thunder Crystal",
+                "id": 40324,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Fulgur Shard",
+                "id": 800904,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 2,
+                "available": false
+            }
+        ]
+    },
+    {
+        "day": 12,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Experience Token",
+                "id": 120000,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Light Crystal",
+                "id": 50364,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Lux Shard",
+                "id": 800905,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 2,
+                "available": false
+            }
+        ]
+    },
+    {
+        "day": 13,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Experience Token",
+                "id": 120000,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Dark Crystal",
+                "id": 60334,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Umbra Shard",
+                "id": 800906,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Emperor",
+                "id": 0,
+                "count": 2,
+                "available": false
+            }
+        ]
+    },
+    {
+        "day": 14,
+        "guaranteed_gem_on_first_spin": true,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Queen",
+                "id": 750004,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Geminus Tome",
+                "id": 800908,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Elementum Tome",
+                "id": 800907,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "ticket",
+                "name": "Summon Ticket",
+                "id": 0,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 15,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Fire Mecha God",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Ignis Shard",
+                "id": 800901,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 16,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Water Mecha God",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Algor Shard",
+                "id": 800902,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 17,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Earth Mecha God",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Terra Shard",
+                "id": 800903,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 18,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Thunder Mecha God",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Fulgur Shard",
+                "id": 800904,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 19,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Light Mecha God",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Lux Shard",
+                "id": 800905,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 20,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Dark Mecha God",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Umbra Shard",
+                "id": 800906,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 21,
+        "guaranteed_gem_on_first_spin": true,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Burst Queen",
+                "id": 750004,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Geminus Tome",
+                "id": 800908,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Elementum Tome",
+                "id": 800907,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Amber Butterfly",
+                "id": 880244,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 22,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Power Imp Pakpak",
+                "id": 10452,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Ignis Shard",
+                "id": 800901,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Fire Golem",
+                "id": 87102601,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 23,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Guard Imp Ganju",
+                "id": 20442,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Algor Shard",
+                "id": 800902,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Water Golem",
+                "id": 87202601,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 24,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Healing Imp Fwahl",
+                "id": 30432,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Terra Shard",
+                "id": 800903,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Earth Golem",
+                "id": 87302601,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 25,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Vigor Imp Molin",
+                "id": 40432,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Fulgur Shard",
+                "id": 800904,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Thunder Golem",
+                "id": 87402601,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 26,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Almighty Imp Arton",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Lux Shard",
+                "id": 800905,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Light Golem",
+                "id": 87502601,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 27,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Almighty Imp Arton",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "unit",
+                "name": "Rainbow Crystal",
+                "id": 750006,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Crescent Dew",
+                "id": 0,
+                "count": 1,
+                "available": false
+            },
+            {
+                "kind": "item",
+                "name": "Umbra Shard",
+                "id": 800906,
+                "count": 20,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Dark Golem",
+                "id": 87602601,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 28,
+        "guaranteed_gem_on_first_spin": true,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Omni Frog",
+                "id": 750003,
+                "count": 2,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Geminus Tome",
+                "id": 800908,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Elementum Tome",
+                "id": 800907,
+                "count": 10,
+                "available": true
+            },
+            {
+                "kind": "item",
+                "name": "Amber Butterfly",
+                "id": 880244,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "ticket",
+                "name": "Summon Ticket",
+                "id": 0,
+                "count": 1,
+                "available": true
+            }
+        ]
+    },
+    {
+        "day": 29,
+        "guaranteed_gem_on_first_spin": false,
+        "spaces": [
+            {
+                "kind": "gem",
+                "name": "Gem",
+                "id": 0,
+                "count": 1,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Power Imp Pakpak",
+                "id": 10452,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Guard Imp Ganju",
+                "id": 20442,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Healing Imp Fwahl",
+                "id": 30432,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Vigor Imp Molin",
+                "id": 40432,
+                "count": 5,
+                "available": true
+            },
+            {
+                "kind": "unit",
+                "name": "Almighty Imp Arton",
+                "id": 0,
+                "count": 3,
+                "available": false
+            }
+        ]
+    }
+]

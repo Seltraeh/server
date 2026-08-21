@@ -59,10 +59,45 @@ struct DailySpinState
 *
 * The live game gave five, but only the first was free — spins 2..5 each
 * required watching a video ad.  There is no ad SDK offline (and the video-ad
-* feature flags are deliberately off, see feature_check.kdl), so the free spin
-* is the whole allowance and a larger number here would simply be unreachable.
+* feature flags are deliberately off, see feature_check.kdl), so the ad-funded
+* spins are unreachable and this is not five.
+*
+* It is TWO rather than one because of the guaranteed-Gem rule: days 7, 14, 21
+* and 28 always pay a Gem on the first spin of the day, so at a limit of one
+* those days could ONLY ever pay a Gem and the other five prizes on them would
+* be unreachable for the whole cycle.  Two keeps the guarantee intact and still
+* lets the rest of the day's table come up.
 */
-inline constexpr int32_t kDailySpinLimit = 1;
+inline constexpr int32_t kDailySpinLimit = 2;
+
+/*!
+* Loads the Daily Spin reward table from archive_root/daily_login.json.
+*
+* Call once during server setup; the table is authored data, not MST, so it is
+* read straight from the archive (handbook §6.15 rule 3).
+*
+* @param archiveRoot Configured archive_root.
+*/
+void loadDailySpinArchive(const std::string& archiveRoot);
+
+/*!
+* Picks the space the wheel lands on, awards it, and records the reward id.
+*
+* Spaces are chosen at random, which is what the live game did.  On days
+* 7 / 14 / 21 / 28 the first spin instead awards the guaranteed Gem.
+*
+* Prizes whose `available` flag is false are skipped with a warning: nine of
+* the wiki's rewards have no id in the MST tables we hold.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved caller.
+* @param state Spin state; `lastRewardId` is set to the awarded space.
+* @return Human-readable description of what was awarded, for logging.
+*/
+drogon::Task<std::string> awardDailySpin(
+	db::Database database,
+	const UserIdentity& identity,
+	DailySpinState& state);
 
 /*!
 * Reads the caller's spin state, rolling it over if the UTC day has advanced.
