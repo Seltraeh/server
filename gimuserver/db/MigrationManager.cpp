@@ -640,6 +640,31 @@ static void RegisterMigrations(MigrationMap& map)
 		);
 	});
 
+	// Daily Spin (Rewards menu -> task_dailyloginspin).  Per-user, one row.
+	//
+	//   spin_day     which day of the reward cycle the player is on (1-based).
+	//                The live game's table runs 29 days and then repeats its
+	//                last row, so this only ever counts up.
+	//   spins_used   spins taken TODAY.  This is the value that goes out as
+	//                35JXN4Ay, and the client treats < 1 as "hasn't spun",
+	//                which makes Home force-open the wheel -- see the warning
+	//                in Initialize.cpp before changing how it is derived.
+	//   last_spin_utc_day  days since the unix epoch, i.e. floor(now/86400).
+	//                Stored rather than a date string so the rollover check is
+	//                an integer compare and cannot be tripped by formatting.
+	migrate("20082026_CreateUserDailySpinTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_daily_spin ("
+			"user_id           TEXT    NOT NULL,"
+			"spin_day          INTEGER NOT NULL DEFAULT 1,"
+			"spins_used        INTEGER NOT NULL DEFAULT 0,"
+			"last_spin_utc_day INTEGER NOT NULL DEFAULT 0,"
+			"last_reward_id    INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id)"
+			");"
+		);
+	});
+
 }
 
 /*!

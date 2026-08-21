@@ -1,6 +1,9 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/DailySpin.hpp>
+
 // The Rewards menu — the unbuilt tiles.
 //
 // `RewardsTopScene::loadMenuList` @0xE42440 builds the menu, and it has EIGHT
@@ -128,18 +131,96 @@ HANDLEF(MysteryBoxClaim)
 // Request (`DailyLoginRequest::createBody` @0x1CC9880): bare identity —
 // userInfoTag + signalKey, nothing feature-specific.
 //
-// The screen itself is driven entirely by `DailyLoginRewardsUserInfo::shared()`
-// — `getUserCurrentCount()` / `getUserLimitCount()` decide whether the spin
-// button is enabled (`DAILY_SPIN_LIMIT_LABEL` is the exhausted-state text).
-// That state arrives on `DailyLoginRewardsUserInfoResponse` = `Drudr2w5`
-// (XIvaD6Jp, 35JXN4Ay, 5xStG99s, ad6i23pO, u8iD6ka7, ZC0msu2L, outas79f), with
-// the catalogue on `DailyLoginRewardsMstResponse`.  Neither is sent today, so
-// both counters read 0 — meaning the wheel will render but the button state is
-// whatever 0/0 produces.  Populating `Drudr2w5` is the next step for this tile,
-// and per §7.12.4 it can ride on UserInfo rather than needing this handler at
-// all, since getResponseObject is a global key->class registry.
+// The screen is driven entirely by `DailyLoginRewardsUserInfo::shared()` —
+// `getUserCurrentCount()` / `getUserLimitCount()` decide whether the spin
+// button is enabled (`DAILY_SPIN_LIMIT_LABEL` is the exhausted-state text),
+// and `isDailyLoginAvailable()` decides whether HOME force-opens the wheel at
+// all.  That state is `Drudr2w5`, seeded by Initialize and replaced here.
+//
+// ⚠ The reward CATALOGUE is not ours to send.  `DailyLoginRewardsMstResponse`
+// is absent from `getResponseObject` entirely, and its only constructor caller
+// is `DataMstManager::loadDailyLoginRewardMst` @0x1209684, which loads
+// `F_SG_DAILYLOGIN_REWARDS_MST` — the client-loaded MST path (§11.2's
+// DataMstManager rule).  The client already has the 29-day table; the server's
+// only job is to say WHICH row was won.
 HANDLEF(DailyLogin)
 {
 	LOG_INFO << "DailyLogin: " << json;
-	co_return HandleResult::success("{}");
+
+	DailyLoginReq req{};
+	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+	{
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
+	}
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+	auto state = co_await gme::loadDailySpin(theDb(), identity);
+
+	// The reward the wheel lands on.  ⚠ THIS IS A PROBE, NOT THE FINAL RULE.
+	//
+	// XIvaD6Jp is not a record id — it is the PRIZE SELECTOR.  wheelSpin
+	// @0xE536E0 opens by looking getId() up in a std::map, and
+	// setupSpinWheelRewards @0xE52740 additionally resolves it through
+	// DailyLoginRewardsMstList::getObject(id) -> getGroupType() ->
+	// getRewardGroupViaGroupType(), so the id picks BOTH which day's six
+	// prizes are displayed AND which of them is won.
+	//
+	// We cannot derive that numbering: F_SG_DAILYLOGIN_REWARDS_MST is loaded
+	// through DataMstManager (the client-loaded MST path — its response class
+	// is absent from getResponseObject entirely), and the table is in none of
+	// the 147 decoded MSTs.  The client has it; we do not.
+	//
+	// So the id is the cycle day for now, which makes the mapping observable:
+	// launch, read the six prizes the wheel shows, compare against the wiki's
+	// day table, then step `spin_day` in deploy/gme.sqlite and relaunch.  A
+	// handful of samples pins the formula (§6.16's probe technique, and §6.19
+	// on why that edit belongs in the database rather than a migration).
+	//
+	// Until it is pinned, this handler deliberately GRANTS NOTHING.  Awarding
+	// from the wiki table against an unverified id mapping would show one
+	// prize and pay a different one, which is worse than paying nothing.
+	//
+	// Only claim a reward when a spin is actually taken.  consumeDailySpin
+	// advances spinDay, so the id has to be read before the call and applied
+	// only on success — otherwise a refused spin reports a prize for a spin
+	// that never happened.
+	if (state.spinsUsed < gme::kDailySpinLimit)
+	{
+		state.lastRewardId = state.spinDay;
+	}
+
+	const bool spun = co_await gme::consumeDailySpin(theDb(), identity, state);
+	if (!spun)
+	{
+		LOG_INFO << "DailyLogin: user " << identity.userId
+			<< " has no spins left today (" << state.spinsUsed
+			<< "/" << gme::kDailySpinLimit << ")";
+	}
+
+	DailyLoginResp resp{};
+	resp.daily_login_rewards.id = state.lastRewardId;
+	resp.daily_login_rewards.current_day = state.spinDay;
+	resp.daily_login_rewards.user_current_count = state.spinsUsed;
+	resp.daily_login_rewards.user_spin_limit_count = gme::kDailySpinLimit;
+	resp.daily_login_rewards.next_reward_id = state.spinDay;
+
+	// u8iD6ka7 is prepended to the message by the client (setDay, a STRING
+	// setter at +0x30 — the KDL types it i32::str, which happens to serialise
+	// compatibly).  The live game guaranteed a Gem on the first spin of days
+	// 7 / 14 / 21 / 28, so this is the distance to the next such day and the
+	// label reads "N day(s) more to guaranteed Gem!".
+	resp.daily_login_rewards.remaining_days_till_guaranteed_reward =
+		(7 - (state.spinDay % 7)) % 7;
+	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
+
+	std::string buffer{};
+	if (const auto& ec = glz::write_json(resp, buffer); ec)
+	{
+		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+	}
+
+	LOG_INFO << "DailyLogin: user " << identity.userId << " spun day " << state.spinDay
+		<< ", reward id " << state.lastRewardId
+		<< ", used " << state.spinsUsed << "/" << gme::kDailySpinLimit;
+	co_return HandleResult::success(buffer);
 }

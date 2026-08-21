@@ -3,6 +3,7 @@
 
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/DailySpin.hpp>
 
 HANDLEF(Initialize)
 {
@@ -65,38 +66,41 @@ HANDLEF(Initialize)
 	//       return this->[0x1c] < 1;          // user_current_count < 1
 	//
 	// and its ONLY two callers are HomeScene2::updateEvent @0x16F2D9C and
-	// AnotherHomeScene::updateEvent @0x16E5128 — so any value below 1 means
-	// "hasn't spun today", and Home pushes the wheel over itself on every
-	// login.  The scene then only leaves by DailyLoginScene::updateEvent
-	// state 1 @0xE52FDC:
+	// AnotherHomeScene::updateEvent @0x16E5128.  Below 1 means "hasn't spun
+	// today", so Home opens the wheel over itself; the wheel then only closes
+	// once `used >= limit` (DailyLoginScene::updateEvent state 1 @0xE52FDC,
+	// else-branch state 7 = exit to Home).  Reporting 0 against a non-zero
+	// limit with no working spin handler locked the client out of Home
+	// entirely — see handbook §7.14.
 	//
-	//     if (getUserCurrentCount() < getUserLimitCount()) stay open;
-	//     else -> state 7 -> getLastHomeSceneID() -> changeSceneWithSceneID()
+	// It is now read from user_daily_spin and rolls over on the UTC day, so a
+	// fresh day legitimately offers the wheel again and the DailyLogin
+	// (4aClzokO) handler is what closes it.
 	//
-	// With 0/0 that exits immediately, which is the "overlay on Home that
-	// blips out" symptom.  With 0/1 it stays open forever, because the only
-	// thing that can raise `current` is a DailyLogin (4aClzokO) reply we do
-	// not implement yet — that locked the client out of Home entirely.
-	//
-	// So we report the day's spin as ALREADY USED (1 of 1).  Home stops
-	// force-opening the wheel, and the tile in the Rewards menu correctly
-	// shows the exhausted state.  This is a truthful resting point for a
-	// server that cannot yet run a spin, NOT a placeholder to leave forever:
-	// see the handbook §7.14 for what implementing it actually needs, the
-	// short version being that DailyLoginRewardsMstList::addObject has exactly
-	// one caller (DailyLoginRewardsMstResponse::readParam), so the reward
-	// catalogue is server-supplied and we have never sent it.
-	//
-	// Field mapping is from tools/ida/audits/Drudr2w5_audit.txt.  Every setter
-	// in that readParam is inlined, so each key was resolved by matching the
-	// offset it stores to against the getters: 35JXN4Ay -> +0x1c
-	// getUserCurrentCount, 5xStG99s -> +0x20 getUserLimitCount,
-	// outas79f -> +0x60 getNextRewardId.
+	// Guarded on a resolved user: this reply also serves the new-user/tutorial
+	// flow, where userId is deliberately empty, and loading there would insert
+	// a spin row keyed on "".  With no user we report the day as already spun,
+	// which is the one value that cannot trap anybody in the wheel.
 	resp.daily_login_rewards.id = 1;
 	resp.daily_login_rewards.current_day = 1;
-	resp.daily_login_rewards.user_current_count = 1;
-	resp.daily_login_rewards.user_spin_limit_count = 1;
+	resp.daily_login_rewards.user_current_count = gme::kDailySpinLimit;
+	resp.daily_login_rewards.user_spin_limit_count = gme::kDailySpinLimit;
+	resp.daily_login_rewards.next_reward_id = 1;
 	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
+
+	if (!identity.userId.empty())
+	{
+		const auto spin = co_await gme::loadDailySpin(theDb(), identity);
+		resp.daily_login_rewards.id = spin.lastRewardId ? spin.lastRewardId : spin.spinDay;
+		resp.daily_login_rewards.current_day = spin.spinDay;
+		resp.daily_login_rewards.user_current_count = spin.spinsUsed;
+		resp.daily_login_rewards.next_reward_id = spin.spinDay;
+		// Distance to the next guaranteed Gem — the live game gave one on the
+		// first spin of days 7 / 14 / 21 / 28.  Prepended to the message by the
+		// client, giving "N day(s) more to guaranteed Gem!".
+		resp.daily_login_rewards.remaining_days_till_guaranteed_reward =
+			(7 - (spin.spinDay % 7)) % 7;
+	}
 
 	std::string buffer{};
 	const auto& ec2 = glz::write_json(resp, buffer);
