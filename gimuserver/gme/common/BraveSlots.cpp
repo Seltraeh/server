@@ -8,6 +8,7 @@
 #include <gimuserver/utils/Random.hpp>
 
 #include <algorithm>
+#include <vector>
 
 namespace gme
 {
@@ -87,6 +88,22 @@ std::string joinReels(const std::vector<uint32_t>& reels)
 }
 
 /*!
+* The popup's prize code for a reward, or 0 when it has none.
+*
+* This is the 1..5 vocabulary from RandallSlotScene::createPrizeDrawInfo's jump
+* table @0x1A757D8, NOT present_type: 1 unit, 2/3 item, 5 medal.
+*/
+std::string popupPrizeType(const uint32_t presentType)
+{
+	switch (presentType)
+	{
+	case 6:                 return "1";   // unit
+	case 4: case 5: case 7: return "2";   // item domains
+	default:                return "0";   // nothing the popup can draw
+	}
+}
+
+/*!
 * Picks an outcome, weighted.
 */
 const BraveSlotPrize* rollPrize()
@@ -132,6 +149,29 @@ void loadBraveSlotArchive(const std::string& archiveRoot)
 		LOG_ERROR << "BraveSlots: failed to load brave_slots.json: " << e.what();
 		return;
 	}
+
+	// ⚠ EVERY row must be renderable, because THE MACHINE CANNOT EXPRESS
+	// "NO PRIZE".  RandallSlotActionScene::updateEvent @0x1A7049C pushes the
+	// result popup unconditionally once the reels stop, and
+	// RandallSlotResultScene::initialize @0x1A74448 runs setPrizeData and then
+	// loadLayout REGARDLESS — so a prize the popup cannot draw leaves
+	// prize_detail_unit_image unbuilt and setLayoutControl dereferences it.
+	// (setPrizeData's popScene() branch, taken when the type is 0 or 4, does
+	// NOT prevent that: the layout pass has already been queued.)
+	//
+	// So an unrenderable row is dropped here rather than allowed to reach a
+	// player, and loudly, because the failure it causes is a hard crash with
+	// no server-side symptom at all.
+	std::erase_if(g_prizes, [](const BraveSlotPrize& p) {
+		if (popupPrizeType(p.present_type) != "0")
+		{
+			return false;
+		}
+		LOG_ERROR << "BraveSlots: dropping payout row '" << p.key
+			<< "' — present_type " << p.present_type
+			<< " has no prize-popup code, and sending it CRASHES the client";
+		return true;
+	});
 
 	LOG_INFO << "BraveSlots: loaded " << g_prizes.size()
 		<< " payout rows from " << archiveRoot << "/brave_slots.json";
@@ -276,18 +316,10 @@ drogon::Task<bool> playBraveSlot(
 			identity.userId);
 	}
 
-	// ⚠ The popup has its OWN prize vocabulary, and it is not present_type.
-	// RandallSlotScene::createPrizeDrawInfo's jump table @0x1A757D8 reads
-	// yT3NBME0 as a 1..5 code — 1 unit, 2/3 item, 5 medal — and 0 makes
-	// setPrizeData call popScene() so no popup appears at all.  Derived here
-	// rather than stored, so it cannot drift from what we actually award.
-	std::string prizeType = "0";
-	switch (prize->present_type)
-	{
-	case 6:                 prizeType = "1"; break;   // unit
-	case 4: case 5: case 7: prizeType = "2"; break;   // item domains
-	default:                prizeType = "0"; break;   // nothing to show
-	}
+	// Derived rather than stored, so the shown prize cannot drift from the
+	// awarded one.  loadBraveSlotArchive has already dropped any row this
+	// would map to 0, so the value here is always renderable.
+	const std::string prizeType = popupPrizeType(prize->present_type);
 
 	result = SlotgameResultInfo{
 		.prize_type = prizeType,

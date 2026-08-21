@@ -84,17 +84,17 @@
         "description": "Ignis Shard x2"
     },
     {
-        "key": "no_win",
+        "key": "consolation",
         "weight": 170,
         "reels": [
             1,
             7,
             9
         ],
-        "prize_rank": "0",
-        "present_type": 0,
-        "target_id": 0,
-        "target_cnt": 0,
-        "description": "No prize this time."
+        "prize_rank": "1",
+        "present_type": 5,
+        "target_id": 800901,
+        "target_cnt": 1,
+        "description": "Ignis Shard x1"
     }
 ]
