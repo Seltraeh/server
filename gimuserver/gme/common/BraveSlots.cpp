@@ -30,22 +30,47 @@ std::vector<BraveSlotPrize> g_prizes;
 * the client reads as an index runs off the end of a 14-entry strip - ids go up
 * to 82.  The cosmetic failure is the one to risk.
 *
-* The strip is the picture list in order, which is exactly how
-* deploy/system/brave_slots.json authors it, so position in `pictures` IS the
-* index.  A symbol missing from the list falls back to 0 rather than pushing an
-* out-of-range value onto the wire.
+* The index is a position in the REEL STRIP (iW62Scdg), which is a different
+* order from the picture list — indexing the wrong one lands the reel on an
+* unrelated symbol.  A symbol absent from the strip falls back to 0 rather than
+* pushing an out-of-range value onto the wire.
 */
 std::string joinReels(const std::vector<uint32_t>& reels)
 {
-	const auto& pictures = theServer()->cache().braveSlotsResp().pictures;
+	// Index into the REEL STRIP, not the picture list — the two are different
+	// orders and only the strip is what the reel actually cycles through.
+	// Reel 1's strip stands for all of them; they are authored identical.
+	const auto& stored = theServer()->cache().braveSlotsResp();
+	std::vector<uint32_t> strip;
+	if (!stored.reels.empty())
+	{
+		std::string cur;
+		const auto& data = stored.reels.front().reel_data;
+		for (size_t i = 0; i <= data.size(); ++i)
+		{
+			if (i == data.size() || data[i] == ',')
+			{
+				if (!cur.empty())
+				{
+					try { strip.push_back(static_cast<uint32_t>(std::stoul(cur))); }
+					catch (const std::exception&) {}
+				}
+				cur.clear();
+			}
+			else
+			{
+				cur += data[i];
+			}
+		}
+	}
 
 	std::string out;
 	for (const auto symbol : reels)
 	{
 		uint32_t index = 0;
-		for (size_t i = 0; i < pictures.size(); ++i)
+		for (size_t i = 0; i < strip.size(); ++i)
 		{
-			if (static_cast<uint32_t>(pictures[i].id) == symbol)
+			if (strip[i] == symbol)
 			{
 				index = static_cast<uint32_t>(i);
 				break;
