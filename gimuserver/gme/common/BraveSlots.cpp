@@ -276,9 +276,26 @@ drogon::Task<bool> playBraveSlot(
 			identity.userId);
 	}
 
+	// ⚠ The popup has its OWN prize vocabulary, and it is not present_type.
+	// RandallSlotScene::createPrizeDrawInfo's jump table @0x1A757D8 reads
+	// yT3NBME0 as a 1..5 code — 1 unit, 2/3 item, 5 medal — and 0 makes
+	// setPrizeData call popScene() so no popup appears at all.  Derived here
+	// rather than stored, so it cannot drift from what we actually award.
+	std::string prizeType = "0";
+	switch (prize->present_type)
+	{
+	case 6:                 prizeType = "1"; break;   // unit
+	case 4: case 5: case 7: prizeType = "2"; break;   // item domains
+	default:                prizeType = "0"; break;   // nothing to show
+	}
+
 	result = SlotgameResultInfo{
-		.prize_type = prize->prize_type,
-		.prize_data = prize->description,
+		.prize_type = prizeType,
+		// ⚠ NOT the description.  createPrizeDrawInfo looks this up with
+		// UnitMstList/ItemMstList::getObject(STRING), so it is the TARGET ID.
+		// A description here returns null, the prize sprite is never built,
+		// and the popup crashes positioning prize_detail_unit_image.
+		.prize_data = std::to_string(prize->target_id),
 		.prize_rank = prize->prize_rank,
 		.picture_pattern = joinReels(prize->reels),
 		.effect_sam = "",
