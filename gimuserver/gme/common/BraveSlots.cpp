@@ -354,11 +354,26 @@ drogon::Task<bool> playBraveSlot(
 
 	result = SlotgameResultInfo{
 		.prize_type = prizeType,
-		// ⚠ NOT the description.  createPrizeDrawInfo looks this up with
-		// UnitMstList/ItemMstList::getObject(STRING), so it is the TARGET ID.
-		// A description here returns null, the prize sprite is never built,
-		// and the popup crashes positioning prize_detail_unit_image.
-		.prize_data = std::to_string(prize->target_id),
+		// ⚠ TWO fields, '@'-separated: "<targetId>@<count>".  NOT the
+		// description, and NOT the bare id either.
+		//
+		// createPrizeDrawInfo @0x1A75674 runs CommonUtils::split over this
+		// using RandallSlotScene::SLOT_PRIZE_DATA_DELIMITER (a global that
+		// resolves to "@"), looks element [0] up with
+		// UnitMstList/ItemMstList::getObject(STRING), and then builds the
+		// popup label as getItemName() + "x" + element [1] — the COUNT.
+		//
+		// Element [1] is read at [vector + 0x18] with NO bounds check
+		// (@0x1A75CE0), so a single-field value makes the client construct a
+		// std::string from whatever heap follows the vector and memcpy from a
+		// wild pointer.  That is a CORRUPTION bug, not a clean crash: it
+		// depends on what happens to sit past the allocation, so the SAME
+		// payload rendered fine once and took the client down twice.
+		//
+		// Same shape as b5yeVr61 ("<medalId>@<cost>") — when a slot field
+		// looks like a lone id, check whether it is really an @-pair.
+		.prize_data = std::to_string(prize->target_id) + "@"
+			+ std::to_string(prize->target_cnt),
 		.prize_rank = prize->prize_rank,
 		.picture_pattern = joinSymbols(prize->reels),
 		.effect_sam = "",
