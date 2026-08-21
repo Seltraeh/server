@@ -652,6 +652,34 @@ static void RegisterMigrations(MigrationMap& map)
 	//   last_spin_utc_day  days since the unix epoch, i.e. floor(now/86400).
 	//                Stored rather than a date string so the rollover check is
 	//                an integer compare and cannot be tripped by formatting.
+	// Mystery Chest (Rewards menu -> task_mysterychest).  One row per chest a
+	// player holds.
+	//
+	//   box_id      the id sent as rEFRefr8 and echoed back by the claim.
+	//   chest_key   which archive definition this chest is; the contents live
+	//               in deploy/archive/mystery_chest.json, not here, so a chest
+	//               already granted follows edits to its rewards.
+	//   reward_ts   unix SECONDS the chest becomes claimable.
+	//   expiry_ts   unix SECONDS it disappears.  The client counts down from
+	//               this (getPresentTimeLeftType @0x1CB30B4 divides
+	//               expiry - server epoch by 86400) and treats non-positive as
+	//               expired, so the server and the client agree without a flag.
+	//   claimed     1 once opened.  Kept rather than deleted so a chest cannot
+	//               be re-granted to someone who already opened it.
+	migrate("21082026_CreateUserMysteryBoxesTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_mystery_boxes ("
+			"user_id   TEXT    NOT NULL,"
+			"box_id    TEXT    NOT NULL,"
+			"chest_key TEXT    NOT NULL,"
+			"reward_ts INTEGER NOT NULL DEFAULT 0,"
+			"expiry_ts INTEGER NOT NULL DEFAULT 0,"
+			"claimed   INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, box_id)"
+			");"
+		);
+	});
+
 	migrate("20082026_CreateUserDailySpinTable", {
 		p->execSqlSync(
 			"CREATE TABLE IF NOT EXISTS user_daily_spin ("

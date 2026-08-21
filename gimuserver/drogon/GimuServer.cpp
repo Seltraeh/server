@@ -5,6 +5,7 @@
 #include <gimuserver/archive/MissionArchiver.hpp>
 #include <gimuserver/archive/UnitArchiver.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
+#include <gimuserver/gme/common/MysteryChest.hpp>
 
 GimuServer::GimuServer() : m_dlc_error_log(), m_have_log(false), m_cache() {}
 
@@ -56,6 +57,7 @@ void GimuServer::initAndStart(const Json::Value& config)
 	// Daily Spin reward table.  Authored data rather than MST, so it lives in
 	// the archive alongside the other curated tables (handbook §6.15 rule 3).
 	gme::loadDailySpinArchive(server["archive_root"].asString());
+	gme::loadMysteryChestArchive(server["archive_root"].asString());
 }
 
 void GimuServer::shutdown() {}

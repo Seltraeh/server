@@ -3,6 +3,7 @@
 
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
+#include <gimuserver/gme/common/MysteryChest.hpp>
 
 // The Rewards menu — the unbuilt tiles.
 //
@@ -95,7 +96,32 @@ HANDLEF(SlotAction)
 HANDLEF(MysteryBoxList)
 {
 	LOG_INFO << "MysteryBoxList: " << json;
-	co_return HandleResult::success("{}");
+
+	MysteryBoxListReq req{};
+	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+	{
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
+	}
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	// The live game handed chests out through operator giveaways and events,
+	// which an offline server has no equivalent of, so the archive's chests are
+	// granted on first visit instead.  Idempotent — an opened chest is never
+	// handed back.
+	co_await gme::provisionMysteryChests(theDb(), identity);
+
+	MysteryBoxListResp resp{};
+	resp.boxes = co_await gme::listMysteryChests(theDb(), identity);
+
+	std::string buffer{};
+	if (const auto& ec = glz::write_json(resp, buffer); ec)
+	{
+		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+	}
+
+	LOG_INFO << "MysteryBoxList: " << resp.boxes.size() << " chest(s) for " << identity.userId;
+	co_return HandleResult::success(buffer);
 }
 
 // Mystery Chest — claim (2paswUpR / kadRadU5).
@@ -119,7 +145,35 @@ HANDLEF(MysteryBoxList)
 HANDLEF(MysteryBoxClaim)
 {
 	LOG_INFO << "MysteryBoxClaim: " << json;
-	co_return HandleResult::success("{}");
+
+	MysteryBoxClaimReq req{};
+	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+	{
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
+	}
+	if (req.entries.empty())
+	{
+		co_return HandleResult::error("MysteryBoxClaim: no chest in request");
+	}
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	MysteryBoxClaimResp resp{};
+	// A refused claim — unknown, already opened or expired — still answers with
+	// the current chest list and header rather than an error, so the screen
+	// resynchronises instead of stranding the player on a chest that is gone.
+	co_await gme::claimMysteryChest(theDb(), identity, req.entries.front().box_id, resp.rewards);
+
+	resp.boxes = co_await gme::listMysteryChests(theDb(), identity);
+	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+
+	std::string buffer{};
+	if (const auto& ec = glz::write_json(resp, buffer); ec)
+	{
+		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+	}
+
+	co_return HandleResult::success(buffer);
 }
 
 // Daily Spin (4aClzokO / stI81haQ).
