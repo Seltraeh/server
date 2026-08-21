@@ -59,10 +59,20 @@ HANDLEF(ControlCenterEnter)
 	}
 	resp.slotgame.pictures = std::move(pictures);
 
-	// We have no reel definitions, so this is an empty JSON ARRAY rather than an
-	// empty string — picojson::parse would fail on "" and the client does not
-	// check the parse result before using it.
-	resp.slotgame.reels = "[]";
+	// The reel strips.  These are NOT optional: setReelInit @0x1A6DAD4 splits
+	// SlotgameInfo::getSlotReelPos() ("1,2,3") and calls
+	// SlotgameReelInfoList::getObject(id) then getSlotReelData() for each entry
+	// — and getObject returns NULL for an id it does not hold (@0x1305628),
+	// with no null check before the dereference.  Sending an empty list here
+	// crashes the Slots scene on open.
+	std::string reels{};
+	if (const auto& ec = glz::write_json(stored.reels, reels); ec)
+	{
+		const auto& glze = glz::format_error(ec, reels);
+		LOG_DEBUG << "Gme ControlCenterEnter: cannot serialize slot reels: " << glze;
+		co_return HandleResult::error("Serialization error", glze);
+	}
+	resp.slotgame.reels = std::move(reels);
 
 	std::string buffer{};
 	const auto& ec = glz::write_json(resp, buffer);

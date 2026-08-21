@@ -22,17 +22,41 @@ std::vector<BraveSlotPrize> g_prizes;
 
 /*!
 * Joins the reel stops the way h6smq0WE carries them.
+*
+* Emits the symbol's INDEX in the reel strip rather than its picture id, and
+* that choice is deliberate under uncertainty.  Nothing pins which the client
+* wants, but the two fail very differently: an index the client reads as a
+* picture id merely stops the reel on the wrong symbol, whereas a picture id
+* the client reads as an index runs off the end of a 14-entry strip - ids go up
+* to 82.  The cosmetic failure is the one to risk.
+*
+* The strip is the picture list in order, which is exactly how
+* deploy/system/brave_slots.json authors it, so position in `pictures` IS the
+* index.  A symbol missing from the list falls back to 0 rather than pushing an
+* out-of-range value onto the wire.
 */
 std::string joinReels(const std::vector<uint32_t>& reels)
 {
+	const auto& pictures = theServer()->cache().braveSlotsResp().pictures;
+
 	std::string out;
-	for (const auto reel : reels)
+	for (const auto symbol : reels)
 	{
+		uint32_t index = 0;
+		for (size_t i = 0; i < pictures.size(); ++i)
+		{
+			if (static_cast<uint32_t>(pictures[i].id) == symbol)
+			{
+				index = static_cast<uint32_t>(i);
+				break;
+			}
+		}
+
 		if (!out.empty())
 		{
 			out += ',';
 		}
-		out += std::to_string(reel);
+		out += std::to_string(index);
 	}
 	return out;
 }
