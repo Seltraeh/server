@@ -57,18 +57,23 @@ struct DailySpinState
 /*!
 * Spins allowed per day.
 *
-* The live game gave five, but only the first was free — spins 2..5 each
-* required watching a video ad.  There is no ad SDK offline (and the video-ad
-* feature flags are deliberately off, see feature_check.kdl), so the ad-funded
-* spins are unreachable and this is not five.
+* The live game gave five, but only the FIRST was free — spins 2..5 each
+* required watching a video ad.
 *
-* It is TWO rather than one because of the guaranteed-Gem rule: days 7, 14, 21
-* and 28 always pay a Gem on the first spin of the day, so at a limit of one
-* those days could ONLY ever pay a Gem and the other five prizes on them would
-* be unreachable for the whole cycle.  Two keeps the guarantee intact and still
-* lets the rest of the day's table come up.
+* ⚠ RAISING THIS DOES NOT GRANT MORE USABLE SPINS.  Tried at 2 on
+* 2026-08-21: the client renders the second spin as a "Bonus Ad Spin" button
+* and refuses it with "There are no ads currently available for your region".
+* The ad gate is the CLIENT's, and it does not consult this number — so a
+* limit above 1 only advertises a spin the player can never take.  It stays at
+* one, which is exactly the free-spin allowance a live player had.
+*
+* The consequence to accept: days 7 / 14 / 21 / 28 guarantee a Gem on the first
+* spin of the day, so on this server those days ALWAYS pay the Gem and their
+* other five prizes never come up.  That is faithful — a live player's free
+* spin on those days was the guaranteed Gem too, and the rest of the row was
+* only reachable by paying with an ad.
 */
-inline constexpr int32_t kDailySpinLimit = 2;
+inline constexpr int32_t kDailySpinLimit = 1;
 
 /*!
 * Loads the Daily Spin reward table from archive_root/daily_login.json.

@@ -106,15 +106,24 @@ drogon::Task<std::string> awardDailySpin(
 	const bool guaranteed = row->guaranteed_gem_on_first_spin && state.spinsUsed == 0;
 	const uint32_t space = guaranteed ? 0 : RandomUInt(0, kSpaces - 1);
 
-	// ⚠ ASSUMED NUMBERING.  XIvaD6Jp is the prize SELECTOR, and its id space is
-	// the client's — F_SG_DAILYLOGIN_REWARDS_MST is loaded through
-	// DataMstManager and is in none of our decoded MSTs (handbook §7.14).  Day-
-	// major sequential is the natural reading and is what this assumes; the
-	// day-7 row is the cheap way to confirm it, because every space there shows
-	// a Gem and nothing else in the cycle looks like that.  If display and
-	// award disagree, THIS LINE is the thing to change.
+	// XIvaD6Jp is the prize SELECTOR, and its id space is the client's —
+	// F_SG_DAILYLOGIN_REWARDS_MST is loaded through DataMstManager and is in
+	// none of our decoded MSTs (handbook §7.14), so this was recovered by
+	// observation rather than derived.
+	//
+	// CONFIRMED 2026-08-21 from two independent client readings:
+	//   id  1 on day 1 -> the client drew the BLUE space (200,000 Karma)
+	//   id 37 on day 7 -> the client drew the BLUE space (Almighty Imp Arton)
+	// Blue is index 1 in the wiki's column order, and both satisfy
+	//   id = (day - 1) * 6 + space
+	// with space 0-based.  An earlier revision added a further +1 here, which
+	// shifted every award one space anticlockwise of what the wheel showed:
+	// day 7 displayed the blue Imp while the server paid out red's Gem.
+	//
+	// Note this makes day 1's red space id 0, so the client's cycle is
+	// 0-based.  Do NOT "correct" that to 1.
 	state.lastRewardId =
-		static_cast<int32_t>((state.spinDay - 1) * static_cast<int32_t>(kSpaces) + space + 1);
+		static_cast<int32_t>((state.spinDay - 1) * static_cast<int32_t>(kSpaces) + space);
 
 	if (space >= row->spaces.size())
 	{
