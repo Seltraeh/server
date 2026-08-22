@@ -235,6 +235,21 @@ HANDLEF(UserInfo)
     resp.campaign_info.id = 1;
 
     resp.summoner_journal.user_id = identity.userId;
+    // ⚠ THE REWARDS TILE DOES NOT EXIST WHILE THIS IS 0.
+    // RewardsTopScene::loadMenuList @0xE42440 reads
+    // getSummonerJournalFlag() first thing and `cbz w0` past the whole tile
+    // (@0xE424B0), so the menu renders SEVEN tiles instead of eight — which
+    // is why the 32Gwida0 / 2y48D13d / 3a83iY3r probes never captured a
+    // body: the screen they belong to was unreachable.
+    //
+    // It has to ride here rather than on the Journal's own response, because
+    // loadMenuList needs it before the screen can be opened at all.
+    //
+    // Per the wiki the Journal is new-Summoner-only and disappears once every
+    // mission is done and every prize claimed, so 0 is the legitimate
+    // "finished" state and this is the switch that retires the feature.
+    resp.summoner_journal.journal_flag = 1;
+    resp.summoner_journal.points = 0;
     resp.signal_key.key = "5EdKHavF";
 
     // Vortex dungeon keys (eFU7Qtb0).  UserInfo is where the client first
