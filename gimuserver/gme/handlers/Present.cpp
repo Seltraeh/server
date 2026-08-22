@@ -1,6 +1,8 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/BraveSlots.hpp>
+
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
@@ -250,6 +252,24 @@ HANDLEF(PresentReceipt)
 					(co_await gme::addUserItem(
 						transaction, identity, itemId,
 						static_cast<uint32_t>(std::max(targetCnt, 1)))).nonEmpty();
+					granted = true;
+					break;
+				}
+				case 12:  // medal
+				{
+					// PresentCommon::createThumbnail @0x11C4900 dispatches
+					// present_type - 2 through a jump table, and 12 is the
+					// entry that reaches GameUtils::getMedalThumbnail with the
+					// target_id — so target_id is the MEDAL id, not an item id.
+					// (2 friend pts, 3 zel, 8 gem, 11 karma, 13 achievement pts,
+					// 16 colosseum pts, 17 summoner sp, 14 sub-dispatches on
+					// target_id for tickets/orbs.)
+					co_await transaction->execSqlCoro(
+						"INSERT INTO user_brave_medals (user_id, medal_id, possession)"
+						" VALUES ($1, $2, MIN($3, $4))"
+						" ON CONFLICT(user_id, medal_id) DO UPDATE SET"
+						" possession = MIN(possession + $3, $4);",
+						identity.userId, targetId, targetCnt, gme::kBraveSlotMedalCap);
 					granted = true;
 					break;
 				}

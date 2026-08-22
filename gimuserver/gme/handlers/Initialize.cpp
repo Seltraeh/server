@@ -3,6 +3,7 @@
 
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/BraveSlots.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
 
 HANDLEF(Initialize)
@@ -90,6 +91,11 @@ HANDLEF(Initialize)
 
 	if (!identity.userId.empty())
 	{
+		// The machine's only medal source on this server — Raid Battle, the
+		// live one, does not exist here.  Sits beside the daily spin because
+		// both roll over on the same UTC clock.
+		co_await gme::grantDailyBraveMedals(theDb(), identity);
+
 		const auto spin = co_await gme::loadDailySpin(theDb(), identity);
 		// ⚠ These two are REWARD IDS, not day numbers.  The client groups the
 		// wheel by the row this id belongs to, so a day number here draws a

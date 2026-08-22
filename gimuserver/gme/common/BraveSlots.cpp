@@ -8,6 +8,7 @@
 #include <gimuserver/utils/Random.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <vector>
 
 namespace gme
@@ -253,6 +254,41 @@ drogon::Task<std::vector<UserBraveMedalInfo>> loadBraveMedals(
 		});
 	}
 	co_return out;
+}
+
+drogon::Task<bool> grantDailyBraveMedals(
+	const db::Database database,
+	const UserIdentity& identity)
+{
+	// Midnight UTC, matching how the daily spin rolls over — one clock for
+	// everything that resets daily, so they cannot disagree at the boundary.
+	const auto now = static_cast<int64_t>(std::chrono::duration_cast<std::chrono::seconds>(
+		std::chrono::system_clock::now().time_since_epoch()).count());
+	const int64_t startOfDay = (now / 86400) * 86400;
+
+	// Keyed off the present box itself rather than a table of its own: the
+	// gift IS the record, so there is no second piece of state to drift.
+	const auto existing = co_await database->execSqlCoro(
+		"SELECT 1 FROM user_presents"
+		" WHERE user_id = $1 AND receipt_type = $2 AND present_date >= $3 LIMIT 1;",
+		identity.userId, kBraveSlotDailyGiftReceiptType, startOfDay);
+
+	if (!existing.empty())
+	{
+		co_return false;
+	}
+
+	// present_type 12 is the MEDAL type, with target_id naming which medal —
+	// PresentCommon::createThumbnail @0x11C4900 routes 12 to
+	// GameUtils::getMedalThumbnail(target_id).
+	co_await gme::addUserPresent(
+		database, identity,
+		12, kBraveSlotMedalId, kBraveSlotDailyGift,
+		kBraveSlotDailyGiftReceiptType, "Daily Raid Medals");
+
+	LOG_INFO << "BraveSlots: queued " << kBraveSlotDailyGift
+		<< " daily medal(s) for " << identity.userId;
+	co_return true;
 }
 
 drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
