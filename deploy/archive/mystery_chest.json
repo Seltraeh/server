@@ -4,7 +4,7 @@
         "name": "Bronze Mystery Chest",
         "text": "A modest chest left for new Summoners. Open it to see what Grand Gaia has spared you.",
         "rank": "1",
-        "skin": "1",
+        "skin": "chest_bronze_thum.png",
         "box_type": "1",
         "lifetime_days": 30,
         "rewards": [
@@ -27,7 +27,7 @@
         "name": "Silver Mystery Chest",
         "text": "Heavier than it looks. Something in here was meant for a Summoner further along than you.",
         "rank": "2",
-        "skin": "2",
+        "skin": "chest_silver_thum.png",
         "box_type": "1",
         "lifetime_days": 30,
         "rewards": [
@@ -56,7 +56,7 @@
         "name": "Gold Mystery Chest",
         "text": "The seal is unbroken. Whatever was put in here, nobody has come back for it.",
         "rank": "3",
-        "skin": "3",
+        "skin": "chest_gold_thum.png",
         "box_type": "1",
         "lifetime_days": 30,
         "rewards": [
@@ -74,9 +74,9 @@
             },
             {
                 "present_type": 6,
-                "target_id": 10313,
+                "target_id": 750005,
                 "target_cnt": 1,
-                "description": "Burst Emperor"
+                "description": "Omni Emperor"
             },
             {
                 "present_type": 5,

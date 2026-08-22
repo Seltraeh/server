@@ -298,6 +298,10 @@ HANDLEF(PresentReceipt)
 
 			resp.presents = co_await readPresents(transaction, identity.userId);
 			resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+			// Medals are a currency the HUD does not carry, so without this the
+			// Brave Slots counter keeps the pre-claim number until some later
+			// call happens to bring UserInfo along.
+			resp.medal_info = co_await gme::loadBraveMedals(transaction, identity);
 		}
 		catch (...)
 		{
