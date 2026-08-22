@@ -52,6 +52,54 @@
 // So the screen is three MSTs (the task catalogue, the milestone ladder and
 // the reward table) plus three per-user progress lists.
 //
+// ── Field maps, audited from each readParam (§6.20) ──────────────────────
+// Setter names are the binary's own, so these are evidence rather than
+// naming guesses.  `str` = the setter takes std::string, `int` = int.
+//
+//   T38aBiw3  SummonerJournalTaskMst        @0xE3363C   9 fields
+//     23DaiBpe str  task_id        s35idar9 str  name
+//     H2Dnbr39 str  instructions   v39D198k int  locked_level
+//     xNd38t2u int  unlock_type    Sd38Dbt3 int  unlock_value
+//     pG2n1A28 int  progress       w3Di51bp int  value
+//     da36ky2E int  target_screen
+//
+//   ad52Diwq  SummonerJournalMilestoneMst   @0xE33EE4   8 fields
+//     Uiwd28Vq str  milestone_id   S1B82FHK str  present_id
+//     TdDHf59J str  target_id      37moriMq str  target_param
+//     ZC0msu2L str  message        9hH0neGa int  points
+//     30Kw4WBa int  present_type   wJsB35iH int  target_cnt
+//
+//   b2DjiaXp  SummonerJournalRewardsMst     @0xE343AC   6 fields
+//     23DaiBpe str  task_id        S1B82FHK str  present_id
+//     37moriMq str  target_param   ZC0msu2L str  message
+//     30Kw4WBa int  present_type   wJsB35iH int  target_cnt
+//     ⚠ NO target_id, unlike MilestoneMst — the reward's target must come
+//     through present_id/target_param.  Do not assume the two MSTs share a
+//     shape just because they share most keys.
+//
+//   M3dw18eB  SummonerJournalUserInfo       @0xE33D18   3 fields
+//     h7eY3sAK str  user_id        9hH0neGa int  points
+//     da365dB8 int  summoner_journal_flag
+//
+//   da38tRai  SummonerJournalUserTaskInfo   @0xE33A40   5 fields
+//     h7eY3sAK str  user_id        23DaiBpe str  task_id
+//     pG2n1A28 int  progress       2g6adYig int  claim_status
+//     b638DwP8 int  is_available
+//
+//   r3D28bqW  SummonerJournalUserMilestoneInfo @0xE347A4  3 fields
+//     h7eY3sAK str  user_id        Uiwd28Vq str  milestone_id
+//     da365dB8 int  claim_status
+//
+// ✅ `30Kw4WBa` / `TdDHf59J` / `wJsB35iH` are the SHARED reward vocabulary
+// (present_type 3=zel, 6=unit, 8=gem, 4/5/7=item) already used by Mystery
+// Chest and the present system — so the journal's payouts reuse the existing
+// reward switch rather than needing a new one.
+//
+// ⚠ `da365dB8` means DIFFERENT things in two classes: summoner_journal_flag
+// on UserInfo, claim_status on UserMilestoneInfo.  The hashes are per field
+// NAME, not per field meaning, so a shared key is not a shared concept —
+// resolve each one against the class that owns it.
+//
 // ── Why these are PROBES ──────────────────────────────────────────────────
 // They log the body and answer `{}`.  An UNREGISTERED GroupId is rejected
 // before the dispatcher can decrypt, so the client shows "Unsupported
