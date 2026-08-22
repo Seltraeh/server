@@ -255,10 +255,10 @@ drogon::Task<std::vector<UserBraveMedalInfo>> loadBraveMedals(
 	co_return out;
 }
 
-drogon::Task<bool> playBraveSlot(
+drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 	const db::Database database,
 	const UserIdentity& identity,
-	SlotgameResultInfo& result)
+	const int32_t drawCount)
 {
 	// Seeds on first sight, so a player who goes straight to the machine can
 	// still pull.
@@ -268,23 +268,35 @@ drogon::Task<bool> playBraveSlot(
 		[](const UserBraveMedalInfo& m) { return m.medal_id == std::stoi(kBraveSlotMedalId); });
 	const int32_t balance = held == medals.end() ? 0 : held->possession;
 
-	if (balance < kBraveSlotPullCost)
+	std::vector<SlotgameResultInfo> results;
+
+	// The count is clamped rather than trusted.  calcSeqCount @0x1A70998
+	// already caps it client-side, but d04gRmkE arrives over the wire and a
+	// bad one would spend medals the player does not have and roll a hundred
+	// prizes.  Affordability decides the rest, matching the client's own
+	// walk-down.
+	const int32_t affordable = kBraveSlotPullCost > 0 ? balance / kBraveSlotPullCost : 0;
+	const int32_t pulls = std::min({std::max(drawCount, 1), kBraveSlotMaxPulls, affordable});
+
+	if (pulls <= 0)
 	{
 		// The client checks this too (RANDALL_SLOTGAME_MEDAL_ERROR), so this is
 		// the backstop rather than the primary gate.
 		LOG_WARN << "BraveSlots: " << identity.userId << " has " << balance
 			<< " medal(s), needs " << kBraveSlotPullCost;
-		co_return false;
+		co_return results;
 	}
 
-	const auto* prize = rollPrize();
-	if (prize == nullptr)
+	if (pulls < drawCount)
 	{
-		LOG_WARN << "BraveSlots: payout table is empty, nothing to roll";
-		co_return false;
+		LOG_WARN << "BraveSlots: " << identity.userId << " asked for " << drawCount
+			<< " pull(s), playing " << pulls
+			<< " (balance " << balance << ", max " << kBraveSlotMaxPulls << ")";
 	}
 
-	const int32_t remaining = balance - kBraveSlotPullCost;
+	// Charged up front, in one write, so a throwing award cannot leave the
+	// player having rolled for free.
+	const int32_t remaining = balance - (pulls * kBraveSlotPullCost);
 	co_await db::DatabaseInterface::update(
 		database,
 		"user_brave_medals",
@@ -294,45 +306,98 @@ drogon::Task<bool> playBraveSlot(
 			db::Lookup("medal_id", kBraveSlotMedalId),
 		});
 
-	// Pay out through the shared vocabulary; present_type 0 means this outcome
-	// pays nothing, which is a legitimate result rather than an error.
 	int64_t zel = 0, gems = 0;
-	switch (prize->present_type)
+	for (int32_t pull = 0; pull < pulls; ++pull)
 	{
-	case 0:
-		break;
-	case 3:
-		zel += prize->target_cnt;
-		break;
-	case 8:
-		gems += prize->target_cnt;
-		break;
-	case 6:
-	{
-		const auto& unitMst = theServer()->cache().unitMst();
-		const auto unit = std::find_if(unitMst.begin(), unitMst.end(),
-			[prize](const auto& u) { return u.id == prize->target_id; });
-		if (unit == unitMst.end())
+		const auto* prize = rollPrize();
+		if (prize == nullptr)
 		{
-			LOG_WARN << "BraveSlots: prize unit " << prize->target_id
-				<< " not in unit_mst — skipped";
+			LOG_WARN << "BraveSlots: payout table is empty, nothing to roll";
 			break;
 		}
-		for (uint32_t i = 0; i < prize->target_cnt; ++i)
+
+		// Pay out through the shared vocabulary; present_type 0 means this
+		// outcome pays nothing, which is a legitimate result rather than an
+		// error.
+		switch (prize->present_type)
 		{
-			co_await gme::addUserUnit(database, identity, *unit);
+		case 0:
+			break;
+		case 3:
+			zel += prize->target_cnt;
+			break;
+		case 8:
+			gems += prize->target_cnt;
+			break;
+		case 6:
+		{
+			const auto& unitMst = theServer()->cache().unitMst();
+			const auto unit = std::find_if(unitMst.begin(), unitMst.end(),
+				[prize](const auto& u) { return u.id == prize->target_id; });
+			if (unit == unitMst.end())
+			{
+				LOG_WARN << "BraveSlots: prize unit " << prize->target_id
+					<< " not in unit_mst — skipped";
+				break;
+			}
+			for (uint32_t i = 0; i < prize->target_cnt; ++i)
+			{
+				co_await gme::addUserUnit(database, identity, *unit);
+			}
+			break;
 		}
-		break;
-	}
-	case 4:
-	case 5:
-	case 7:
-		co_await gme::addUserItem(database, identity, prize->target_id, prize->target_cnt);
-		break;
-	default:
-		LOG_WARN << "BraveSlots: present_type " << prize->present_type
-			<< " not supported — skipped";
-		break;
+		case 4:
+		case 5:
+		case 7:
+			co_await gme::addUserItem(database, identity, prize->target_id, prize->target_cnt);
+			break;
+		default:
+			LOG_WARN << "BraveSlots: present_type " << prize->present_type
+				<< " not supported — skipped";
+			break;
+		}
+
+		// Derived rather than stored, so the shown prize cannot drift from the
+		// awarded one.  loadBraveSlotArchive has already dropped any row this
+		// would map to 0, so the value here is always renderable.
+		results.push_back(SlotgameResultInfo{
+			.prize_type = popupPrizeType(prize->present_type),
+			// ⚠ TWO fields, '@'-separated: "<targetId>@<count>".  NOT the
+			// description, and NOT the bare id either.
+			//
+			// createPrizeDrawInfo @0x1A75674 runs CommonUtils::split over this
+			// using RandallSlotScene::SLOT_PRIZE_DATA_DELIMITER (a global that
+			// resolves to "@"), looks element [0] up with
+			// UnitMstList/ItemMstList::getObject(STRING), and then builds the
+			// popup label as getItemName() + "x" + element [1] — the COUNT.
+			//
+			// Element [1] is read at [vector + 0x18] with NO bounds check
+			// (@0x1A75CE0), so a single-field value makes the client construct
+			// a std::string from whatever heap follows the vector and memcpy
+			// from a wild pointer.  That is a CORRUPTION bug, not a clean
+			// crash: it depends on what happens to sit past the allocation, so
+			// the SAME payload rendered fine once and took the client down
+			// twice.
+			//
+			// Same shape as b5yeVr61 ("<medalId>@<cost>") — when a slot field
+			// looks like a lone id, check whether it is really an @-pair.
+			.prize_data = std::to_string(prize->target_id) + "@"
+				+ std::to_string(prize->target_cnt),
+			.prize_rank = prize->prize_rank,
+			.picture_pattern = joinSymbols(prize->reels),
+			.effect_sam = "",
+			.effect_type = "0",
+			.effect_param = "0",
+			.reel_stop_num = joinSymbols(prize->reels),
+			// Every entry carries the balance AFTER the whole action, because
+			// the client reads the counter off the result it is showing and a
+			// per-pull figure would count back down as the list is paged.
+			.medal_num = std::to_string(remaining),
+		});
+
+		LOG_INFO << "BraveSlots: " << identity.userId << " pulled '" << prize->key
+			<< "' (" << prize->description << "), reels "
+			<< results.back().reel_stop_num;
 	}
 
 	if (zel > 0 || gems > 0)
@@ -347,46 +412,9 @@ drogon::Task<bool> playBraveSlot(
 			identity.userId);
 	}
 
-	// Derived rather than stored, so the shown prize cannot drift from the
-	// awarded one.  loadBraveSlotArchive has already dropped any row this
-	// would map to 0, so the value here is always renderable.
-	const std::string prizeType = popupPrizeType(prize->present_type);
-
-	result = SlotgameResultInfo{
-		.prize_type = prizeType,
-		// ⚠ TWO fields, '@'-separated: "<targetId>@<count>".  NOT the
-		// description, and NOT the bare id either.
-		//
-		// createPrizeDrawInfo @0x1A75674 runs CommonUtils::split over this
-		// using RandallSlotScene::SLOT_PRIZE_DATA_DELIMITER (a global that
-		// resolves to "@"), looks element [0] up with
-		// UnitMstList/ItemMstList::getObject(STRING), and then builds the
-		// popup label as getItemName() + "x" + element [1] — the COUNT.
-		//
-		// Element [1] is read at [vector + 0x18] with NO bounds check
-		// (@0x1A75CE0), so a single-field value makes the client construct a
-		// std::string from whatever heap follows the vector and memcpy from a
-		// wild pointer.  That is a CORRUPTION bug, not a clean crash: it
-		// depends on what happens to sit past the allocation, so the SAME
-		// payload rendered fine once and took the client down twice.
-		//
-		// Same shape as b5yeVr61 ("<medalId>@<cost>") — when a slot field
-		// looks like a lone id, check whether it is really an @-pair.
-		.prize_data = std::to_string(prize->target_id) + "@"
-			+ std::to_string(prize->target_cnt),
-		.prize_rank = prize->prize_rank,
-		.picture_pattern = joinSymbols(prize->reels),
-		.effect_sam = "",
-		.effect_type = "0",
-		.effect_param = "0",
-		.reel_stop_num = joinSymbols(prize->reels),
-		.medal_num = std::to_string(remaining),
-	};
-
-	LOG_INFO << "BraveSlots: " << identity.userId << " pulled '" << prize->key
-		<< "' (" << prize->description << "), reels " << result.reel_stop_num
-		<< ", " << remaining << " medal(s) left";
-	co_return true;
+	LOG_INFO << "BraveSlots: " << identity.userId << " played " << results.size()
+		<< " pull(s), " << remaining << " medal(s) left";
+	co_return results;
 }
 
 } // namespace gme

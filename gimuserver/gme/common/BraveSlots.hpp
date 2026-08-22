@@ -56,21 +56,38 @@ drogon::Task<std::vector<UserBraveMedalInfo>> loadBraveMedals(
 	const UserIdentity& identity);
 
 /*!
-* Plays one pull: spends a medal, picks an outcome, and awards it.
+* The most pulls one SlotAction may play.
+*
+* `RandallSlotScene::SLOT_SEQUENCE_MAX` in .rodata @0x23652B0, read by
+* `RandallSlotActionScene::calcSeqCount` @0x1A70998 — which takes
+* min(SLOT_SEQUENCE_MAX, requested) and then walks it DOWN until the balance
+* covers cost*N.  The client therefore never legitimately asks for more than
+* this, and the value is mirrored rather than invented.
+*/
+inline constexpr int32_t kBraveSlotMaxPulls = 10;
+
+/*!
+* Plays `drawCount` pulls: spends a medal each, picks an outcome, awards it.
 *
 * The SERVER decides the outcome and the client animates to it, so the reel
 * positions in the reply are not decoration — they are what the machine stops
 * on.
 *
+* Every pull gets its own entry, because the client renders a multi-pull as a
+* LIST: `RandallSlotResultListScene::setPrizeList` @0x1A72B44 loops over
+* `SlotgameResultInfoList::getCount()`.  Returning one entry for a ten-medal
+* pull would show one prize and silently pocket the rest.
+*
 * @param database Database client or transaction to use.
 * @param identity Resolved caller.
-* @param result Filled with the outcome for the s8r5M6wI reply.
-* @return false when the player cannot afford the pull, in which case nothing
-*         is spent and nothing is awarded.
+* @param drawCount Pulls requested (d04gRmkE); clamped to what is affordable
+*        and to kBraveSlotMaxPulls.
+* @return One result per pull actually played, empty when none were
+*         affordable — in which case nothing is spent and nothing is awarded.
 */
-drogon::Task<bool> playBraveSlot(
+drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 	db::Database database,
 	const UserIdentity& identity,
-	SlotgameResultInfo& result);
+	int32_t drawCount);
 
 } // namespace gme

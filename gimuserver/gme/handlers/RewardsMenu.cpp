@@ -88,12 +88,18 @@ HANDLEF(SlotAction)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
+	// d04gRmkE is the number of medals the player fed in, chosen on the
+	// machine itself: calcSeqCount @0x1A70998 takes min(SLOT_SEQUENCE_MAX = 10,
+	// requested) and walks it down until the balance covers cost*N.  Ignoring
+	// it charged one medal and paid one prize no matter what was selected.
+	//
+	// The client renders the multi-pull as a LIST — setPrizeList @0x1A72B44
+	// loops over SlotgameResultInfoList::getCount() — so it wants one entry
+	// per pull, not one entry for the batch.
+	const int32_t drawCount = req.entries.empty() ? 1 : req.entries.front().draw_cnt;
+
 	SlotActionResp resp{};
-	SlotgameResultInfo result{};
-	if (co_await gme::playBraveSlot(theDb(), identity, result))
-	{
-		resp.results.push_back(std::move(result));
-	}
+	resp.results = co_await gme::playBraveSlot(theDb(), identity, drawCount);
 	// A refused pull answers with the balance and header rather than an error,
 	// so the machine resynchronises instead of stranding the player.  The
 	// client gates on the medal count itself (RANDALL_SLOTGAME_MEDAL_ERROR), so
