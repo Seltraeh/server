@@ -6,12 +6,14 @@
             "name": "Squad Up",
             "instructions": "Form a squad with 5 units",
             "points": 5,
-            "value": 5,
+            "target": 5,
+            "target_screen": 0,
             "tracked": false,
             "present_type": 3,
             "target_id": 0,
             "target_cnt": 1000,
-            "reward_note": "1000x Zel"
+            "reward_note": "1000x Zel",
+            "substituted": false
         },
         {
             "task_id": "2",
@@ -19,12 +21,14 @@
             "name": "Add Favorite",
             "instructions": "Add Favorite to your starter hero",
             "points": 5,
-            "value": 1,
+            "target": 1,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750006,
             "target_cnt": 1,
-            "reward_note": "1 Metal Ghost"
+            "reward_note": "1 Metal Ghost",
+            "substituted": true
         },
         {
             "task_id": "3",
@@ -32,12 +36,14 @@
             "name": "Unit Fusion",
             "instructions": "10 Fusions performed",
             "points": 5,
-            "value": 10,
+            "target": 10,
+            "target_screen": 0,
             "tracked": false,
             "present_type": 11,
             "target_id": 0,
             "target_cnt": 1000,
-            "reward_note": "1000x Karma"
+            "reward_note": "1000x Karma",
+            "substituted": false
         },
         {
             "task_id": "4",
@@ -45,12 +51,14 @@
             "name": "Sell Units",
             "instructions": "Sell your excess units to earn 2000 zel",
             "points": 10,
-            "value": 2000,
+            "target": 2000,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750006,
             "target_cnt": 1,
-            "reward_note": "1 Metal Ghost"
+            "reward_note": "1 Metal Ghost",
+            "substituted": true
         },
         {
             "task_id": "5",
@@ -58,12 +66,14 @@
             "name": "Zel Harvest",
             "instructions": "Harvest 1000 zel in town",
             "points": 10,
-            "value": 1000,
+            "target": 1000,
+            "target_screen": 0,
             "tracked": false,
             "present_type": 3,
             "target_id": 0,
             "target_cnt": 5000,
-            "reward_note": "5000x Zel"
+            "reward_note": "5000x Zel",
+            "substituted": false
         },
         {
             "task_id": "6",
@@ -71,12 +81,14 @@
             "name": "Karma Harvest",
             "instructions": "Harvest 1000 karma in town",
             "points": 5,
-            "value": 1000,
+            "target": 1000,
+            "target_screen": 0,
             "tracked": false,
             "present_type": 11,
             "target_id": 0,
             "target_cnt": 5000,
-            "reward_note": "5000x Karma"
+            "reward_note": "5000x Karma",
+            "substituted": false
         },
         {
             "task_id": "7",
@@ -84,12 +96,14 @@
             "name": "Green Grass Harvest",
             "instructions": "Harvest 10 Green Grass in town",
             "points": 5,
-            "value": 10,
+            "target": 10,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "20x Green Grass"
+            "present_type": 5,
+            "target_id": 800901,
+            "target_cnt": 20,
+            "reward_note": "20x Green Grass",
+            "substituted": true
         },
         {
             "task_id": "8",
@@ -97,12 +111,14 @@
             "name": "Green Drop Harvest",
             "instructions": "Harvest 10 Green Drops in town",
             "points": 5,
-            "value": 10,
+            "target": 10,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "20x Green Drop"
+            "present_type": 5,
+            "target_id": 800901,
+            "target_cnt": 20,
+            "reward_note": "20x Green Drop",
+            "substituted": true
         },
         {
             "task_id": "9",
@@ -110,12 +126,14 @@
             "name": "Friendship",
             "instructions": "Add 10 friends in your friend list",
             "points": 20,
-            "value": 10,
+            "target": 10,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
+            "present_type": 11,
             "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "300x Honor Points"
+            "target_cnt": 300,
+            "reward_note": "300x Honor Points",
+            "substituted": true
         },
         {
             "task_id": "10",
@@ -123,12 +141,14 @@
             "name": "Clear Main Quests I",
             "instructions": "Clear 50 quests",
             "points": 20,
-            "value": 50,
+            "target": 50,
+            "target_screen": 3,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 5,
+            "target_id": 800908,
             "target_cnt": 1,
-            "reward_note": "1 Summon Ticket"
+            "reward_note": "1 Summon Ticket",
+            "substituted": true
         },
         {
             "task_id": "11",
@@ -136,12 +156,14 @@
             "name": "Synthesis I",
             "instructions": "Synthesize 10 Cures",
             "points": 10,
-            "value": 10,
+            "target": 10,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "3x High Cure"
+            "present_type": 5,
+            "target_id": 800907,
+            "target_cnt": 3,
+            "reward_note": "3x High Cure",
+            "substituted": true
         },
         {
             "task_id": "12",
@@ -149,12 +171,14 @@
             "name": "Use Consumable I",
             "instructions": "Use 5 Cures in battle",
             "points": 10,
-            "value": 5,
+            "target": 5,
+            "target_screen": 0,
             "tracked": false,
             "present_type": 3,
             "target_id": 0,
             "target_cnt": 2000,
-            "reward_note": "2000x Zel"
+            "reward_note": "2000x Zel",
+            "substituted": false
         },
         {
             "task_id": "13",
@@ -162,12 +186,14 @@
             "name": "Evolution",
             "instructions": "Evolve 1 unit",
             "points": 25,
-            "value": 1,
+            "target": 1,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750005,
             "target_cnt": 1,
-            "reward_note": "1 Metal King"
+            "reward_note": "1 Metal King",
+            "substituted": true
         },
         {
             "task_id": "14",
@@ -175,12 +201,14 @@
             "name": "Upgrade Forest",
             "instructions": "Upgrade Forest to level 5",
             "points": 10,
-            "value": 5,
+            "target": 5,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "5x Yellow Grass"
+            "present_type": 5,
+            "target_id": 800901,
+            "target_cnt": 5,
+            "reward_note": "5x Yellow Grass",
+            "substituted": true
         },
         {
             "task_id": "15",
@@ -188,12 +216,14 @@
             "name": "Upgrade Farm",
             "instructions": "Upgrade Farm to level 5",
             "points": 10,
-            "value": 5,
+            "target": 5,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "5x Green Claw"
+            "present_type": 5,
+            "target_id": 800901,
+            "target_cnt": 5,
+            "reward_note": "5x Green Claw",
+            "substituted": true
         },
         {
             "task_id": "16",
@@ -201,12 +231,14 @@
             "name": "Upgrade River",
             "instructions": "Upgrade River to level 5",
             "points": 10,
-            "value": 5,
+            "target": 5,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "5x Fujin's Eye"
+            "present_type": 5,
+            "target_id": 800901,
+            "target_cnt": 5,
+            "reward_note": "5x Fujin's Eye",
+            "substituted": true
         },
         {
             "task_id": "17",
@@ -214,12 +246,14 @@
             "name": "Upgrade Mountain",
             "instructions": "Upgrade Mountain to level 5",
             "points": 10,
-            "value": 5,
+            "target": 5,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "10x Blue Claw"
+            "present_type": 5,
+            "target_id": 800901,
+            "target_cnt": 10,
+            "reward_note": "10x Blue Claw",
+            "substituted": true
         },
         {
             "task_id": "18",
@@ -227,12 +261,14 @@
             "name": "Forge Sphere I",
             "instructions": "Forge 1 Famous Blade",
             "points": 5,
-            "value": 1,
+            "target": 1,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750006,
             "target_cnt": 1,
-            "reward_note": "1 Jewel Ghost"
+            "reward_note": "1 Jewel Ghost",
+            "substituted": true
         },
         {
             "task_id": "19",
@@ -240,12 +276,14 @@
             "name": "Equip Sphere",
             "instructions": "Equip 1 sphere",
             "points": 15,
-            "value": 1,
+            "target": 1,
+            "target_screen": 0,
             "tracked": false,
             "present_type": 11,
             "target_id": 0,
             "target_cnt": 5000,
-            "reward_note": "5000x Karma"
+            "reward_note": "5000x Karma",
+            "substituted": false
         },
         {
             "task_id": "20",
@@ -253,12 +291,14 @@
             "name": "Upgrade Facility I",
             "instructions": "Upgrade Synthesis House to level 8",
             "points": 15,
-            "value": 8,
+            "target": 8,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 5,
+            "target_id": 800907,
             "target_cnt": 1,
-            "reward_note": "1 Divine Light"
+            "reward_note": "1 Divine Light",
+            "substituted": true
         },
         {
             "task_id": "21",
@@ -266,12 +306,14 @@
             "name": "Friend gifts",
             "instructions": "Receive 3 honor drops from friends",
             "points": 20,
-            "value": 3,
+            "target": 3,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 5,
+            "target_id": 800907,
             "target_cnt": 1,
-            "reward_note": "1 Yomi Feather"
+            "reward_note": "1 Yomi Feather",
+            "substituted": true
         },
         {
             "task_id": "22",
@@ -279,12 +321,14 @@
             "name": "Synthesis II",
             "instructions": "Synthesize 1 Revive",
             "points": 15,
-            "value": 1,
+            "target": 1,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 5,
+            "target_id": 800907,
             "target_cnt": 1,
-            "reward_note": "1 Crescent Dew"
+            "reward_note": "1 Crescent Dew",
+            "substituted": true
         },
         {
             "task_id": "23",
@@ -292,12 +336,14 @@
             "name": "Use Consumable II",
             "instructions": "Use 1 Revive potion in any battle",
             "points": 15,
-            "value": 1,
+            "target": 1,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750005,
             "target_cnt": 1,
-            "reward_note": "1 Jewel King"
+            "reward_note": "1 Jewel King",
+            "substituted": true
         },
         {
             "task_id": "24",
@@ -305,12 +351,14 @@
             "name": "Upgrade Facility II",
             "instructions": "Upgrade Sphere house to level 6",
             "points": 15,
-            "value": 6,
+            "target": 6,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "5x Rhau Feather"
+            "present_type": 5,
+            "target_id": 800901,
+            "target_cnt": 5,
+            "reward_note": "5x Rhau Feather",
+            "substituted": true
         },
         {
             "task_id": "25",
@@ -318,12 +366,14 @@
             "name": "Forge Sphere II",
             "instructions": "Forge 2 Holy Blades",
             "points": 15,
-            "value": 2,
+            "target": 2,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "2x Blood Pelt"
+            "present_type": 5,
+            "target_id": 800907,
+            "target_cnt": 2,
+            "reward_note": "2x Blood Pelt",
+            "substituted": true
         },
         {
             "task_id": "26",
@@ -331,12 +381,14 @@
             "name": "Upgrade Facility III",
             "instructions": "Upgrade Sphere house to level 12",
             "points": 25,
-            "value": 12,
+            "target": 12,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
-            "target_cnt": 1,
-            "reward_note": "2x Guardian Eye"
+            "present_type": 5,
+            "target_id": 800907,
+            "target_cnt": 2,
+            "reward_note": "2x Guardian Eye",
+            "substituted": true
         },
         {
             "task_id": "27",
@@ -344,12 +396,14 @@
             "name": "Forge Sphere III",
             "instructions": "Forge 1 Muramasa",
             "points": 25,
-            "value": 1,
+            "target": 1,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750003,
             "target_cnt": 1,
-            "reward_note": "1 Sphere Frog"
+            "reward_note": "1 Sphere Frog",
+            "substituted": true
         },
         {
             "task_id": "28",
@@ -357,12 +411,14 @@
             "name": "Clear Main Quests II",
             "instructions": "Clear 150 quests",
             "points": 80,
-            "value": 150,
+            "target": 150,
+            "target_screen": 3,
             "tracked": false,
             "present_type": 8,
             "target_id": 0,
             "target_cnt": 1,
-            "reward_note": "1 Gem"
+            "reward_note": "1 Gem",
+            "substituted": false
         },
         {
             "task_id": "29",
@@ -370,12 +426,14 @@
             "name": "Metal Parade",
             "instructions": "Clear any quest in Metal Parade 3 times",
             "points": 10,
-            "value": 3,
+            "target": 3,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750004,
             "target_cnt": 1,
-            "reward_note": "1 Metal God"
+            "reward_note": "1 Metal God",
+            "substituted": true
         },
         {
             "task_id": "30",
@@ -383,12 +441,14 @@
             "name": "Jewel Parade",
             "instructions": "Clear Jewel Parade 3 times",
             "points": 10,
-            "value": 3,
+            "target": 3,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750006,
             "target_cnt": 1,
-            "reward_note": "1 Soul Bracer"
+            "reward_note": "1 Soul Bracer",
+            "substituted": true
         },
         {
             "task_id": "31",
@@ -396,12 +456,14 @@
             "name": "Metal Key Collection",
             "instructions": "Collect metal keys 3 times from Randall",
             "points": 15,
-            "value": 3,
+            "target": 3,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 5,
+            "target_id": 800908,
             "target_cnt": 1,
-            "reward_note": "1 Metal Key"
+            "reward_note": "1 Metal Key",
+            "substituted": true
         },
         {
             "task_id": "32",
@@ -409,12 +471,14 @@
             "name": "Jewel Key Collection",
             "instructions": "Collect jewel keys 3 times from Randall",
             "points": 15,
-            "value": 3,
+            "target": 3,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 5,
+            "target_id": 800908,
             "target_cnt": 1,
-            "reward_note": "1 Jewel Key"
+            "reward_note": "1 Jewel Key",
+            "substituted": true
         },
         {
             "task_id": "33",
@@ -422,12 +486,14 @@
             "name": "Daily Vortex Mission",
             "instructions": "Clear any daily vortex quests 5 times",
             "points": 25,
-            "value": 5,
+            "target": 5,
+            "target_screen": 4,
             "tracked": false,
             "present_type": 8,
             "target_id": 0,
             "target_cnt": 1,
-            "reward_note": "1 Gem"
+            "reward_note": "1 Gem",
+            "substituted": false
         },
         {
             "task_id": "34",
@@ -435,12 +501,14 @@
             "name": "Arena",
             "instructions": "Reach Novice Rank in Arena",
             "points": 20,
-            "value": 1,
+            "target": 1,
+            "target_screen": 5,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750003,
             "target_cnt": 1,
-            "reward_note": "1 Burst Frog"
+            "reward_note": "1 Burst Frog",
+            "substituted": true
         },
         {
             "task_id": "35",
@@ -448,12 +516,14 @@
             "name": "Vortex Special Events",
             "instructions": "Clear 5 quests in any special dungeons",
             "points": 25,
-            "value": 5,
+            "target": 5,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750004,
             "target_cnt": 1,
-            "reward_note": "1 Metal God"
+            "reward_note": "1 Metal God",
+            "substituted": true
         },
         {
             "task_id": "36",
@@ -461,12 +531,14 @@
             "name": "Randall Missions",
             "instructions": "Obtain a total of 2000 or more Merit Points",
             "points": 25,
-            "value": 2000,
+            "target": 2000,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750006,
             "target_cnt": 1,
-            "reward_note": "1 Miracle Bulb"
+            "reward_note": "1 Miracle Bulb",
+            "substituted": true
         },
         {
             "task_id": "37",
@@ -474,12 +546,14 @@
             "name": "Super Metal Parade",
             "instructions": "Clear Super Metal Parade 3 times",
             "points": 25,
-            "value": 3,
+            "target": 3,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750003,
             "target_cnt": 1,
-            "reward_note": "1 Burst Frog"
+            "reward_note": "1 Burst Frog",
+            "substituted": true
         },
         {
             "task_id": "38",
@@ -487,12 +561,14 @@
             "name": "Super Jewel Parade",
             "instructions": "Clear Super Jewel Parade 3 times",
             "points": 25,
-            "value": 3,
+            "target": 3,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750003,
             "target_cnt": 1,
-            "reward_note": "1 Burst Frog"
+            "reward_note": "1 Burst Frog",
+            "substituted": true
         },
         {
             "task_id": "39",
@@ -500,12 +576,14 @@
             "name": "Garden of Imps",
             "instructions": "Clear Garden of Imps 3 times",
             "points": 75,
-            "value": 3,
+            "target": 3,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750004,
             "target_cnt": 1,
-            "reward_note": "1 Almighty Imp Arton"
+            "reward_note": "1 Almighty Imp Arton",
+            "substituted": true
         },
         {
             "task_id": "40",
@@ -513,12 +591,14 @@
             "name": "Mega Metal Parade",
             "instructions": "Clear Mega Metal Parade 3 times",
             "points": 30,
-            "value": 3,
+            "target": 3,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750003,
             "target_cnt": 1,
-            "reward_note": "1 Burst Frog"
+            "reward_note": "1 Burst Frog",
+            "substituted": true
         },
         {
             "task_id": "41",
@@ -526,12 +606,14 @@
             "name": "Mega Jewel Parade",
             "instructions": "Clear Mega Jewel Parade 3 times",
             "points": 30,
-            "value": 3,
+            "target": 3,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750003,
             "target_cnt": 1,
-            "reward_note": "1 Burst Frog"
+            "reward_note": "1 Burst Frog",
+            "substituted": true
         },
         {
             "task_id": "42",
@@ -539,12 +621,14 @@
             "name": "Summoners' Research Lab",
             "instructions": "Clear Trial No. 001",
             "points": 60,
-            "value": 1,
+            "target": 1,
+            "target_screen": 4,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750006,
             "target_cnt": 1,
-            "reward_note": "1 Water Crystal"
+            "reward_note": "1 Water Crystal",
+            "substituted": true
         },
         {
             "task_id": "43",
@@ -552,12 +636,14 @@
             "name": "Grand Gaia Chronicles",
             "instructions": "Clear 5 quests in Crusade of Six Heroes",
             "points": 65,
-            "value": 5,
+            "target": 5,
+            "target_screen": 3,
             "tracked": false,
             "present_type": 8,
             "target_id": 0,
             "target_cnt": 1,
-            "reward_note": "1 Gem"
+            "reward_note": "1 Gem",
+            "substituted": false
         },
         {
             "task_id": "44",
@@ -565,12 +651,14 @@
             "name": "Brave Medal Slots",
             "instructions": "Spin the brave medal slots 10 times",
             "points": 60,
-            "value": 10,
+            "target": 10,
+            "target_screen": 0,
             "tracked": false,
-            "present_type": 0,
-            "target_id": 0,
+            "present_type": 6,
+            "target_id": 750004,
             "target_cnt": 1,
-            "reward_note": "1 Metal Mimic"
+            "reward_note": "1 Metal Mimic",
+            "substituted": true
         },
         {
             "task_id": "45",
@@ -578,12 +666,14 @@
             "name": "Raid Battle",
             "instructions": "Clear 5 Raid Missions",
             "points": 65,
-            "value": 5,
+            "target": 5,
+            "target_screen": 7,
             "tracked": false,
             "present_type": 8,
             "target_id": 0,
             "target_cnt": 1,
-            "reward_note": "1 Gem"
+            "reward_note": "1 Gem",
+            "substituted": false
         }
     ],
     "milestones": [
@@ -618,7 +708,7 @@
             "target_id": 750006,
             "target_cnt": 1,
             "reward_note": "Malice Jewel",
-            "substitution": "Malice Jewel is absent from unit_mst; Rainbow Crystal substituted"
+            "substitution": "absent from unit_mst; Rainbow Crystal substituted"
         },
         {
             "milestone_id": "5",
@@ -627,7 +717,7 @@
             "target_id": 750003,
             "target_cnt": 1,
             "reward_note": "Holy Ice Selena",
-            "substitution": "Holy Ice Selena is absent from unit_mst; Omni Frog substituted"
+            "substitution": "absent from unit_mst; Omni Frog substituted"
         }
     ]
 }

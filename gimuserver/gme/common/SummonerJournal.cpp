@@ -42,6 +42,7 @@ void loadSummonerJournalArchive(const std::string& archiveRoot)
 	uint32_t total = 0;
 	uint32_t untracked = 0;
 	uint32_t unpayable = 0;
+	uint32_t substituted = 0;
 	for (const auto& task : g_journal.tasks)
 	{
 		total += task.points;
@@ -52,6 +53,10 @@ void loadSummonerJournalArchive(const std::string& archiveRoot)
 		if (task.present_type == 0)
 		{
 			++unpayable;
+		}
+		if (task.substituted)
+		{
+			++substituted;
 		}
 	}
 
@@ -65,6 +70,12 @@ void loadSummonerJournalArchive(const std::string& archiveRoot)
 	{
 		LOG_WARN << "SummonerJournal: " << untracked << " of " << g_journal.tasks.size()
 			<< " mission(s) have no progress source yet — they display but cannot complete";
+	}
+	if (substituted > 0)
+	{
+		LOG_WARN << "SummonerJournal: " << substituted
+			<< " mission reward(s) are STAND-INS — the entity the wiki names does not"
+			   " exist here; reward_note records what each should have been";
 	}
 	if (unpayable > 0)
 	{
@@ -99,13 +110,21 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 			.locked_level = 0,
 			.unlock_type = 0,
 			.unlock_value = 0,
-			// The MST side of pG2n1A28 is the TARGET to reach; the user's
-			// actual progress travels on SummonerJournalUserTaskInfo.
-			.progress = static_cast<int32_t>(task.value),
-			.value = static_cast<int32_t>(task.value),
-			// GO-button destination.  Scene ids are unverified, so the button
-			// is left inert rather than sent somewhere wrong.
-			.target_screen = 0,
+			// ⚠ These two are NOT what their setter names suggest, and the
+			// first cut had them swapped.  Pinned from
+			// setSummonerJournalList: the [0/N] label is built from
+			// UserTaskInfo::getProgress() over TaskMst::getProgress()
+			// (@0xE3B4DC-E3B4E8), while SJ_TASK_POINT — the "Journal Point
+			// reward" line — is filled from TaskMst::getValue() (@0xE3BB4C).
+			//
+			// So progress is the TARGET and value is the POINT REWARD.
+			// Swapping them printed "Journal Point reward: 50" on a 20-point
+			// mission whose target was 50.
+			.progress = static_cast<int32_t>(task.target),
+			.value = static_cast<int32_t>(task.points),
+			// moveToTaskScene @0xE3DD00 takes 1..9 and returns for anything
+			// else, so an unset destination is an inert button, not a crash.
+			.target_screen = static_cast<int32_t>(task.target_screen),
 		});
 
 		resp.rewards.push_back(::SummonerJournalRewardsMst{
@@ -117,13 +136,22 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 			.target_cnt = static_cast<int32_t>(task.target_cnt),
 		});
 
-		// Every mission is offered and none is complete, because no counter
-		// feeds progress yet.
+		// Which BUTTON the row shows, from setSummonerJournalList
+		// @0xE3BCDC:
+		//
+		//     claim_status == 0                  -> receive_btn
+		//     claim_status != 0, is_available 0  -> locked
+		//     claim_status != 0, is_available !0 -> go_btn
+		//
+		// claim_status 0 therefore means "there is a reward waiting", NOT
+		// "unclaimed so far" — sending 0 everywhere put a Receive button on
+		// all 45 missions including ones at 0 progress.  Nothing can be
+		// complete yet, so every row is an in-progress GO.
 		resp.user_tasks.push_back(::SummonerJournalUserTaskInfo{
 			.user_id = identity.userId,
 			.task_id = task.task_id,
 			.progress = 0,
-			.claim_status = 0,
+			.claim_status = 1,
 			.is_available = 1,
 		});
 	}
