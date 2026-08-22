@@ -1,6 +1,9 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/SummonerJournal.hpp>
+
 // Summoner Journal — tag 0 on the Rewards menu, scene 101802.
 //
 // The LAST Rewards tile with no handler at all (see RewardsMenu.cpp for the
@@ -116,7 +119,24 @@
 HANDLEF(SummonerJournalInfo)
 {
 	LOG_INFO << "SummonerJournalInfo: " << json;
-	co_return HandleResult::success("{}");
+
+	SummonerJournalInfoReq req{};
+	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+	{
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
+	}
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity);
+
+	std::string buffer{};
+	if (const auto& ec = glz::write_json(resp, buffer); ec)
+	{
+		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+	}
+
+	co_return HandleResult::success(buffer);
 }
 
 HANDLEF(SummonerJournalTaskRewards)

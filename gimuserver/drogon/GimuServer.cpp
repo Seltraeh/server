@@ -5,6 +5,7 @@
 #include <gimuserver/archive/MissionArchiver.hpp>
 #include <gimuserver/archive/UnitArchiver.hpp>
 #include <gimuserver/gme/common/BraveSlots.hpp>
+#include <gimuserver/gme/common/SummonerJournal.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
 #include <gimuserver/gme/common/MysteryChest.hpp>
 
@@ -60,6 +61,7 @@ void GimuServer::initAndStart(const Json::Value& config)
 	gme::loadDailySpinArchive(server["archive_root"].asString());
 	gme::loadMysteryChestArchive(server["archive_root"].asString());
 	gme::loadBraveSlotArchive(server["archive_root"].asString());
+	gme::loadSummonerJournalArchive(server["archive_root"].asString());
 }
 
 void GimuServer::shutdown() {}
