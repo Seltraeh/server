@@ -1,0 +1,84 @@
+#include "App.hpp"
+#include "Handlers.hpp"
+
+// Summoner Journal — tag 0 on the Rewards menu, scene 101802.
+//
+// The LAST Rewards tile with no handler at all (see RewardsMenu.cpp for the
+// full tile/tag map).  `RewardsTopScene::loadMenuList` @0xE42440 lists it
+// first, and §7.14 missed it entirely.
+//
+// ── The three requests ────────────────────────────────────────────────────
+// Every GroupId and key below was read out of .rodata via each Request
+// class's getRequestID / getEncodeKey — 12-byte functions that return a
+// literal — exactly as §4.2 describes.  None is a guess.
+//
+//   32Gwida0 / 66B2pDki  SummonerJournalInfoRequest             @0xE37934
+//        identity + signal key only (createBody @0xE3794C is 44 bytes).
+//        "Give me the journal" — the screen's initial load.
+//
+//   2y48D13d / 7nm3Dqe9  SummonerJournalTaskRewardsRequest      @0xE37758
+//        identity + signal key + version tag, then group `da38tRai`
+//        carrying one param `23DaiBpe` (createBody @0xE377A8).  Claiming a
+//        single task's reward.
+//        ⚠ `da38tRai` is ALSO the dispatch key of
+//        SummonerJournalUserTaskInfoResponse — the request echoes the same
+//        group shape it will be answered in.
+//        `23DaiBpe` uses the std::string overload of JsonNode::addParam
+//        (@0xE37898), not the int one, so §3.4's "int setter + quoted wire
+//        value" ambiguity does NOT apply here — it really is a string.
+//
+//   3a83iY3r / 98Tw0ubW  SummonerJournalMilestoneRewardsRequest @0xE379D0
+//        identity + signal key only (createBody @0xE379E8 is 44 bytes).
+//        Carries NO milestone id, so this claims whatever is currently
+//        claimable rather than one named milestone — worth confirming
+//        against a real body before the handler assumes it.
+//
+// ── The six responses ─────────────────────────────────────────────────────
+// ALL SIX are in `GameResponseParser::getResponseObject` @0x1392568, so the
+// SERVER supplies every part of this screen — including the MSTs.  That is
+// the opposite of Daily Spin, whose rewards MST is absent from that table
+// and loaded locally by DataMstManager, and it is why the reward catalogue
+// there could not be authored server-side but this one can.
+//
+// Keys taken from the strcmp immediately preceding each constructor:
+//
+//   T38aBiw3  SummonerJournalTaskMstResponse            @0x139593C
+//   ad52Diwq  SummonerJournalMilestoneMstResponse       @0x1395918
+//   b2DjiaXp  SummonerJournalRewardsMstResponse         @0x1395960
+//   M3dw18eB  SummonerJournalUserInfoResponse           @0x1395984
+//   da38tRai  SummonerJournalUserTaskInfoResponse       @0x13959A8
+//   r3D28bqW  SummonerJournalUserMilestoneInfoResponse  @0x13959CC
+//
+// So the screen is three MSTs (the task catalogue, the milestone ladder and
+// the reward table) plus three per-user progress lists.
+//
+// ── Why these are PROBES ──────────────────────────────────────────────────
+// They log the body and answer `{}`.  An UNREGISTERED GroupId is rejected
+// before the dispatcher can decrypt, so the client shows "Unsupported
+// request" or dies with NO log written at all and we learn nothing (§4.2).
+// Registered, the next client launch prints the real body — which is how
+// every other tile on this menu was identified.
+//
+// ⚠ Do NOT populate the responses by guessing field names: each response's
+// readParam has to be audited IN FULL first (§6.20), because a field left at
+// 0/"" is not neutral on this client.  Slots proved that three separate
+// ways — an unchecked getObject, an unchecked split element [1], and a
+// layout pass that runs regardless of whether setPrizeData bailed.
+
+HANDLEF(SummonerJournalInfo)
+{
+	LOG_INFO << "SummonerJournalInfo: " << json;
+	co_return HandleResult::success("{}");
+}
+
+HANDLEF(SummonerJournalTaskRewards)
+{
+	LOG_INFO << "SummonerJournalTaskRewards: " << json;
+	co_return HandleResult::success("{}");
+}
+
+HANDLEF(SummonerJournalMilestoneRewards)
+{
+	LOG_INFO << "SummonerJournalMilestoneRewards: " << json;
+	co_return HandleResult::success("{}");
+}

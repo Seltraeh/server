@@ -159,4 +159,11 @@ namespace GmeHandlers
 	HANDLE(MysteryBoxList);
 	HANDLE(MysteryBoxClaim);
 	HANDLE(DailyLogin);
+
+	// Summoner Journal — tag 0, the last tile with no handler.  Probes: they
+	// log the body and answer {}.  See SummonerJournal.cpp for the request
+	// shapes and the six response classes the screen expects.
+	HANDLE(SummonerJournalInfo);
+	HANDLE(SummonerJournalTaskRewards);
+	HANDLE(SummonerJournalMilestoneRewards);
 }

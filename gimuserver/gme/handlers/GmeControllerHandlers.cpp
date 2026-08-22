@@ -181,6 +181,14 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("2paswUpR", MysteryBoxClaim, "kadRadU5");
 	REGISTER("4aClzokO", DailyLogin,      "stI81haQ");
 
+	// Summoner Journal (tag 0, scene 101802) — the last unbuilt tile.  Ids and
+	// keys read from getRequestID / getEncodeKey the same way; all three are
+	// probes until a real client body has been seen.  SummonerJournal.cpp
+	// carries the six response classes and their dispatch keys.
+	REGISTER("32Gwida0", SummonerJournalInfo,             "66B2pDki");
+	REGISTER("2y48D13d", SummonerJournalTaskRewards,      "7nm3Dqe9");
+	REGISTER("3a83iY3r", SummonerJournalMilestoneRewards, "98Tw0ubW");
+
 	}
 }
 
