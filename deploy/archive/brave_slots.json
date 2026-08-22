@@ -15,7 +15,7 @@
     },
     {
         "key": "triple_emperor",
-        "weight": 4,
+        "weight": 3,
         "reels": [
             3,
             3,
@@ -23,13 +23,41 @@
         ],
         "prize_rank": "3",
         "present_type": 6,
-        "target_id": 10313,
+        "target_id": 750005,
         "target_cnt": 1,
-        "description": "Burst Emperor"
+        "description": "Omni Emperor"
+    },
+    {
+        "key": "triple_god",
+        "weight": 5,
+        "reels": [
+            9,
+            9,
+            9
+        ],
+        "prize_rank": "3",
+        "present_type": 6,
+        "target_id": 750004,
+        "target_cnt": 1,
+        "description": "Burst Queen"
+    },
+    {
+        "key": "triple_allup",
+        "weight": 8,
+        "reels": [
+            7,
+            7,
+            7
+        ],
+        "prize_rank": "2",
+        "present_type": 6,
+        "target_id": 750006,
+        "target_cnt": 1,
+        "description": "Rainbow Crystal"
     },
     {
         "key": "triple_sphere",
-        "weight": 10,
+        "weight": 12,
         "reels": [
             18,
             18,
@@ -37,9 +65,9 @@
         ],
         "prize_rank": "2",
         "present_type": 5,
-        "target_id": 800907,
+        "target_id": 800908,
         "target_cnt": 2,
-        "description": "Elementum Tome x2"
+        "description": "Geminus Tome x2"
     },
     {
         "key": "triple_frog",
@@ -65,9 +93,9 @@
         ],
         "prize_rank": "1",
         "present_type": 5,
-        "target_id": 800901,
+        "target_id": 800907,
         "target_cnt": 5,
-        "description": "Ignis Shard x5"
+        "description": "Elementum Tome x5"
     },
     {
         "key": "double_medal",
@@ -78,14 +106,14 @@
             1
         ],
         "prize_rank": "1",
-        "present_type": 5,
-        "target_id": 800901,
-        "target_cnt": 2,
-        "description": "Ignis Shard x2"
+        "present_type": 12,
+        "target_id": 1,
+        "target_cnt": 1,
+        "description": "1 Raid Medal"
     },
     {
         "key": "consolation",
-        "weight": 170,
+        "weight": 156,
         "reels": [
             1,
             7,

@@ -129,8 +129,9 @@ std::string popupPrizeType(const uint32_t presentType)
 {
 	switch (presentType)
 	{
-	case 6:                 return "1";   // unit
-	case 4: case 5: case 7: return "2";   // item domains
+	case 6:                 return "1";   // unit   -> UnitMstList
+	case 4: case 5: case 7: return "2";   // items  -> ItemMstList
+	case 12:                return "5";   // medal  -> MedalMstList
 	default:                return "0";   // nothing the popup can draw
 	}
 }
@@ -343,6 +344,7 @@ drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 		});
 
 	int64_t zel = 0, gems = 0;
+	int32_t medalsWon = 0;
 	for (int32_t pull = 0; pull < pulls; ++pull)
 	{
 		const auto* prize = rollPrize();
@@ -386,6 +388,14 @@ drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 		case 5:
 		case 7:
 			co_await gme::addUserItem(database, identity, prize->target_id, prize->target_cnt);
+			break;
+		case 12:
+			// The medal symbol paying medals back — the wiki's "1 Raid Medal"
+			// row.  ACCUMULATED rather than written here: the medals were
+			// charged in one write before the loop, and `remaining` is what
+			// every result reports as the balance, so crediting mid-loop would
+			// leave each medal_num understating what the player actually holds.
+			medalsWon += static_cast<int32_t>(prize->target_cnt);
 			break;
 		default:
 			LOG_WARN << "BraveSlots: present_type " << prize->present_type
@@ -434,6 +444,22 @@ drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 		LOG_INFO << "BraveSlots: " << identity.userId << " pulled '" << prize->key
 			<< "' (" << prize->description << "), reels "
 			<< results.back().reel_stop_num;
+	}
+
+	if (medalsWon > 0)
+	{
+		co_await database->execSqlCoro(
+			"UPDATE user_brave_medals SET possession = MIN(possession + $1, $2)"
+			" WHERE user_id = $3 AND medal_id = $4;",
+			medalsWon, kBraveSlotMedalCap, identity.userId, kBraveSlotMedalId);
+
+		// Every entry reports the same post-action balance, so they all have to
+		// be corrected together once the winnings are known.
+		const auto finalBalance = std::min(remaining + medalsWon, kBraveSlotMedalCap);
+		for (auto& entry : results)
+		{
+			entry.medal_num = std::to_string(finalBalance);
+		}
 	}
 
 	if (zel > 0 || gems > 0)
