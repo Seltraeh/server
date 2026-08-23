@@ -231,14 +231,14 @@ std::string milestoneKey(const std::string& milestoneId)
 
 } // namespace
 
-drogon::Task<uint32_t> claimJournalMilestones(
+drogon::Task<std::vector<std::string>> claimJournalMilestones(
 	const db::Database database,
 	const UserIdentity& identity)
 {
+	std::vector<std::string> paidIds;
 	const auto journal = co_await buildSummonerJournal(database, identity);
-	const int32_t points = journal.user_info.points;
+	const int32_t points = journal.user_info.points;   // announces nothing
 
-	uint32_t paid = 0;
 	for (const auto& milestone : g_journal.milestones)
 	{
 		if (points < static_cast<int32_t>(milestone.points))
@@ -278,10 +278,10 @@ drogon::Task<uint32_t> claimJournalMilestones(
 
 		LOG_INFO << "SummonerJournal: " << identity.userId << " claimed milestone "
 			<< milestone.points << " (" << milestone.reward_note << ")";
-		++paid;
+		paidIds.push_back(milestone.milestone_id);
 	}
 
-	co_return paid;
+	co_return paidIds;
 }
 
 drogon::Task<bool> claimJournalTask(
@@ -362,7 +362,8 @@ drogon::Task<bool> claimJournalTask(
 
 drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	const db::Database database,
-	const UserIdentity& identity)
+	const UserIdentity& identity,
+	std::vector<std::string> announceMilestones)
 {
 	::SummonerJournalInfoResp resp{};
 
@@ -495,22 +496,22 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 			.target_cnt = static_cast<int32_t>(milestone.target_cnt),
 		});
 
-		// ⚠ claim_status 0 means "this reward is WAITING TO BE TAKEN", the
-		// same polarity as a task row — NOT "never claimed".  Sending 0 for
-		// all five rungs told the client every milestone was ready, so one
-		// task claim lit up all five chests and the screen announced the
-		// Journal complete at 60/1000.
+		// ⚠⚠ r3D28bqW IS AN ANNOUNCEMENT QUEUE, NOT A STATE LIST.
+		//
+		// SummonerJournalTopScene::checkForMilestoneReward @0xE3CC9C takes
+		// entry 0 of UserMilestoneInfoList, REMOVES it from the list
+		// (@0xE3CD3C), pops a "milestone reward received" window, and loops
+		// until the list is empty.  It never reads claim_status at all.
+		//
+		// So every entry sent here IS a popup the client will fire.  Sending
+		// the full ladder on every reply — which the name invites, since the
+		// sibling UserTaskInfo genuinely is a state list — announced five
+		// milestone rewards the player had not earned, declared the Journal
+		// complete at 60/1000, and crashed the client on the way through.
+		//
+		// It is EMPTY unless a milestone was just paid.
 		const auto msFound = stored.find(milestoneKey(milestone.milestone_id));
-		const bool msClaimed = msFound != stored.end() && msFound->second.second != 0;
-		const bool msEarned = earned >= static_cast<int32_t>(milestone.points);
-
-		resp.user_milestones.push_back(::SummonerJournalUserMilestoneInfo{
-			.user_id = identity.userId,
-			.milestone_id = milestone.milestone_id,
-			.claim_status = (msEarned && !msClaimed) ? 0 : 1,
-		});
-
-		if (!msClaimed)
+		if (msFound == stored.end() || msFound->second.second == 0)
 		{
 			allMilestonesClaimed = false;
 		}
@@ -520,6 +521,16 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	// Rewards TILE exist at all (loadMenuList reads the flag before this screen
 	// can be opened); this copy is what the screen itself reads for its points
 	// header.
+	// The only entries the client should ever see: rungs paid by THIS request.
+	for (const auto& id : announceMilestones)
+	{
+		resp.user_milestones.push_back(::SummonerJournalUserMilestoneInfo{
+			.user_id = identity.userId,
+			.milestone_id = id,
+			.claim_status = 1,
+		});
+	}
+
 	resp.user_info.user_id = identity.userId;
 	resp.user_info.points = earned;
 	// Per the wiki the Journal is new-Summoner-only and "will disappear" once

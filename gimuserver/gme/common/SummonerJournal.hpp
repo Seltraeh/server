@@ -6,6 +6,7 @@
 #include <drogon/drogon.h>
 
 #include <string>
+#include <vector>
 
 namespace gme
 {
@@ -86,6 +87,9 @@ drogon::Task<bool> claimJournalTask(
 /*!
 * Claims every milestone the caller's points have reached.
 *
+* Returns the ids that were paid, which the caller must hand back to
+* buildSummonerJournal — see `announceMilestones` there.
+*
 * The 3a83iY3r request carries NO milestone id (createBody @0xE379E8 is
 * identity + signal key only), so it means "give me everything I have earned"
 * rather than naming one rung.
@@ -94,7 +98,7 @@ drogon::Task<bool> claimJournalTask(
 * @param identity Resolved caller.
 * @return How many rungs were paid by THIS call.
 */
-drogon::Task<uint32_t> claimJournalMilestones(
+drogon::Task<std::vector<std::string>> claimJournalMilestones(
 	db::Database database,
 	const UserIdentity& identity);
 
@@ -115,6 +119,7 @@ drogon::Task<uint32_t> claimJournalMilestones(
 */
 drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	db::Database database,
-	const UserIdentity& identity);
+	const UserIdentity& identity,
+	std::vector<std::string> announceMilestones = {});
 
 } // namespace gme

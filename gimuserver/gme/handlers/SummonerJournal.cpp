@@ -194,10 +194,18 @@ HANDLEF(SummonerJournalTaskRewards)
 	LOG_INFO << "SummonerJournalTaskRewards: claimed " << claimed
 		<< " of " << requested << " requested";
 
+	// A task claim can push the total over a rung, so milestones are settled
+	// here too — and only the ones actually paid are announced.  Sending the
+	// whole ladder is what fired five unearned reward popups and crashed the
+	// client (see the queue note in buildSummonerJournal).
+	const auto paidMilestones = claimed > 0
+		? co_await gme::claimJournalMilestones(theDb(), identity)
+		: std::vector<std::string>{};
+
 	// Answered with the whole journal so the rows, the points header and the
 	// buttons all re-render from one reply — the same reason PresentReceipt
 	// returns the refreshed box.
-	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity);
+	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity, paidMilestones);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
@@ -224,9 +232,11 @@ HANDLEF(SummonerJournalMilestoneRewards)
 	// milestone id — so this claims everything the player has earned rather
 	// than one named rung.  Reuses SummonerJournalInfoReq for that reason.
 	const auto paid = co_await gme::claimJournalMilestones(theDb(), identity);
-	LOG_INFO << "SummonerJournalMilestoneRewards: paid " << paid << " milestone(s)";
+	LOG_INFO << "SummonerJournalMilestoneRewards: paid " << paid.size() << " milestone(s)";
 
-	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity);
+	// The ids just paid are handed back so the reply announces THOSE and only
+	// those — r3D28bqW is a popup queue, not a state list.
+	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity, paid);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
