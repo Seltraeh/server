@@ -39,11 +39,11 @@
             "target": 10,
             "target_screen": 1,
             "tracked": true,
-            "present_type": 3,
+            "present_type": 11,
             "target_id": 0,
             "target_cnt": 1000,
             "reward_note": "1000x Karma",
-            "substituted": true
+            "substituted": false
         },
         {
             "task_id": "4",
@@ -84,11 +84,11 @@
             "target": 1000,
             "target_screen": 2,
             "tracked": false,
-            "present_type": 3,
+            "present_type": 11,
             "target_id": 0,
             "target_cnt": 5000,
             "reward_note": "5000x Karma",
-            "substituted": true
+            "substituted": false
         },
         {
             "task_id": "7",
@@ -129,7 +129,7 @@
             "target": 10,
             "target_screen": 8,
             "tracked": false,
-            "present_type": 3,
+            "present_type": 11,
             "target_id": 0,
             "target_cnt": 300,
             "reward_note": "300x Honor Points",
@@ -279,11 +279,11 @@
             "target": 1,
             "target_screen": 1,
             "tracked": true,
-            "present_type": 3,
+            "present_type": 11,
             "target_id": 0,
             "target_cnt": 5000,
             "reward_note": "5000x Karma",
-            "substituted": true
+            "substituted": false
         },
         {
             "task_id": "20",
