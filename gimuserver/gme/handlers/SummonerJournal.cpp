@@ -151,20 +151,48 @@ HANDLEF(SummonerJournalTaskRewards)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	// The list is walked rather than assuming one entry, because "Receive All"
-	// is expected to claim every finished mission and the group is modelled as
-	// a list.  Whether the client batches them here or fires one request each
-	// is still unconfirmed — this copes with either.
+	// ⚠ "Receive All" sends ONE entry whose task_id is a COMMA-JOINED LIST:
+	//     {"da38tRai":[{"23DaiBpe":"1,11,14,19,2"}]}
+	// captured from a real client 2026-08-23.  A single Receive sends one id in
+	// the same field, so the field is always a list and sometimes has one
+	// element — treating it as a bare id made Receive All claim NOTHING, and
+	// the client then had to render five missions it believed it had just
+	// claimed still sitting there as claimable.
+	//
+	// The group is modelled as a list too, so both nestings are handled.
 	uint32_t claimed = 0;
+	uint32_t requested = 0;
 	for (const auto& entry : req.entries)
 	{
-		if (co_await gme::claimJournalTask(theDb(), identity, entry.task_id))
+		std::string current;
+		auto claimOne = [&]() -> drogon::Task<void> {
+			if (current.empty())
+			{
+				co_return;
+			}
+			++requested;
+			if (co_await gme::claimJournalTask(theDb(), identity, current))
+			{
+				++claimed;
+			}
+			current.clear();
+		};
+
+		for (const char ch : entry.task_id)
 		{
-			++claimed;
+			if (ch == ',')
+			{
+				co_await claimOne();
+			}
+			else if (ch != ' ')
+			{
+				current += ch;
+			}
 		}
+		co_await claimOne();
 	}
 	LOG_INFO << "SummonerJournalTaskRewards: claimed " << claimed
-		<< " of " << req.entries.size() << " requested";
+		<< " of " << requested << " requested";
 
 	// Answered with the whole journal so the rows, the points header and the
 	// buttons all re-render from one reply — the same reason PresentReceipt

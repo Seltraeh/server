@@ -255,6 +255,22 @@ HANDLEF(PresentReceipt)
 					granted = true;
 					break;
 				}
+				case 11:  // karma
+				{
+					// PresentCommon::createThumbnail @0x11C4900 maps
+					// present_type 11 to karma_thum.png, and the Journal pays
+					// karma for "Equip Sphere" and the Honor Points stand-in.
+					// Without this the present was displayable but not
+					// grantable - it would sit in the box logging "not
+					// supported" when Receive was pressed.
+					co_await transaction->execSqlCoro(
+						"UPDATE user_info SET karma = MIN(karma + $1, $2)"
+						" WHERE gumi_user_id = $3 AND id = $4;",
+						targetCnt, static_cast<int64_t>(99'999'999),
+						identity.gumiUserId, identity.userId);
+					granted = true;
+					break;
+				}
 				case 12:  // medal
 				{
 					// PresentCommon::createThumbnail @0x11C4900 dispatches

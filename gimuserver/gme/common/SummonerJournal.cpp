@@ -308,8 +308,19 @@ drogon::Task<bool> claimJournalTask(
 			db::Lookup("task_key", task->key),
 		})).data;
 
-	const int32_t progress = rows.empty() ? 0 : rows[0]["progress"].as<int32_t>();
 	const int32_t claimed = rows.empty() ? 0 : rows[0]["claimed"].as<int32_t>();
+
+	// ⚠ Must consider DERIVED progress too, not just the stored counter.
+	// Thirteen missions have no counter row at all - they are answered from
+	// account state - so reading the table alone reported 0 for every one of
+	// them, and Receive All claimed nothing while the screen showed five
+	// missions ready.  The display and the claim have to agree, so both go
+	// through the same merge.
+	const auto derived = co_await deriveProgress(database, identity);
+	const auto fromState = derived.find(task->key);
+	const int32_t progress = std::max(
+		rows.empty() ? 0 : rows[0]["progress"].as<int32_t>(),
+		fromState == derived.end() ? 0 : fromState->second);
 
 	if (progress < static_cast<int32_t>(task->target) || claimed != 0)
 	{
@@ -321,10 +332,17 @@ drogon::Task<bool> claimJournalTask(
 
 	// Marked BEFORE paying, like Mystery Chest: a reward that throws must not
 	// leave the mission claimable a second time.
+	//
+	// ⚠ INSERT-or-update, not a bare UPDATE.  A DERIVED mission has no counter
+	// row at all, so an UPDATE matched nothing, the claimed flag never stuck,
+	// and Receive All could be pressed repeatedly to mint the same five
+	// rewards over and over.  The row is created here precisely so the claim
+	// has somewhere to live.
 	co_await database->execSqlCoro(
-		"UPDATE user_journal_tasks SET claimed = 1"
-		" WHERE user_id = $1 AND task_key = $2;",
-		identity.userId, task->key);
+		"INSERT INTO user_journal_tasks (user_id, task_key, progress, claimed)"
+		" VALUES ($1, $2, $3, 1)"
+		" ON CONFLICT(user_id, task_key) DO UPDATE SET claimed = 1;",
+		identity.userId, task->key, progress);
 
 	// Straight to the present box, which is where the wiki says Journal
 	// rewards land: "a reward that is sent directly to your Gift Box".

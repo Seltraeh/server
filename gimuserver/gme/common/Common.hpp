@@ -82,13 +82,15 @@ inline drogon::Task<db::InterfaceResult<UserUnitInfo>> addUserUnit(
 	packet.user_unit_id = result.front<uint32_t>("user_unit_id");
 	packet.received_order = packet.user_unit_id;
 
-	co_await db::PacketInterfaceFor<UserUnitDictionary>::insert(
-		database,
-		"user_unit_dictionary",
-		UserUnitDictionary{
-			.user_id = identity.userId,
-			.unit_id = packet.unit_id,
-		});
+	// OR IGNORE: the dictionary is one row per SPECIES, keyed
+	// (user_id, unit_id), so obtaining a second copy of a unit you already own
+	// collides on the primary key.  A plain insert would throw and take the
+	// whole grant down with it — the dictionary is a record of what you have
+	// seen, and failing to re-record it must never cost you the unit.
+	co_await database->execSqlCoro(
+		"INSERT OR IGNORE INTO user_unit_dictionary (user_id, unit_id)"
+		" VALUES ($1, $2);",
+		identity.userId, packet.unit_id);
 
 	co_return db::InterfaceResult<UserUnitInfo>{
 		.data = std::move(packet),
@@ -391,18 +393,35 @@ inline drogon::Task<void> addUserUnit(
 		" base_rec, add_rec, ext_rec, limit_over_rec,"
 		" exp, total_exp,"
 		" skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
-		" element, unit_type_id) "
+		" element, unit_type_id, \"new\") "
 		"VALUES ($1,$2,1,"
 		" $3,0,0,0, $4,0,0,0, $5,0,0,0,"
 		" $6,0,0,0,"
 		" 1,1,"
 		" $7,$8,$9,$10,"
-		" $11,$12);",
+		" $11,$12,1);",
 		identity.userId, std::to_string(unit.id),
 		unit.min_hp, unit.min_atk, unit.min_def, unit.min_rec,
 		unit.skill_id, skillLv, unit.extra_skill_id, extraSkillLv,
 		std::string(elementIdToString(unit.element)),
 		unitType);
+
+	// ⚠ THIS OVERLOAD USED TO DO NEITHER OF THE TWO THINGS ABOVE AND BELOW.
+	//
+	// The UserUnitInfo overload sets is_new and records the species in
+	// user_unit_dictionary; this one is raw SQL and did neither, so every unit
+	// granted through it — slot prizes, Journal rewards, CampaignReceipt —
+	// arrived with no NEW badge and never appeared in the in-game unit
+	// dictionary.  That is why an account with 29 units had 8 distinct species
+	// owned and only 6 listed, the missing five being exactly the ones the
+	// reward paths handed out.
+	//
+	// OR IGNORE because the dictionary is one row per SPECIES: obtaining a
+	// second Burst Frog must not fail the grant on the primary key.
+	co_await database->execSqlCoro(
+		"INSERT OR IGNORE INTO user_unit_dictionary (user_id, unit_id)"
+		" VALUES ($1, $2);",
+		identity.userId, unit.id);
 }
 
 /*!
