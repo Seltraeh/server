@@ -383,6 +383,16 @@ HANDLEF(MissionEnd)
 			resp.reward_info.lvlup_flag = leveledUp ? 1 : 0;
 			resp.reward_info.inc_exp = rewardExp;
 			resp.reward_info.reward_units = encodeUnitDrops(droppedUnits, newFlags);
+			// Tell the client the mission is cleared NOW, rather than leaving
+			// it to whenever UserInfo next runs.  Until this was here a
+			// freshly beaten mission kept its uncleared marker on the map and
+			// whatever it unlocked stayed out of reach.
+			//
+			// Merges rather than replaces: readParam @0x13FD758 addObject()s
+			// without removeAllObjects, so this cannot drop clears the client
+			// already knows about.
+			resp.clear_mission_info = co_await gme::getClearedMissions(theDb(), identity);
+
 			resp.login_info = std::move(loginInfo);
 			resp.team_info = std::move(teamInfo);
 			resp.unit_info = std::move(droppedUnits);
