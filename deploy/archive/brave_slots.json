@@ -9,27 +9,13 @@
         ],
         "prize_rank": "4",
         "present_type": 6,
-        "target_id": 20011,
+        "target_id": 50133,
         "target_cnt": 1,
-        "description": "Selena"
+        "description": "Jewel God"
     },
     {
-        "key": "triple_emperor",
+        "key": "triple_king",
         "weight": 3,
-        "reels": [
-            3,
-            3,
-            3
-        ],
-        "prize_rank": "3",
-        "present_type": 6,
-        "target_id": 10112,
-        "target_cnt": 1,
-        "description": "Phoenix"
-    },
-    {
-        "key": "triple_god",
-        "weight": 5,
         "reels": [
             9,
             9,
@@ -37,41 +23,55 @@
         ],
         "prize_rank": "3",
         "present_type": 6,
-        "target_id": 20030,
+        "target_id": 50132,
         "target_cnt": 1,
-        "description": "Squirty"
+        "description": "Jewel King"
     },
     {
         "key": "triple_allup",
-        "weight": 8,
+        "weight": 5,
         "reels": [
             7,
             7,
             7
         ],
-        "prize_rank": "2",
+        "prize_rank": "3",
         "present_type": 6,
-        "target_id": 10030,
+        "target_id": 50612,
         "target_cnt": 1,
-        "description": "Burny"
+        "description": "Almighty Imp Arton"
     },
     {
         "key": "triple_sphere",
-        "weight": 12,
+        "weight": 10,
         "reels": [
             18,
             18,
             18
         ],
         "prize_rank": "2",
-        "present_type": 5,
-        "target_id": 800908,
-        "target_cnt": 2,
-        "description": "Geminus Tome x2"
+        "present_type": 6,
+        "target_id": 20302,
+        "target_cnt": 1,
+        "description": "Sphere Frog"
+    },
+    {
+        "key": "triple_emperor",
+        "weight": 16,
+        "reels": [
+            3,
+            3,
+            3
+        ],
+        "prize_rank": "2",
+        "present_type": 6,
+        "target_id": 10313,
+        "target_cnt": 1,
+        "description": "Burst Emperor"
     },
     {
         "key": "triple_frog",
-        "weight": 20,
+        "weight": 25,
         "reels": [
             2,
             2,
@@ -85,7 +85,7 @@
     },
     {
         "key": "triple_item",
-        "weight": 35,
+        "weight": 40,
         "reels": [
             13,
             13,
@@ -113,7 +113,7 @@
     },
     {
         "key": "consolation",
-        "weight": 156,
+        "weight": 140,
         "reels": [
             1,
             7,
