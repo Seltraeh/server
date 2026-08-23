@@ -463,6 +463,20 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 			allTasksClaimed = false;
 		}
 
+		// A CLAIMED mission leaves the list entirely.
+		//
+		// The rows are built from UserTaskInfo, not from the MST:
+		// setSummonerJournalList walks UserTaskInfo::getTaskID and looks each
+		// one up in TaskMstList.  So emitting a finished-and-claimed mission
+		// kept its tile on screen with a live GO button, which is what Evan
+		// saw after Receive All.  Dropping it here is what retires the row —
+		// and once every mission has gone this way, journal_flag goes to 0 and
+		// the whole feature retires with them.
+		if (claimed != 0)
+		{
+			continue;
+		}
+
 		// Which BUTTON the row shows, from setSummonerJournalList @0xE3BCDC:
 		//
 		//     claim_status == 0                  -> receive_btn

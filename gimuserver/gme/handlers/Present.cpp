@@ -1,6 +1,8 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <vector>
+
 #include <gimuserver/gme/common/BraveSlots.hpp>
 
 #include <gimuserver/db/PacketInterface.hpp>
@@ -179,18 +181,49 @@ HANDLEF(PresentReceipt)
 		auto transaction = co_await theDb()->newTransactionCoro();
 		try
 		{
+			// ⚠ "RECEIVE ALL" SENDS NO PRESENT ID AT ALL.
+			//
+			// Captured from a real client: a single claim posts
+			//     {"i1WQkh4G":"1","S1B82FHK":"7"}
+			// while Receive All posts
+			//     {"i1WQkh4G":"2"}
+			// — mode 2, no id, meaning "everything in the box".  Skipping
+			// nodes without an id therefore made Receive All claim NOTHING,
+			// which is why the box only ever emptied one present at a time.
+			//
+			// ⚠ i1WQkh4G is a MODE in the REQUEST but carries our stored
+			// receipt_type in the LISTING we send.  Same key, two meanings:
+			// the client sends 1 for a single claim regardless of what the
+			// listing said that present's receipt_type was.  So it is NOT
+			// echoed back and must NOT be used to filter.
+			std::vector<int64_t> toClaim;
 			for (const auto& node : req.nodes)
 			{
-				if (node.present_id.empty())
-					continue;
-
-				int64_t presentId = 0;
-				try { presentId = std::stoll(node.present_id); }
-				catch (...)
+				if (!node.present_id.empty())
 				{
-					LOG_WARN << "PresentReceipt: non-numeric present id " << node.present_id;
+					try { toClaim.push_back(std::stoll(node.present_id)); }
+					catch (...)
+					{
+						LOG_WARN << "PresentReceipt: non-numeric present id "
+							<< node.present_id;
+					}
 					continue;
 				}
+
+				const auto all = co_await transaction->execSqlCoro(
+					"SELECT present_id FROM user_presents"
+					" WHERE user_id = $1 AND is_receipt = 0 ORDER BY present_id;",
+					identity.userId);
+				for (const auto& row : all)
+				{
+					toClaim.push_back(row["present_id"].as<int64_t>());
+				}
+				LOG_INFO << "PresentReceipt: receive-all for " << identity.userId
+					<< " — " << all.size() << " unclaimed present(s)";
+			}
+
+			for (const auto presentId : toClaim)
+			{
 
 				// Scoped to this user AND to unclaimed rows, so a replayed
 				// claim finds nothing and pays out nothing.
