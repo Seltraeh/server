@@ -1,6 +1,8 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/SummonerJournal.hpp>
+
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 #include <cmath>
@@ -447,6 +449,13 @@ HANDLEF(UnitMix)
         LOG_ERROR << "UnitMix: serialization error: " << glz::format_error(ec2, buffer);
         co_return HandleResult::error("Serialization error");
     }
+
+    // Journal: "10 Fusions performed".  Counts the units consumed, which is
+    // what a player means by a fusion - feeding five fodder in one action is
+    // five fusions, not one.
+    co_await gme::addJournalProgress(
+        theDb(), identity, gme::kJournalTaskUnitFusion,
+        static_cast<int32_t>(std::max<size_t>(matIds.size(), 1)));
 
     co_return HandleResult::success(buffer);
 }

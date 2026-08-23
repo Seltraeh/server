@@ -26,6 +26,23 @@ void loadSummonerJournalArchive(const std::string& archiveRoot);
 inline constexpr const char* kJournalTaskBraveSlots = "brave_medal_slots";
 
 /*!
+* Archive keys for the missions that need a COUNTER because the action leaves
+* no lasting trace to read back.
+*
+* Everything else the Journal asks about is derived from state instead (deck
+* size, favourites, town levels, recipe crafts, quests cleared), which makes
+* those retroactive — an account that already satisfies the condition shows
+* the mission complete the first time the screen is opened.
+*/
+inline constexpr const char* kJournalTaskUnitFusion = "unit_fusion";
+inline constexpr const char* kJournalTaskSellUnits = "sell_units";
+inline constexpr const char* kJournalTaskEvolution = "evolution";
+inline constexpr const char* kJournalTaskZelHarvest = "zel_harvest";
+inline constexpr const char* kJournalTaskKarmaHarvest = "karma_harvest";
+inline constexpr const char* kJournalTaskMetalKeys = "metal_key_collection";
+inline constexpr const char* kJournalTaskJewelKeys = "jewel_key_collection";
+
+/*!
 * Adds to a mission's progress, creating the row on first sight.
 *
 * Clamped to the mission's target so a counter cannot run past what the

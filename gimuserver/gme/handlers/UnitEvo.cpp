@@ -1,6 +1,8 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/SummonerJournal.hpp>
+
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
@@ -277,6 +279,9 @@ HANDLEF(UnitEvo)
         LOG_ERROR << "UnitEvo: serialization error: " << glz::format_error(ec2, buffer);
         co_return HandleResult::error("Serialization error");
     }
+
+    // Journal: "Evolve 1 unit".
+    co_await gme::addJournalProgress(theDb(), identity, gme::kJournalTaskEvolution, 1);
 
     co_return HandleResult::success(buffer);
 }

@@ -132,6 +132,92 @@ namespace
 {
 
 /*!
+* Progress that can be READ OUT OF EXISTING STATE rather than counted.
+*
+* Many missions ask about a condition the account either satisfies or does
+* not - "form a squad with 5 units" is a question about the current deck, not
+* a tally of squad-forming events.  Deriving those makes them RETROACTIVE for
+* free: an account that already has five units in its deck shows the mission
+* complete the first time the Journal is opened, which is what a player who
+* did it before the feature existed should see.
+*
+* Counters (user_journal_tasks) remain for missions that genuinely need one -
+* an event that leaves no trace behind, like a fusion or a slot spin.  The two
+* are merged with max(), so neither can drag the other backwards.
+*
+* Every id below is resolved, not guessed:
+*   town LOCATIONS  1 Mountain, 2 River, 3 Farm, 4 Forest - from
+*                   tools/TOWN_STATE_MODEL.md, which identifies them by their
+*                   town_location_lv_mst drop pools.
+*   town FACILITIES 2 is item Synthesis, 1 is Sphere synthesis - same doc
+*                   (MyTownItemListScene is facility 2, MyTownSphereListScene
+*                   facility 1), and text_local confirms
+*                   MST_TOWN_FACILITY_2_NAME is literally "Synthesis".
+*   recipe 1009     produces item 20000, whose name key is
+*                   MST_ITEMS_BATTLEITEMS_20000_NAME = "Cure".
+*/
+drogon::Task<std::map<std::string, int32_t>> deriveProgress(
+	const db::Database database,
+	const UserIdentity& identity)
+{
+	std::map<std::string, int32_t> out;
+
+	const auto scalar = [&](const std::string& sql) -> drogon::Task<int32_t> {
+		const auto rows = co_await database->execSqlCoro(sql, identity.userId);
+		co_return rows.empty() || rows[0][0].isNull() ? 0 : rows[0][0].as<int32_t>();
+	};
+
+	// Deck 0 of deck_type 1 is the active squad.
+	out["squad_up"] = co_await scalar(
+		"SELECT COUNT(*) FROM user_decks WHERE user_id = $1 AND deck_type = 1 AND deck_num = 0;");
+
+	out["add_favorite"] = co_await scalar(
+		"SELECT COUNT(*) FROM user_units WHERE user_id = $1 AND favorite_flg = 1;");
+
+	out["equip_sphere"] = co_await scalar(
+		"SELECT COUNT(*) FROM user_equip_items WHERE user_id = $1;");
+
+	// Both quest missions read the same total and differ only in target.
+	const auto cleared = co_await scalar(
+		"SELECT COALESCE(SUM(clear_count), 0) FROM user_campaign_missions WHERE user_id = $1;");
+	out["clear_main_quests_i"] = cleared;
+	out["clear_main_quests_ii"] = cleared;
+
+	out["synthesis_i"] = co_await scalar(
+		"SELECT COALESCE(SUM(craft_count), 0) FROM user_recipe_crafts"
+		" WHERE user_id = $1 AND recipe_id = 1009;");
+
+	// Town tiles and buildings report their LEVEL as progress, so "upgrade to
+	// level 5" reads 3/5 while the tile sits at three.
+	const std::pair<const char*, int> locations[] = {
+		{"upgrade_mountain", 1}, {"upgrade_river", 2},
+		{"upgrade_farm", 3}, {"upgrade_forest", 4},
+	};
+	for (const auto& [key, locationId] : locations)
+	{
+		const auto rows = co_await database->execSqlCoro(
+			"SELECT lv FROM user_town_locations WHERE user_id = $1 AND location_id = $2;",
+			identity.userId, locationId);
+		out[key] = rows.empty() ? 0 : rows[0]["lv"].as<int32_t>();
+	}
+
+	const std::pair<const char*, int> facilities[] = {
+		{"upgrade_facility_i", 2},     // Synthesis house, target 8
+		{"upgrade_facility_ii", 1},    // Sphere house, target 6
+		{"upgrade_facility_iii", 1},   // Sphere house again, target 12
+	};
+	for (const auto& [key, facilityId] : facilities)
+	{
+		const auto rows = co_await database->execSqlCoro(
+			"SELECT lv FROM user_town_facilities WHERE user_id = $1 AND facility_id = $2;",
+			identity.userId, facilityId);
+		out[key] = rows.empty() ? 0 : rows[0]["lv"].as<int32_t>();
+	}
+
+	co_return out;
+}
+
+/*!
 * Storage key for a milestone's claim state.
 *
 * Milestones live in user_journal_tasks under a prefix rather than in a table
@@ -279,6 +365,8 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 			row["progress"].as<int32_t>(), row["claimed"].as<int32_t>()};
 	}
 
+	const auto derived = co_await deriveProgress(database, identity);
+
 	int32_t earned = 0;
 	bool allTasksClaimed = true;
 	bool allMilestonesClaimed = true;
@@ -334,7 +422,16 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 		});
 
 		const auto found = stored.find(task.key);
-		const int32_t progress = found == stored.end() ? 0 : found->second.first;
+		const auto fromState = derived.find(task.key);
+		// max(): a derived condition and a counted event must not pull each
+		// other backwards - selling a unit cannot un-form your squad.
+		// Clamped like the counters are (addJournalProgress does it in SQL), so
+		// a derived value cannot read 2/1 when the account has two favourites
+		// and the mission only asked for one.
+		const int32_t progress = std::min(
+			std::max(found == stored.end() ? 0 : found->second.first,
+				fromState == derived.end() ? 0 : fromState->second),
+			static_cast<int32_t>(task.target));
 		const int32_t claimed = found == stored.end() ? 0 : found->second.second;
 		const bool complete = progress >= static_cast<int32_t>(task.target);
 

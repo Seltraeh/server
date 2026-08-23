@@ -1,6 +1,8 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/SummonerJournal.hpp>
+
 #include <gimuserver/gme/common/Common.hpp>
 
 // UnitSell — sell one or more owned units for zel.
@@ -106,6 +108,11 @@ HANDLEF(UnitSell)
         LOG_ERROR << "UnitSell: serialization error: " << glz::format_error(ec2, buffer);
         co_return HandleResult::error("Serialization error");
     }
+
+    // Journal: "Sell your excess units to earn 2000 zel" - the target is the
+    // ZEL earned, not the number of units, so the sale value is what counts.
+    co_await gme::addJournalProgress(
+        theDb(), identity, gme::kJournalTaskSellUnits, static_cast<int32_t>(totalZel));
 
     co_return HandleResult::success(buffer);
 }
