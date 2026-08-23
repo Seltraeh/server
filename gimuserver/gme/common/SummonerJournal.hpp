@@ -19,6 +19,54 @@ struct UserIdentity;
 void loadSummonerJournalArchive(const std::string& archiveRoot);
 
 /*!
+* Archive key of the Brave Slots mission ("Spin the brave medal slots 10
+* times").  The FIRST mission wired to a real counter — the pattern the other
+* 44 follow.
+*/
+inline constexpr const char* kJournalTaskBraveSlots = "brave_medal_slots";
+
+/*!
+* Adds to a mission's progress, creating the row on first sight.
+*
+* Clamped to the mission's target so a counter cannot run past what the
+* Journal will ever ask for, and silently ignored when the archive has no such
+* mission — a caller naming a task that was renamed should not throw at the
+* point of the gameplay action it is counting.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved caller.
+* @param taskKey Archive `key` of the mission, e.g. kJournalTaskBraveSlots.
+* @param amount How much to add.
+*/
+drogon::Task<void> addJournalProgress(
+	db::Database database,
+	const UserIdentity& identity,
+	const std::string& taskKey,
+	int32_t amount);
+
+/*!
+* receipt_type stamped on Journal mission rewards in the present box.
+*/
+inline constexpr int32_t kJournalRewardReceiptType = 3;
+
+/*!
+* Claims one finished mission: marks it claimed and queues its reward.
+*
+* Marks BEFORE paying, the same order Mystery Chest uses, so a reward that
+* throws cannot leave the mission claimable again.  Refuses a mission that is
+* not finished or is already claimed rather than paying twice.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved caller.
+* @param taskId The wire task_id being claimed (23DaiBpe).
+* @return true when a reward was queued by THIS call.
+*/
+drogon::Task<bool> claimJournalTask(
+	db::Database database,
+	const UserIdentity& identity,
+	const std::string& taskId);
+
+/*!
 * Builds the whole Summoner's Journal reply.
 *
 * The captured 32Gwida0 request carries no parameters at all — identity,

@@ -689,6 +689,24 @@ static void RegisterMigrations(MigrationMap& map)
 		);
 	});
 
+	// Summoner's Journal progress, one row per (user, task).
+	//
+	// A generic counter table rather than a column per mission: there are 45
+	// missions and each needs its own tally, so widening a table for every one
+	// would be unworkable.  Rows are created on first increment, so a mission
+	// that has never ticked simply has no row and reads as 0.
+	migrate("23082026_CreateUserJournalTasksTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_journal_tasks ("
+			"user_id  TEXT    NOT NULL,"
+			"task_key TEXT    NOT NULL,"
+			"progress INTEGER NOT NULL DEFAULT 0,"
+			"claimed  INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, task_key)"
+			");"
+		);
+	});
+
 	migrate("21082026_CreateUserMysteryBoxesTable", {
 		p->execSqlSync(
 			"CREATE TABLE IF NOT EXISTS user_mystery_boxes ("

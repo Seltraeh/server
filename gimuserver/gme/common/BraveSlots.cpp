@@ -1,6 +1,7 @@
 #include "BraveSlots.hpp"
 
 #include "Common.hpp"
+#include "SummonerJournal.hpp"
 
 #include <gimuserver/archive/archive.hpp>
 #include <gimuserver/db/DatabaseInterface.h>
@@ -472,6 +473,16 @@ drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 			" WHERE id = $5;",
 			zel, static_cast<int64_t>(99'999'999), gems, static_cast<int64_t>(9'999),
 			identity.userId);
+	}
+
+	// The Summoner's Journal counts spins, not medals — "Spin the brave medal
+	// slots 10 times" — so a ten-medal action is counted as the number of
+	// pulls actually played, not as one.
+	if (!results.empty())
+	{
+		co_await gme::addJournalProgress(
+			database, identity, kJournalTaskBraveSlots,
+			static_cast<int32_t>(results.size()));
 	}
 
 	LOG_INFO << "BraveSlots: " << identity.userId << " played " << results.size()

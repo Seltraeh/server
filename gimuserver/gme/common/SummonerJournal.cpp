@@ -6,7 +6,10 @@
 #include <gimuserver/db/DatabaseInterface.h>
 #include <gimuserver/utils/JsonFile.hpp>
 
+#include <algorithm>
+#include <map>
 #include <string>
+#include <utility>
 
 namespace gme
 {
@@ -92,11 +95,121 @@ void loadSummonerJournalArchive(const std::string& archiveRoot)
 	}
 }
 
+drogon::Task<void> addJournalProgress(
+	const db::Database database,
+	const UserIdentity& identity,
+	const std::string& taskKey,
+	const int32_t amount)
+{
+	const auto task = std::find_if(g_journal.tasks.begin(), g_journal.tasks.end(),
+		[&taskKey](const SummonerJournalTask& t) { return t.key == taskKey; });
+
+	if (task == g_journal.tasks.end())
+	{
+		// Not fatal: the caller is in the middle of a gameplay action that has
+		// nothing to do with the Journal, and a renamed archive key must not
+		// take that action down with it.
+		LOG_WARN << "SummonerJournal: no mission keyed '" << taskKey
+			<< "' — progress dropped";
+		co_return;
+	}
+
+	// Clamped to the target, so a counter cannot run past what the mission
+	// will ever ask for and the [n/N] label can never read 14/10.
+	co_await database->execSqlCoro(
+		"INSERT INTO user_journal_tasks (user_id, task_key, progress)"
+		" VALUES ($1, $2, MIN($3, $4))"
+		" ON CONFLICT(user_id, task_key) DO UPDATE SET"
+		" progress = MIN(progress + $3, $4);",
+		identity.userId, taskKey, amount, static_cast<int32_t>(task->target));
+
+	LOG_INFO << "SummonerJournal: " << identity.userId << " +" << amount
+		<< " on '" << taskKey << "' (target " << task->target << ")";
+	co_return;
+}
+
+drogon::Task<bool> claimJournalTask(
+	const db::Database database,
+	const UserIdentity& identity,
+	const std::string& taskId)
+{
+	const auto task = std::find_if(g_journal.tasks.begin(), g_journal.tasks.end(),
+		[&taskId](const SummonerJournalTask& t) { return t.task_id == taskId; });
+
+	if (task == g_journal.tasks.end())
+	{
+		LOG_WARN << "SummonerJournal: claim for unknown task_id '" << taskId << "'";
+		co_return false;
+	}
+
+	const auto rows = (co_await db::DatabaseInterface::read(
+		database,
+		"user_journal_tasks",
+		{
+			db::Data("progress"),
+			db::Data("claimed"),
+			db::Lookup("user_id", identity.userId),
+			db::Lookup("task_key", task->key),
+		})).data;
+
+	const int32_t progress = rows.empty() ? 0 : rows[0]["progress"].as<int32_t>();
+	const int32_t claimed = rows.empty() ? 0 : rows[0]["claimed"].as<int32_t>();
+
+	if (progress < static_cast<int32_t>(task->target) || claimed != 0)
+	{
+		LOG_WARN << "SummonerJournal: refusing claim of '" << task->key
+			<< "' — progress " << progress << "/" << task->target
+			<< ", claimed " << claimed;
+		co_return false;
+	}
+
+	// Marked BEFORE paying, like Mystery Chest: a reward that throws must not
+	// leave the mission claimable a second time.
+	co_await database->execSqlCoro(
+		"UPDATE user_journal_tasks SET claimed = 1"
+		" WHERE user_id = $1 AND task_key = $2;",
+		identity.userId, task->key);
+
+	// Straight to the present box, which is where the wiki says Journal
+	// rewards land: "a reward that is sent directly to your Gift Box".
+	co_await gme::addUserPresent(
+		database, identity,
+		static_cast<int32_t>(task->present_type),
+		task->target_id == 0 ? std::string{} : std::to_string(task->target_id),
+		static_cast<int32_t>(task->target_cnt),
+		kJournalRewardReceiptType,
+		task->name);
+
+	LOG_INFO << "SummonerJournal: " << identity.userId << " claimed '" << task->key
+		<< "' (+" << task->points << " pts), queued " << task->reward_note
+		<< (task->substituted ? " [STAND-IN]" : "");
+	co_return true;
+}
+
 drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	const db::Database database,
 	const UserIdentity& identity)
 {
 	::SummonerJournalInfoResp resp{};
+
+	// One read for all 45 missions; a mission that has never ticked has no row
+	// and is absent here, which reads as 0.
+	std::map<std::string, std::pair<int32_t, int32_t>> stored;
+	for (const auto& row : (co_await db::DatabaseInterface::read(
+		database,
+		"user_journal_tasks",
+		{
+			db::Data("task_key"),
+			db::Data("progress"),
+			db::Data("claimed"),
+			db::Lookup("user_id", identity.userId),
+		})).data)
+	{
+		stored[row["task_key"].as<std::string>()] = {
+			row["progress"].as<int32_t>(), row["claimed"].as<int32_t>()};
+	}
+
+	int32_t earned = 0;
 
 	for (const auto& task : g_journal.tasks)
 	{
@@ -127,31 +240,52 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 			.target_screen = static_cast<int32_t>(task.target_screen),
 		});
 
+		// ⚠ present_id IS THE REWARDED ENTITY, not an id for the reward row.
+		// setSummonerJournalList @0xE3AEA0 draws the row icon with
+		// PresentCommon::createThumbnailBack(getPresentType(), getPresentID()),
+		// so for an item or unit reward that string goes straight into
+		// ItemMstList/UnitMstList::getObject.
+		//
+		// Putting the TASK id here (and the entity in target_param) crashed the
+		// screen the moment those 35 rows stopped being present_type 0:
+		// getObject("1") returned null and the thumbnail read off it.  Currency
+		// types (3 zel, 8 gem, 11 karma) hid it, because those draw a fixed
+		// thumbnail and never look anything up — which is why the first cut,
+		// where only the 10 currency rows had a real present_type, was fine.
 		resp.rewards.push_back(::SummonerJournalRewardsMst{
 			.task_id = task.task_id,
-			.present_id = task.task_id,
-			.target_param = task.target_id == 0 ? std::string{} : std::to_string(task.target_id),
+			.present_id = task.target_id == 0 ? std::string{} : std::to_string(task.target_id),
+			.target_param = {},
 			.message = task.reward_note,
 			.present_type = static_cast<int32_t>(task.present_type),
 			.target_cnt = static_cast<int32_t>(task.target_cnt),
 		});
 
-		// Which BUTTON the row shows, from setSummonerJournalList
-		// @0xE3BCDC:
+		const auto found = stored.find(task.key);
+		const int32_t progress = found == stored.end() ? 0 : found->second.first;
+		const int32_t claimed = found == stored.end() ? 0 : found->second.second;
+		const bool complete = progress >= static_cast<int32_t>(task.target);
+
+		if (claimed != 0)
+		{
+			earned += static_cast<int32_t>(task.points);
+		}
+
+		// Which BUTTON the row shows, from setSummonerJournalList @0xE3BCDC:
 		//
 		//     claim_status == 0                  -> receive_btn
 		//     claim_status != 0, is_available 0  -> locked
 		//     claim_status != 0, is_available !0 -> go_btn
 		//
-		// claim_status 0 therefore means "there is a reward waiting", NOT
-		// "unclaimed so far" — sending 0 everywhere put a Receive button on
-		// all 45 missions including ones at 0 progress.  Nothing can be
-		// complete yet, so every row is an in-progress GO.
+		// So claim_status 0 means "there is a reward waiting", NOT "unclaimed
+		// so far" — sending 0 everywhere put Receive on 45 missions sitting at
+		// zero progress.  A finished-but-unclaimed mission is the ONLY case
+		// that should offer Receive.
 		resp.user_tasks.push_back(::SummonerJournalUserTaskInfo{
 			.user_id = identity.userId,
 			.task_id = task.task_id,
-			.progress = 0,
-			.claim_status = 1,
+			.progress = progress,
+			.claim_status = (complete && claimed == 0) ? 0 : 1,
 			.is_available = 1,
 		});
 	}
@@ -182,7 +316,7 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	// can be opened); this copy is what the screen itself reads for its points
 	// header.
 	resp.user_info.user_id = identity.userId;
-	resp.user_info.points = 0;
+	resp.user_info.points = earned;
 	resp.user_info.journal_flag = 1;
 
 	co_return resp;

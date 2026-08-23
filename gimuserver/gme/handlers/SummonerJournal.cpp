@@ -142,7 +142,42 @@ HANDLEF(SummonerJournalInfo)
 HANDLEF(SummonerJournalTaskRewards)
 {
 	LOG_INFO << "SummonerJournalTaskRewards: " << json;
-	co_return HandleResult::success("{}");
+
+	SummonerJournalTaskRewardsReq req{};
+	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+	{
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
+	}
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	// The list is walked rather than assuming one entry, because "Receive All"
+	// is expected to claim every finished mission and the group is modelled as
+	// a list.  Whether the client batches them here or fires one request each
+	// is still unconfirmed — this copes with either.
+	uint32_t claimed = 0;
+	for (const auto& entry : req.entries)
+	{
+		if (co_await gme::claimJournalTask(theDb(), identity, entry.task_id))
+		{
+			++claimed;
+		}
+	}
+	LOG_INFO << "SummonerJournalTaskRewards: claimed " << claimed
+		<< " of " << req.entries.size() << " requested";
+
+	// Answered with the whole journal so the rows, the points header and the
+	// buttons all re-render from one reply — the same reason PresentReceipt
+	// returns the refreshed box.
+	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity);
+
+	std::string buffer{};
+	if (const auto& ec = glz::write_json(resp, buffer); ec)
+	{
+		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+	}
+
+	co_return HandleResult::success(buffer);
 }
 
 HANDLEF(SummonerJournalMilestoneRewards)

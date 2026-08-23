@@ -653,7 +653,7 @@
             "points": 60,
             "target": 10,
             "target_screen": 0,
-            "tracked": false,
+            "tracked": true,
             "present_type": 6,
             "target_id": 750004,
             "target_cnt": 1,
