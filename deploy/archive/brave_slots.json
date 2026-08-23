@@ -9,9 +9,9 @@
         ],
         "prize_rank": "4",
         "present_type": 6,
-        "target_id": 750003,
+        "target_id": 20011,
         "target_cnt": 1,
-        "description": "Omni Frog"
+        "description": "Selena"
     },
     {
         "key": "triple_emperor",
@@ -23,9 +23,9 @@
         ],
         "prize_rank": "3",
         "present_type": 6,
-        "target_id": 750005,
+        "target_id": 10112,
         "target_cnt": 1,
-        "description": "Omni Emperor"
+        "description": "Phoenix"
     },
     {
         "key": "triple_god",
@@ -37,9 +37,9 @@
         ],
         "prize_rank": "3",
         "present_type": 6,
-        "target_id": 750004,
+        "target_id": 20030,
         "target_cnt": 1,
-        "description": "Burst Queen"
+        "description": "Squirty"
     },
     {
         "key": "triple_allup",
@@ -51,9 +51,9 @@
         ],
         "prize_rank": "2",
         "present_type": 6,
-        "target_id": 750006,
+        "target_id": 10030,
         "target_cnt": 1,
-        "description": "Rainbow Crystal"
+        "description": "Burny"
     },
     {
         "key": "triple_sphere",

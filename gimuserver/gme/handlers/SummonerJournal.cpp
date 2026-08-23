@@ -183,5 +183,28 @@ HANDLEF(SummonerJournalTaskRewards)
 HANDLEF(SummonerJournalMilestoneRewards)
 {
 	LOG_INFO << "SummonerJournalMilestoneRewards: " << json;
-	co_return HandleResult::success("{}");
+
+	SummonerJournalInfoReq req{};
+	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+	{
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
+	}
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	// createBody @0xE379E8 sends identity and the signal key only — no
+	// milestone id — so this claims everything the player has earned rather
+	// than one named rung.  Reuses SummonerJournalInfoReq for that reason.
+	const auto paid = co_await gme::claimJournalMilestones(theDb(), identity);
+	LOG_INFO << "SummonerJournalMilestoneRewards: paid " << paid << " milestone(s)";
+
+	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity);
+
+	std::string buffer{};
+	if (const auto& ec = glz::write_json(resp, buffer); ec)
+	{
+		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+	}
+
+	co_return HandleResult::success(buffer);
 }

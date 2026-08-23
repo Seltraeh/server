@@ -25,7 +25,7 @@
             "target_screen": 0,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750006,
+            "target_id": 10030,
             "target_cnt": 1,
             "reward_note": "1 Metal Ghost",
             "substituted": true
@@ -55,7 +55,7 @@
             "target_screen": 0,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750006,
+            "target_id": 10030,
             "target_cnt": 1,
             "reward_note": "1 Metal Ghost",
             "substituted": true
@@ -190,7 +190,7 @@
             "target_screen": 0,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750005,
+            "target_id": 20011,
             "target_cnt": 1,
             "reward_note": "1 Metal King",
             "substituted": true
@@ -265,7 +265,7 @@
             "target_screen": 0,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750006,
+            "target_id": 10030,
             "target_cnt": 1,
             "reward_note": "1 Jewel Ghost",
             "substituted": true
@@ -340,7 +340,7 @@
             "target_screen": 0,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750005,
+            "target_id": 20011,
             "target_cnt": 1,
             "reward_note": "1 Jewel King",
             "substituted": true
@@ -400,7 +400,7 @@
             "target_screen": 0,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750003,
+            "target_id": 20030,
             "target_cnt": 1,
             "reward_note": "1 Sphere Frog",
             "substituted": true
@@ -430,7 +430,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750004,
+            "target_id": 10112,
             "target_cnt": 1,
             "reward_note": "1 Metal God",
             "substituted": true
@@ -445,7 +445,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750006,
+            "target_id": 10030,
             "target_cnt": 1,
             "reward_note": "1 Soul Bracer",
             "substituted": true
@@ -505,7 +505,7 @@
             "target_screen": 5,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750003,
+            "target_id": 20030,
             "target_cnt": 1,
             "reward_note": "1 Burst Frog",
             "substituted": true
@@ -520,7 +520,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750004,
+            "target_id": 10112,
             "target_cnt": 1,
             "reward_note": "1 Metal God",
             "substituted": true
@@ -535,7 +535,7 @@
             "target_screen": 0,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750006,
+            "target_id": 10030,
             "target_cnt": 1,
             "reward_note": "1 Miracle Bulb",
             "substituted": true
@@ -550,7 +550,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750003,
+            "target_id": 20030,
             "target_cnt": 1,
             "reward_note": "1 Burst Frog",
             "substituted": true
@@ -565,7 +565,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750003,
+            "target_id": 20030,
             "target_cnt": 1,
             "reward_note": "1 Burst Frog",
             "substituted": true
@@ -580,7 +580,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750004,
+            "target_id": 10112,
             "target_cnt": 1,
             "reward_note": "1 Almighty Imp Arton",
             "substituted": true
@@ -595,7 +595,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750003,
+            "target_id": 20030,
             "target_cnt": 1,
             "reward_note": "1 Burst Frog",
             "substituted": true
@@ -610,7 +610,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750003,
+            "target_id": 20030,
             "target_cnt": 1,
             "reward_note": "1 Burst Frog",
             "substituted": true
@@ -625,7 +625,7 @@
             "target_screen": 4,
             "tracked": false,
             "present_type": 6,
-            "target_id": 750006,
+            "target_id": 10030,
             "target_cnt": 1,
             "reward_note": "1 Water Crystal",
             "substituted": true
@@ -655,7 +655,7 @@
             "target_screen": 0,
             "tracked": true,
             "present_type": 6,
-            "target_id": 750004,
+            "target_id": 10112,
             "target_cnt": 1,
             "reward_note": "1 Metal Mimic",
             "substituted": true
@@ -705,19 +705,19 @@
             "milestone_id": "4",
             "points": 750,
             "present_type": 6,
-            "target_id": 750006,
+            "target_id": 20212,
             "target_cnt": 1,
             "reward_note": "Malice Jewel",
-            "substitution": "absent from unit_mst; Rainbow Crystal substituted"
+            "substitution": "no such unit here; Twin Gem Rickel substituted"
         },
         {
             "milestone_id": "5",
             "points": 1000,
             "present_type": 6,
-            "target_id": 750003,
+            "target_id": 20011,
             "target_cnt": 1,
             "reward_note": "Holy Ice Selena",
-            "substitution": "absent from unit_mst; Omni Frog substituted"
+            "substitution": "Selena is the closest archived unit to Holy Ice Selena"
         }
     ]
 }

@@ -128,6 +128,76 @@ drogon::Task<void> addJournalProgress(
 	co_return;
 }
 
+namespace
+{
+
+/*!
+* Storage key for a milestone's claim state.
+*
+* Milestones live in user_journal_tasks under a prefix rather than in a table
+* of their own: the table is already a generic (user, key) -> progress/claimed
+* counter, and five rungs do not justify a migration.
+*/
+std::string milestoneKey(const std::string& milestoneId)
+{
+	return "milestone:" + milestoneId;
+}
+
+} // namespace
+
+drogon::Task<uint32_t> claimJournalMilestones(
+	const db::Database database,
+	const UserIdentity& identity)
+{
+	const auto journal = co_await buildSummonerJournal(database, identity);
+	const int32_t points = journal.user_info.points;
+
+	uint32_t paid = 0;
+	for (const auto& milestone : g_journal.milestones)
+	{
+		if (points < static_cast<int32_t>(milestone.points))
+		{
+			continue;
+		}
+
+		const auto key = milestoneKey(milestone.milestone_id);
+		const auto rows = (co_await db::DatabaseInterface::read(
+			database,
+			"user_journal_tasks",
+			{
+				db::Data("claimed"),
+				db::Lookup("user_id", identity.userId),
+				db::Lookup("task_key", key),
+			})).data;
+
+		if (!rows.empty() && rows[0]["claimed"].as<int32_t>() != 0)
+		{
+			continue;
+		}
+
+		// Marked first, then paid — same order as a task claim.
+		co_await database->execSqlCoro(
+			"INSERT INTO user_journal_tasks (user_id, task_key, progress, claimed)"
+			" VALUES ($1, $2, $3, 1)"
+			" ON CONFLICT(user_id, task_key) DO UPDATE SET claimed = 1;",
+			identity.userId, key, static_cast<int32_t>(milestone.points));
+
+		co_await gme::addUserPresent(
+			database, identity,
+			static_cast<int32_t>(milestone.present_type),
+			milestone.target_id == 0 ? std::string{} : std::to_string(milestone.target_id),
+			static_cast<int32_t>(milestone.target_cnt),
+			kJournalRewardReceiptType,
+			"Journal Milestone " + std::to_string(milestone.points));
+
+		LOG_INFO << "SummonerJournal: " << identity.userId << " claimed milestone "
+			<< milestone.points << " (" << milestone.reward_note << ")";
+		++paid;
+	}
+
+	co_return paid;
+}
+
 drogon::Task<bool> claimJournalTask(
 	const db::Database database,
 	const UserIdentity& identity,
@@ -210,6 +280,8 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	}
 
 	int32_t earned = 0;
+	bool allTasksClaimed = true;
+	bool allMilestonesClaimed = true;
 
 	for (const auto& task : g_journal.tasks)
 	{
@@ -270,6 +342,10 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 		{
 			earned += static_cast<int32_t>(task.points);
 		}
+		else
+		{
+			allTasksClaimed = false;
+		}
 
 		// Which BUTTON the row shows, from setSummonerJournalList @0xE3BCDC:
 		//
@@ -304,11 +380,25 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 			.target_cnt = static_cast<int32_t>(milestone.target_cnt),
 		});
 
+		// ⚠ claim_status 0 means "this reward is WAITING TO BE TAKEN", the
+		// same polarity as a task row — NOT "never claimed".  Sending 0 for
+		// all five rungs told the client every milestone was ready, so one
+		// task claim lit up all five chests and the screen announced the
+		// Journal complete at 60/1000.
+		const auto msFound = stored.find(milestoneKey(milestone.milestone_id));
+		const bool msClaimed = msFound != stored.end() && msFound->second.second != 0;
+		const bool msEarned = earned >= static_cast<int32_t>(milestone.points);
+
 		resp.user_milestones.push_back(::SummonerJournalUserMilestoneInfo{
 			.user_id = identity.userId,
 			.milestone_id = milestone.milestone_id,
-			.claim_status = 0,
+			.claim_status = (msEarned && !msClaimed) ? 0 : 1,
 		});
+
+		if (!msClaimed)
+		{
+			allMilestonesClaimed = false;
+		}
 	}
 
 	// Sent here as well as on UserInfo/Initialize.  Those two are what make the
@@ -317,7 +407,11 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	// header.
 	resp.user_info.user_id = identity.userId;
 	resp.user_info.points = earned;
-	resp.user_info.journal_flag = 1;
+	// Per the wiki the Journal is new-Summoner-only and "will disappear" once
+	// every mission is done and every prize claimed, replaced by a red
+	// treasure chest on Home.  The flag is what retires it — and it also gates
+	// the Rewards TILE, so this is what makes the feature go away.
+	resp.user_info.journal_flag = (allTasksClaimed && allMilestonesClaimed) ? 0 : 1;
 
 	co_return resp;
 }

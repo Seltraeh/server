@@ -67,6 +67,21 @@ drogon::Task<bool> claimJournalTask(
 	const std::string& taskId);
 
 /*!
+* Claims every milestone the caller's points have reached.
+*
+* The 3a83iY3r request carries NO milestone id (createBody @0xE379E8 is
+* identity + signal key only), so it means "give me everything I have earned"
+* rather than naming one rung.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved caller.
+* @return How many rungs were paid by THIS call.
+*/
+drogon::Task<uint32_t> claimJournalMilestones(
+	db::Database database,
+	const UserIdentity& identity);
+
+/*!
 * Builds the whole Summoner's Journal reply.
 *
 * The captured 32Gwida0 request carries no parameters at all — identity,
