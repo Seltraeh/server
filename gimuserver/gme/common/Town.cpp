@@ -200,7 +200,10 @@ std::string rollTap(const TownLocationLvMst& level, const std::vector<DropChance
 /// collected yet without also handing them a fresh tap allowance.  The list is
 /// rebuilt to exactly tapCnt entries, which keeps getCollectItemInfo's
 /// `count - tap_cnt` index pointing at the next tap.
-void rollDrops(const int32_t locationId, const int32_t lv, const int32_t tapCnt,
+///
+/// tapCnt is in/out: the ONE way to emit fewer entries than taps is to have no
+/// level row at all, and that path zeroes it rather than break the invariant.
+void rollDrops(const int32_t locationId, const int32_t lv, int32_t& tapCnt,
 	std::string& dropInfo)
 {
 	dropInfo.clear();
@@ -208,8 +211,16 @@ void rollDrops(const int32_t locationId, const int32_t lv, const int32_t tapCnt,
 	const auto* level = locationLevelRow(locationId, lv);
 	if (!level)
 	{
+		// tapCnt has to be zeroed with the list, not just left alone.  The
+		// sparkle is gated on tap_cnt (setLocationInfo @0x18F1730), NOT on
+		// drop_item_info, so a tile with taps left and no loot still invites a
+		// tap -- and getCollectItemInfo indexes `count - tap_cnt` @0x18F38D8
+		// through an unchecked madd @0x18F38E0.  An empty list splits to one
+		// element, so tap_cnt >= 2 indexes BEFORE the vector.
 		LOG_WARN << "Town: no TownLocationLvMst row for location " << locationId
-			<< " lv " << lv << "; tile will not sparkle";
+			<< " lv " << lv << "; dropping its " << tapCnt
+			<< " remaining tap(s) -- the tile will go quiet until it re-rolls";
+		tapCnt = 0;
 		return;
 	}
 
