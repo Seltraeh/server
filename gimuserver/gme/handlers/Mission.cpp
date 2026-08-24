@@ -391,7 +391,17 @@ HANDLEF(MissionEnd)
 			// Merges rather than replaces: readParam @0x13FD758 addObject()s
 			// without removeAllObjects, so this cannot drop clears the client
 			// already knows about.
-			resp.clear_mission_info = co_await gme::getClearedMissions(theDb(), identity);
+			// MUST use `transaction`, not theDb(): the SQLite pool is a single
+			// connection, so querying theDb() while this transaction holds it
+			// deadlocks the request.  Introduced as theDb() in dee3a1f and hung
+			// every MissionEnd from then until 2026-08-24 (handbook 6.14).
+			resp.clear_mission_info = co_await gme::getClearedMissions(transaction, identity);
+
+			// Fold this battle's statistics into the lifetime trophy archive.
+			// The client already reports all eight in rXvA1E5y with the same
+			// keys UserTeamArchive stores them under; before this they were
+			// parsed and dropped, which is why every battle trophy read 0.
+			co_await gme::accumulateBattleArchive(transaction, identity, req.battle_result);
 
 			resp.login_info = std::move(loginInfo);
 			resp.team_info = std::move(teamInfo);

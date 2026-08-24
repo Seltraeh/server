@@ -707,6 +707,38 @@ static void RegisterMigrations(MigrationMap& map)
 		);
 	});
 
+	// Lifetime battle statistics -- the progress half of the trophy system.
+	//
+	// UserTeamArchive (zI2tJB7R) carries 39 counters and every one is answered
+	// by PlayerInfoBattleResultScene::getActual @0x1791EEC, which maps exactly
+	// one trophy id per field.  Only these eight are populated: they are the
+	// ones the client already reports in every MissionEnd request, byte
+	// identical keys, so they cost nothing to collect.  The other 31 need
+	// instrumenting at their own call sites (unit fusion, item mixing, gifts,
+	// logins) and are left at 0 until someone does that.
+	//
+	// SUM vs MAX per column is taken from each trophy's label in
+	// deploy/mst/trophy_mst.json -- 累計/総合 sums, 最大 maxes -- NOT from the
+	// setter name.  See tools/SERVER_COMPONENT_AUDIT.md.
+	migrate("24082026_CreateUserTeamArchiveTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_team_archive ("
+			"user_id                TEXT    NOT NULL,"
+			// cumulative
+			"b_crystal              INTEGER NOT NULL DEFAULT 0,"
+			"h_crystal              INTEGER NOT NULL DEFAULT 0,"
+			"battle_spark_cnt       INTEGER NOT NULL DEFAULT 0,"
+			"battle_skill_cnt       INTEGER NOT NULL DEFAULT 0,"
+			"quest_mimic_cnt        INTEGER NOT NULL DEFAULT 0,"
+			// high-water marks
+			"battle_turn_max_damage INTEGER NOT NULL DEFAULT 0,"
+			"battle_turn_max_spark  INTEGER NOT NULL DEFAULT 0,"
+			"turn_max_unit_damage   INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id)"
+			");"
+		);
+	});
+
 	migrate("21082026_CreateUserMysteryBoxesTable", {
 		p->execSqlSync(
 			"CREATE TABLE IF NOT EXISTS user_mystery_boxes ("

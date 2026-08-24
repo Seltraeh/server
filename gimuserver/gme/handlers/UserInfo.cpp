@@ -167,6 +167,11 @@ HANDLEF(UserInfo)
 	// login snapshot.
 	resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
 
+	// Lifetime battle statistics behind the Trophy / Arena Archive / Colosseum
+	// Archive screens.  Only the eight counters MissionEnd can feed are real;
+	// the rest of UserTeamArchive stays 0 until something instruments them.
+	resp.archive = co_await gme::loadTeamArchive(db, identity);
+
 	// Favorited/locked units (3kcmQy7B) — UnitFavorite persists the flag;
 	// reporting it back makes locks survive a reload.
 	{

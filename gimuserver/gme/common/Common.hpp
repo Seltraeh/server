@@ -733,6 +733,142 @@ inline drogon::Task<db::InterfaceResult<UserIdentity>> getUserIdentity(
 }
 
 /*!
+* Folds one battle's statistics into the caller's lifetime trophy archive.
+*
+* UserTeamArchive (zI2tJB7R) is the progress half of the trophy system: every
+* one of its counters is answered by PlayerInfoBattleResultScene::getActual
+* (libgame.so 0x1791EEC), a 32KB chain of TrophyMst::getTrophyID() compares that
+* maps exactly one trophy id to one counter.
+*
+* These eight are the ones the client already reports in every MissionEnd
+* request under rXvA1E5y, with byte-identical keys, each sourced from BattleLog
+* — i.e. THIS BATTLE's value, never a running total, so the server accumulates.
+*
+* SUM vs MAX comes from each trophy's own label in deploy/mst/trophy_mst.json
+* (累計 / 総合 sum, 最大 max), NOT from the setter name:
+*
+*   b_crystal              += hoG2ieT5   trophy 100310 累計バトルクリスタル出現数
+*   h_crystal              += 6PLsn8xo   trophy 100320 累計ハートクリスタル出現数
+*   battle_spark_cnt       += U8uZLA34   trophy 100350 累計スパーク回数
+*   battle_skill_cnt       += rZQJF5G9   trophy 100360 累計BB使用回数
+*   quest_mimic_cnt        += TW1Mrtp5   trophy 200040 総合ミミック出現数
+*   battle_turn_max_damage  = max(…, 5NRJQ1LU)  trophy 100330 戦闘1ターン最大ダメージ数
+*   battle_turn_max_spark   = max(…, XP06YWdT)  trophy 100340 戦闘1ターン最大スパーク回数
+*   turn_max_unit_damage    = max(…, e6BKoYy9)  trophy 100325 ユニット単体最大ダメージ数
+*
+* Negative values are clamped to 0 before folding: the wire fields are quoted
+* ints the client controls, and a negative would corrupt a lifetime total that
+* nothing ever recomputes.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved user identity to update.
+* @param battle   The request's rXvA1E5y block.
+*/
+inline drogon::Task<void> accumulateBattleArchive(
+	const db::Database database,
+	const UserIdentity identity,
+	const ::MissionBattleResultInfo battle)
+{
+	const auto clamp = [](const int32_t v) { return std::max(v, 0); };
+
+	// One UPSERT rather than read-modify-write: MissionEnd already runs inside a
+	// transaction on the single-connection SQLite pool, and a second await here
+	// would be another sequential round trip (handbook §6.14).  The conflict
+	// clause does the summing and the max-ing in SQL, so a concurrent clear
+	// cannot lose an update.
+	//
+	// Values are ints off a parsed struct plus a server-minted user id, so
+	// inlining them carries no injection surface.
+	const std::string sql =
+		"INSERT INTO user_team_archive ("
+		"user_id, b_crystal, h_crystal, battle_spark_cnt, battle_skill_cnt,"
+		" quest_mimic_cnt, battle_turn_max_damage, battle_turn_max_spark,"
+		" turn_max_unit_damage) VALUES ('"
+		+ identity.userId + "',"
+		+ std::to_string(clamp(battle.battle_crystal_num)) + ","
+		+ std::to_string(clamp(battle.heart_crystal_num)) + ","
+		+ std::to_string(clamp(battle.spark_cnt)) + ","
+		+ std::to_string(clamp(battle.skill_use_cnt)) + ","
+		+ std::to_string(clamp(battle.mimic_cnt)) + ","
+		+ std::to_string(clamp(battle.max_turn_damage)) + ","
+		+ std::to_string(clamp(battle.max_turn_spark_cnt)) + ","
+		+ std::to_string(clamp(battle.one_attack_damage)) + ")"
+		" ON CONFLICT(user_id) DO UPDATE SET"
+		" b_crystal        = b_crystal        + excluded.b_crystal,"
+		" h_crystal        = h_crystal        + excluded.h_crystal,"
+		" battle_spark_cnt = battle_spark_cnt + excluded.battle_spark_cnt,"
+		" battle_skill_cnt = battle_skill_cnt + excluded.battle_skill_cnt,"
+		" quest_mimic_cnt  = quest_mimic_cnt  + excluded.quest_mimic_cnt,"
+		" battle_turn_max_damage = MAX(battle_turn_max_damage, excluded.battle_turn_max_damage),"
+		" battle_turn_max_spark  = MAX(battle_turn_max_spark,  excluded.battle_turn_max_spark),"
+		" turn_max_unit_damage   = MAX(turn_max_unit_damage,   excluded.turn_max_unit_damage);";
+
+	try
+	{
+		co_await database->execSqlCoro(sql);
+	}
+	catch (const drogon::orm::DrogonDbException& ex)
+	{
+		// Never fail a mission clear over a statistics row.  The reward, the
+		// unit drops and the clear flag matter; a missed trophy tick does not.
+		LOG_WARN << "accumulateBattleArchive: " << ex.base().what();
+	}
+	co_return;
+}
+
+/*!
+* Loads the caller's lifetime trophy archive for zI2tJB7R.
+*
+* Returns a single-element vector because that is the shape UserInfoResp wants.
+* Only the eight counters accumulateBattleArchive maintains are filled; the
+* other 31 fields stay 0 because nothing feeds them yet, which reads on the
+* client as a trophy with no progress rather than as an error.
+*
+* A user with no row yet yields an all-zero entry rather than an empty vector —
+* UserTeamArchiveResponse is a singleton readParam, so sending the row is what
+* makes the Trophy screen show 0/N instead of leaving stale values in place.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved user identity to read.
+* @return One UserTeamArchive, ready to serialise under zI2tJB7R.
+*/
+inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
+	const db::Database database,
+	const UserIdentity identity)
+{
+	::UserTeamArchive archive = {};
+	archive.user_id = identity.userId;
+
+	try
+	{
+		const auto rows = co_await database->execSqlCoro(
+			"SELECT b_crystal, h_crystal, battle_spark_cnt, battle_skill_cnt,"
+			" quest_mimic_cnt, battle_turn_max_damage, battle_turn_max_spark,"
+			" turn_max_unit_damage FROM user_team_archive WHERE user_id = $1;",
+			identity.userId);
+
+		if (!rows.empty())
+		{
+			const auto& row = rows.front();
+			archive.b_crystal              = row["b_crystal"].as<int32_t>();
+			archive.h_crystal              = row["h_crystal"].as<int32_t>();
+			archive.battle_spark_cnt       = row["battle_spark_cnt"].as<int32_t>();
+			archive.battle_skill_cnt       = row["battle_skill_cnt"].as<int32_t>();
+			archive.quest_mimic_cnt        = row["quest_mimic_cnt"].as<int32_t>();
+			archive.battle_turn_max_damage = row["battle_turn_max_damage"].as<int32_t>();
+			archive.battle_turn_max_spark  = row["battle_turn_max_spark"].as<int32_t>();
+			archive.turn_max_unit_damage   = row["turn_max_unit_damage"].as<int32_t>();
+		}
+	}
+	catch (const drogon::orm::DrogonDbException& ex)
+	{
+		LOG_WARN << "loadTeamArchive: " << ex.base().what();
+	}
+
+	co_return std::vector<::UserTeamArchive>{ std::move(archive) };
+}
+
+/*!
 * Reads the caller's cleared-mission history (UT1SVg59).
 *
 * THE progression driver: the client evaluates feature unlocks against this
