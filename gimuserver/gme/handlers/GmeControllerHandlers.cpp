@@ -79,6 +79,11 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("Uo86DcRh", GachaList, "8JbxFvuSaB2CK7Ln");
 	REGISTER("k57TdKDj", UnitSelectorGachaTicket, "1IJ8SaNk");
 	REGISTER("NiYWKdzs", HomeInfo, "f6uOewOD");
+	// Records / Archive screens.  GroupId and AES key recovered from the
+	// .rodata block: the key sits at GroupId+9 and the mangled class name
+	// ends it -- vUQrAV65 / 7pW4xF9H / actionSymbol/DheJ07aI.php /
+	// 20GetPlayerInfoRequest.
+	REGISTER("vUQrAV65", GetPlayerInfo, "7pW4xF9H");
 	REGISTER("9TvyNR5H", MissionEnd, "oINq0rfUFPx5MgmT");
 	REGISTER("jE6Sp0q4", MissionStart, "csiVLDKkxEwBfR70");
 	REGISTER("ruoB7bD8", ItemEdit, "DHEfRexCu0q5TAQm");

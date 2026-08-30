@@ -80,6 +80,7 @@ using HandlerFunc = std::function<drogon::Task<HandleResult>(drogon::SessionPtr 
 namespace GmeHandlers
 {
 	HANDLE(Initialize);
+	HANDLE(GetPlayerInfo);
 	HANDLE(BadgeInfo);
 	HANDLE(ChallengeArenaResetInfo);
 	HANDLE(ControlCenterEnter);
