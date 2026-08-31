@@ -844,7 +844,10 @@ inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 		const auto rows = co_await database->execSqlCoro(
 			"SELECT b_crystal, h_crystal, battle_spark_cnt, battle_skill_cnt,"
 			" quest_mimic_cnt, battle_turn_max_damage, battle_turn_max_spark,"
-			" turn_max_unit_damage FROM user_team_archive WHERE user_id = $1;",
+			" turn_max_unit_damage, zel_get, karma_get, zel_use, karma_use,"
+			" zel_unit_sale, unit_mix_cnt, unit_mix_elem_cnt, unit_evo_cnt,"
+			" town_harvest_cnt, quest_challenge_cnt, quest_clear_cnt"
+			" FROM user_team_archive WHERE user_id = $1;",
 			identity.userId);
 
 		if (!rows.empty())
@@ -858,6 +861,17 @@ inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 			archive.battle_turn_max_damage = row["battle_turn_max_damage"].as<int32_t>();
 			archive.battle_turn_max_spark  = row["battle_turn_max_spark"].as<int32_t>();
 			archive.turn_max_unit_damage   = row["turn_max_unit_damage"].as<int32_t>();
+			archive.zel_get                = row["zel_get"].as<int64_t>();
+			archive.karma_get              = row["karma_get"].as<int64_t>();
+			archive.zel_use                = row["zel_use"].as<int64_t>();
+			archive.karma_use              = row["karma_use"].as<int64_t>();
+			archive.zel_unit_sale          = row["zel_unit_sale"].as<int64_t>();
+			archive.unit_mix_cnt           = row["unit_mix_cnt"].as<int32_t>();
+			archive.unit_mix_elem_cnt      = row["unit_mix_elem_cnt"].as<int32_t>();
+			archive.unit_evo_cnt           = row["unit_evo_cnt"].as<int32_t>();
+			archive.town_harvest_cnt       = row["town_harvest_cnt"].as<int32_t>();
+			archive.quest_challenge_cnt    = row["quest_challenge_cnt"].as<int32_t>();
+			archive.quest_clear_cnt        = row["quest_clear_cnt"].as<int32_t>();
 		}
 	}
 	catch (const drogon::orm::DrogonDbException& ex)
@@ -866,6 +880,69 @@ inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 	}
 
 	co_return std::vector<::UserTeamArchive>{ std::move(archive) };
+}
+
+/*!
+* Adds to one or more cumulative trophy counters on user_team_archive.
+*
+* The counters wired through here are the ones a HANDLER observes as it does the
+* work -- zel earned, a fusion performed, a tile tapped -- as opposed to the
+* eight that arrive pre-measured in MissionEnd's rXvA1E5y block (those go through
+* accumulateBattleArchive, which also has to MAX three of them).
+*
+* Every counter here is a SUM. That is not inferred from the column name: each
+* one's trophy label in deploy/mst/trophy_mst.json is 累計 / 総合 / 回数 / 数,
+* all cumulative, and none is 最大. See tools/SERVER_COMPONENT_AUDIT.md for the
+* per-field citation.
+*
+* One UPSERT for the whole set, because several call sites already run inside a
+* transaction on the single-connection SQLite pool and an await per counter
+* would be a sequential round trip each (handbook §6.14).
+*
+* Negative deltas are dropped: these are lifetime totals nothing ever recomputes,
+* and every caller is adding an amount it just granted or charged.
+*
+* @param database Database client or transaction to use.
+* @param identity Resolved user identity to update.
+* @param deltas   column -> amount to add. Columns are compile-time literals
+*                 from the call sites, never user input.
+*/
+inline drogon::Task<void> bumpArchiveCounters(
+	const db::Database database,
+	const UserIdentity identity,
+	const std::vector<std::pair<std::string, int64_t>> deltas)
+{
+	std::string cols, vals, sets;
+	for (const auto& [col, raw] : deltas)
+	{
+		const auto delta = std::max<int64_t>(raw, 0);
+		if (delta == 0)
+		{
+			continue;
+		}
+
+		cols += ", " + col;
+		vals += ", " + std::to_string(delta);
+		sets += (sets.empty() ? " " : ", ") + col + " = " + col + " + excluded." + col;
+	}
+
+	if (sets.empty())
+	{
+		co_return;
+	}
+
+	try
+	{
+		co_await database->execSqlCoro(
+			"INSERT INTO user_team_archive (user_id" + cols + ") VALUES ('"
+			+ identity.userId + "'" + vals + ") ON CONFLICT(user_id) DO UPDATE SET" + sets + ";");
+	}
+	catch (const drogon::orm::DrogonDbException& ex)
+	{
+		// A statistics row must never fail the action that produced it.
+		LOG_WARN << "bumpArchiveCounters: " << ex.base().what();
+	}
+	co_return;
 }
 
 /*!

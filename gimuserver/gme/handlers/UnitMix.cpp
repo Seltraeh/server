@@ -457,5 +457,14 @@ HANDLEF(UnitMix)
         theDb(), identity, gme::kJournalTaskUnitFusion,
         static_cast<int32_t>(std::max<size_t>(matIds.size(), 1)));
 
+    // Trophies 100220 合成回数 / 100230 合成ユニット素材使用数 / 100040 総合ゼル使用額.
+    // matIds is the material set the handler actually consumed, and zelCost is
+    // what it charged -- both taken after validation, not from the raw request.
+    co_await gme::bumpArchiveCounters(theDb(), identity, {
+        { "unit_mix_cnt",      1 },
+        { "unit_mix_elem_cnt", static_cast<int64_t>(matIds.size()) },
+        { "zel_use",           static_cast<int64_t>(zelCost) },
+    });
+
     co_return HandleResult::success(buffer);
 }

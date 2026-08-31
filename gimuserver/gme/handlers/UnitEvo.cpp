@@ -283,5 +283,10 @@ HANDLEF(UnitEvo)
     // Journal: "Evolve 1 unit".
     co_await gme::addJournalProgress(theDb(), identity, gme::kJournalTaskEvolution, 1);
 
+    // Trophy 100240 進化回数.  One evolution per successful UnitEvo.
+    co_await gme::bumpArchiveCounters(theDb(), identity, {
+        { "unit_evo_cnt", 1 },
+    });
+
     co_return HandleResult::success(buffer);
 }

@@ -124,6 +124,12 @@ HANDLEF(TownFacilityUpdate)
         }
     }
 
+    // Trophy 100080 総合カルマ使用数.  karmaCost is what actually left the
+    // balance above, so the counter and the deduction cannot disagree.
+    co_await gme::bumpArchiveCounters(theDb(), identity, {
+        { "karma_use", karmaCost },
+    });
+
     // Report back the two lists the upgrade just invalidated.
     //
     // The client recomputed its own facility/location levels before sending, so

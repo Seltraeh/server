@@ -36,6 +36,31 @@ HANDLEF(TownUpdate)
 
 	co_await gme::Town::applyTaps(theDb(), identity, req.collect.collect_log);
 
+	// Trophy 100280 村採取タッチ数 -- the number of TAPS, counted off the same
+	// "<locationId>:<tapCnt>,..." log applyTaps just consumed, so the counter
+	// and the harvest cannot disagree about how many touches happened.
+	{
+		int64_t taps = 0;
+		const auto& log = req.collect.collect_log;
+		for (size_t at = 0; at < log.size();)
+		{
+			const auto comma = log.find(',', at);
+			const auto entry = log.substr(at, comma == std::string::npos ? std::string::npos : comma - at);
+			const auto colon = entry.find(':');
+			if (colon != std::string::npos)
+			{
+				try { taps += std::stoll(entry.substr(colon + 1)); }
+				catch (const std::exception&) { /* a malformed entry counts as zero */ }
+			}
+			if (comma == std::string::npos) break;
+			at = comma + 1;
+		}
+
+		co_await gme::bumpArchiveCounters(theDb(), identity, {
+			{ "town_harvest_cnt", taps },
+		});
+	}
+
 	// LzKDI2i7 (the owned sound-room track list) rides along on the same
 	// request.  It is not persisted: nothing server-side reads it back, and the
 	// sound room is a client-local purchase list.  Logged above with the rest of

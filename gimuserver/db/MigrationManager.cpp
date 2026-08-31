@@ -739,6 +739,27 @@ static void RegisterMigrations(MigrationMap& map)
 		);
 	});
 
+	// Second tranche of trophy counters.  Every one is a SUM: the classifier is
+	// each trophy's own label in deploy/mst/trophy_mst.json -- 累計 / 総合 /
+	// 回数 / 数 are all cumulative, and none of these carries 最大.
+	//
+	// Unlike the first eight (which arrive pre-measured in MissionEnd's
+	// rXvA1E5y), these are incremented by the handler that performs the action,
+	// so each is worth exactly one +1 or one += amount at the point of truth.
+	migrate("31082026_UserTeamArchiveCountersTrancheTwo", {
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN zel_get INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN karma_get INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN zel_use INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN karma_use INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN zel_unit_sale INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN unit_mix_cnt INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN unit_mix_elem_cnt INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN unit_evo_cnt INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN town_harvest_cnt INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN quest_challenge_cnt INTEGER NOT NULL DEFAULT 0;");
+			p->execSqlSync("ALTER TABLE user_team_archive ADD COLUMN quest_clear_cnt INTEGER NOT NULL DEFAULT 0;");
+	});
+
 	migrate("21082026_CreateUserMysteryBoxesTable", {
 		p->execSqlSync(
 			"CREATE TABLE IF NOT EXISTS user_mystery_boxes ("

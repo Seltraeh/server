@@ -403,6 +403,15 @@ HANDLEF(MissionEnd)
 			// parsed and dropped, which is why every battle trophy read 0.
 			co_await gme::accumulateBattleArchive(transaction, identity, req.battle_result);
 
+			// Lifetime totals the handler observes rather than receives.
+			// rewardZel/rewardKarma are the server-computed grant, not the
+			// client's claim, so these track what we actually paid out.
+			co_await gme::bumpArchiveCounters(transaction, identity, {
+				{ "zel_get",         static_cast<int64_t>(rewardZel)   },
+				{ "karma_get",       static_cast<int64_t>(rewardKarma) },
+				{ "quest_clear_cnt", 1 },
+			});
+
 			resp.login_info = std::move(loginInfo);
 			resp.team_info = std::move(teamInfo);
 			resp.unit_info = std::move(droppedUnits);

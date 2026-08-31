@@ -111,6 +111,12 @@ HANDLEF(UnitSell)
 
     // Journal: "Sell your excess units to earn 2000 zel" - the target is the
     // ZEL earned, not the number of units, so the sale value is what counts.
+    // Trophy 100050 総合ユニット売却額 -- the zel the SERVER decided the sale was
+    // worth (UnitMst.sell_price), never the client's Rs7bCE3t claim.
+    co_await gme::bumpArchiveCounters(theDb(), identity, {
+        { "zel_unit_sale", totalZel },
+    });
+
     co_await gme::addJournalProgress(
         theDb(), identity, gme::kJournalTaskSellUnits, static_cast<int32_t>(totalZel));
 
