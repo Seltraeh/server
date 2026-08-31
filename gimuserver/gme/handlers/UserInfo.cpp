@@ -176,6 +176,7 @@ HANDLEF(UserInfo)
 	// empty array never runs it and the client draws uninitialised memory --
 	// which is exactly what the Battle Record's Arena section was showing.
 	resp.arena_archive = gme::zeroedArenaArchive(identity);
+	resp.arena_info = gme::zeroedArenaInfo(identity);
 
 	// Favorited/locked units (3kcmQy7B) — UnitFavorite persists the flag;
 	// reporting it back makes locks survive a reload.

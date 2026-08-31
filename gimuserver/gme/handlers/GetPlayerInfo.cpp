@@ -63,6 +63,7 @@ HANDLEF(GetPlayerInfo)
 	GetPlayerInfoResp resp = {};
 	resp.archive = co_await gme::loadTeamArchive(theDb(), identity);
 	resp.arena_archive = gme::zeroedArenaArchive(identity);
+	resp.arena_info = gme::zeroedArenaInfo(identity);
 	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
 
 	std::string buffer{};

@@ -946,6 +946,27 @@ inline drogon::Task<void> bumpArchiveCounters(
 }
 
 /*!
+* Returns a zero-initialised arena standing for 8jBJ7uKR.
+*
+* Same singleton trap as zeroedArenaArchive: UserArenaInfoResponse::readParam
+* (libgame.so 0x13FCDF0) writes per ROW, so "8jBJ7uKR":[] never runs it and the
+* client draws uninitialised memory -- observed as 9,765,061 Total Entries and
+* 14,614,711 Total Wins on the Battle Record.
+*
+* Nothing instruments arena battles, so 0 is the honest value; sending the row
+* is what matters.
+*
+* @param identity Resolved user identity.
+* @return Exactly one UserArenaInfo, ready to serialise under 8jBJ7uKR.
+*/
+inline std::vector<::UserArenaInfo> zeroedArenaInfo(const UserIdentity identity)
+{
+	::UserArenaInfo arena = {};
+	arena.user_id = identity.userId;
+	return { std::move(arena) };
+}
+
+/*!
 * Returns a zero-initialised arena archive for PQ56vbkI.
 *
 * ⚠ THIS MUST BE SENT EVEN THOUGH EVERY COUNTER IS ZERO.
