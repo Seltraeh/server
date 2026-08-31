@@ -172,6 +172,11 @@ HANDLEF(UserInfo)
 	// the rest of UserTeamArchive stays 0 until something instruments them.
 	resp.archive = co_await gme::loadTeamArchive(db, identity);
 
+	// Must be a real row, not [].  PQ56vbkI is a SINGLETON readParam, so an
+	// empty array never runs it and the client draws uninitialised memory --
+	// which is exactly what the Battle Record's Arena section was showing.
+	resp.arena_archive = gme::zeroedArenaArchive(identity);
+
 	// Favorited/locked units (3kcmQy7B) — UnitFavorite persists the flag;
 	// reporting it back makes locks survive a reload.
 	{

@@ -869,6 +869,38 @@ inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 }
 
 /*!
+* Returns a zero-initialised arena archive for PQ56vbkI.
+*
+* ⚠ THIS MUST BE SENT EVEN THOUGH EVERY COUNTER IS ZERO.
+*
+* UserTeamArenaArchiveResponse::readParam (libgame.so 0x1402AC8) is a SINGLETON
+* parser: removeAllObjects/addObject fire per row, so a zero-row array means
+* readParam never runs at all and the client-side singleton is never written.
+* It then draws whatever was in that memory.
+*
+* That is not theoretical.  With `"PQ56vbkI":[]` the Battle Record's Arena
+* section rendered uninitialised heap: 9,765,061 entries, a defense win streak
+* of -1,191,182,337, "Earth Units Defeated -216".  Sending one all-zero row
+* makes readParam run and the screen read an honest 0.
+*
+* This is the general singleton trap — an EMPTY LIST IS NOT A CLEAR.  The same
+* reasoning applies to any singleton response class; contrast the list classes,
+* where omitting a key genuinely leaves the previous contents.
+*
+* Nothing instruments arena battles yet, so every field here is legitimately 0
+* except the user id.  When arena scoring lands, this is where it reads from.
+*
+* @param identity Resolved user identity.
+* @return Exactly one UserTeamArenaArchive, ready to serialise under PQ56vbkI.
+*/
+inline std::vector<::UserTeamArenaArchive> zeroedArenaArchive(const UserIdentity identity)
+{
+	::UserTeamArenaArchive arena = {};
+	arena.user_id = identity.userId;
+	return { std::move(arena) };
+}
+
+/*!
 * Reads the caller's cleared-mission history (UT1SVg59).
 *
 * THE progression driver: the client evaluates feature unlocks against this
