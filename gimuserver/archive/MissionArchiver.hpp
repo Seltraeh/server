@@ -69,6 +69,22 @@ public:
 	static bool populatePacket(const MissionRecord& record, std::vector<MonsterMst>& msts);
 
 	/*!
+	* Populates the per-animation sprite rows for any special (non-obtainable)
+	* monsters in the mission.
+	*
+	* Sets nullopt when the mission has no special monsters, so the 8hoyIF9Q
+	* block is omitted entirely rather than sent empty -- its readParam clears
+	* the client's cached list before repopulating it.
+	*
+	* @param record Archive record to read from.
+	* @param msts Packet rows to populate, or nullopt.
+	* @return Always true; a mission with no special monsters is not an error.
+	*/
+	static bool populatePacket(
+		const MissionRecord& record,
+		std::optional<std::vector<MonsterCgsMst>>& msts);
+
+	/*!
 	* Populates all battle monster group MST rows referenced by the mission
 	* record.
 	*

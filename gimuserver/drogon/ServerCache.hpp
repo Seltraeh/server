@@ -182,6 +182,14 @@ public:
 	inline const auto& missionsByDungeon() const { return m_missionsByDungeon; }
 
 	/*!
+	* mission id -> its FIRST-CLEAR reward string, for the 787 missions that
+	* have one.  Comma-separated `type:id:amount:?:?` in the shared reward
+	* vocabulary (3 zel, 8 gem, 6 unit, 4/5/7 item, 11 karma, 17 SP) --
+	* see MissionMst::clear_rewards.  Missions with no reward are absent.
+	*/
+	inline const auto& missionClearRewards() const { return m_missionClearRewards; }
+
+	/*!
 	* mission id -> the missions that must be cleared before it unlocks.
 	*
 	* Only missions WITH a prerequisite appear; an absent entry means the
@@ -275,6 +283,48 @@ public:
 	{
 		return m_vortexDayPermits.at(weekdayIndex);
 	}
+
+	/*!
+	* Mission id -> the Grand Gaia quest dungeon it belongs to, absent for any
+	* mission that earns no clear Gem.
+	*
+	* Clearing every mission in one of these dungeons pays 1 Gem, once — the
+	* "1 Gem from fully completing a stage in a Quest map" on the wiki's
+	* In-Game Credits page.  203 dungeons carry a Gem across 989 missions, so
+	* roughly one Gem per five missions.
+	*
+	* ⚠ The wiki says this two ways and they are not the same size.  Quests
+	* says "Finishing an AREA rewards you with 1 Gem", which is 26 Gems for the
+	* whole campaign; In-Game Credits says a STAGE, which is the dungeon and is
+	* the 203 above.  The dungeon reading is the one implemented: it is the one
+	* the project owner remembered ("one gem for completing a mission set"), it
+	* matches the word "stage", and 26 Gems across 989 missions cannot sustain
+	* a 3-Gem summon.  To switch, index by mission.area_id here instead —
+	* MissionEnd reads whatever this maps to and needs no other change.
+	*
+	* Quest content only.  Vortex, Frontier Gate, Frontier Hunter and Grand
+	* Quest all live on land 99 and are not a "Quest map"; event and collab
+	* content sits above the id floor.
+	*/
+	inline const auto& missionQuestDungeon() const { return m_missionQuestDungeon; }
+
+	/*!
+	* The area table as the CLIENT should hold it — areaMst() minus the Vortex
+	* areas not worth a tile, with Parade Garden floated to the top.
+	*
+	* Sent on UserInfo at 3SG2wX0R, which is a full replace of the client's
+	* AreaMstList, so this is deliberately the WHOLE table and not just the
+	* Vortex slice.  Use areaMst() for anything server-side; this one exists
+	* only to be serialised.  See UserInfoResp::area_mst for the readParam
+	* evidence, and Setup() for what the curation drops.
+	*/
+	inline const auto& clientAreaMst() const { return m_clientAreaMst; }
+
+	/*!
+	* Vortex areas that are deliberately not drawn — empty shells, untranslated
+	* collab content, and repeats of a tile the player already has.
+	*/
+	inline const auto& vortexHiddenAreas() const { return m_vortexHiddenAreas; }
 
 	/*!
 	* Summoner Unit master data — the player avatar's level curve, per-element
@@ -444,6 +494,7 @@ private:
 	// dungeon_id -> ascending mission ids.  Derived index over F_MISSION_MST;
 	// the rows themselves are not retained.  Consumer: FrontierGateInfo.
 	std::map<int32_t, std::vector<int32_t>> m_missionsByDungeon;
+	std::map<int32_t, std::string> m_missionClearRewards;
 
 	// mission id -> prerequisite mission ids.  Only missions that HAVE a
 	// prerequisite are present.  Consumer: UserInfo's PermitPlace gate.
@@ -464,6 +515,18 @@ private:
 	// missions only; areas stay in m_vortexPermits.
 	// Consumer: UserInfo's PermitPlace injection.
 	std::array<TopologyPermits, 7> m_vortexDayPermits;
+
+	// Mission -> its Grand Gaia quest dungeon.
+	// Consumer: MissionEnd's dungeon-clear Gem.
+	std::map<int32_t, int32_t> m_missionQuestDungeon;
+
+	// Vortex areas curated out of the tile list at boot.
+	// Consumers: m_clientAreaMst and the m_vortexPermits collection.
+	std::set<int32_t> m_vortexHiddenAreas;
+
+	// m_areaMst minus m_vortexHiddenAreas, Parade Garden reordered.
+	// Consumer: UserInfo's 3SG2wX0R emission.
+	std::vector<AreaMst> m_clientAreaMst;
 
 	// Summoner Unit — mst/summoner.kdl
 	std::vector<SummonerAbilityMst> m_summonerAbilityMst;

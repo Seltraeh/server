@@ -947,28 +947,3343 @@
   {
     "id": 11960,
     "priority": 1,
-    "caption_msg": "<center>[<color=255:255:0>Rare Summon: All Star Units!</color>]<br>Summon <color=255:0:0>3~4*</color> units! <color=0:255:0>Increased Rates</color> for featured units <color=192:192:192>Zellha</color>, <color=128:0:128>Elza</color> and <color=0:0:255>Elimo</color>! <color=255:255:0><br>Summon now!</color><center>",
-    "detail_msg": "<center>Summon units with <color=255:0:0>3* and 4*</color> rarity! <color=0:255:0>Increased Rates</color> for daily featured units!<br>Enjoy <color=255:255:0>SUMMON</color> for <color=255:255:0>3 gems</color>!<center>",
+    "caption_msg": "<center>[<color=255:255:0>Rare Summon: All Star Units!</color>]<br>Summon any <color=255:0:0>3★</color> to <color=255:0:0>5★</color> unit — no fodder, no evolution materials.<br><color=255:255:0>Summon now!</color><center>",
+    "detail_msg": "<center>Chance to get any <color=255:0:0>3★</color> to <color=255:0:0>5★</color> unit from SUMMON!<br>Enjoy <color=255:255:0>SUMMON</color> for <color=255:255:0>3 gems</color>!<center>",
     "pool": [
       {
-        "unit_id": 10011,
-        "weight": 100,
-        "name": "Fencer Vargas"
+        "unit_id": 10012,
+        "weight": 2000,
+        "name": "Burning Vargas"
       },
       {
-        "unit_id": 20011,
-        "weight": 100,
-        "name": "Selena"
+        "unit_id": 10013,
+        "weight": 700,
+        "name": "Fire King Vargas"
       },
       {
-        "unit_id": 30011,
+        "unit_id": 10014,
         "weight": 100,
-        "name": "Pikeman Lance"
+        "name": "Fire God Vargas"
       },
       {
-        "unit_id": 40011,
+        "unit_id": 10022,
+        "weight": 2000,
+        "name": "Rage Beast Zegar"
+      },
+      {
+        "unit_id": 10023,
+        "weight": 700,
+        "name": "Fire Beast Zegar"
+      },
+      {
+        "unit_id": 10024,
         "weight": 100,
-        "name": "Warrior Eze"
+        "name": "Beast King Zegar"
+      },
+      {
+        "unit_id": 10032,
+        "weight": 2000,
+        "name": "Kaiser Burny"
+      },
+      {
+        "unit_id": 10042,
+        "weight": 2000,
+        "name": "Pyromancer Liza"
+      },
+      {
+        "unit_id": 10052,
+        "weight": 2000,
+        "name": "Hobgoblin"
+      },
+      {
+        "unit_id": 10062,
+        "weight": 2000,
+        "name": "Head Thief Leon"
+      },
+      {
+        "unit_id": 10063,
+        "weight": 700,
+        "name": "Great Thief Leon"
+      },
+      {
+        "unit_id": 10072,
+        "weight": 2000,
+        "name": "Cerberus"
+      },
+      {
+        "unit_id": 10073,
+        "weight": 700,
+        "name": "Ragnaberus"
+      },
+      {
+        "unit_id": 10082,
+        "weight": 2000,
+        "name": "Ifrit"
+      },
+      {
+        "unit_id": 10083,
+        "weight": 700,
+        "name": "Malvan"
+      },
+      {
+        "unit_id": 10092,
+        "weight": 2000,
+        "name": "Firedrake"
+      },
+      {
+        "unit_id": 10093,
+        "weight": 700,
+        "name": "Dragon Graven"
+      },
+      {
+        "unit_id": 10094,
+        "weight": 100,
+        "name": "Dalimaone"
+      },
+      {
+        "unit_id": 10102,
+        "weight": 2000,
+        "name": "Knight Agni"
+      },
+      {
+        "unit_id": 10103,
+        "weight": 700,
+        "name": "Fire Knight Agni"
+      },
+      {
+        "unit_id": 10104,
+        "weight": 100,
+        "name": "Magma Knight Agni"
+      },
+      {
+        "unit_id": 10112,
+        "weight": 2000,
+        "name": "Phoenix"
+      },
+      {
+        "unit_id": 10113,
+        "weight": 700,
+        "name": "Lava Phoenix"
+      },
+      {
+        "unit_id": 10114,
+        "weight": 100,
+        "name": "God Phoenix"
+      },
+      {
+        "unit_id": 10122,
+        "weight": 2000,
+        "name": "Lava"
+      },
+      {
+        "unit_id": 10123,
+        "weight": 700,
+        "name": "Fire Knight Lava"
+      },
+      {
+        "unit_id": 10124,
+        "weight": 100,
+        "name": "Fire God Lava"
+      },
+      {
+        "unit_id": 10142,
+        "weight": 2000,
+        "name": "Bruiser Galant"
+      },
+      {
+        "unit_id": 10143,
+        "weight": 700,
+        "name": "God Arm Galant"
+      },
+      {
+        "unit_id": 10144,
+        "weight": 100,
+        "name": "Smith Lord Galant"
+      },
+      {
+        "unit_id": 10152,
+        "weight": 2000,
+        "name": "Lancia"
+      },
+      {
+        "unit_id": 10153,
+        "weight": 700,
+        "name": "Hot Chef Lancia"
+      },
+      {
+        "unit_id": 10154,
+        "weight": 100,
+        "name": "Head Chef Lancia"
+      },
+      {
+        "unit_id": 10162,
+        "weight": 2000,
+        "name": "Lorand"
+      },
+      {
+        "unit_id": 10163,
+        "weight": 700,
+        "name": "Professor Lorand"
+      },
+      {
+        "unit_id": 10164,
+        "weight": 100,
+        "name": "Master Lorand"
+      },
+      {
+        "unit_id": 10172,
+        "weight": 2000,
+        "name": "Ogre"
+      },
+      {
+        "unit_id": 10182,
+        "weight": 2000,
+        "name": "Mountaineer Talos"
+      },
+      {
+        "unit_id": 10212,
+        "weight": 2000,
+        "name": "Drake Chief Aisha"
+      },
+      {
+        "unit_id": 10213,
+        "weight": 700,
+        "name": "Drake Lord Aisha"
+      },
+      {
+        "unit_id": 10214,
+        "weight": 100,
+        "name": "Drake Queen Aisha"
+      },
+      {
+        "unit_id": 10222,
+        "weight": 2000,
+        "name": "Goltovah"
+      },
+      {
+        "unit_id": 10223,
+        "weight": 700,
+        "name": "Flame King Goltovah"
+      },
+      {
+        "unit_id": 10233,
+        "weight": 700,
+        "name": "Swordswoman Seria"
+      },
+      {
+        "unit_id": 10234,
+        "weight": 100,
+        "name": "Blade God Seria"
+      },
+      {
+        "unit_id": 10243,
+        "weight": 700,
+        "name": "Freya"
+      },
+      {
+        "unit_id": 10244,
+        "weight": 100,
+        "name": "Blaze Sibyl Freya"
+      },
+      {
+        "unit_id": 10253,
+        "weight": 700,
+        "name": "Red Axe Michele"
+      },
+      {
+        "unit_id": 10254,
+        "weight": 100,
+        "name": "Lotus Axe Michele"
+      },
+      {
+        "unit_id": 10262,
+        "weight": 2000,
+        "name": "King Bozdell"
+      },
+      {
+        "unit_id": 10273,
+        "weight": 700,
+        "name": "Homusubi"
+      },
+      {
+        "unit_id": 10274,
+        "weight": 100,
+        "name": "Kagutsuchi"
+      },
+      {
+        "unit_id": 10283,
+        "weight": 700,
+        "name": "War Demon Vishra"
+      },
+      {
+        "unit_id": 10284,
+        "weight": 100,
+        "name": "Rakshasa Vishra"
+      },
+      {
+        "unit_id": 10293,
+        "weight": 700,
+        "name": "Sword Emperor Reed"
+      },
+      {
+        "unit_id": 10294,
+        "weight": 100,
+        "name": "Sword God Reed"
+      },
+      {
+        "unit_id": 10302,
+        "weight": 2000,
+        "name": "Unit 10302"
+      },
+      {
+        "unit_id": 10333,
+        "weight": 700,
+        "name": "Red Slash Farlon"
+      },
+      {
+        "unit_id": 10334,
+        "weight": 100,
+        "name": "Red Blade Farlon"
+      },
+      {
+        "unit_id": 10363,
+        "weight": 700,
+        "name": "Fire Step Ramna"
+      },
+      {
+        "unit_id": 10364,
+        "weight": 100,
+        "name": "Fire Dance Ramna"
+      },
+      {
+        "unit_id": 10373,
+        "weight": 700,
+        "name": "Dark Arts Dia"
+      },
+      {
+        "unit_id": 10374,
+        "weight": 100,
+        "name": "Dark Princess Dia"
+      },
+      {
+        "unit_id": 10433,
+        "weight": 700,
+        "name": "Flaming Javelin Lars"
+      },
+      {
+        "unit_id": 10434,
+        "weight": 100,
+        "name": "Burning Spear Lars"
+      },
+      {
+        "unit_id": 10443,
+        "weight": 700,
+        "name": "Luther"
+      },
+      {
+        "unit_id": 10444,
+        "weight": 100,
+        "name": "Defiant Luther"
+      },
+      {
+        "unit_id": 10463,
+        "weight": 700,
+        "name": "Bodyguard Darvanshel"
+      },
+      {
+        "unit_id": 10464,
+        "weight": 100,
+        "name": "Protector Darvanshel"
+      },
+      {
+        "unit_id": 10493,
+        "weight": 700,
+        "name": "Emperor Orwen"
+      },
+      {
+        "unit_id": 10494,
+        "weight": 100,
+        "name": "Divine Emperor Orwen"
+      },
+      {
+        "unit_id": 10503,
+        "weight": 700,
+        "name": "Fire Witch Ulkina"
+      },
+      {
+        "unit_id": 10504,
+        "weight": 100,
+        "name": "Fire Dragoon Ulkina"
+      },
+      {
+        "unit_id": 10514,
+        "weight": 100,
+        "name": "Owen"
+      },
+      {
+        "unit_id": 10543,
+        "weight": 700,
+        "name": "Ember Elder Fiora"
+      },
+      {
+        "unit_id": 10544,
+        "weight": 100,
+        "name": "Ember Sage Fiora"
+      },
+      {
+        "unit_id": 10553,
+        "weight": 700,
+        "name": "Phoenix Knight Arus"
+      },
+      {
+        "unit_id": 10554,
+        "weight": 100,
+        "name": "Phoenix Emperor Arus"
+      },
+      {
+        "unit_id": 10583,
+        "weight": 700,
+        "name": "Gilded Armor Vanberk"
+      },
+      {
+        "unit_id": 10584,
+        "weight": 100,
+        "name": "Blaze Armor Vanberk"
+      },
+      {
+        "unit_id": 10594,
+        "weight": 100,
+        "name": "Scorching Alpha"
+      },
+      {
+        "unit_id": 10604,
+        "weight": 100,
+        "name": "Burning Pike Claire"
+      },
+      {
+        "unit_id": 10612,
+        "weight": 2000,
+        "name": "Brangea"
+      },
+      {
+        "unit_id": 10613,
+        "weight": 700,
+        "name": "Granmeria"
+      },
+      {
+        "unit_id": 10622,
+        "weight": 2000,
+        "name": "Anje"
+      },
+      {
+        "unit_id": 10623,
+        "weight": 700,
+        "name": "Cavalry Lass Anje"
+      },
+      {
+        "unit_id": 10634,
+        "weight": 100,
+        "name": "Crimson Dragon Regrard"
+      },
+      {
+        "unit_id": 10644,
+        "weight": 100,
+        "name": "Pyro Spin Ruby"
+      },
+      {
+        "unit_id": 10664,
+        "weight": 100,
+        "name": "Flame Rifle Bestie"
+      },
+      {
+        "unit_id": 10674,
+        "weight": 100,
+        "name": "Strong Flame Griff"
+      },
+      {
+        "unit_id": 10684,
+        "weight": 100,
+        "name": "Dark Fire Rineth"
+      },
+      {
+        "unit_id": 10704,
+        "weight": 100,
+        "name": "Velnar"
+      },
+      {
+        "unit_id": 10722,
+        "weight": 2000,
+        "name": "Garfon"
+      },
+      {
+        "unit_id": 10734,
+        "weight": 100,
+        "name": "Flame Demon Adel"
+      },
+      {
+        "unit_id": 10743,
+        "weight": 700,
+        "name": "Elise"
+      },
+      {
+        "unit_id": 10744,
+        "weight": 100,
+        "name": "Informant Elise"
+      },
+      {
+        "unit_id": 10754,
+        "weight": 100,
+        "name": "War Fire Avant"
+      },
+      {
+        "unit_id": 10774,
+        "weight": 100,
+        "name": "Lava Beast Vermilion"
+      },
+      {
+        "unit_id": 10794,
+        "weight": 100,
+        "name": "Fire Rod Limera"
+      },
+      {
+        "unit_id": 10804,
+        "weight": 100,
+        "name": "Hot Metal Gildorf"
+      },
+      {
+        "unit_id": 10824,
+        "weight": 100,
+        "name": "Inferno Berdette"
+      },
+      {
+        "unit_id": 10864,
+        "weight": 100,
+        "name": "Intense Flame Golzo"
+      },
+      {
+        "unit_id": 10884,
+        "weight": 100,
+        "name": "Red Witch Shelly"
+      },
+      {
+        "unit_id": 10922,
+        "weight": 2000,
+        "name": "F-2 Flamero"
+      },
+      {
+        "unit_id": 10923,
+        "weight": 700,
+        "name": "F-8 Flareveil"
+      },
+      {
+        "unit_id": 20012,
+        "weight": 2000,
+        "name": "Ice Selena"
+      },
+      {
+        "unit_id": 20013,
+        "weight": 700,
+        "name": "Ice Queen Selena"
+      },
+      {
+        "unit_id": 20014,
+        "weight": 100,
+        "name": "Ice Goddess Selena"
+      },
+      {
+        "unit_id": 20022,
+        "weight": 2000,
+        "name": "Knight Zephu"
+      },
+      {
+        "unit_id": 20023,
+        "weight": 700,
+        "name": "Dragoon Zephu"
+      },
+      {
+        "unit_id": 20024,
+        "weight": 100,
+        "name": "Dragon Hero Zephu"
+      },
+      {
+        "unit_id": 20032,
+        "weight": 2000,
+        "name": "Kaiser Squirty"
+      },
+      {
+        "unit_id": 20042,
+        "weight": 2000,
+        "name": "Bishop Merith"
+      },
+      {
+        "unit_id": 20052,
+        "weight": 2000,
+        "name": "Lizard Man"
+      },
+      {
+        "unit_id": 20062,
+        "weight": 2000,
+        "name": "Plunderer Verica"
+      },
+      {
+        "unit_id": 20063,
+        "weight": 700,
+        "name": "Sea Prince Verica"
+      },
+      {
+        "unit_id": 20072,
+        "weight": 2000,
+        "name": "Scylla"
+      },
+      {
+        "unit_id": 20073,
+        "weight": 700,
+        "name": "Lotan"
+      },
+      {
+        "unit_id": 20082,
+        "weight": 2000,
+        "name": "Legtos"
+      },
+      {
+        "unit_id": 20083,
+        "weight": 700,
+        "name": "Legnaura"
+      },
+      {
+        "unit_id": 20092,
+        "weight": 2000,
+        "name": "Undine"
+      },
+      {
+        "unit_id": 20093,
+        "weight": 700,
+        "name": "Siren"
+      },
+      {
+        "unit_id": 20094,
+        "weight": 100,
+        "name": "Meltia"
+      },
+      {
+        "unit_id": 20102,
+        "weight": 2000,
+        "name": "Knight Sergio"
+      },
+      {
+        "unit_id": 20103,
+        "weight": 700,
+        "name": "Ice Ruler Sergio"
+      },
+      {
+        "unit_id": 20104,
+        "weight": 100,
+        "name": "Ice Knight Sergio"
+      },
+      {
+        "unit_id": 20112,
+        "weight": 2000,
+        "name": "Leviathan"
+      },
+      {
+        "unit_id": 20113,
+        "weight": 700,
+        "name": "Loch Ness"
+      },
+      {
+        "unit_id": 20114,
+        "weight": 100,
+        "name": "Malnaplis"
+      },
+      {
+        "unit_id": 20122,
+        "weight": 2000,
+        "name": "Captain Mega"
+      },
+      {
+        "unit_id": 20123,
+        "weight": 700,
+        "name": "War Captain Mega"
+      },
+      {
+        "unit_id": 20124,
+        "weight": 100,
+        "name": "Commander Mega"
+      },
+      {
+        "unit_id": 20142,
+        "weight": 2000,
+        "name": "Snow Blade Stya"
+      },
+      {
+        "unit_id": 20143,
+        "weight": 700,
+        "name": "Frost Queen Stya"
+      },
+      {
+        "unit_id": 20144,
+        "weight": 100,
+        "name": "Mother Snow Stya"
+      },
+      {
+        "unit_id": 20152,
+        "weight": 2000,
+        "name": "Elimo"
+      },
+      {
+        "unit_id": 20153,
+        "weight": 700,
+        "name": "Royal Elimo"
+      },
+      {
+        "unit_id": 20154,
+        "weight": 100,
+        "name": "Genius Elimo"
+      },
+      {
+        "unit_id": 20162,
+        "weight": 2000,
+        "name": "Dean"
+      },
+      {
+        "unit_id": 20163,
+        "weight": 700,
+        "name": "Ice Mage Dean"
+      },
+      {
+        "unit_id": 20164,
+        "weight": 100,
+        "name": "Ice Wizard Dean"
+      },
+      {
+        "unit_id": 20172,
+        "weight": 2000,
+        "name": "Hrungnir"
+      },
+      {
+        "unit_id": 20182,
+        "weight": 2000,
+        "name": "Frozen Rose Elize"
+      },
+      {
+        "unit_id": 20212,
+        "weight": 2000,
+        "name": "Twin Gem Rickel"
+      },
+      {
+        "unit_id": 20213,
+        "weight": 700,
+        "name": "Twin Flash Rickel"
+      },
+      {
+        "unit_id": 20214,
+        "weight": 100,
+        "name": "Twin Shot Rickel"
+      },
+      {
+        "unit_id": 20222,
+        "weight": 2000,
+        "name": "Jaegar"
+      },
+      {
+        "unit_id": 20223,
+        "weight": 700,
+        "name": "Ice King Jaegar"
+      },
+      {
+        "unit_id": 20233,
+        "weight": 700,
+        "name": "Brave Knight Karl"
+      },
+      {
+        "unit_id": 20234,
+        "weight": 100,
+        "name": "Ice Warrior Karl"
+      },
+      {
+        "unit_id": 20243,
+        "weight": 700,
+        "name": "Eliza"
+      },
+      {
+        "unit_id": 20244,
+        "weight": 100,
+        "name": "Snow Sibyl Eliza"
+      },
+      {
+        "unit_id": 20253,
+        "weight": 700,
+        "name": "Polar Angel Tiara"
+      },
+      {
+        "unit_id": 20254,
+        "weight": 100,
+        "name": "Ice Apostle Tiara"
+      },
+      {
+        "unit_id": 20262,
+        "weight": 2000,
+        "name": "Ghoul Fish Pilaf"
+      },
+      {
+        "unit_id": 20273,
+        "weight": 700,
+        "name": "Ice Keep Copra"
+      },
+      {
+        "unit_id": 20274,
+        "weight": 100,
+        "name": "Ice Tower Tesla"
+      },
+      {
+        "unit_id": 20283,
+        "weight": 700,
+        "name": "Hail Bot Reeze"
+      },
+      {
+        "unit_id": 20284,
+        "weight": 100,
+        "name": "Hail Mech Reeze"
+      },
+      {
+        "unit_id": 20293,
+        "weight": 700,
+        "name": "Talon King Rhein"
+      },
+      {
+        "unit_id": 20294,
+        "weight": 100,
+        "name": "Talon God Rhein"
+      },
+      {
+        "unit_id": 20323,
+        "weight": 700,
+        "name": "Snow Cub Signas"
+      },
+      {
+        "unit_id": 20324,
+        "weight": 100,
+        "name": "Snow Lion Signas"
+      },
+      {
+        "unit_id": 20353,
+        "weight": 700,
+        "name": "Spear Fist Raydn"
+      },
+      {
+        "unit_id": 20354,
+        "weight": 100,
+        "name": "Spear Arms Raydn"
+      },
+      {
+        "unit_id": 20363,
+        "weight": 700,
+        "name": "Azure Blade Lucina"
+      },
+      {
+        "unit_id": 20364,
+        "weight": 100,
+        "name": "Azure Warrior Lucina"
+      },
+      {
+        "unit_id": 20423,
+        "weight": 700,
+        "name": "Ice Knight Kyle"
+      },
+      {
+        "unit_id": 20424,
+        "weight": 100,
+        "name": "Frozen Blade Kyle"
+      },
+      {
+        "unit_id": 20433,
+        "weight": 700,
+        "name": "Phee"
+      },
+      {
+        "unit_id": 20434,
+        "weight": 100,
+        "name": "Tyrant Phee"
+      },
+      {
+        "unit_id": 20453,
+        "weight": 700,
+        "name": "Dark Axe Mariudeth"
+      },
+      {
+        "unit_id": 20454,
+        "weight": 100,
+        "name": "Axe King Mariudeth"
+      },
+      {
+        "unit_id": 20473,
+        "weight": 700,
+        "name": "Prince Arius"
+      },
+      {
+        "unit_id": 20474,
+        "weight": 100,
+        "name": "Divine Prince Arius"
+      },
+      {
+        "unit_id": 20483,
+        "weight": 700,
+        "name": "Aquamancer Kuhla"
+      },
+      {
+        "unit_id": 20484,
+        "weight": 100,
+        "name": "Aqua Ruler Kuhla"
+      },
+      {
+        "unit_id": 20494,
+        "weight": 100,
+        "name": "Noah"
+      },
+      {
+        "unit_id": 20513,
+        "weight": 700,
+        "name": "Sea Pirate Eve"
+      },
+      {
+        "unit_id": 20514,
+        "weight": 100,
+        "name": "Pirate Empress Eve"
+      },
+      {
+        "unit_id": 20524,
+        "weight": 100,
+        "name": "Tesla"
+      },
+      {
+        "unit_id": 20533,
+        "weight": 700,
+        "name": "Disciple Belfura"
+      },
+      {
+        "unit_id": 20534,
+        "weight": 100,
+        "name": "Slayer Belfura"
+      },
+      {
+        "unit_id": 20553,
+        "weight": 700,
+        "name": "Alchemist Rigness"
+      },
+      {
+        "unit_id": 20554,
+        "weight": 100,
+        "name": "Synthesizer Rigness"
+      },
+      {
+        "unit_id": 20564,
+        "weight": 100,
+        "name": "Piercing Tazer"
+      },
+      {
+        "unit_id": 20574,
+        "weight": 100,
+        "name": "Frozen Blade Colt"
+      },
+      {
+        "unit_id": 20582,
+        "weight": 2000,
+        "name": "Levira"
+      },
+      {
+        "unit_id": 20583,
+        "weight": 700,
+        "name": "Vordos"
+      },
+      {
+        "unit_id": 20592,
+        "weight": 2000,
+        "name": "Lionel"
+      },
+      {
+        "unit_id": 20593,
+        "weight": 700,
+        "name": "Blue Knight Lionel"
+      },
+      {
+        "unit_id": 20604,
+        "weight": 100,
+        "name": "Cerulean Dragon Rubeus"
+      },
+      {
+        "unit_id": 20614,
+        "weight": 100,
+        "name": "Cascade Pearl Medina"
+      },
+      {
+        "unit_id": 20624,
+        "weight": 100,
+        "name": "Lance Knight Vernil"
+      },
+      {
+        "unit_id": 20634,
+        "weight": 100,
+        "name": "Lapis Princess Iris"
+      },
+      {
+        "unit_id": 20644,
+        "weight": 100,
+        "name": "Aqua Wand Quartz"
+      },
+      {
+        "unit_id": 20654,
+        "weight": 100,
+        "name": "Yuni"
+      },
+      {
+        "unit_id": 20662,
+        "weight": 2000,
+        "name": "Aerohang"
+      },
+      {
+        "unit_id": 20674,
+        "weight": 100,
+        "name": "Charming Threat Savia"
+      },
+      {
+        "unit_id": 20683,
+        "weight": 700,
+        "name": "Sera"
+      },
+      {
+        "unit_id": 20684,
+        "weight": 100,
+        "name": "Administrator Sera"
+      },
+      {
+        "unit_id": 20694,
+        "weight": 100,
+        "name": "Frost Prisoner Lune"
+      },
+      {
+        "unit_id": 20704,
+        "weight": 100,
+        "name": "Spring Flower Piany"
+      },
+      {
+        "unit_id": 20724,
+        "weight": 100,
+        "name": "Ice Knight Farzen"
+      },
+      {
+        "unit_id": 20734,
+        "weight": 100,
+        "name": "Drake Armor Klaus"
+      },
+      {
+        "unit_id": 20754,
+        "weight": 100,
+        "name": "Inferno Sareas"
+      },
+      {
+        "unit_id": 20774,
+        "weight": 100,
+        "name": "Sea Nymph Averus"
+      },
+      {
+        "unit_id": 20804,
+        "weight": 100,
+        "name": "Frost Harp Soleil"
+      },
+      {
+        "unit_id": 20862,
+        "weight": 2000,
+        "name": "Surveillance Dray"
+      },
+      {
+        "unit_id": 20863,
+        "weight": 700,
+        "name": "Tracker Lefdray"
+      },
+      {
+        "unit_id": 20892,
+        "weight": 2000,
+        "name": "Ice Wolf Zolf"
+      },
+      {
+        "unit_id": 20893,
+        "weight": 700,
+        "name": "Crystal Wolf Zolf"
+      },
+      {
+        "unit_id": 30012,
+        "weight": 2000,
+        "name": "Vine Pike Lance"
+      },
+      {
+        "unit_id": 30013,
+        "weight": 700,
+        "name": "Earth Pike Lance"
+      },
+      {
+        "unit_id": 30014,
+        "weight": 100,
+        "name": "Nature God Lance"
+      },
+      {
+        "unit_id": 30022,
+        "weight": 2000,
+        "name": "Marksman Lario"
+      },
+      {
+        "unit_id": 30023,
+        "weight": 700,
+        "name": "Hawkeye Lario"
+      },
+      {
+        "unit_id": 30024,
+        "weight": 100,
+        "name": "Bow God Lario"
+      },
+      {
+        "unit_id": 30032,
+        "weight": 2000,
+        "name": "Kaiser Mossy"
+      },
+      {
+        "unit_id": 30042,
+        "weight": 2000,
+        "name": "Time Lord Claris"
+      },
+      {
+        "unit_id": 30052,
+        "weight": 2000,
+        "name": "Leshy"
+      },
+      {
+        "unit_id": 30062,
+        "weight": 2000,
+        "name": "Head Bandit Zaza"
+      },
+      {
+        "unit_id": 30063,
+        "weight": 700,
+        "name": "Wild Bandit Zaza"
+      },
+      {
+        "unit_id": 30072,
+        "weight": 2000,
+        "name": "Titania"
+      },
+      {
+        "unit_id": 30073,
+        "weight": 700,
+        "name": "Finkell"
+      },
+      {
+        "unit_id": 30082,
+        "weight": 2000,
+        "name": "Ent"
+      },
+      {
+        "unit_id": 30083,
+        "weight": 700,
+        "name": "Xipe Totec"
+      },
+      {
+        "unit_id": 30092,
+        "weight": 2000,
+        "name": "Dryad"
+      },
+      {
+        "unit_id": 30093,
+        "weight": 700,
+        "name": "High Elf"
+      },
+      {
+        "unit_id": 30094,
+        "weight": 100,
+        "name": "Lemenara"
+      },
+      {
+        "unit_id": 30102,
+        "weight": 2000,
+        "name": "Princess Lidith"
+      },
+      {
+        "unit_id": 30103,
+        "weight": 700,
+        "name": "Queen Lidith"
+      },
+      {
+        "unit_id": 30104,
+        "weight": 100,
+        "name": "Empress Lidith"
+      },
+      {
+        "unit_id": 30112,
+        "weight": 2000,
+        "name": "Great Tree Alneu"
+      },
+      {
+        "unit_id": 30113,
+        "weight": 700,
+        "name": "World Tree Altro"
+      },
+      {
+        "unit_id": 30114,
+        "weight": 100,
+        "name": "God Tree Eltri"
+      },
+      {
+        "unit_id": 30122,
+        "weight": 2000,
+        "name": "Gunner Douglas"
+      },
+      {
+        "unit_id": 30123,
+        "weight": 700,
+        "name": "Gun King Douglas"
+      },
+      {
+        "unit_id": 30124,
+        "weight": 100,
+        "name": "Gun God Douglas"
+      },
+      {
+        "unit_id": 30142,
+        "weight": 2000,
+        "name": "Brawler Nemia"
+      },
+      {
+        "unit_id": 30143,
+        "weight": 700,
+        "name": "Gaia Fist Nemia"
+      },
+      {
+        "unit_id": 30144,
+        "weight": 100,
+        "name": "Quake Fist Nemia"
+      },
+      {
+        "unit_id": 30152,
+        "weight": 2000,
+        "name": "Pixy Leore"
+      },
+      {
+        "unit_id": 30153,
+        "weight": 700,
+        "name": "Pixy Royal Leore"
+      },
+      {
+        "unit_id": 30154,
+        "weight": 100,
+        "name": "Pixy King Leore"
+      },
+      {
+        "unit_id": 30162,
+        "weight": 2000,
+        "name": "Edea"
+      },
+      {
+        "unit_id": 30163,
+        "weight": 700,
+        "name": "Earth Knight Edea"
+      },
+      {
+        "unit_id": 30164,
+        "weight": 100,
+        "name": "Mother Earth Edea"
+      },
+      {
+        "unit_id": 30172,
+        "weight": 2000,
+        "name": "Dwarf Prince"
+      },
+      {
+        "unit_id": 30182,
+        "weight": 2000,
+        "name": "Bard Elton"
+      },
+      {
+        "unit_id": 30212,
+        "weight": 2000,
+        "name": "Twins Il & Mina"
+      },
+      {
+        "unit_id": 30213,
+        "weight": 700,
+        "name": "Earthly Il & Mina"
+      },
+      {
+        "unit_id": 30214,
+        "weight": 100,
+        "name": "Gemini Il & Mina"
+      },
+      {
+        "unit_id": 30222,
+        "weight": 2000,
+        "name": "Ristrall"
+      },
+      {
+        "unit_id": 30223,
+        "weight": 700,
+        "name": "Phantom Ristrall"
+      },
+      {
+        "unit_id": 30233,
+        "weight": 700,
+        "name": "Lugina"
+      },
+      {
+        "unit_id": 30234,
+        "weight": 100,
+        "name": "Gaia King Lugina"
+      },
+      {
+        "unit_id": 30243,
+        "weight": 700,
+        "name": "Paula"
+      },
+      {
+        "unit_id": 30244,
+        "weight": 100,
+        "name": "Rose Sibyl Paula"
+      },
+      {
+        "unit_id": 30253,
+        "weight": 700,
+        "name": "Scar Blade Zelban"
+      },
+      {
+        "unit_id": 30254,
+        "weight": 100,
+        "name": "Blade Hero Zelban"
+      },
+      {
+        "unit_id": 30262,
+        "weight": 2000,
+        "name": "Woodland Fairy Finia"
+      },
+      {
+        "unit_id": 30273,
+        "weight": 700,
+        "name": "Golem"
+      },
+      {
+        "unit_id": 30274,
+        "weight": 100,
+        "name": "Great Golem"
+      },
+      {
+        "unit_id": 30283,
+        "weight": 700,
+        "name": "Pugilist Dilma"
+      },
+      {
+        "unit_id": 30284,
+        "weight": 100,
+        "name": "Champ Fist Dilma"
+      },
+      {
+        "unit_id": 30293,
+        "weight": 700,
+        "name": "Lawful Warrior Aneil"
+      },
+      {
+        "unit_id": 30294,
+        "weight": 100,
+        "name": "Lawful God Aneil"
+      },
+      {
+        "unit_id": 30313,
+        "weight": 700,
+        "name": "Havoc Girl Luly"
+      },
+      {
+        "unit_id": 30314,
+        "weight": 100,
+        "name": "Havoc Queen Luly"
+      },
+      {
+        "unit_id": 30343,
+        "weight": 700,
+        "name": "Battle Girl Ophelia"
+      },
+      {
+        "unit_id": 30344,
+        "weight": 100,
+        "name": "War Girl Ophelia"
+      },
+      {
+        "unit_id": 30353,
+        "weight": 700,
+        "name": "Iron Shield Darvan"
+      },
+      {
+        "unit_id": 30354,
+        "weight": 100,
+        "name": "Steel Shield Darvan"
+      },
+      {
+        "unit_id": 30393,
+        "weight": 700,
+        "name": "Lin"
+      },
+      {
+        "unit_id": 30394,
+        "weight": 100,
+        "name": "Logistics Support Lin"
+      },
+      {
+        "unit_id": 30413,
+        "weight": 700,
+        "name": "Steel Noble Heins"
+      },
+      {
+        "unit_id": 30414,
+        "weight": 100,
+        "name": "Machine Lord Heins"
+      },
+      {
+        "unit_id": 30423,
+        "weight": 700,
+        "name": "Nalmika"
+      },
+      {
+        "unit_id": 30424,
+        "weight": 100,
+        "name": "Ivy Nalmika"
+      },
+      {
+        "unit_id": 30443,
+        "weight": 700,
+        "name": "Great Thief Zelnite"
+      },
+      {
+        "unit_id": 30444,
+        "weight": 100,
+        "name": "Noble Thief Zelnite"
+      },
+      {
+        "unit_id": 30463,
+        "weight": 700,
+        "name": "Flora Princess Faris"
+      },
+      {
+        "unit_id": 30464,
+        "weight": 100,
+        "name": "Flora Queen Faris"
+      },
+      {
+        "unit_id": 30473,
+        "weight": 700,
+        "name": "Forest Guardian Tia"
+      },
+      {
+        "unit_id": 30474,
+        "weight": 100,
+        "name": "Divine Guardian Tia"
+      },
+      {
+        "unit_id": 30493,
+        "weight": 700,
+        "name": "Diva Hatsune Miku"
+      },
+      {
+        "unit_id": 30494,
+        "weight": 100,
+        "name": "Goddess Hatsune Miku"
+      },
+      {
+        "unit_id": 30503,
+        "weight": 700,
+        "name": "Spirit Ruler Lucca"
+      },
+      {
+        "unit_id": 30504,
+        "weight": 100,
+        "name": "Phantom Ruler Lucca"
+      },
+      {
+        "unit_id": 30513,
+        "weight": 700,
+        "name": "Green Dragon Vael"
+      },
+      {
+        "unit_id": 30514,
+        "weight": 100,
+        "name": "Royal Dragon Farvnil"
+      },
+      {
+        "unit_id": 30543,
+        "weight": 700,
+        "name": "Floret Petal Rosetta"
+      },
+      {
+        "unit_id": 30544,
+        "weight": 100,
+        "name": "Floret Queen Rosetta"
+      },
+      {
+        "unit_id": 30554,
+        "weight": 100,
+        "name": "Thorned Tora"
+      },
+      {
+        "unit_id": 30564,
+        "weight": 100,
+        "name": "Beryl Edge Quaid"
+      },
+      {
+        "unit_id": 30572,
+        "weight": 2000,
+        "name": "Kobolta"
+      },
+      {
+        "unit_id": 30573,
+        "weight": 700,
+        "name": "Impal"
+      },
+      {
+        "unit_id": 30582,
+        "weight": 2000,
+        "name": "Mau"
+      },
+      {
+        "unit_id": 30583,
+        "weight": 700,
+        "name": "Wild Beast Mau"
+      },
+      {
+        "unit_id": 30594,
+        "weight": 100,
+        "name": "Hermit Wizard Oguro"
+      },
+      {
+        "unit_id": 30604,
+        "weight": 100,
+        "name": "Gale Piercing Dion"
+      },
+      {
+        "unit_id": 30614,
+        "weight": 100,
+        "name": "Swift Katana Toutetsu"
+      },
+      {
+        "unit_id": 30624,
+        "weight": 100,
+        "name": "Green Sparkle Libera"
+      },
+      {
+        "unit_id": 30634,
+        "weight": 100,
+        "name": "Earth Blade Duran"
+      },
+      {
+        "unit_id": 30654,
+        "weight": 100,
+        "name": "Lindsey"
+      },
+      {
+        "unit_id": 30662,
+        "weight": 2000,
+        "name": "Wargloon"
+      },
+      {
+        "unit_id": 30674,
+        "weight": 100,
+        "name": "Pure Lady Cyan"
+      },
+      {
+        "unit_id": 30684,
+        "weight": 100,
+        "name": "Regal Sword Dolk"
+      },
+      {
+        "unit_id": 30694,
+        "weight": 100,
+        "name": "Demon Pike Drevas"
+      },
+      {
+        "unit_id": 30704,
+        "weight": 100,
+        "name": "War Soldier Estelle"
+      },
+      {
+        "unit_id": 30714,
+        "weight": 100,
+        "name": "Snake Chord Isterio"
+      },
+      {
+        "unit_id": 30734,
+        "weight": 100,
+        "name": "Inferno Dure"
+      },
+      {
+        "unit_id": 30754,
+        "weight": 100,
+        "name": "Holy Beast Belardo"
+      },
+      {
+        "unit_id": 30774,
+        "weight": 100,
+        "name": "Pink Thorns Leona"
+      },
+      {
+        "unit_id": 30822,
+        "weight": 2000,
+        "name": "ＢＧ‐Ｅ７５０"
+      },
+      {
+        "unit_id": 30823,
+        "weight": 700,
+        "name": "BG-ELG9040"
+      },
+      {
+        "unit_id": 30932,
+        "weight": 2000,
+        "name": "Golem Megalam"
+      },
+      {
+        "unit_id": 40012,
+        "weight": 2000,
+        "name": "Thunder Eze"
+      },
+      {
+        "unit_id": 40013,
+        "weight": 700,
+        "name": "Thunder King Eze"
+      },
+      {
+        "unit_id": 40014,
+        "weight": 100,
+        "name": "Thunder God Eze"
+      },
+      {
+        "unit_id": 40022,
+        "weight": 2000,
+        "name": "Strategist Weiss"
+      },
+      {
+        "unit_id": 40023,
+        "weight": 700,
+        "name": "Commander Weiss"
+      },
+      {
+        "unit_id": 40024,
+        "weight": 100,
+        "name": "General Weiss"
+      },
+      {
+        "unit_id": 40032,
+        "weight": 2000,
+        "name": "Kaiser Sparky"
+      },
+      {
+        "unit_id": 40042,
+        "weight": 2000,
+        "name": "Royal Dancer May"
+      },
+      {
+        "unit_id": 40052,
+        "weight": 2000,
+        "name": "Ocypete"
+      },
+      {
+        "unit_id": 40062,
+        "weight": 2000,
+        "name": "Sky Boss Grafl"
+      },
+      {
+        "unit_id": 40063,
+        "weight": 700,
+        "name": "Sky Emperor Grafl"
+      },
+      {
+        "unit_id": 40072,
+        "weight": 2000,
+        "name": "Cyclops"
+      },
+      {
+        "unit_id": 40073,
+        "weight": 700,
+        "name": "Gigas"
+      },
+      {
+        "unit_id": 40082,
+        "weight": 2000,
+        "name": "Djin"
+      },
+      {
+        "unit_id": 40083,
+        "weight": 700,
+        "name": "Crow Tengu"
+      },
+      {
+        "unit_id": 40092,
+        "weight": 2000,
+        "name": "Thunderbird"
+      },
+      {
+        "unit_id": 40093,
+        "weight": 700,
+        "name": "Great Falcon Ziz"
+      },
+      {
+        "unit_id": 40094,
+        "weight": 100,
+        "name": "Zazabis"
+      },
+      {
+        "unit_id": 40102,
+        "weight": 2000,
+        "name": "Sky Knight Falma"
+      },
+      {
+        "unit_id": 40103,
+        "weight": 700,
+        "name": "Sky King Falma"
+      },
+      {
+        "unit_id": 40104,
+        "weight": 100,
+        "name": "Sky Legend Falma"
+      },
+      {
+        "unit_id": 40112,
+        "weight": 2000,
+        "name": "Behemoth"
+      },
+      {
+        "unit_id": 40113,
+        "weight": 700,
+        "name": "King Behemoth"
+      },
+      {
+        "unit_id": 40114,
+        "weight": 100,
+        "name": "Alpha Behemoth"
+      },
+      {
+        "unit_id": 40122,
+        "weight": 2000,
+        "name": "Emilia"
+      },
+      {
+        "unit_id": 40123,
+        "weight": 700,
+        "name": "Princess Emilia"
+      },
+      {
+        "unit_id": 40124,
+        "weight": 100,
+        "name": "Goddess Emilia"
+      },
+      {
+        "unit_id": 40142,
+        "weight": 2000,
+        "name": "Spark Kick Zeln"
+      },
+      {
+        "unit_id": 40143,
+        "weight": 700,
+        "name": "Thunder Kick Zeln"
+      },
+      {
+        "unit_id": 40144,
+        "weight": 100,
+        "name": "Thunder Punt Zeln"
+      },
+      {
+        "unit_id": 40152,
+        "weight": 2000,
+        "name": "Tinkerer Elulu"
+      },
+      {
+        "unit_id": 40153,
+        "weight": 700,
+        "name": "Inventor Elulu"
+      },
+      {
+        "unit_id": 40154,
+        "weight": 100,
+        "name": "Bolt Mallet Elulu"
+      },
+      {
+        "unit_id": 40162,
+        "weight": 2000,
+        "name": "Loch"
+      },
+      {
+        "unit_id": 40163,
+        "weight": 700,
+        "name": "Shock Bow Loch"
+      },
+      {
+        "unit_id": 40164,
+        "weight": 100,
+        "name": "Zeus Bow Loch"
+      },
+      {
+        "unit_id": 40172,
+        "weight": 2000,
+        "name": "Gorgon"
+      },
+      {
+        "unit_id": 40182,
+        "weight": 2000,
+        "name": "Thunder Cat Parmi"
+      },
+      {
+        "unit_id": 40212,
+        "weight": 2000,
+        "name": "Bolt Pike Amy"
+      },
+      {
+        "unit_id": 40213,
+        "weight": 700,
+        "name": "Bolt Knight Amy"
+      },
+      {
+        "unit_id": 40214,
+        "weight": 100,
+        "name": "Bolt Goddess Amy"
+      },
+      {
+        "unit_id": 40222,
+        "weight": 2000,
+        "name": "Raiden"
+      },
+      {
+        "unit_id": 40223,
+        "weight": 700,
+        "name": "Slicing Bolt Raiden"
+      },
+      {
+        "unit_id": 40233,
+        "weight": 700,
+        "name": "Paladin Paris"
+      },
+      {
+        "unit_id": 40234,
+        "weight": 100,
+        "name": "Royal Guard Paris"
+      },
+      {
+        "unit_id": 40243,
+        "weight": 700,
+        "name": "Zele"
+      },
+      {
+        "unit_id": 40244,
+        "weight": 100,
+        "name": "Bolt Sibyl Zele"
+      },
+      {
+        "unit_id": 40253,
+        "weight": 700,
+        "name": "Drakeborn Lodin"
+      },
+      {
+        "unit_id": 40254,
+        "weight": 100,
+        "name": "Drake God Lodin"
+      },
+      {
+        "unit_id": 40262,
+        "weight": 2000,
+        "name": "Catoblepas"
+      },
+      {
+        "unit_id": 40273,
+        "weight": 700,
+        "name": "Sky Angel Kushra"
+      },
+      {
+        "unit_id": 40274,
+        "weight": 100,
+        "name": "Rebel Angel Elsel"
+      },
+      {
+        "unit_id": 40283,
+        "weight": 700,
+        "name": "Shock Mage Rashil"
+      },
+      {
+        "unit_id": 40284,
+        "weight": 100,
+        "name": "Bolt Magus Rashil"
+      },
+      {
+        "unit_id": 40293,
+        "weight": 700,
+        "name": "Fast Princess Lucana"
+      },
+      {
+        "unit_id": 40294,
+        "weight": 100,
+        "name": "Fast God Lucana"
+      },
+      {
+        "unit_id": 40313,
+        "weight": 700,
+        "name": "Gold Warrior Rina"
+      },
+      {
+        "unit_id": 40314,
+        "weight": 100,
+        "name": "Gold Knight Rina"
+      },
+      {
+        "unit_id": 40343,
+        "weight": 700,
+        "name": "Mech Arms Grybe"
+      },
+      {
+        "unit_id": 40344,
+        "weight": 100,
+        "name": "Mech Cannon Grybe"
+      },
+      {
+        "unit_id": 40353,
+        "weight": 700,
+        "name": "Sage Bran"
+      },
+      {
+        "unit_id": 40354,
+        "weight": 100,
+        "name": "Lightning Sage Bran"
+      },
+      {
+        "unit_id": 40413,
+        "weight": 700,
+        "name": "Thunder Hero Rutheon"
+      },
+      {
+        "unit_id": 40414,
+        "weight": 100,
+        "name": "Crashing Bolt Rutheon"
+      },
+      {
+        "unit_id": 40423,
+        "weight": 700,
+        "name": "Uda"
+      },
+      {
+        "unit_id": 40424,
+        "weight": 100,
+        "name": "Crusher Uda"
+      },
+      {
+        "unit_id": 40443,
+        "weight": 700,
+        "name": "Thunder Beast Ahvel"
+      },
+      {
+        "unit_id": 40444,
+        "weight": 100,
+        "name": "Thunder God Esna"
+      },
+      {
+        "unit_id": 40463,
+        "weight": 700,
+        "name": "Lead Engineer Garnan"
+      },
+      {
+        "unit_id": 40464,
+        "weight": 100,
+        "name": "Head Engineer Garnan"
+      },
+      {
+        "unit_id": 40473,
+        "weight": 700,
+        "name": "Bolt Gun Rowgen"
+      },
+      {
+        "unit_id": 40474,
+        "weight": 100,
+        "name": "Thunder Gun Rowgen"
+      },
+      {
+        "unit_id": 40493,
+        "weight": 700,
+        "name": "Thunder Whip Orna"
+      },
+      {
+        "unit_id": 40494,
+        "weight": 100,
+        "name": "Divine Whip Orna"
+      },
+      {
+        "unit_id": 40503,
+        "weight": 700,
+        "name": "Thunder Guard Shera"
+      },
+      {
+        "unit_id": 40504,
+        "weight": 100,
+        "name": "Thunder Sentry Shera"
+      },
+      {
+        "unit_id": 40523,
+        "weight": 700,
+        "name": "Dragoon Elder Bargus"
+      },
+      {
+        "unit_id": 40524,
+        "weight": 100,
+        "name": "Dragoon Lord Bargus"
+      },
+      {
+        "unit_id": 40534,
+        "weight": 100,
+        "name": "Admonition Kanon"
+      },
+      {
+        "unit_id": 40544,
+        "weight": 100,
+        "name": "Voltage Cutlass Diana"
+      },
+      {
+        "unit_id": 40552,
+        "weight": 2000,
+        "name": "Rognomus"
+      },
+      {
+        "unit_id": 40553,
+        "weight": 700,
+        "name": "Bagura Nagia"
+      },
+      {
+        "unit_id": 40562,
+        "weight": 2000,
+        "name": "Neid"
+      },
+      {
+        "unit_id": 40563,
+        "weight": 700,
+        "name": "Static Monk Neid"
+      },
+      {
+        "unit_id": 40574,
+        "weight": 100,
+        "name": "Divine Destroyer Rize"
+      },
+      {
+        "unit_id": 40584,
+        "weight": 100,
+        "name": "Sound Thunder Balgran"
+      },
+      {
+        "unit_id": 40594,
+        "weight": 100,
+        "name": "Shadow Scroll Kagura"
+      },
+      {
+        "unit_id": 40604,
+        "weight": 100,
+        "name": "Thunder Pole Rhoa"
+      },
+      {
+        "unit_id": 40614,
+        "weight": 100,
+        "name": "Bolt Axe Mahalu"
+      },
+      {
+        "unit_id": 40624,
+        "weight": 100,
+        "name": "Symphonia"
+      },
+      {
+        "unit_id": 40632,
+        "weight": 2000,
+        "name": "Volteg"
+      },
+      {
+        "unit_id": 40644,
+        "weight": 100,
+        "name": "Yellow Dragon Belzeft"
+      },
+      {
+        "unit_id": 40664,
+        "weight": 100,
+        "name": "Shock Fist Rahgan"
+      },
+      {
+        "unit_id": 40674,
+        "weight": 100,
+        "name": "Blue Spark Reud"
+      },
+      {
+        "unit_id": 40684,
+        "weight": 100,
+        "name": "Twin Bolts Julius"
+      },
+      {
+        "unit_id": 40694,
+        "weight": 100,
+        "name": "Magnetic Lady Lafiel"
+      },
+      {
+        "unit_id": 40714,
+        "weight": 100,
+        "name": "Inferno Radia"
+      },
+      {
+        "unit_id": 40744,
+        "weight": 100,
+        "name": "Mechanized Reddrag"
+      },
+      {
+        "unit_id": 40774,
+        "weight": 100,
+        "name": "Bolt Singe Pamela"
+      },
+      {
+        "unit_id": 40802,
+        "weight": 2000,
+        "name": "Spined Razbit"
+      },
+      {
+        "unit_id": 40803,
+        "weight": 700,
+        "name": "Menacing Ragbarrett"
+      },
+      {
+        "unit_id": 50012,
+        "weight": 2000,
+        "name": "Knight Atro"
+      },
+      {
+        "unit_id": 50013,
+        "weight": 700,
+        "name": "Holy Knight Atro"
+      },
+      {
+        "unit_id": 50014,
+        "weight": 100,
+        "name": "God Atro"
+      },
+      {
+        "unit_id": 50022,
+        "weight": 2000,
+        "name": "Sunshine Luna"
+      },
+      {
+        "unit_id": 50023,
+        "weight": 700,
+        "name": "Holy Queen Luna"
+      },
+      {
+        "unit_id": 50024,
+        "weight": 100,
+        "name": "Holy Empress Luna"
+      },
+      {
+        "unit_id": 50032,
+        "weight": 2000,
+        "name": "Kaiser Glowy"
+      },
+      {
+        "unit_id": 50042,
+        "weight": 2000,
+        "name": "Great Sage Mimir"
+      },
+      {
+        "unit_id": 50052,
+        "weight": 2000,
+        "name": "Azrael"
+      },
+      {
+        "unit_id": 50061,
+        "weight": 2000,
+        "name": "Pegasus"
+      },
+      {
+        "unit_id": 50063,
+        "weight": 700,
+        "name": "Remuihl"
+      },
+      {
+        "unit_id": 50072,
+        "weight": 2000,
+        "name": "Angel Maria"
+      },
+      {
+        "unit_id": 50073,
+        "weight": 700,
+        "name": "Saint Maria"
+      },
+      {
+        "unit_id": 50082,
+        "weight": 2000,
+        "name": "Valkyrie"
+      },
+      {
+        "unit_id": 50083,
+        "weight": 700,
+        "name": "Sky Hero Athena"
+      },
+      {
+        "unit_id": 50084,
+        "weight": 100,
+        "name": "Legendary Jona"
+      },
+      {
+        "unit_id": 50092,
+        "weight": 2000,
+        "name": "Cowboy Heidt"
+      },
+      {
+        "unit_id": 50093,
+        "weight": 700,
+        "name": "Holy Shot Heidt"
+      },
+      {
+        "unit_id": 50094,
+        "weight": 100,
+        "name": "Pistol God Heidt"
+      },
+      {
+        "unit_id": 50102,
+        "weight": 2000,
+        "name": "Wyvern"
+      },
+      {
+        "unit_id": 50103,
+        "weight": 700,
+        "name": "Bahamut"
+      },
+      {
+        "unit_id": 50104,
+        "weight": 100,
+        "name": "Rameldria"
+      },
+      {
+        "unit_id": 50112,
+        "weight": 2000,
+        "name": "Knight Will"
+      },
+      {
+        "unit_id": 50113,
+        "weight": 700,
+        "name": "Holy Knight Will"
+      },
+      {
+        "unit_id": 50114,
+        "weight": 100,
+        "name": "God Knight Will"
+      },
+      {
+        "unit_id": 50142,
+        "weight": 2000,
+        "name": "Adventurer Alma"
+      },
+      {
+        "unit_id": 50143,
+        "weight": 700,
+        "name": "Hero Alma"
+      },
+      {
+        "unit_id": 50144,
+        "weight": 100,
+        "name": "Brave Hero Alma"
+      },
+      {
+        "unit_id": 50152,
+        "weight": 2000,
+        "name": "Knight Aem"
+      },
+      {
+        "unit_id": 50153,
+        "weight": 700,
+        "name": "Champion Aem"
+      },
+      {
+        "unit_id": 50154,
+        "weight": 100,
+        "name": "Holy Master Aem"
+      },
+      {
+        "unit_id": 50162,
+        "weight": 2000,
+        "name": "Eight Blade Sefia"
+      },
+      {
+        "unit_id": 50163,
+        "weight": 700,
+        "name": "Blade Storm Sefia"
+      },
+      {
+        "unit_id": 50164,
+        "weight": 100,
+        "name": "Blade Queen Sefia"
+      },
+      {
+        "unit_id": 50172,
+        "weight": 2000,
+        "name": "Cait Sith"
+      },
+      {
+        "unit_id": 50182,
+        "weight": 2000,
+        "name": "Holy Maiden Amul"
+      },
+      {
+        "unit_id": 50242,
+        "weight": 2000,
+        "name": "Mila"
+      },
+      {
+        "unit_id": 50243,
+        "weight": 700,
+        "name": "Twinkling Flash Mila"
+      },
+      {
+        "unit_id": 50253,
+        "weight": 700,
+        "name": "Tilith"
+      },
+      {
+        "unit_id": 50254,
+        "weight": 100,
+        "name": "Goddess Tilith"
+      },
+      {
+        "unit_id": 50263,
+        "weight": 700,
+        "name": "Sola"
+      },
+      {
+        "unit_id": 50264,
+        "weight": 100,
+        "name": "Ray Sibyl Sola"
+      },
+      {
+        "unit_id": 50273,
+        "weight": 700,
+        "name": "Legionary Melchio"
+      },
+      {
+        "unit_id": 50274,
+        "weight": 100,
+        "name": "Centurion Melchio"
+      },
+      {
+        "unit_id": 50292,
+        "weight": 2000,
+        "name": "GS-1000"
+      },
+      {
+        "unit_id": 50303,
+        "weight": 700,
+        "name": "White Lebra"
+      },
+      {
+        "unit_id": 50304,
+        "weight": 100,
+        "name": "Lubradine"
+      },
+      {
+        "unit_id": 50313,
+        "weight": 700,
+        "name": "Cyborg Lilith"
+      },
+      {
+        "unit_id": 50314,
+        "weight": 100,
+        "name": "Cyborg Lilith II"
+      },
+      {
+        "unit_id": 50323,
+        "weight": 700,
+        "name": "Heavy Guard Nevsky"
+      },
+      {
+        "unit_id": 50324,
+        "weight": 100,
+        "name": "Heavy God Nevsky"
+      },
+      {
+        "unit_id": 50344,
+        "weight": 100,
+        "name": "Keymaster Gilnea"
+      },
+      {
+        "unit_id": 50383,
+        "weight": 700,
+        "name": "Horseman Sodis"
+      },
+      {
+        "unit_id": 50384,
+        "weight": 100,
+        "name": "Cavalryman Sodis"
+      },
+      {
+        "unit_id": 50403,
+        "weight": 700,
+        "name": "Light Blade Alyut"
+      },
+      {
+        "unit_id": 50404,
+        "weight": 100,
+        "name": "Holy Warrior Alyut"
+      },
+      {
+        "unit_id": 50413,
+        "weight": 700,
+        "name": "Prodigy Themis"
+      },
+      {
+        "unit_id": 50414,
+        "weight": 100,
+        "name": "Unflinching Themis"
+      },
+      {
+        "unit_id": 50444,
+        "weight": 100,
+        "name": "Eriole"
+      },
+      {
+        "unit_id": 50463,
+        "weight": 700,
+        "name": "Moon Sovereign Alicia"
+      },
+      {
+        "unit_id": 50464,
+        "weight": 100,
+        "name": "Lunar Queen Alicia"
+      },
+      {
+        "unit_id": 50473,
+        "weight": 700,
+        "name": "Zellha"
+      },
+      {
+        "unit_id": 50474,
+        "weight": 100,
+        "name": "Ruin Zellha"
+      },
+      {
+        "unit_id": 50483,
+        "weight": 700,
+        "name": "Dark Angel Azael"
+      },
+      {
+        "unit_id": 50484,
+        "weight": 100,
+        "name": "Wisdom Angel Azael"
+      },
+      {
+        "unit_id": 50503,
+        "weight": 700,
+        "name": "Brave Legend Hogar"
+      },
+      {
+        "unit_id": 50504,
+        "weight": 100,
+        "name": "Brave King Hogar"
+      },
+      {
+        "unit_id": 50513,
+        "weight": 700,
+        "name": "Mad Knight Narza"
+      },
+      {
+        "unit_id": 50514,
+        "weight": 100,
+        "name": "Mad King Narza"
+      },
+      {
+        "unit_id": 50583,
+        "weight": 700,
+        "name": "Holy Treasures Yujeh"
+      },
+      {
+        "unit_id": 50584,
+        "weight": 100,
+        "name": "Sacred Relics Yujeh"
+      },
+      {
+        "unit_id": 50603,
+        "weight": 700,
+        "name": "Royal Edge Priscilla"
+      },
+      {
+        "unit_id": 50604,
+        "weight": 100,
+        "name": "Poinsettia Priscilla"
+      },
+      {
+        "unit_id": 50643,
+        "weight": 700,
+        "name": "Priestess Elmedia"
+      },
+      {
+        "unit_id": 50644,
+        "weight": 100,
+        "name": "High Priestess Elmedia"
+      },
+      {
+        "unit_id": 50654,
+        "weight": 100,
+        "name": "Larking Kira"
+      },
+      {
+        "unit_id": 50664,
+        "weight": 100,
+        "name": "Noble Sage Fadahl"
+      },
+      {
+        "unit_id": 50672,
+        "weight": 2000,
+        "name": "La Guardo"
+      },
+      {
+        "unit_id": 50673,
+        "weight": 700,
+        "name": "Del Bardo"
+      },
+      {
+        "unit_id": 50682,
+        "weight": 2000,
+        "name": "Mireia"
+      },
+      {
+        "unit_id": 50683,
+        "weight": 700,
+        "name": "Gunner Girl Mireia"
+      },
+      {
+        "unit_id": 50694,
+        "weight": 100,
+        "name": "Spiritual Warrior Raaga"
+      },
+      {
+        "unit_id": 50734,
+        "weight": 100,
+        "name": "Holy Defender Rinon"
+      },
+      {
+        "unit_id": 50744,
+        "weight": 100,
+        "name": "Robotic Wings Sixgear"
+      },
+      {
+        "unit_id": 50754,
+        "weight": 100,
+        "name": "Noble Cavalier Krantz"
+      },
+      {
+        "unit_id": 50764,
+        "weight": 100,
+        "name": "Heavenly Lance Nadore"
+      },
+      {
+        "unit_id": 50774,
+        "weight": 100,
+        "name": "Yuuri"
+      },
+      {
+        "unit_id": 50802,
+        "weight": 2000,
+        "name": "Lebutorium"
+      },
+      {
+        "unit_id": 50814,
+        "weight": 100,
+        "name": "Flash Knight Jed"
+      },
+      {
+        "unit_id": 50834,
+        "weight": 100,
+        "name": "Light Priestess Charla"
+      },
+      {
+        "unit_id": 50864,
+        "weight": 100,
+        "name": "White Dragon Folg"
+      },
+      {
+        "unit_id": 50884,
+        "weight": 100,
+        "name": "Pure Knight Rouche"
+      },
+      {
+        "unit_id": 50894,
+        "weight": 100,
+        "name": "Lawful Pride Reihard"
+      },
+      {
+        "unit_id": 50914,
+        "weight": 100,
+        "name": "Inferno Sirius"
+      },
+      {
+        "unit_id": 50934,
+        "weight": 100,
+        "name": "Guiding Light Layla"
+      },
+      {
+        "unit_id": 50964,
+        "weight": 100,
+        "name": "Holy Minister Astall"
+      },
+      {
+        "unit_id": 51112,
+        "weight": 2000,
+        "name": "Kitsune Gin"
+      },
+      {
+        "unit_id": 51113,
+        "weight": 700,
+        "name": "Kyuubi Ginryou"
+      },
+      {
+        "unit_id": 51192,
+        "weight": 2000,
+        "name": "Dragon Raptor"
+      },
+      {
+        "unit_id": 51193,
+        "weight": 700,
+        "name": "General Raptorhead"
+      },
+      {
+        "unit_id": 60012,
+        "weight": 2000,
+        "name": "Heavy Magress"
+      },
+      {
+        "unit_id": 60013,
+        "weight": 700,
+        "name": "Black Magress"
+      },
+      {
+        "unit_id": 60014,
+        "weight": 100,
+        "name": "Death Magress"
+      },
+      {
+        "unit_id": 60022,
+        "weight": 2000,
+        "name": "Samurai Mifune"
+      },
+      {
+        "unit_id": 60023,
+        "weight": 700,
+        "name": "God Blade Mifune"
+      },
+      {
+        "unit_id": 60024,
+        "weight": 100,
+        "name": "Ryujin Mifune"
+      },
+      {
+        "unit_id": 60032,
+        "weight": 2000,
+        "name": "Kaiser Gloomy"
+      },
+      {
+        "unit_id": 60042,
+        "weight": 2000,
+        "name": "Dark Arts Lily"
+      },
+      {
+        "unit_id": 60052,
+        "weight": 2000,
+        "name": "Skull Lord"
+      },
+      {
+        "unit_id": 60062,
+        "weight": 2000,
+        "name": "Zahhak"
+      },
+      {
+        "unit_id": 60063,
+        "weight": 700,
+        "name": "Lulujann"
+      },
+      {
+        "unit_id": 60072,
+        "weight": 2000,
+        "name": "Succubus"
+      },
+      {
+        "unit_id": 60073,
+        "weight": 700,
+        "name": "Nyx"
+      },
+      {
+        "unit_id": 60082,
+        "weight": 2000,
+        "name": "Vampire"
+      },
+      {
+        "unit_id": 60083,
+        "weight": 700,
+        "name": "Lich"
+      },
+      {
+        "unit_id": 60084,
+        "weight": 100,
+        "name": "Legion"
+      },
+      {
+        "unit_id": 60092,
+        "weight": 2000,
+        "name": "Shida"
+      },
+      {
+        "unit_id": 60093,
+        "weight": 700,
+        "name": "Garroter Shida"
+      },
+      {
+        "unit_id": 60094,
+        "weight": 100,
+        "name": "Executioner Shida"
+      },
+      {
+        "unit_id": 60102,
+        "weight": 2000,
+        "name": "Memetes"
+      },
+      {
+        "unit_id": 60103,
+        "weight": 700,
+        "name": "Hell King Hades"
+      },
+      {
+        "unit_id": 60104,
+        "weight": 100,
+        "name": "Death God Lodaga"
+      },
+      {
+        "unit_id": 60112,
+        "weight": 2000,
+        "name": "Alice"
+      },
+      {
+        "unit_id": 60113,
+        "weight": 700,
+        "name": "Scythe Alice"
+      },
+      {
+        "unit_id": 60114,
+        "weight": 100,
+        "name": "Scythe God Alice"
+      },
+      {
+        "unit_id": 60152,
+        "weight": 2000,
+        "name": "Assassin Oboro"
+      },
+      {
+        "unit_id": 60153,
+        "weight": 700,
+        "name": "Shadow Oboro"
+      },
+      {
+        "unit_id": 60154,
+        "weight": 100,
+        "name": "Red Shadow Oboro"
+      },
+      {
+        "unit_id": 60162,
+        "weight": 2000,
+        "name": "Lemia"
+      },
+      {
+        "unit_id": 60163,
+        "weight": 700,
+        "name": "Necromancer Lemia"
+      },
+      {
+        "unit_id": 60164,
+        "weight": 100,
+        "name": "Soul Keeper Lemia"
+      },
+      {
+        "unit_id": 60172,
+        "weight": 2000,
+        "name": "Kikuri"
+      },
+      {
+        "unit_id": 60173,
+        "weight": 700,
+        "name": "Goth Kikuri"
+      },
+      {
+        "unit_id": 60174,
+        "weight": 100,
+        "name": "Goth Idol Kikuri"
+      },
+      {
+        "unit_id": 60182,
+        "weight": 2000,
+        "name": "Incubus"
+      },
+      {
+        "unit_id": 60192,
+        "weight": 2000,
+        "name": "High Roller Zeul"
+      },
+      {
+        "unit_id": 60212,
+        "weight": 2000,
+        "name": "Bahvel"
+      },
+      {
+        "unit_id": 60213,
+        "weight": 700,
+        "name": "Black Emperor Bahvel"
+      },
+      {
+        "unit_id": 60233,
+        "weight": 700,
+        "name": "Disciple Zebra"
+      },
+      {
+        "unit_id": 60234,
+        "weight": 100,
+        "name": "Mad God Zebra"
+      },
+      {
+        "unit_id": 60243,
+        "weight": 700,
+        "name": "Madia"
+      },
+      {
+        "unit_id": 60244,
+        "weight": 100,
+        "name": "Night Sibyl Madia"
+      },
+      {
+        "unit_id": 60253,
+        "weight": 700,
+        "name": "Duel-GX"
+      },
+      {
+        "unit_id": 60254,
+        "weight": 100,
+        "name": "Duel-GX II"
+      },
+      {
+        "unit_id": 60262,
+        "weight": 2000,
+        "name": "Arachna"
+      },
+      {
+        "unit_id": 60273,
+        "weight": 700,
+        "name": "Half Blood Lira"
+      },
+      {
+        "unit_id": 60274,
+        "weight": 100,
+        "name": "Magistra Lira"
+      },
+      {
+        "unit_id": 60283,
+        "weight": 700,
+        "name": "Dark Swords Logan"
+      },
+      {
+        "unit_id": 60284,
+        "weight": 100,
+        "name": "Evil Blades Logan"
+      },
+      {
+        "unit_id": 60293,
+        "weight": 700,
+        "name": "Dual Blade Eru"
+      },
+      {
+        "unit_id": 60294,
+        "weight": 100,
+        "name": "Dual Blade God Eru"
+      },
+      {
+        "unit_id": 60313,
+        "weight": 700,
+        "name": "Dark Charm Lunaris"
+      },
+      {
+        "unit_id": 60314,
+        "weight": 100,
+        "name": "Dark Curse Lunaris"
+      },
+      {
+        "unit_id": 60324,
+        "weight": 100,
+        "name": "Grahdens"
+      },
+      {
+        "unit_id": 60353,
+        "weight": 700,
+        "name": "Dark Blade Zephyr"
+      },
+      {
+        "unit_id": 60354,
+        "weight": 100,
+        "name": "Dark Warrior Zephyr"
+      },
+      {
+        "unit_id": 60363,
+        "weight": 700,
+        "name": "Magic Riffs Eric"
+      },
+      {
+        "unit_id": 60364,
+        "weight": 100,
+        "name": "Dark Tunes Eric"
+      },
+      {
+        "unit_id": 60463,
+        "weight": 700,
+        "name": "Criminal Warrior Jade"
+      },
+      {
+        "unit_id": 60464,
+        "weight": 100,
+        "name": "Sinful Edge Jade"
+      },
+      {
+        "unit_id": 60473,
+        "weight": 700,
+        "name": "Kajah"
+      },
+      {
+        "unit_id": 60474,
+        "weight": 100,
+        "name": "Evil Kajah"
+      },
+      {
+        "unit_id": 60483,
+        "weight": 700,
+        "name": "Disciple Mare"
+      },
+      {
+        "unit_id": 60484,
+        "weight": 100,
+        "name": "Blazing Mare"
+      },
+      {
+        "unit_id": 60493,
+        "weight": 700,
+        "name": "Dictator Lilly Matah"
+      },
+      {
+        "unit_id": 60494,
+        "weight": 100,
+        "name": "Empress Lilly Matah"
+      },
+      {
+        "unit_id": 60523,
+        "weight": 700,
+        "name": "Inferno Elza"
+      },
+      {
+        "unit_id": 60524,
+        "weight": 100,
+        "name": "Inferno Queen Elza"
+      },
+      {
+        "unit_id": 60533,
+        "weight": 700,
+        "name": "Assassin Kuda"
+      },
+      {
+        "unit_id": 60534,
+        "weight": 100,
+        "name": "Loyal Assassin Kuda"
+      },
+      {
+        "unit_id": 60543,
+        "weight": 700,
+        "name": "Disciple Zurg"
+      },
+      {
+        "unit_id": 60544,
+        "weight": 100,
+        "name": "God of Decay Zurg"
+      },
+      {
+        "unit_id": 60583,
+        "weight": 700,
+        "name": "Duetto Megurine Luka"
+      },
+      {
+        "unit_id": 60593,
+        "weight": 700,
+        "name": "Dark Winged Ardin"
+      },
+      {
+        "unit_id": 60594,
+        "weight": 100,
+        "name": "Dark Seraph Ardin"
+      },
+      {
+        "unit_id": 60603,
+        "weight": 700,
+        "name": "Graham"
+      },
+      {
+        "unit_id": 60604,
+        "weight": 100,
+        "name": "Treacherous Graham"
+      },
+      {
+        "unit_id": 60623,
+        "weight": 700,
+        "name": "Dark Keeper Iidor"
+      },
+      {
+        "unit_id": 60624,
+        "weight": 100,
+        "name": "Draconian Varfed"
+      },
+      {
+        "unit_id": 60643,
+        "weight": 700,
+        "name": "Dark Blades Zergel"
+      },
+      {
+        "unit_id": 60644,
+        "weight": 100,
+        "name": "Penta Blade Zergel"
+      },
+      {
+        "unit_id": 60664,
+        "weight": 100,
+        "name": "Misfortune Feeva"
+      },
+      {
+        "unit_id": 60674,
+        "weight": 100,
+        "name": "Void Pearl Ivris"
+      },
+      {
+        "unit_id": 60682,
+        "weight": 2000,
+        "name": "Bilmera"
+      },
+      {
+        "unit_id": 60683,
+        "weight": 700,
+        "name": "Baldeura"
+      },
+      {
+        "unit_id": 60692,
+        "weight": 2000,
+        "name": "Lymle"
+      },
+      {
+        "unit_id": 60693,
+        "weight": 700,
+        "name": "Demon Bow Lymle"
+      },
+      {
+        "unit_id": 60704,
+        "weight": 100,
+        "name": "Ominous Slasher Aaron"
+      },
+      {
+        "unit_id": 60734,
+        "weight": 100,
+        "name": "Haunting Curse Yuura"
+      },
+      {
+        "unit_id": 60754,
+        "weight": 100,
+        "name": "Dark Armor Reis"
+      },
+      {
+        "unit_id": 60764,
+        "weight": 100,
+        "name": "Dark Snake Kafka"
+      },
+      {
+        "unit_id": 60774,
+        "weight": 100,
+        "name": "Shadow Collector Charis"
+      },
+      {
+        "unit_id": 60794,
+        "weight": 100,
+        "name": "Phoena"
+      },
+      {
+        "unit_id": 60822,
+        "weight": 2000,
+        "name": "Grimoire"
+      },
+      {
+        "unit_id": 60834,
+        "weight": 100,
+        "name": "Onyx Dragon Rugrow"
+      },
+      {
+        "unit_id": 60844,
+        "weight": 100,
+        "name": "Metal Forger Chrome"
+      },
+      {
+        "unit_id": 60874,
+        "weight": 100,
+        "name": "Demon Knight Febros"
+      },
+      {
+        "unit_id": 60884,
+        "weight": 100,
+        "name": "Cursed Sword Laberd"
+      },
+      {
+        "unit_id": 60894,
+        "weight": 100,
+        "name": "Unworldly Guns Malbelle"
+      },
+      {
+        "unit_id": 60914,
+        "weight": 100,
+        "name": "Inferno Melina"
+      },
+      {
+        "unit_id": 60954,
+        "weight": 100,
+        "name": "Mysterious Knight Zeal"
+      },
+      {
+        "unit_id": 60974,
+        "weight": 100,
+        "name": "Dark Divinity Eclise"
+      },
+      {
+        "unit_id": 60984,
+        "weight": 100,
+        "name": "Dark Soil Mizerka"
+      },
+      {
+        "unit_id": 61072,
+        "weight": 2000,
+        "name": "Yuurei Sayori"
+      },
+      {
+        "unit_id": 61073,
+        "weight": 700,
+        "name": "Oni Kageri"
+      },
+      {
+        "unit_id": 810003,
+        "weight": 2000,
+        "name": "Maiden Cayena"
+      },
+      {
+        "unit_id": 810004,
+        "weight": 700,
+        "name": "Hot Rocket Cayena"
+      },
+      {
+        "unit_id": 810005,
+        "weight": 100,
+        "name": "War Rocket Cayena"
+      },
+      {
+        "unit_id": 810044,
+        "weight": 700,
+        "name": "Crimson Wing Blaze"
+      },
+      {
+        "unit_id": 810212,
+        "weight": 2000,
+        "name": "Nice Burny"
+      },
+      {
+        "unit_id": 810315,
+        "weight": 100,
+        "name": "Berserker Korzan"
+      },
+      {
+        "unit_id": 820003,
+        "weight": 2000,
+        "name": "Maiden Serin"
+      },
+      {
+        "unit_id": 820004,
+        "weight": 700,
+        "name": "Gun Lady Serin"
+      },
+      {
+        "unit_id": 820005,
+        "weight": 100,
+        "name": "Gun Goddess Serin"
+      },
+      {
+        "unit_id": 820044,
+        "weight": 700,
+        "name": "Lapis Wing Sae"
+      },
+      {
+        "unit_id": 820045,
+        "weight": 100,
+        "name": "Abyssal Wing Sae"
+      },
+      {
+        "unit_id": 820315,
+        "weight": 100,
+        "name": "Battlemage Haile"
+      },
+      {
+        "unit_id": 830003,
+        "weight": 2000,
+        "name": "Maiden Bayley"
+      },
+      {
+        "unit_id": 830004,
+        "weight": 700,
+        "name": "Nyan Slash Bayley"
+      },
+      {
+        "unit_id": 830005,
+        "weight": 100,
+        "name": "Wild Slash Bayley"
+      },
+      {
+        "unit_id": 830044,
+        "weight": 700,
+        "name": "Royal Wing Dranoel"
+      },
+      {
+        "unit_id": 830045,
+        "weight": 100,
+        "name": "Regalia Wing Dranoel"
+      },
+      {
+        "unit_id": 830315,
+        "weight": 100,
+        "name": "Chieftain Avani"
+      },
+      {
+        "unit_id": 840003,
+        "weight": 2000,
+        "name": "Maiden Fennia"
+      },
+      {
+        "unit_id": 840004,
+        "weight": 700,
+        "name": "Raid Bomb Fennia"
+      },
+      {
+        "unit_id": 840005,
+        "weight": 100,
+        "name": "Raid Bolt Fennia"
+      },
+      {
+        "unit_id": 840044,
+        "weight": 700,
+        "name": "Storm Wing Cerise"
+      },
+      {
+        "unit_id": 840045,
+        "weight": 100,
+        "name": "Vorpal Wing Cerise"
+      },
+      {
+        "unit_id": 840204,
+        "weight": 700,
+        "name": "Vocals Kagamine Rin"
+      },
+      {
+        "unit_id": 840205,
+        "weight": 100,
+        "name": "Gemini Kagamine Rin"
+      },
+      {
+        "unit_id": 840315,
+        "weight": 100,
+        "name": "Chevalier Mikael"
+      },
+      {
+        "unit_id": 850003,
+        "weight": 2000,
+        "name": "Maiden Vanila"
+      },
+      {
+        "unit_id": 850004,
+        "weight": 700,
+        "name": "Sky Queen Vanila"
+      },
+      {
+        "unit_id": 850005,
+        "weight": 100,
+        "name": "Sky Angel Vanila"
+      },
+      {
+        "unit_id": 850013,
+        "weight": 2000,
+        "name": "Estia"
+      },
+      {
+        "unit_id": 850014,
+        "weight": 700,
+        "name": "Damsel Estia"
+      },
+      {
+        "unit_id": 850015,
+        "weight": 100,
+        "name": "Princess Estia"
+      },
+      {
+        "unit_id": 850025,
+        "weight": 100,
+        "name": "Xenon & Estia"
+      },
+      {
+        "unit_id": 850204,
+        "weight": 700,
+        "name": "Clavier Kagamine Len"
+      },
+      {
+        "unit_id": 850205,
+        "weight": 100,
+        "name": "Gemini Kagamine Len"
+      },
+      {
+        "unit_id": 850315,
+        "weight": 100,
+        "name": "Librarian Allanon"
+      },
+      {
+        "unit_id": 860003,
+        "weight": 2000,
+        "name": "Maiden Lico"
+      },
+      {
+        "unit_id": 860004,
+        "weight": 700,
+        "name": "Dark Blade Lico"
+      },
+      {
+        "unit_id": 860005,
+        "weight": 100,
+        "name": "Demon Blade Lico"
+      },
+      {
+        "unit_id": 860013,
+        "weight": 2000,
+        "name": "Xenon"
+      },
+      {
+        "unit_id": 860014,
+        "weight": 700,
+        "name": "Royal Guard Xenon"
+      },
+      {
+        "unit_id": 860015,
+        "weight": 100,
+        "name": "Sir Sancus Xenon"
+      },
+      {
+        "unit_id": 860315,
+        "weight": 100,
+        "name": "Alley Cat Nyami"
       }
     ]
   }

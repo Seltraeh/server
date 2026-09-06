@@ -34,6 +34,167 @@ constexpr uint8_t kSecondTutorialCheckpoint = 10;
 // "Tutorial Gacha" (type 20000, GachaActionScene::initConnect @ 0x16988C0).
 constexpr uint32_t kTutorialSummonGems = 5;
 
+// Clearing every mission in a Grand Gaia quest dungeon pays this, once — the
+// "1 Gem from fully completing a stage in a Quest map" on the wiki's In-Game
+// Credits page.  203 dungeons across the campaign, so ~1 Gem per 5 missions.
+// See ServerCache::missionQuestDungeon for why the dungeon and not the area.
+//
+// This is a SERVER-SIDE rule, not MST data: F_MISSION_MST carries exp, zel and
+// karma per mission and no gem column at all, and neither AreaMst nor
+// DungeonMst has a reward field — so the live server is what paid it, and this
+// is where we pay it.  See tools/wiki_gem_scrape.py for the source.
+constexpr int64_t kDungeonClearGems = 1;
+
+// Matches CampaignReceipt / DailySpin — the client's counter is 4 digits.
+constexpr int64_t kMaxGems = 9'999LL;
+
+/*!
+* Pays the clear Gem when a first clear completes a Grand Gaia quest dungeon.
+*
+* Called only on a FIRST clear, which is what makes it pay once per dungeon
+* with no extra bookkeeping: the grant needs the last uncleared mission in the
+* dungeon to become cleared, and once that has happened there are no first
+* clears left in that dungeon to trigger it again.  Replaying a mission is not
+* a first clear, so it cannot pay twice.
+*
+* @param database Transaction the surrounding MissionEnd is running in.
+* @param identity Resolved caller.
+* @param missionId The mission just cleared.
+*/
+// ---------------------------------------------------------------------------
+// First-clear rewards
+//
+// F_MISSION_MST::clear_rewards (SiYs27Cj) carries them on 787 missions as
+// comma-separated `type:id:amount:?:?`, in the SAME reward vocabulary the
+// present box and CampaignReceipt already dispatch on -- 3 zel, 8 gem, 6 unit,
+// 4/5/7 item/material/sphere, 11 karma, 17 summoner SP.
+//
+// They are delivered as PRESENTS rather than granted inline.  That is the
+// deferred half of the reward system this server already has (addUserPresent),
+// it reuses one tested payout path instead of adding a second per-type switch,
+// and it matches what the game told the player: "Gifts have been awarded to
+// you. Visit your presents box to receive them."
+// ---------------------------------------------------------------------------
+struct ClearReward { int32_t type; std::string id; int32_t amount; };
+
+static std::vector<ClearReward> parseClearRewards(const std::string& raw)
+{
+	std::vector<ClearReward> out;
+	size_t start = 0;
+	while (start <= raw.size())
+	{
+		const auto comma = raw.find(',', start);
+		const auto entry = raw.substr(start, comma == std::string::npos
+		                                     ? std::string::npos : comma - start);
+		if (!entry.empty())
+		{
+			// type:id:amount, plus two trailing fields nothing reads.
+			std::vector<std::string> parts;
+			size_t f = 0;
+			while (f <= entry.size() && parts.size() < 5)
+			{
+				const auto colon = entry.find(':', f);
+				parts.push_back(entry.substr(f, colon == std::string::npos
+				                                ? std::string::npos : colon - f));
+				if (colon == std::string::npos) break;
+				f = colon + 1;
+			}
+			if (parts.size() >= 3)
+			{
+				try
+				{
+					const auto type   = std::stoi(parts[0]);
+					const auto amount = std::stoi(parts[2]);
+					if (type > 0 && amount > 0)
+						out.push_back({ type, parts[1] == "0" ? std::string() : parts[1], amount });
+				}
+				catch (const std::exception&) { /* malformed entry: skip it */ }
+			}
+		}
+		if (comma == std::string::npos) break;
+		start = comma + 1;
+	}
+	return out;
+}
+
+// The result screen's own bonus line.  MissionResultBaseScene::getRewardBonusZel
+// @0x18B9780 parses this as comma-separated `type:_:amount` triples and sums
+// the entries matching its type -- and it only ever asks for 3 (zel), 11
+// (karma) and 17 (SP).  Everything else in the reward list is delivered by
+// present and would simply be ignored here, so it is not emitted.
+static std::string encodeClearBonus(const std::vector<ClearReward>& rewards)
+{
+	std::string out;
+	for (const auto& r : rewards)
+	{
+		if (r.type != 3 && r.type != 11 && r.type != 17)
+			continue;
+		if (!out.empty()) out += ',';
+		out += std::to_string(r.type) + ":0:" + std::to_string(r.amount);
+	}
+	return out;
+}
+
+drogon::Task<void> grantDungeonClearGem(
+	const db::Database database,
+	const gme::UserIdentity identity,
+	const uint32_t missionId)
+{
+	const auto& cache = theServer()->cache();
+	const auto dungeonIt = cache.missionQuestDungeon().find(static_cast<int32_t>(missionId));
+	if (dungeonIt == cache.missionQuestDungeon().end())
+		co_return; // Vortex, Frontier Gate, event content — no clear Gem.
+
+	const auto missionsIt = cache.missionsByDungeon().find(dungeonIt->second);
+	if (missionsIt == cache.missionsByDungeon().end())
+		co_return;
+
+	const auto& dungeonMissions = missionsIt->second;
+
+	// One query rather than a per-mission loop: MissionEnd already runs a long
+	// chain of awaits inside a transaction on a single-connection SQLite pool,
+	// and that is exactly the shape that wedged the pool in §6.14.
+	//
+	// The ids are QUOTED because user_campaign_missions.mission_id is TEXT (the
+	// insert above writes std::to_string(serial_id)).  SQLite would in fact
+	// apply the column's TEXT affinity to a bare integer in an IN list and
+	// match anyway, but that is a rule worth not depending on.  These are our
+	// own MST ints, so there is nothing to escape.
+	std::string idList;
+	idList.reserve(dungeonMissions.size() * 10);
+	for (size_t i = 0; i < dungeonMissions.size(); ++i)
+	{
+		if (i)
+			idList += ',';
+		idList += '\'';
+		idList += std::to_string(dungeonMissions[i]);
+		idList += '\'';
+	}
+
+	const auto rows = co_await database->execSqlCoro(
+		"SELECT COUNT(DISTINCT mission_id) AS cleared FROM user_campaign_missions"
+		" WHERE user_id = $1 AND state = 2 AND mission_id IN (" + idList + ");",
+		identity.userId);
+	if (rows.empty())
+		co_return;
+
+	const auto cleared = rows[0]["cleared"].as<int64_t>();
+	if (cleared < static_cast<int64_t>(dungeonMissions.size()))
+		co_return;
+
+	co_await database->execSqlCoro(
+		"UPDATE user_info SET gems = MIN(gems + $1, $2)"
+		" WHERE gumi_user_id = $3 AND id = $4;",
+		kDungeonClearGems,
+		kMaxGems,
+		identity.gumiUserId,
+		identity.userId);
+
+	LOG_INFO << "MissionEnd: quest dungeon " << dungeonIt->second << " fully cleared by "
+	         << identity.userId << " (" << dungeonMissions.size()
+	         << " missions) — awarded " << kDungeonClearGems << " gem";
+}
+
 std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 {
 	std::vector<UserUnitInfo> units;
@@ -66,7 +227,13 @@ std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 			return units;
 		}
 
-		unit->unit_lvl = static_cast<uint32_t>(std::stoul(level));
+		// A drop can specify a level above 1, and base_* must follow it.
+		// fromArchivedUnit hands back the LEVEL-1 statline, and the client
+		// displays user_units.base_* verbatim, so setting the level alone
+		// produced a "Lv 30" unit with level-1 stats.
+		const auto dropLevel = static_cast<uint32_t>(std::stoul(level));
+		unit->unit_lvl = dropLevel;
+		gme::scaleUnitBaseStats(*unit, static_cast<int>(dropLevel));
 		units.push_back(std::move(*unit));
 	}
 
@@ -309,6 +476,11 @@ HANDLEF(MissionEnd)
 					identity.userId);
 			}
 
+			// Filled in below when this turns out to be a first clear; stays
+			// empty otherwise, which is what the live server sent and what the
+			// result screen's length check expects.
+			std::string firstClearBonus;
+
 			// Record the clear in the mission clear-history
 			// (user_campaign_missions, state=2).  UserInfo reports this set as
 			// UT1SVg59 (UserClearMissionInfo) — the list the client evaluates
@@ -319,6 +491,15 @@ HANDLEF(MissionEnd)
 				const auto clearedAt = static_cast<int64_t>(
 					std::chrono::duration_cast<std::chrono::seconds>(
 						std::chrono::system_clock::now().time_since_epoch()).count());
+
+				// Whether this is the FIRST clear decides the area Gem below,
+				// so it has to be read before the upsert bumps clear_count.
+				const auto firstClear = (co_await transaction->execSqlCoro(
+					"SELECT 1 FROM user_campaign_missions"
+					" WHERE user_id = $1 AND mission_id = $2 AND state = 2;",
+					identity.userId,
+					std::to_string(req.mission_num.serial_id))).empty();
+
 				co_await transaction->execSqlCoro(
 					"INSERT INTO user_campaign_missions"
 					" (user_id, mission_id, state, attain_percent, clear_count, last_cleared_at)"
@@ -329,6 +510,31 @@ HANDLEF(MissionEnd)
 					identity.userId,
 					std::to_string(req.mission_num.serial_id),
 					clearedAt);
+
+				if (firstClear)
+				{
+					co_await grantDungeonClearGem(transaction, identity, req.mission_num.serial_id);
+
+					// Per-mission first-clear rewards, queued to the present box.
+					const auto& clearRewards = theServer()->cache().missionClearRewards();
+					const auto rewardIt = clearRewards.find(
+						static_cast<int32_t>(req.mission_num.serial_id));
+					if (rewardIt != clearRewards.end())
+					{
+						const auto rewards = parseClearRewards(rewardIt->second);
+						for (const auto& r : rewards)
+						{
+							co_await gme::addUserPresent(
+								transaction, identity, r.type, r.id, r.amount,
+								0, "First clear reward");
+						}
+						// The result screen shows only the currency half.
+						firstClearBonus = encodeClearBonus(rewards);
+						LOG_INFO << "MissionEnd: first clear of "
+							<< req.mission_num.serial_id << " -> " << rewards.size()
+							<< " reward(s) queued (" << rewardIt->second << ")";
+					}
+				}
 			}
 
 			auto loginInfo = std::move((co_await gme::getLoginInfo(transaction, identity)).nonEmpty());
@@ -383,6 +589,7 @@ HANDLEF(MissionEnd)
 			resp.reward_info.lvlup_flag = leveledUp ? 1 : 0;
 			resp.reward_info.inc_exp = rewardExp;
 			resp.reward_info.reward_units = encodeUnitDrops(droppedUnits, newFlags);
+			resp.reward_info.clear_bonus = firstClearBonus;
 			// Tell the client the mission is cleared NOW, rather than leaving
 			// it to whenever UserInfo next runs.  Until this was here a
 			// freshly beaten mission kept its uncleared marker on the map and
@@ -410,6 +617,10 @@ HANDLEF(MissionEnd)
 				{ "zel_get",         static_cast<int64_t>(rewardZel)   },
 				{ "karma_get",       static_cast<int64_t>(rewardKarma) },
 				{ "quest_clear_cnt", 1 },
+				// TROPHY 200030 (total battle wins).  A cleared mission is a
+				// won battle; the two differ only once a mission can be failed
+				// part-way, which this flow has no concept of yet.
+				{ "quest_win_cnt",   1 },
 			});
 
 			resp.login_info = std::move(loginInfo);
@@ -528,6 +739,7 @@ HANDLEF(MissionStart)
 	if (!MissionArchiver::populatePacket(*missionRecord, resp.mission_num)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.ais)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.monsters)
+		|| !MissionArchiver::populatePacket(*missionRecord, resp.monster_cgs)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.battle_monster_groups)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.battle_groups))
 	{

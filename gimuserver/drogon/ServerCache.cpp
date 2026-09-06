@@ -6,7 +6,14 @@
 #include <gimuserver/utils/JsonFile.hpp>
 
 #include <algorithm>
+#include <filesystem>
+#include <map>
+#include <string>
+#include <string_view>
+#include <system_error>
+#include <tuple>
 #include <unordered_map>
+#include <vector>
 
 // Vortex topology bounds, used to collect m_vortexPermits at boot.
 //
@@ -18,6 +25,88 @@
 // is 700000 "A Dark Ritual", so the cut is wide.
 static constexpr int32_t kVortexLandId = 99;
 static constexpr int32_t kVortexAreaIdMax = 200000;
+
+// Above this, an id belongs to event/special content rather than the Grand
+// Gaia quest line.  Same floor UserInfo's PermitPlace uses for its dense
+// ranges; see kSpecialIdFloor there.
+static constexpr int32_t kQuestSpecialIdFloor = 100000;
+
+// Parade Garden, and the display_order that floats it to the top of the Vortex
+// tile list.
+//
+// It is where the evolution, sale and enhancing units come from, so it is the
+// tile a player wants first, and its shipped order (100) buries it at the
+// bottom.
+//
+// ⚠ THE VORTEX LIST IS SORTED DESCENDING — HIGHEST display_order FIRST.
+// The tile order comes from AreaSPSelectScene::setDungeonList, which builds its
+// OWN pair<dispOrder, AreaMst*> vector and sorts it at 0x183F2D4 with
+// std::__sort<std::greater<...>>.  Do NOT reach for AreaMstList::getActiveList
+// @0x1309EDC to answer this: that one sorts with std::__less and is ASCENDING,
+// it is a different consumer, and trusting it put this constant at 1 and Parade
+// Garden dead last.  99999 is above every shipped land-99 row (the highest is
+// 9800, "Year-End Dungeon").
+static constexpr int32_t kParadeGardenAreaId = 100600;
+static constexpr int32_t kParadeGardenDispOrder = 99999;
+
+// Where the CDN serves area/dungeon banner art from.  Relative because main()
+// chdirs into the config file's directory before Drogon starts, and every other
+// path in config.json (document_root, mst_root, archive_root) is relative the
+// same way.
+static constexpr std::string_view kBannerDir = "./game_content/content/dungeon/";
+
+/*!
+* An English banner to use in place of a Japanese one, when the set ships both.
+*
+* Three tiles reach the player with Japanese burnt into the artwork even though
+* their MST names are English — "Mysterious Paradise" draws 神秘の楽園,
+* "Ultimate Paradise" draws 究極の楽園, "Heavenly Paradise" draws 天上の楽園.
+* The global build shipped translated art for exactly these three next to the
+* originals (sp_quest_banner_frog{,3,_crystal}_EN.png), so the fix is to point
+* at it rather than to drop three of the frog dungeons the player wants.
+*
+* Probed on disk rather than listed, so art added later is picked up.
+*
+* @param banner Banner filename from the MST.
+* @return The _EN filename when one exists, otherwise banner unchanged.
+*/
+static std::string LocalisedBanner(const std::string& banner)
+{
+	if (!banner.ends_with(".png"))
+		return banner;
+
+	auto localised = banner.substr(0, banner.size() - 4) + "_EN.png";
+	std::error_code ec;
+	if (std::filesystem::exists(std::string(kBannerDir) + localised, ec))
+		return localised;
+
+	return banner;
+}
+
+/*!
+* Whether a name is displayable text rather than Japanese or mojibake.
+*
+* Two shapes have to go.  Some rows are honestly Japanese ("天上の楽園",
+* "禁断の石版"); others are Shift-JIS that was decoded as Latin somewhere
+* upstream and reached the MST as literal question marks ("?X?g???C???C?Y").
+* Neither renders as anything a player can read, and the localisation keys we
+* DO want ("MST_DUNGEONS_DUNGEON_100600_NAME") are plain ASCII, so a
+* non-ASCII byte or a run of question marks is enough to tell them apart.
+*/
+static bool IsDisplayableName(std::string_view name)
+{
+	int questionRun = 0;
+	for (const auto ch : name)
+	{
+		if (static_cast<unsigned char>(ch) > 0x7F)
+			return false;
+		questionRun = (ch == '?') ? questionRun + 1 : 0;
+		if (questionRun >= 3)
+			return false;
+	}
+
+	return true;
+}
 
 /*!
 * Weekday mask for a Vortex dungeon, from its banner filename.
@@ -279,6 +368,26 @@ void ServerCache::Setup(const Json::Value& serverObj)
 			{
 				m_missionsByDungeon[mission.dungeon_id].push_back(mission.id);
 
+				// First-clear rewards, kept for the 787 rows that have any.
+				// Two ints and a short string wide -- the same reasoning as the
+				// indexes below, rather than reviving the whole row cache.
+				if (!mission.clear_rewards.empty())
+					m_missionClearRewards.emplace(mission.id, mission.clear_rewards);
+
+				// Mission -> its quest dungeon, for the clear Gem (see
+				// missionQuestDungeon()).  Grand Gaia only: land 99 is the
+				// special-content catch-all (Vortex, Frontier Gate, Frontier
+				// Hunter, Grand Quest) and none of those are the "Quest map"
+				// the reward belongs to.  The id floor keeps event and collab
+				// numbering out for the same reason.
+				if (mission.land_id > 0 && mission.land_id < kVortexLandId
+					&& mission.area_id > 0 && mission.area_id < kQuestSpecialIdFloor
+					&& mission.dungeon_id > 0 && mission.dungeon_id < kQuestSpecialIdFloor
+					&& mission.id > 0 && mission.id < kQuestSpecialIdFloor)
+				{
+					m_missionQuestDungeon.emplace(mission.id, mission.dungeon_id);
+				}
+
 				// Prerequisites, for PermitPlace's progression gate.  Kept as
 				// its own index for the same reason as the one above: the
 				// rows themselves are dropped, and this is two ints wide.
@@ -293,6 +402,15 @@ void ServerCache::Setup(const Json::Value& serverObj)
 				std::sort(ids.begin(), ids.end());
 			LOG_INFO << "ServerCache: indexed " << missions.size() << " missions across "
 			         << m_missionsByDungeon.size() << " dungeons";
+
+			{
+				std::set<int32_t> gemDungeons;
+				for (const auto& [missionId, dungeonId] : m_missionQuestDungeon)
+					gemDungeons.insert(dungeonId);
+				LOG_INFO << "ServerCache: " << gemDungeons.size()
+				         << " quest dungeon(s) pay a clear Gem, covering "
+				         << m_missionQuestDungeon.size() << " mission(s)";
+			}
 
 			// Everything PermitPlace must allow for Frontier Gate to be
 			// enterable.  UserInfo's dense ranges cover the Grand Gaia
@@ -391,6 +509,118 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_areaMst = LoadJson<AreaMstCache>(mstRoot, "area_mst.json").data;
 		m_dungeonMst = LoadJson<DungeonMstCache>(mstRoot, "dungeon_mst.json").data;
 
+		// Which of the 88 Vortex areas are worth a tile.  Three ways to lose
+		// one, all of them things the player sees as clutter:
+		//
+		//  - nothing behind it.  Ten areas have no dungeon at all, because
+		//    this data version consolidated the weekday dungeons under area
+		//    100001 "Enhancement" and left the old per-day area shells
+		//    ("Garden of God", "Cave of Greed", "Souls Training Ground", ...)
+		//    empty.  They still draw, and open onto nothing.
+		//  - Japanese or mojibake naming.  34 areas, mostly the untranslated
+		//    collab dungeons (Tales of, FFBE, Guilty Gear, Megami Tensei) plus
+		//    the 至高の楽園 run.
+		//  - the same tile again.  13 areas repeat a tile the player already
+		//    has: "Heavenly Paradise" is six areas, "Ultimate Paradise" four,
+		//    "Year-End Dungeon" three, and "Winter Paradise" arrives three
+		//    times over as Travellers / Vortex Trials / Seasons Past.
+		//
+		// Duplicates are matched on the BANNER SET rather than the area name,
+		// because the Winter Paradise trio carries three different area names
+		// and plate images over one identical dungeon.  The lowest
+		// display_order in each group is the one kept, so the survivor is
+		// wherever the player already expected the tile to be.
+		std::map<std::vector<std::string>, int32_t> bannersSeen;
+		{
+			std::map<int32_t, std::vector<const DungeonMst*>> vortexDungeons;
+			for (const auto& dungeon : m_dungeonMst)
+				if (dungeon.land_id == kVortexLandId && dungeon.area_id < kVortexAreaIdMax)
+					vortexDungeons[dungeon.area_id].push_back(&dungeon);
+
+			std::vector<const AreaMst*> vortexAreas;
+			for (const auto& area : m_areaMst)
+				if (area.land_id == kVortexLandId && area.area_id < kVortexAreaIdMax)
+					vortexAreas.push_back(&area);
+
+			std::sort(vortexAreas.begin(), vortexAreas.end(),
+				[](const AreaMst* lhs, const AreaMst* rhs) {
+					return std::tie(lhs->display_order, lhs->area_id)
+					     < std::tie(rhs->display_order, rhs->area_id);
+				});
+
+			size_t empty = 0, untranslated = 0, duplicate = 0;
+			for (const auto* area : vortexAreas)
+			{
+				const auto it = vortexDungeons.find(area->area_id);
+				if (it == vortexDungeons.end())
+				{
+					m_vortexHiddenAreas.insert(area->area_id);
+					++empty;
+					continue;
+				}
+
+				const auto& dungeons = it->second;
+				const auto readable = IsDisplayableName(area->name)
+					&& std::all_of(dungeons.begin(), dungeons.end(),
+						[](const DungeonMst* d) { return IsDisplayableName(d->name); });
+				if (!readable)
+				{
+					m_vortexHiddenAreas.insert(area->area_id);
+					++untranslated;
+					continue;
+				}
+
+				std::vector<std::string> banners;
+				banners.reserve(dungeons.size());
+				for (const auto* dungeon : dungeons)
+					banners.push_back(dungeon->room_asset);
+				std::sort(banners.begin(), banners.end());
+
+				if (!bannersSeen.emplace(std::move(banners), area->area_id).second)
+				{
+					m_vortexHiddenAreas.insert(area->area_id);
+					++duplicate;
+					continue;
+				}
+			}
+
+			LOG_INFO << "ServerCache: Vortex tiles — "
+			         << (vortexAreas.size() - m_vortexHiddenAreas.size()) << " kept of "
+			         << vortexAreas.size() << " (" << empty << " empty, "
+			         << untranslated << " untranslated, " << duplicate << " duplicate)";
+		}
+
+		// The area table the client is served, which is what actually draws the
+		// Vortex list: the hidden areas are dropped, Parade Garden is floated
+		// to the top, and any tile with translated art gets it.  Every other
+		// row is passed through untouched — the key is a full replace (see
+		// UserInfoResp::area_mst), so anything missing here stops existing for
+		// the client, Grand Gaia included.
+		{
+			size_t localised = 0;
+			m_clientAreaMst.reserve(m_areaMst.size());
+			for (const auto& area : m_areaMst)
+			{
+				if (m_vortexHiddenAreas.contains(area.area_id))
+					continue;
+
+				auto& emitted = m_clientAreaMst.emplace_back(area);
+				if (emitted.area_id == kParadeGardenAreaId)
+					emitted.display_order = kParadeGardenDispOrder;
+
+				auto banner = LocalisedBanner(emitted.plate_img);
+				if (banner != emitted.plate_img)
+				{
+					emitted.plate_img = std::move(banner);
+					++localised;
+				}
+			}
+
+			LOG_INFO << "ServerCache: serving " << m_clientAreaMst.size()
+			         << " area(s) to the client, " << localised
+			         << " with translated banner art";
+		}
+
 		// Everything PermitPlace must allow before the Vortex draws a tile.
 		// See vortexPermits() for why this is scoped rather than a widening.
 		//
@@ -399,12 +629,19 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		// survives and is all this needs to walk dungeon -> missions.
 		{
 			for (const auto& area : m_areaMst)
-				if (area.land_id == kVortexLandId && area.area_id < kVortexAreaIdMax)
+				if (area.land_id == kVortexLandId && area.area_id < kVortexAreaIdMax
+					&& !m_vortexHiddenAreas.contains(area.area_id))
 					m_vortexPermits.areas.insert(area.area_id);
 
 			for (const auto& dungeon : m_dungeonMst)
 			{
 				if (dungeon.land_id != kVortexLandId || dungeon.area_id >= kVortexAreaIdMax)
+					continue;
+
+				// A hidden area has no tile, so nothing inside it is reachable.
+				// Leaving its dungeons permitted would not draw anything, but it
+				// would keep them in PermitPlace for no reason.
+				if (m_vortexHiddenAreas.contains(dungeon.area_id))
 					continue;
 
 				// The area is permitted unconditionally even for a rotating
