@@ -293,6 +293,14 @@ PacketInterfaceFor<::UserUnitInfo>::fields()
 			.update = true,
 			.insert = true,
 		}),
+		// The Sphere Frog bit.  Mapped here rather than filled by hand in each
+		// handler so every path that loads a unit carries it -- UserInfo, the
+		// incremental qC2tJs4E updates, party snapshots.
+		field<&::UserUnitInfo::ext_count>("sphere_ext", {
+			.read = true,
+			.update = true,
+			.insert = true,
+		}),
 	};
 }
 

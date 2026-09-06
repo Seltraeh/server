@@ -170,6 +170,11 @@ HANDLEF(UserInfo)
 	// Lifetime battle statistics behind the Trophy / Arena Archive / Colosseum
 	// Archive screens.  Only the eight counters MissionEnd can feed are real;
 	// the rest of UserTeamArchive stays 0 until something instruments them.
+	// Count today's login BEFORE reading the archive, so the Records screen
+	// shows the streak including the session the player is opening right now.
+	// Idempotent per calendar day, so the repeated UserInfo calls a session
+	// makes count once.
+	co_await gme::touchLoginStreak(db, identity);
 	resp.archive = co_await gme::loadTeamArchive(db, identity);
 
 	// Must be a real row, not [].  PQ56vbkI is a SINGLETON readParam, so an
@@ -240,6 +245,21 @@ HANDLEF(UserInfo)
     resp.gacha_info = GachaArchiver::instance().populateAllPackets();
     resp.gacha_categories = theServer()->cache().gachaListRsp().gacha_categories;
 
+    // The world-area table, which is what draws the Vortex tile list.  Curated
+    // at boot (ServerCache::clientAreaMst) to drop the Vortex areas that are
+    // empty shells, untranslated, or a second copy of a tile the player already
+    // has, and to float Parade Garden to the top of the list.
+    //
+    // ⚠ Sending this key REPLACES the client's whole AreaMstList — row 0 of
+    // AreaMstResponse::readParam calls AreaMstList::removeAllObjects() first.
+    // That is what makes the curation take effect, and it is also why the whole
+    // table goes out rather than the Vortex slice: anything left out stops
+    // existing for the client.  Our deploy/mst/area_mst.json is byte-identical
+    // to the F_AREA_MST_Ver669 the client already downloaded from our own CDN
+    // (deploy/game_content/mst/Ver669_vj6fEsg7.dat), so every row it does not
+    // curate is the row the client already had.
+    resp.area_mst = theServer()->cache().clientAreaMst();
+
     resp.campaign_info.current_day = 1;
     resp.campaign_info.total_days = 96;
     resp.campaign_info.first_for_the_day = false;
@@ -293,6 +313,99 @@ HANDLEF(UserInfo)
     // itself (RANDALL_SLOTGAME_MEDAL_ERROR), so no amount of care in the result
     // handler makes the machine playable.  See handbook §7.14.
     resp.medal_info = co_await gme::loadBraveMedals(db, identity);
+
+    // Summoner Arms the player owns (dhMmbm5p).  The block was already wired
+    // into this response but its struct was a stub, so the array was always
+    // empty and an arm could never be owned — which is what made first-clear
+    // reward type 18 unclaimable.  Nothing seeds rows here: an arm arrives by
+    // being granted, so an account with none legitimately sends an empty list.
+    {
+        const auto rows = co_await db->execSqlCoro(
+            "SELECT summoner_arm_id, exp, level FROM user_summoner_arms"
+            " WHERE user_id = $1 ORDER BY summoner_arm_id;",
+            identity.userId);
+        resp.summoner_arm_info.clear();
+        resp.summoner_arm_info.reserve(rows.size());
+        for (const auto& row : rows)
+        {
+            resp.summoner_arm_info.push_back({
+                .user_id         = identity.userId,
+                .summoner_arm_id = row["summoner_arm_id"].as<std::string>(),
+                .exp             = row["exp"].as<int32_t>(),
+                .level           = row["level"].as<int32_t>(),
+            });
+        }
+    }
+
+    // The Summoner itself (n5mdIUqj) — a SINGLETON, so exactly one row.
+    //
+    // UserSummonerInfoResponse::readParam @0x144EAD0 calls
+    // UserSummonerInfo::shared()->init() before its first strcmp, so an empty
+    // array never runs readParam and the client keeps its constructed
+    // defaults.  That is why summoner SP had nowhere to appear.
+    //
+    // Only `sp` is ours.  The other 31 fields are sent at exactly the values
+    // init() @0x127E9E8 assigns — read out of .rodata, not guessed: strings
+    // empty except the equipped arm "10" (the first of
+    // DefineMst.init_summoner_arm_id "10,20"), sex/element 1, every
+    // exp/level pair (0,1), friend point 0, summon_limit 1, deck 0.  So this
+    // block changes nothing the summoner subsystem has not been built for.
+    //
+    // hp/atk/def/hel are the one deliberate departure: init() leaves 1/1/1/1,
+    // which is a placeholder for the server to fill, so we send
+    // SummonerLevelMst's row for the level we send.
+    {
+        const auto rows = co_await db->execSqlCoro(
+            "SELECT sp FROM user_summoner WHERE user_id = $1;", identity.userId);
+        const auto sp = rows.empty() ? 0 : rows[0]["sp"].as<int32_t>();
+
+        constexpr int32_t kSummonerLevel = 1;
+
+        // Fall back to init()'s placeholder if the level has no MST row, so a
+        // truncated MST cannot make the summoner screen read as 0 ATK.
+        int32_t hp = 1, atk = 1, def = 1, hel = 1;
+        const auto& levels = theServer()->cache().summonerLevelMst();
+        const auto lv = std::find_if(levels.begin(), levels.end(),
+            [](const SummonerLevelMst& l) { return l.lv == kSummonerLevel; });
+        if (lv != levels.end())
+        {
+            hp  = lv->base_hp;
+            atk = lv->base_atk;
+            def = lv->base_def;
+            hel = lv->base_rec;
+        }
+
+        UserSummonerInfo summoner{};
+        summoner.user_id = identity.userId;
+        summoner.sex = 1;
+        summoner.element = 1;
+        summoner.summoner_arm_id = "10";
+        summoner.summoner_hair_id = "";
+        summoner.exp = 0;
+        summoner.level = kSummonerLevel;
+        summoner.exp1 = 0; summoner.level1 = 1;
+        summoner.exp2 = 0; summoner.level2 = 1;
+        summoner.exp3 = 0; summoner.level3 = 1;
+        summoner.exp4 = 0; summoner.level4 = 1;
+        summoner.exp5 = 0; summoner.level5 = 1;
+        summoner.exp6 = 0; summoner.level6 = 1;
+        summoner.sp = sp;
+        summoner.summoner_friend_point = 0;
+        summoner.hp = hp;
+        summoner.atk = atk;
+        summoner.def = def;
+        summoner.hel = hel;
+        summoner.summon_limit = 1;
+        summoner.ep3_current_deck_no = 0;
+        summoner.summoner_ability_info = "";
+        summoner.eqp_item_frame_id = "";
+        summoner.eqp_item_id = "";
+        summoner.extra_passive_skill_id = "";
+        summoner.extra_passive_skill_id2 = "";
+
+        resp.summoner_info.clear();
+        resp.summoner_info.push_back(std::move(summoner));
+    }
 
     std::string buffer{};
     const auto& ec2 = glz::write_json(resp, buffer);

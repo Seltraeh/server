@@ -93,6 +93,11 @@ HANDLEF(ItemSell)
 				"UPDATE user_info SET zel = MIN(zel + $1, 99999999) WHERE id = $2;",
 				zelCredit, userId);
 			LOG_INFO << "ItemSell: credited " << zelCredit << " zel";
+			// TROPHY 100060 (total zel from items sold) and 100040 (total zel
+			// used is separate).  Records draws it from zel_item_sale.
+			co_await gme::bumpArchiveCounters(theDb(), identity, {
+				{ "zel_item_sale", zelCredit },
+			});
 		}
 		catch (const drogon::orm::DrogonDbException& ex)
 		{

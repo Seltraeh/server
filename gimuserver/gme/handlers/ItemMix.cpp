@@ -321,5 +321,42 @@ HANDLEF(ItemMix)
 		LOG_INFO << "ItemMix: crafted recipe " << recipeId << " x" << count;
 	}
 
+	// Records counters: 100250 syntheses performed, 100260 materials consumed,
+	// 100270 spheres created.  A "sphere" is an ItemMst row with a non-zero
+	// sphere_type -- the same test ItemSphereEqp uses to pick the slot frame --
+	// so the Sphere Synthesis screen and the Item Synthesis screen both feed
+	// 100250/100260 and only the former also feeds 100270.
+	{
+		int64_t crafts = 0, materials = 0, spheres = 0;
+		for (const auto& [recipeId, count] : crafted)
+		{
+			(void)recipeId;
+			crafts += count;
+		}
+		for (const auto& [itemId, qty] : consumed)
+		{
+			(void)itemId;
+			materials += qty;
+		}
+		const auto& itemMst = theServer()->cache().itemMst();
+		for (const auto& [itemId, qty] : produced)
+		{
+			for (const auto& m : itemMst)
+			{
+				if (m.id == static_cast<int32_t>(itemId))
+				{
+					if (m.sphere_type != 0)
+						spheres += qty;
+					break;
+				}
+			}
+		}
+		co_await gme::bumpArchiveCounters(theDb(), identity, {
+			{ "item_mix_cnt",      crafts    },
+			{ "item_mix_elem_cnt", materials },
+			{ "sphere_mix_cnt",    spheres   },
+		});
+	}
+
 	co_return HandleResult::success("{}");
 }

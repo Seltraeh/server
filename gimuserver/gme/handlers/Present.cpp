@@ -288,6 +288,62 @@ HANDLEF(PresentReceipt)
 					granted = true;
 					break;
 				}
+				case 9:  // dungeon key
+				{
+					// PresentCommon::createPresentName @0x11C37F4 dispatches
+					// (present_type - 2) through the jump table at 0x2328200, and
+					// index 7 lands at 0x11C3EDC -> DungeonKeyMstList, so target_id
+					// is a DungeonKeyMst id (1 Metal, 2 Jewel, 3 Imp).
+					//
+					// Capped at that key's possession_limit (50 on all three rows)
+					// for the same reason DungeonKeyReceipt caps it: the client's
+					// Administration Office draws "held / limit" and a present must
+					// not be able to push the count past what the daily claim can.
+					//
+					// last_receipt_day stays 0 on a fresh row: it is the once-per-day
+					// CLAIM token, and stamping it here would consume today's
+					// legitimate claim.  A present is not a distribution.
+					if (targetId.empty())
+						break;
+
+					int32_t keyId = 0;
+					try { keyId = std::stoi(targetId); }
+					catch (const std::exception&) { break; }
+
+					const auto& keyMst = theServer()->cache().dungeonKeyMst();
+					const auto key = std::find_if(keyMst.begin(), keyMst.end(),
+						[keyId](const DungeonKeyMst& k) { return k.id == keyId; });
+					if (key == keyMst.end())
+					{
+						LOG_WARN << "PresentReceipt: dungeon key " << targetId
+							<< " is not in DungeonKeyMst — present left unclaimed";
+						break;
+					}
+
+					co_await transaction->execSqlCoro(
+						"INSERT INTO user_dungeon_keys"
+						" (user_id, dungeon_key_id, possession, last_receipt_day, active_type)"
+						" VALUES ($1, $2, MIN($3, $4), 0, 0)"
+						" ON CONFLICT(user_id, dungeon_key_id) DO UPDATE SET"
+						" possession = MIN(possession + $3, $4);",
+						identity.userId, keyId, std::max(targetCnt, 1),
+						static_cast<int32_t>(key->possession_limit));
+
+					// Read back rather than reporting target_cnt: the MIN above
+					// means a 100-key present on a 50 cap grants 46, and a log that
+					// says 100 would hide that.  Same "held/limit" shape as
+					// DungeonKeyReceipt's line.
+					const auto held = co_await transaction->execSqlCoro(
+						"SELECT possession FROM user_dungeon_keys"
+						" WHERE user_id = $1 AND dungeon_key_id = $2;",
+						identity.userId, keyId);
+					LOG_INFO << "PresentReceipt: " << key->name << " present of "
+						<< std::max(targetCnt, 1) << " — now holding "
+						<< (held.empty() ? 0 : held[0]["possession"].as<int32_t>())
+						<< "/" << static_cast<int32_t>(key->possession_limit);
+					granted = true;
+					break;
+				}
 				case 11:  // karma
 				{
 					// PresentCommon::createThumbnail @0x11C4900 maps
@@ -322,11 +378,84 @@ HANDLEF(PresentReceipt)
 					granted = true;
 					break;
 				}
+				case 17:  // summoner SP
+				{
+					// PresentCommon::createPresentName @0x11C37F4, index 15 of the
+					// jump table at 0x2328200.  A quantity-only reward: target_id is
+					// 0 in every row of the data, target_cnt is the SP.
+					//
+					// Capped at DefineMst.max_summoner_sp (99999), the same way karma
+					// is capped -- the client's SP label has no room to grow past the
+					// value the define declares.
+					//
+					// The row is created on demand: nothing seeds user_summoner at
+					// account creation, and an absent row reads as 0 SP in UserInfo.
+					constexpr int32_t kMaxSummonerSp = 99'999;
+
+					co_await transaction->execSqlCoro(
+						"INSERT INTO user_summoner (user_id, sp) VALUES ($1, MIN($2, $3))"
+						" ON CONFLICT(user_id) DO UPDATE SET sp = MIN(sp + $2, $3);",
+						identity.userId, std::max(targetCnt, 1), kMaxSummonerSp);
+
+					const auto held = co_await transaction->execSqlCoro(
+						"SELECT sp FROM user_summoner WHERE user_id = $1;",
+						identity.userId);
+					LOG_INFO << "PresentReceipt: summoner SP present of "
+						<< std::max(targetCnt, 1) << " — now holding "
+						<< (held.empty() ? 0 : held[0]["sp"].as<int32_t>())
+						<< "/" << kMaxSummonerSp;
+					granted = true;
+					break;
+				}
+				case 18:  // summoner arm
+				{
+					// PresentCommon::createPresentName @0x11C37F4 dispatches
+					// (present_type - 2) through the jump table at 0x2328200,
+					// and index 16 lands at 0x11C3E98 -> SummonerArmMstList,
+					// so target_id is a SummonerArmMst id.  Every id the
+					// mission rewards use resolves in that 23-row table.
+					//
+					// An arm is owned once; target_cnt is always 1 in the data
+					// and a repeat grant must not create a second row.  Level
+					// starts at 1 because that is what the arm list shows for
+					// an unlevelled arm -- 0 would render as "Lv.0".
+					if (targetId.empty())
+						break;
+
+					int32_t armId = 0;
+					try { armId = std::stoi(targetId); }
+					catch (const std::exception&) { break; }
+
+					const auto& arms = theServer()->cache().summonerArmMst();
+					const auto known = std::any_of(arms.begin(), arms.end(),
+						[&](const SummonerArmMst& a) { return a.id == armId; });
+					if (!known)
+					{
+						LOG_WARN << "PresentReceipt: summoner arm " << targetId
+							<< " is not in SummonerArmMst — present left unclaimed";
+						break;
+					}
+
+					co_await transaction->execSqlCoro(
+						"INSERT INTO user_summoner_arms (user_id, summoner_arm_id, exp, level)"
+						" VALUES ($1, $2, 0, 1)"
+						" ON CONFLICT(user_id, summoner_arm_id) DO NOTHING;",
+						identity.userId, targetId);
+					granted = true;
+					break;
+				}
 				default:
+				{
+					// Every type the mission/campaign reward data actually uses
+					// now has a case above.  Anything reaching here is a type only
+					// PresentCommon::createPresentName @0x11C37F4 knows about —
+					// resolve it through the jump table at 0x2328200 (index is
+					// present_type - 2) before adding a case for it.
 					LOG_WARN << "PresentReceipt: present_type " << presentType
 						<< " (target " << targetId << " x" << targetCnt
 						<< ") not supported — present left unclaimed";
 					break;
+				}
 				}
 
 				if (!granted)

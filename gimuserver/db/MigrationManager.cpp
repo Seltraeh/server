@@ -787,6 +787,141 @@ static void RegisterMigrations(MigrationMap& map)
 		);
 	});
 
+	// Summoner Arm ownership.  The client reads it back as UserSummonerArmsInfo
+	// (wire dhMmbm5p): user_id, summoner_arm_id, exp, level -- exactly the four
+	// keys UserSummonerArmsInfoResponse::readParam @0x144E824 sets, and nothing
+	// more.  An arm is OWNED ONCE, so (user_id, summoner_arm_id) is the key and
+	// a second grant of the same arm is a no-op rather than a duplicate row.
+	//
+	// This is what makes first-clear reward type 18 claimable; without a table
+	// to put it in, PresentReceipt could only log "not supported".
+	migrate("04092026_CreateUserSummonerArmsTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_summoner_arms ("
+			"user_id         TEXT    NOT NULL,"
+			"summoner_arm_id TEXT    NOT NULL,"
+			"exp             INTEGER NOT NULL DEFAULT 0,"
+			"level           INTEGER NOT NULL DEFAULT 1,"
+			"PRIMARY KEY (user_id, summoner_arm_id)"
+			");"
+		);
+	});
+
+	// Summoner SP — the currency reward type 17 pays.
+	//
+	// ONE COLUMN ON PURPOSE.  UserSummonerInfo (wire n5mdIUqj) carries 32
+	// fields, but 31 of them belong to a Summoner subsystem nobody has built:
+	// summoner level and element mastery are earned in battle, abilities are
+	// bought in SummonerAbilityListScene, equipment is chosen on the summoner
+	// screen — and none of those handlers exist.  Giving them columns now
+	// would create writeless state that can only go stale.  UserInfo emits
+	// those fields at the values UserSummonerInfo::init() @0x127E9E8 already
+	// assigns, so they persist nowhere because nothing can change them.
+	//
+	// When the summoner subsystem lands, this table grows level/exp/element
+	// columns and the emit stops using init() defaults for them.
+	//
+	// Consumed by PresentReceipt case 17 and UserInfo's summoner_info block.
+	migrate("04092026_CreateUserSummonerTable", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_summoner ("
+			"user_id TEXT    NOT NULL,"
+			"sp      INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id)"
+			");"
+		);
+	});
+
+	// The Sphere Frog's extra sphere slot.
+	//
+	// The rule is the game's own, from MST_HELP_SUBTOPIC_100_8_DESCRIPTION
+	// ("Sphere Capacity Increase"): fusing the unit "Sphere Frog" as material
+	// raises the base unit's sphere capacity, ONE extra slot per unit and no
+	// more, and "those units who have increased their sphere capacity will
+	// inherit this trait even when they evolve".
+	//
+	// A column on user_units rather than a table, because it is one bit that
+	// belongs to a unit instance and dies with it.  Evolution needs no work:
+	// UnitEvo updates the base row in place, so the bit rides along, which is
+	// exactly the inheritance the help text promises.
+	//
+	// Consumed by UnitMix (which sets it), ItemSphereEqp (which enforces it)
+	// and the UserUnitInfo packet mapping (which sends it as ext_count).
+	migrate("04092026_AddUserUnitsSphereExt", {
+		p->execSqlSync(
+			"ALTER TABLE user_units ADD COLUMN sphere_ext INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// Login-day trophies.  TROPHY 100010 (login days) and 100020 (consecutive
+	// login days) are two of the 39 the Records screen draws, and both were
+	// stuck at 0 because nothing counted a login.
+	//
+	// The client read is already decoded: PlayerInfoBattleResultScene::getActual
+	// @0x1791EEC answers trophy 100010 from UserTeamArchive.login_cnt (dD64grYH)
+	// and 100020 from serial_login_day (3w6YDS4z).  Only the source was missing.
+	//
+	// last_login_day is the third column and the only one that is not itself a
+	// trophy: it is the epoch-day token the streak is computed against, the same
+	// once-per-day device user_dungeon_keys uses.  Without it a streak cannot
+	// tell "logged in again today" from "logged in the next day".
+	// The rest of the Records counters the handlers can actually source.
+	// Every one maps 1:1 to a trophy the client already knows how to draw --
+	// PlayerInfoBattleResultScene::getActual @0x1791EEC does the lookup, and
+	// net/user.kdl records which field answers which id:
+	//   zel_item_sale 100060, unit_sum_cnt 100190, item_mix_cnt 100250,
+	//   item_mix_elem_cnt 100260, sphere_mix_cnt 100270, b_crystal_max 100290,
+	//   h_crystal_max 100300, quest_win_cnt 200030.
+	// Written by ItemSell, addUserUnit, ItemMix and MissionEnd respectively.
+	migrate("04092026_AddUserTeamArchiveRecordCounters", {
+		for (const auto* col : {
+			"zel_item_sale     INTEGER NOT NULL DEFAULT 0",
+			"unit_sum_cnt      INTEGER NOT NULL DEFAULT 0",
+			"item_mix_cnt      INTEGER NOT NULL DEFAULT 0",
+			"item_mix_elem_cnt INTEGER NOT NULL DEFAULT 0",
+			"sphere_mix_cnt    INTEGER NOT NULL DEFAULT 0",
+			"b_crystal_max     INTEGER NOT NULL DEFAULT 0",
+			"h_crystal_max     INTEGER NOT NULL DEFAULT 0",
+			"quest_win_cnt     INTEGER NOT NULL DEFAULT 0" })
+		{
+			p->execSqlSync(std::string("ALTER TABLE user_team_archive ADD COLUMN ") + col + ";");
+		}
+	});
+
+	migrate("04092026_AddUserTeamArchiveLoginCounters", {
+		for (const auto* col : {
+			"login_cnt INTEGER NOT NULL DEFAULT 0",
+			"serial_login_day INTEGER NOT NULL DEFAULT 0",
+			"last_login_day INTEGER NOT NULL DEFAULT 0" })
+		{
+			p->execSqlSync(std::string("ALTER TABLE user_team_archive ADD COLUMN ") + col + ";");
+		}
+	});
+
+	// SPHERE CAPACITY SENTINEL.  eqip_item_frame_id2 gained a third meaning:
+	// -1 = "this unit has no second sphere slot", alongside 0 = empty slot and
+	// 1..14 = the sphere type occupying it.  The column was created DEFAULT 0,
+	// so every row on every existing save says "second slot present" and the
+	// client duly draws two slots on every unit.  The Sphere Frog had nothing
+	// left to grant.  gme::kNoSecondSphereSlot has the client-side proof.
+	//
+	// A MIGRATION RATHER THAN A LOCAL DB EDIT, deliberately: this is not a
+	// one-off data fix (which belongs in deploy/gme.sqlite by hand) but a
+	// change to what a value MEANS.  Every save in existence carries the wrong
+	// one, so the correction has to travel with the code.
+	//
+	// Guarded on sphere_ext = 0 so a unit that genuinely earned the slot keeps
+	// it, and on eqip_item_id2 = 0 so a sphere already sitting in slot 2 is
+	// never orphaned by taking the slot away underneath it -- such a row would
+	// need its sphere returned to the warehouse first, and this migration
+	// deliberately does not do that silently.  It leaves the pair disagreeing,
+	// which ItemSphereEqp then reads as "has the slot"; the generous reading is
+	// the right one when the alternative is eating a player's sphere.
+	migrate("05092026_UnitSphereCapacitySentinel", {
+		p->execSqlSync(
+			"UPDATE user_units SET eqip_item_frame_id2 = -1 "
+			"WHERE sphere_ext = 0 AND eqip_item_id2 = 0;");
+	});
+
 }
 
 /*!

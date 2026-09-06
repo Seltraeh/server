@@ -32,6 +32,44 @@ struct UserIdentity
 };
 
 /*!
+* Sphere capacity sentinel for user_units.eqip_item_frame_id2.
+*
+* A unit is born with ONE sphere slot.  The second is granted only by fusing a
+* Sphere Frog (unit 20302), and the client carries that capacity in the SECOND
+* SLOT'S FRAME ID rather than in any count field:
+*
+*     -1     no second slot -- the slot is not drawn at all
+*      0     slot exists, empty
+*   1..14    slot exists, holding a sphere of that ItemMst.sphere_type
+*
+* CONFIRMED IN-CLIENT 2026-09-05.  UnitMixMainScene::mixUnitDoubleSphereCheck
+* @0x1C118F8 walks the material list, calls UserUnitInfoBase::getEquipItemFrameID2
+* (vtable+0x1f0) and compares the result against the literal string "-1"
+* (mov w22, #0x312d); a material that is NOT "-1" raises UNIT_MIX_CONFIRM_SPHERE,
+* "A Unit with max Sphere capacity has been selected as an Ingredient."  The
+* unit-detail scene tests the same sentinel in 14 places.  Probing one unit at
+* -1 against another left at 0 drew exactly one slot on the first, two on the
+* second.
+*
+* // WE STORED 0 FOR EVERY UNIT, so every unit read as owning both slots.  An
+* // earlier pass concluded this build had dropped sphere capacity altogether.
+* // That was wrong, and wrong in a way worth keeping: it went looking for a
+* // slot COUNT -- a capacity column, a "SphereSlot" symbol, a unit_mst field --
+* // and found none, because the capacity is not a count.  It also leaned on
+* // so_xref reporting no callers, which proves NOTHING for the virtual getters
+* // this path uses: they are reached by blr through a vtable, and no xref
+* // exists to find.  The thread that actually solved it was the in-game fusion
+* // warning above, which named the check.
+*
+* sphere_ext (UserUnitInfo::ext_count) remains the boolean record of "a frog was
+* fused"; this sentinel is what the client reads.  Every write site must keep
+* the two agreed:
+*
+*     eqip_item_frame_id2 == -1   <=>   sphere_ext == 0
+*/
+static constexpr int32_t kNoSecondSphereSlot = -1;
+
+/*!
 * Builds a user-unit packet from curated unit archive data.
 *
 * @param unit_id Unit id to look up in the archive.
@@ -74,6 +112,13 @@ inline drogon::Task<db::InterfaceResult<UserUnitInfo>> addUserUnit(
 	auto packet = unit;
 	packet.user_id = identity.userId;
 	packet.is_new = isNew;
+
+	// A unit arrives with ONE sphere slot unless it was handed to us already
+	// carrying the frog bit (evolution copies, archive grants).  Without this
+	// the field default-initialises to 0, which the client reads as "second
+	// slot present" -- see kNoSecondSphereSlot.
+	if (packet.ext_count == 0)
+		packet.equipitem_frame_id2 = kNoSecondSphereSlot;
 	const auto result = co_await db::PacketInterfaceFor<UserUnitInfo>::insert(
 		database,
 		"user_units",
@@ -91,6 +136,24 @@ inline drogon::Task<db::InterfaceResult<UserUnitInfo>> addUserUnit(
 		"INSERT OR IGNORE INTO user_unit_dictionary (user_id, unit_id)"
 		" VALUES ($1, $2);",
 		identity.userId, packet.unit_id);
+
+	// TROPHY 100190 (total units acquired).  Every copy counts, unlike the
+	// dictionary above which is one row per species -- that is the difference
+	// between 100190 and the 100110 "units found" the dictionary answers.
+	// Inlined rather than via bumpArchiveCounters because that helper is
+	// declared further down this header.
+	try
+	{
+		co_await database->execSqlCoro(
+			"INSERT INTO user_team_archive (user_id, unit_sum_cnt) VALUES ($1, 1)"
+			" ON CONFLICT(user_id) DO UPDATE SET unit_sum_cnt = unit_sum_cnt + 1;",
+			identity.userId);
+	}
+	catch (const drogon::orm::DrogonDbException& ex)
+	{
+		// Never lose a unit over a trophy tick.
+		LOG_WARN << "addUserUnit: unit_sum_cnt: " << ex.base().what();
+	}
 
 	co_return db::InterfaceResult<UserUnitInfo>{
 		.data = std::move(packet),
@@ -393,13 +456,17 @@ inline drogon::Task<void> addUserUnit(
 		" base_rec, add_rec, ext_rec, limit_over_rec,"
 		" exp, total_exp,"
 		" skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
-		" element, unit_type_id, \"new\") "
+		" element, unit_type_id, \"new\","
+		// -1, not the column default of 0: one sphere slot until a Sphere Frog
+		// says otherwise (kNoSecondSphereSlot).
+		" eqip_item_frame_id2) "
 		"VALUES ($1,$2,1,"
 		" $3,0,0,0, $4,0,0,0, $5,0,0,0,"
 		" $6,0,0,0,"
 		" 1,1,"
 		" $7,$8,$9,$10,"
-		" $11,$12,1);",
+		" $11,$12,1,"
+		" -1);",
 		identity.userId, std::to_string(unit.id),
 		unit.min_hp, unit.min_atk, unit.min_def, unit.min_rec,
 		unit.skill_id, skillLv, unit.extra_skill_id, extraSkillLv,
@@ -783,7 +850,7 @@ inline drogon::Task<void> accumulateBattleArchive(
 		"INSERT INTO user_team_archive ("
 		"user_id, b_crystal, h_crystal, battle_spark_cnt, battle_skill_cnt,"
 		" quest_mimic_cnt, battle_turn_max_damage, battle_turn_max_spark,"
-		" turn_max_unit_damage) VALUES ('"
+		" turn_max_unit_damage, b_crystal_max, h_crystal_max) VALUES ('"
 		+ identity.userId + "',"
 		+ std::to_string(clamp(battle.battle_crystal_num)) + ","
 		+ std::to_string(clamp(battle.heart_crystal_num)) + ","
@@ -792,7 +859,11 @@ inline drogon::Task<void> accumulateBattleArchive(
 		+ std::to_string(clamp(battle.mimic_cnt)) + ","
 		+ std::to_string(clamp(battle.max_turn_damage)) + ","
 		+ std::to_string(clamp(battle.max_turn_spark_cnt)) + ","
-		+ std::to_string(clamp(battle.one_attack_damage)) + ")"
+		+ std::to_string(clamp(battle.one_attack_damage)) + ","
+		// Trophies 100290 / 100300 are the BEST SINGLE BATTLE, not the total —
+		// the same two numbers as b_crystal/h_crystal, MAX-ed instead of summed.
+		+ std::to_string(clamp(battle.battle_crystal_num)) + ","
+		+ std::to_string(clamp(battle.heart_crystal_num)) + ")"
 		" ON CONFLICT(user_id) DO UPDATE SET"
 		" b_crystal        = b_crystal        + excluded.b_crystal,"
 		" h_crystal        = h_crystal        + excluded.h_crystal,"
@@ -801,7 +872,9 @@ inline drogon::Task<void> accumulateBattleArchive(
 		" quest_mimic_cnt  = quest_mimic_cnt  + excluded.quest_mimic_cnt,"
 		" battle_turn_max_damage = MAX(battle_turn_max_damage, excluded.battle_turn_max_damage),"
 		" battle_turn_max_spark  = MAX(battle_turn_max_spark,  excluded.battle_turn_max_spark),"
-		" turn_max_unit_damage   = MAX(turn_max_unit_damage,   excluded.turn_max_unit_damage);";
+		" turn_max_unit_damage   = MAX(turn_max_unit_damage,   excluded.turn_max_unit_damage),"
+		" b_crystal_max          = MAX(b_crystal_max,          excluded.b_crystal_max),"
+		" h_crystal_max          = MAX(h_crystal_max,          excluded.h_crystal_max);";
 
 	try
 	{
@@ -832,6 +905,107 @@ inline drogon::Task<void> accumulateBattleArchive(
 * @param identity Resolved user identity to read.
 * @return One UserTeamArchive, ready to serialise under zI2tJB7R.
 */
+/*!
+* Counts today's login for TROPHY 100010 (login days) and 100020 (consecutive
+* login days), and returns nothing -- loadTeamArchive reads the result back.
+*
+* Idempotent within a calendar day: the whole update is gated on
+* last_login_day, so the many UserInfo calls a single session makes count once.
+*
+* LOCAL midnight, not UTC, for the same reason the dungeon-key claim uses local:
+* "did I log in today" has to mean what the player's clock says.
+*
+* A gap of exactly one day continues the streak; any larger gap restarts it at
+* 1.  A first-ever login also starts at 1 rather than 0 -- the day you log in is
+* day one of the streak, which is what the client's "<n> days" label reads as.
+*
+* Consumed by: UserInfo (the login envelope).  Writes user_team_archive, which
+* MissionEnd also upserts, hence ON CONFLICT rather than a bare INSERT.
+*/
+/*!
+* Rewrites a unit's base_* to the statline for `level`.
+*
+* user_units.base_* holds the stats AT THE UNIT'S CURRENT LEVEL.  The client
+* renders them verbatim -- it does no scaling of its own -- so any code that
+* changes a unit's level has to change these too or the unit keeps the statline
+* of the level it used to be.
+*
+* Interpolates UnitMst min..max across 1..max_lv, the same curve UnitMix uses
+* for its level-up animation rows.  A unit whose MST row is missing is left
+* untouched rather than zeroed.
+*
+* Consumed by: Mission drop parsing.  UnitMix does the same arithmetic inline
+* because it already has the MST row in hand.
+*/
+inline void scaleUnitBaseStats(::UserUnitInfo& unit, int level)
+{
+	const auto& unitMst = theServer()->cache().unitMst();
+	const auto id = static_cast<int32_t>(unit.unit_id);
+
+	const auto* mst = static_cast<const ::UnitMst*>(nullptr);
+	for (const auto& u : unitMst)
+	{
+		if (u.id == id) { mst = &u; break; }
+	}
+	if (!mst)
+		return;
+
+	const auto at = [&](int minV, int maxV) -> int32_t {
+		const int maxLv = mst->max_lv;
+		if (maxLv <= 1 || level <= 1) return minV;
+		if (level >= maxLv)           return maxV;
+		return minV + static_cast<int>(
+			static_cast<double>(maxV - minV) * (level - 1) / (maxLv - 1));
+	};
+	unit.base_hp  = at(mst->min_hp,  mst->max_hp);
+	unit.base_atk = at(mst->min_atk, mst->max_atk);
+	unit.base_def = at(mst->min_def, mst->max_def);
+	unit.base_rec = at(mst->min_rec, mst->max_rec);
+}
+
+inline drogon::Task<void> touchLoginStreak(
+	const db::Database database,
+	const UserIdentity identity)
+{
+	const auto now = std::time(nullptr);
+	std::tm local = *std::localtime(&now);
+	local.tm_hour = 0;
+	local.tm_min = 0;
+	local.tm_sec = 0;
+	local.tm_isdst = -1;
+	const int64_t today = static_cast<int64_t>(std::mktime(&local)) / 86400;
+
+	try
+	{
+		co_await database->execSqlCoro(
+			"INSERT INTO user_team_archive (user_id, login_cnt, serial_login_day, last_login_day)"
+			" VALUES ($1, 1, 1, $2)"
+			" ON CONFLICT(user_id) DO UPDATE SET"
+			"   login_cnt        = login_cnt + 1,"
+			"   serial_login_day = CASE WHEN last_login_day = $2 - 1"
+			"                          THEN serial_login_day + 1 ELSE 1 END,"
+			"   last_login_day   = $2"
+			" WHERE last_login_day <> $2;",
+			identity.userId, today);
+
+		const auto rows = co_await database->execSqlCoro(
+			"SELECT login_cnt, serial_login_day FROM user_team_archive WHERE user_id = $1;",
+			identity.userId);
+		if (!rows.empty())
+		{
+			LOG_INFO << "Login streak for " << identity.userId << ": day "
+				<< rows[0]["serial_login_day"].as<int32_t>() << " consecutive, "
+				<< rows[0]["login_cnt"].as<int32_t>() << " total";
+		}
+	}
+	catch (const drogon::orm::DrogonDbException& ex)
+	{
+		// A login must never fail because a trophy counter could not be written.
+		LOG_WARN << "touchLoginStreak: " << ex.base().what();
+	}
+	co_return;
+}
+
 inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 	const db::Database database,
 	const UserIdentity identity)
@@ -846,7 +1020,10 @@ inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 			" quest_mimic_cnt, battle_turn_max_damage, battle_turn_max_spark,"
 			" turn_max_unit_damage, zel_get, karma_get, zel_use, karma_use,"
 			" zel_unit_sale, unit_mix_cnt, unit_mix_elem_cnt, unit_evo_cnt,"
-			" town_harvest_cnt, quest_challenge_cnt, quest_clear_cnt"
+			" town_harvest_cnt, quest_challenge_cnt, quest_clear_cnt,"
+			" login_cnt, serial_login_day, zel_item_sale, unit_sum_cnt,"
+			" item_mix_cnt, item_mix_elem_cnt, sphere_mix_cnt,"
+			" b_crystal_max, h_crystal_max, quest_win_cnt"
 			" FROM user_team_archive WHERE user_id = $1;",
 			identity.userId);
 
@@ -872,6 +1049,18 @@ inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 			archive.town_harvest_cnt       = row["town_harvest_cnt"].as<int32_t>();
 			archive.quest_challenge_cnt    = row["quest_challenge_cnt"].as<int32_t>();
 			archive.quest_clear_cnt        = row["quest_clear_cnt"].as<int32_t>();
+			// Trophies 100010 and 100020 — see touchLoginStreak, which writes them.
+			archive.login_cnt              = row["login_cnt"].as<int32_t>();
+			archive.serial_login_day       = row["serial_login_day"].as<int32_t>();
+			// The rest of the 100-series the handlers can source.
+			archive.zel_item_sale          = row["zel_item_sale"].as<int64_t>();     // 100060
+			archive.unit_sum_cnt           = row["unit_sum_cnt"].as<int32_t>();      // 100190
+			archive.item_mix_cnt           = row["item_mix_cnt"].as<int32_t>();      // 100250
+			archive.item_mix_elem_cnt      = row["item_mix_elem_cnt"].as<int32_t>(); // 100260
+			archive.sphere_mix_cnt         = row["sphere_mix_cnt"].as<int32_t>();    // 100270
+			archive.b_crystal_max          = row["b_crystal_max"].as<int32_t>();     // 100290
+			archive.h_crystal_max          = row["h_crystal_max"].as<int32_t>();     // 100300
+			archive.quest_win_cnt          = row["quest_win_cnt"].as<int32_t>();     // 200030
 		}
 	}
 	catch (const drogon::orm::DrogonDbException& ex)
