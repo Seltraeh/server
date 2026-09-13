@@ -308,6 +308,13 @@ void ServerCache::Setup(const Json::Value& serverObj)
 
 		// Grand Mission ("Campaign") master data — wrapper keys and field
 		// maps documented in mst/grand_mission.kdl.
+		// Randall Achievement master data — the list, the Merit Point shop and
+		// the dedicate rates.  Ported and date-filtered by
+		// tools/gen_achievement_mst.py; see mst/achievement.kdl.
+		m_achievementSubjectMst = LoadJson<AchievementSubjectMstCache>(mstRoot, "achievement_subject_mst.json").data;
+		m_achievementTradeMst = LoadJson<AchievementTradeMstCache>(mstRoot, "achievement_trade_mst.json").data;
+		m_achievementDeliverRateMst = LoadJson<AchievementDeliverRateMstCache>(mstRoot, "achievement_deliver_rate_mst.json").data;
+
 		m_grandMissionMst = LoadJson<GrandMissionMstCache>(mstRoot, "grand_mission_mst.json").data;
 		m_grandMissionMapMst = LoadJson<GrandMissionMapMstCache>(mstRoot, "grand_mission_map_mst.json").data;
 		m_grandMissionSpotMst = LoadJson<GrandMissionSpotMstCache>(mstRoot, "grand_mission_spot_mst.json").data;
@@ -354,10 +361,11 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		// Purchase age-band spend caps — see mst/purchase.kdl.
 		m_purchaseAgeLimitMst = LoadJson<PurchaseAgeLimitMstCache>(mstRoot, "purchase_age_limit_mst.json").data;
 
-		// Frontier Gate master data — see mst/frontier_gate.kdl (REWARD and
-		// AREA remain unported; no response class in the export).
+		// Frontier Gate master data — see mst/frontier_gate.kdl (AREA remains
+		// unported).  The reward table pays out the end of a run.
 		m_frontierGateMst = LoadJson<FrontierGateMstCache>(mstRoot, "frontier_gate_mst.json").data;
 		m_frontierGateSupportMst = LoadJson<FrontierGateSupportMstCache>(mstRoot, "frontier_gate_support_mst.json").data;
+		m_frontierGateRewardMst = LoadJson<FrontierGateRewardMstCache>(mstRoot, "frontier_gate_reward_mst.json").data;
 
 		// Build the dungeon -> missions index, then drop the rows.  Only the id
 		// and dungeon_id columns survive; see missionsByDungeon() for why this
@@ -461,6 +469,33 @@ void ServerCache::Setup(const Json::Value& serverObj)
 						m_frontierGatePermits.lands.insert(mit->second->land_id);
 				}
 			}
+
+			// Grand Quest.  The mode is invisible without a permit entry for the
+			// first Grand Mission's dungeon: GameUtils::checkGrandPermit
+			// @0x11A767C looks each Grand Mission's dungeon up in the permit
+			// list and returns isEnterable() for the one whose place id is
+			// "5000000".  The dungeon id is not in F_GRAND_MISSION_MST at all —
+			// CampaignUtils::missionMstReflect @0x11E4F98 copies it from the
+			// like-numbered F_MISSION_MST row, which is where this reads it.
+			for (const auto& grand : m_grandMissionMst)
+			{
+				const auto mit = missionById.find(grand.mission_id);
+				if (mit == missionById.end())
+					continue;
+				m_grandQuestPermits.missions.insert(grand.mission_id);
+				if (mit->second->dungeon_id != 0)
+					m_grandQuestPermits.dungeons.insert(mit->second->dungeon_id);
+				if (mit->second->area_id != 0)
+					m_grandQuestPermits.areas.insert(mit->second->area_id);
+				if (mit->second->land_id != 0)
+					m_grandQuestPermits.lands.insert(mit->second->land_id);
+			}
+
+			LOG_INFO << "ServerCache: Grand Quest permits — "
+			         << m_grandQuestPermits.lands.size() << " land(s), "
+			         << m_grandQuestPermits.areas.size() << " area(s), "
+			         << m_grandQuestPermits.dungeons.size() << " dungeon(s), "
+			         << m_grandQuestPermits.missions.size() << " mission(s)";
 
 			LOG_INFO << "ServerCache: Frontier Gate permits — "
 			         << m_frontierGatePermits.lands.size() << " land(s), "
@@ -651,19 +686,62 @@ void ServerCache::Setup(const Json::Value& serverObj)
 
 				const auto dayMask = VortexDayMaskFromBanner(dungeon.room_asset);
 
+				// A dungeon a DungeonKey opens is emitted by UserInfo instead,
+				// which alone knows whether the window is live and can attach
+				// C1vG0iKh/qY49LBjw.  Emitting it here too would put a BARE
+				// entry earlier in the list, and getObjectDungeon takes the
+				// first match -- whose isEnterable() is false, so the parade
+				// would draw locked no matter what we appended later.
+				const bool dungeonKeyed = std::any_of(
+					m_initrsp.dungeon_keys.begin(), m_initrsp.dungeon_keys.end(),
+					[&dungeon](const DungeonKeyMst& k) { return k.dungeon_id == dungeon.dungeon_id; });
+
 				// Not in the rotation -> permanently open.
-				if (dayMask == 0)
+				if (dayMask == 0 && !dungeonKeyed)
 					m_vortexPermits.dungeons.insert(dungeon.dungeon_id);
 
 				const auto it = m_missionsByDungeon.find(dungeon.dungeon_id);
 				const auto* missionIds =
 					it == m_missionsByDungeon.end() ? nullptr : &it->second;
 
+				// A mission with a need_mission_id is held back into
+				// gatedMissions instead of being permitted outright, so
+				// PermitPlace can test it against the player's cleared set.
+				// The parade ladders (Metal base -> six elements -> Super ->
+				// six Super elements -> Mega, and Jewel base -> Super -> Mega)
+				// are expressed this way; Vortex ids are above kSpecialIdFloor,
+				// so the Grand Gaia gate never sees them and every tier used to
+				// be open from the start.
+				//
+				// m_missionNeeds is already built above, so this reuses it
+				// rather than rescanning the MST.
+				// Dungeons a DungeonKey opens (the parades) are gated by the
+				// key tier, not by the topology: the player buys a rung and
+				// gets that rung's missions for limit_sec.  Their missions are
+				// held back wholesale and emitted by UserInfo against the
+				// active tier.
+				const bool keyGated = std::any_of(
+					m_initrsp.dungeon_keys.begin(), m_initrsp.dungeon_keys.end(),
+					[&dungeon](const DungeonKeyMst& k) { return k.dungeon_id == dungeon.dungeon_id; });
+
+				const auto place = [this, keyGated](TopologyPermits& permits, int32_t missionId) {
+					if (keyGated)
+					{
+						permits.keyGatedMissions.insert(missionId);
+						return;
+					}
+					const auto need = m_missionNeeds.find(missionId);
+					if (need != m_missionNeeds.end() && !need->second.empty())
+						permits.gatedMissions.emplace(missionId, need->second);
+					else
+						permits.missions.insert(missionId);
+				};
+
 				if (dayMask == 0)
 				{
 					if (missionIds)
 						for (const auto missionId : *missionIds)
-							m_vortexPermits.missions.insert(missionId);
+							place(m_vortexPermits, missionId);
 					continue;
 				}
 
@@ -673,10 +751,11 @@ void ServerCache::Setup(const Json::Value& serverObj)
 						continue;
 
 					auto& permits = m_vortexDayPermits[day];
-					permits.dungeons.insert(dungeon.dungeon_id);
+					if (!dungeonKeyed)
+						permits.dungeons.insert(dungeon.dungeon_id);
 					if (missionIds)
 						for (const auto missionId : *missionIds)
-							permits.missions.insert(missionId);
+							place(permits, missionId);
 				}
 			}
 

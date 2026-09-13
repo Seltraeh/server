@@ -553,6 +553,11 @@ drogon::Task<::SummonerJournalInfoResp> buildSummonerJournal(
 	// the Rewards TILE, so this is what makes the feature go away.
 	resp.user_info.journal_flag = (allTasksClaimed && allMilestonesClaimed) ? 0 : 1;
 
+	// The header rides every Journal reply.  Rewards land in the present box
+	// and the Rewards menu badges the Presents tile off team_info's
+	// present_count, so a claim's badge would otherwise wait for HomeInfo.
+	resp.team_info = std::move((co_await getTeamInfo(database, identity)).nonEmpty());
+
 	co_return resp;
 }
 

@@ -102,6 +102,9 @@ namespace GmeHandlers
 	HANDLE(TutorialSkip);
 	HANDLE(TutorialUpdate);
 	HANDLE(UpdateInfoLight);
+	HANDLE(UpdateInfo);
+	HANDLE(NoticeUpdate);
+	HANDLE(UserLoginCampaignInfo);
 	HANDLE(UserInfo);
 	HANDLE(UnitFavorite);
 	HANDLE(UnitEvo);
@@ -118,8 +121,15 @@ namespace GmeHandlers
 	HANDLE(CampaignBattleEnd);
 	HANDLE(CampaignReceipt);
 	HANDLE(CampaignEnd);
+	HANDLE(CampaignDeckEdit);
+	HANDLE(CampaignItemEdit);
+	HANDLE(CampaignSave);
+	HANDLE(CampaignRestart);
 	HANDLE(ChallengeBase);
 	HANDLE(ChallengeRanking);
+	HANDLE(ChallengeUserInfo);
+	HANDLE(MissionContinue);
+	HANDLE(MissionRestart);
 	HANDLE(ShopUse);
 	HANDLE(FrontierGateInfo);
 	HANDLE(FrontierGateStart);
@@ -140,9 +150,19 @@ namespace GmeHandlers
 	HANDLE(PresentList);
 	HANDLE(PresentReceipt);
 
-	// Achievements.  Registered, but answers empty until the four response
-	// classes are decoded — see the header comment in Achievement.cpp.
+	// Randall achievements: the catalogue, the Merit Point loop, and the
+	// Start/Give Up buttons — see Achievement.cpp and AchievementAction.cpp.
 	HANDLE(GetAchievementInfo);
+	HANDLE(AchievementRewardReceive);
+	HANDLE(AchievementTrade);
+	HANDLE(AchievementAccept);
+
+	// Dual Brave Burst — see gme/common/Dbb.hpp.
+	HANDLE(DbbBond);
+	HANDLE(UnitBondBoost);
+	HANDLE(BannerClick);
+	HANDLE(NoticeList);
+	HANDLE(NoticeReadUpdate);
 
 	// Brave Points & Rewards (daily tasks / milestones / BP prize shop).
 	HANDLE(DailyTaskUserInfo);

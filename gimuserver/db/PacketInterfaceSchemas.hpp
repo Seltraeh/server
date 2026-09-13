@@ -85,11 +85,10 @@ PacketInterfaceFor<::UserTeamInfo>::fields()
 			.update = true,
 			.insert = true,
 		}),
-		// Hunter Orbs — the Frontier Gate / Frontier Hunter attempt currency.
-		// The client's own name for them is fight points; the Survey Office
-		// header renders the pair as an x/y counter.  Both were 0 on the wire
-		// until these were mapped, which is what produced "You have no Hunter
-		// Orbs left" on every gate.
+		// Fight points.  Mapped as the Hunter Orbs, but ShopHelFightScene shows
+		// they are the ARENA Orbs (SHOP_HEL_FIGHT_TITLE "Arena Orbs", restored
+		// by ShopUse type 4); the Hunter Orbs are ChallengeHeaderInfo Aube,
+		// which ChallengeBase feeds.
 		field<&::UserTeamInfo::fight_point>("fight_point", {
 			.read = true,
 			.update = true,

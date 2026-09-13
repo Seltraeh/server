@@ -10,6 +10,7 @@
 namespace gme
 {
 struct UserIdentity;
+struct GrantedRewards;
 
 /*!
 * Per-user Daily Spin state (the Rewards menu's task_dailyloginspin tile).
@@ -120,12 +121,15 @@ void loadDailySpinArchive(const std::string& archiveRoot);
 * @param database Database client or transaction to use.
 * @param identity Resolved caller.
 * @param state Spin state; `lastRewardId` is set to the awarded space.
+* @param granted Records any unit or item the spin created, so the reply can
+*        refresh those client caches.
 * @return Human-readable description of what was awarded, for logging.
 */
 drogon::Task<std::string> awardDailySpin(
 	db::Database database,
 	const UserIdentity& identity,
-	DailySpinState& state);
+	DailySpinState& state,
+	GrantedRewards& granted);
 
 /*!
 * Reads the caller's spin state, rolling it over if the UTC day has advanced.

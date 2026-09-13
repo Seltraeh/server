@@ -3,6 +3,7 @@
 
 #include <gimuserver/db/DatabaseInterface.h>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/HunterOrbs.hpp>
 
 #include <algorithm>
 
@@ -94,6 +95,25 @@ HANDLEF(FrontierGateStart)
         co_return HandleResult::success("{}");
     }
 
+    // THE HUNTER ORB.  A gate entry costs one, and the client does not debit
+    // itself here: MissionStartScene::initConnect @0x1823358 skips its own
+    // `setAube(max(getAube(),1) - 1)` whenever FrontierGateUtils::nowFrontierGate
+    // is true, which it is for every Frontier Gate start.  So the charge is the
+    // server's, and it is taken here rather than at MissionStart because this
+    // is where the RUN opens -- the floors inside it are not separate entries.
+    //
+    // Charged after the gate is validated and before the run row exists, so a
+    // refused gate is free and a paid orb always has a run behind it.  The
+    // client has already checked its own count in
+    // FrontierGateConditionScene::startCheck, so reaching here with none means
+    // the two disagreed; refuse rather than let the run open for free.
+    if (!co_await gme::spendHunterOrb(theDb(), identity))
+    {
+        LOG_WARN << "FrontierGateStart: " << identity.userId
+                 << " has no Hunter Orbs; refusing to open gate " << gateId;
+        co_return HandleResult::success("{}");
+    }
+
     ::FrontierGateStartResp resp{};
 
     try
@@ -128,6 +148,13 @@ HANDLEF(FrontierGateStart)
                 // the party vanished.
                 db::Data("party_deck_json", glz::write_json(req.party_deck).value_or("[]")),
                 db::Data("party_units_json", glz::write_json(req.units).value_or("[]")),
+                // A new run starts at floor 0 with no score.  The upsert keeps
+                // any column it does not name, so an abandoned run's floors
+                // would otherwise carry into this one.
+                db::Data("run_score", 0),
+                db::Data("run_progress", 0),
+                db::Data("run_note", std::string{}),
+                db::Data("run_od_info", std::string{}),
             },
             /*conflict*/ {"user_id"});
 

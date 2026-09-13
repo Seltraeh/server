@@ -49,11 +49,14 @@ HANDLEF(ItemEdit)
 
     // Full-replace: the client always sends the complete loadout, and an empty
     // group is how it expresses "every slot cleared".  Deleting first is what
-    // makes un-equipping work at all.
+    // makes un-equipping work at all.  BOTH bars are replaced together — the
+    // request carries them together and the screen edits them together.
     try
     {
         co_await theDb()->execSqlCoro(
             "DELETE FROM user_equip_items WHERE user_id=$1;", kUserId);
+        co_await theDb()->execSqlCoro(
+            "DELETE FROM user_equip_bonus_items WHERE user_id=$1;", kUserId);
     }
     catch (const drogon::orm::DrogonDbException& ex)
     {
@@ -87,7 +90,37 @@ HANDLEF(ItemEdit)
         }
     }
 
-    LOG_INFO << "ItemEdit: stored " << stored << " equipped item(s) for " << kUserId;
+    // The bonus bar (nAligJSQ).  It used to be dropped by the lenient read, so
+    // the player's bonus picks never survived the screen — and UserInfo had
+    // nothing to report, so the slots came back empty every time.
+    size_t bonusStored = 0;
+    for (const auto& e : req.bonus_items)
+    {
+        if (e.item_id == 0)
+            continue;
+
+        try
+        {
+            co_await theDb()->execSqlCoro(
+                "INSERT INTO user_equip_bonus_items (user_id, disp_order, item_id, item_num)"
+                " VALUES ($1, $2, $3, $4)"
+                " ON CONFLICT(user_id, disp_order) DO UPDATE SET"
+                " item_id=$3, item_num=$4;",
+                kUserId,
+                static_cast<int32_t>(e.disp_order),
+                static_cast<int32_t>(e.item_id),
+                static_cast<int32_t>(e.item_num));
+            ++bonusStored;
+        }
+        catch (const drogon::orm::DrogonDbException& ex)
+        {
+            LOG_WARN << "ItemEdit: bonus slot " << e.disp_order << " INSERT failed: "
+                     << ex.base().what();
+        }
+    }
+
+    LOG_INFO << "ItemEdit: stored " << stored << " equipped item(s) and "
+             << bonusStored << " bonus item(s) for " << kUserId;
 
     co_return HandleResult::success("{}");
 }

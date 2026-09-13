@@ -1,9 +1,10 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/Achievements.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
-// GetAchievementInfo (YPBU7MD8 / AKjzyZ81).
+// GetAchievementInfo (YPBU7MD8 / AKjzyZ81) — the Randall Achievement screen.
 //
 // This is the request the client fires when the menu hosting achievements
 // opens.  It is NOT the present box — that assumption cost a build.  YPBU7MD8
@@ -14,35 +15,38 @@
 // with `25GetAchievementInfoRequest` (see tools/ida/groupid_key_pair_audit.py
 // and handbook §4.2).  The present box lives at nhjvB52R / bV5xa0ZW.
 //
-// The screen evidently loads achievements first, so an unregistered YPBU7MD8
-// killed it before anything else on it — including any present request — could
-// run.  Registering this handler is what lets the rest of that screen proceed.
+// It used to answer with the signal key ALONE, and deliberately so: the four
+// achievement response classes were known but their fields were not, and
+// handbook §3.4 says a response key filled with 0/"" is worse than an absent
+// one.  The 2026-09-13 readParam audit lifted that (see
+// UserAchievementSubjectInfo in net/achievement.kdl): `pG2n1A28` is Progress,
+// `rPk8gtY5` is RewardReceiveStatus and `dJNpLc81` is NewFlg, all named from
+// other classes that use the same hashes with surviving setters.  Two keys are
+// still unnamed and go out as 0 — which is what the client's own constructor
+// leaves them at, so for those two sending and omitting are the same thing.
 //
-// The response is deliberately EMPTY.  The four achievement response classes
-// are known but undecoded — readparam_analysis.json has their keys and C++
-// types with every setter name null, so the field semantics are unknown:
+// THE MASTER DATA IS THE OTHER HALF, and it travels by a different road.
+// `H9ATfJ38`, `82CcMZhp` and `1tJiqKgZ` are NOT getResponseObject keys: they are
+// three of the 58 tags GameResponseParser::parseBodyTag routes to
+// DataMstManager::save*, which writes the client's own MST store;
+// DataMstManager::load* reads it back and HomeScene::loadFiles re-runs that
+// load, so a table sent here is live from the next trip through Home.  Nothing
+// had ever sent them, so even a player whose counters were full had no
+// achievement names to read.  They are ported and date-filtered by
+// tools/gen_achievement_mst.py (873 achievements, 181 shop offers, 53 rates).
 //
-//     Bnc4LpM8  UserAchievementInfoResponse           3 x uint32
-//     YTRJLG65  UserAchievementSubjectInfoResponse    9 fields (M7SXoc31 = subject id)
-//     9j3ALx8I  UserAchievementTradeInfoResponse      4 fields
-//     LcFCx1Uz  UserAchievementSPSubjectInfoResponse  1 field  (M7SXoc31)
+// The request is a QUERY: `mode` 1 wants the subject list and 2 the trade shop,
+// narrowed by `category` and `sub_category` (which are the same keys as
+// F_ACHIEVEMENT_SUBJECT_MST's own columns, so the two join directly).  The
+// client CLEARS the list it is about to receive — createBody branches on mode
+// straight after sending it, 1 calling UserAchievementSubjectInfoList::
+// removeDataObject and 2 UserAchievementTradeInfoList::removeAllObjects — so an
+// omitted list reads as empty rather than stale, and a filtered answer is
+// exactly what the screen expects.
 //
-// Handbook §3.4: never ship a response key whose fields you would have to fill
-// with 0/"" — the client takes a present-but-wrong value at face value, while a
-// missing key falls back to its own default.  So this sends nothing but the
-// signal key until a readParam audit names the setters.  The old fork answered
-// achievements with an empty OK for the same reason.
-//
-// NOTE the client CLEARS the list it is about to receive: createBody branches
-// on `mode` immediately after sending it — 1 calls
-// UserAchievementSubjectInfoList::removeDataObject, 2 calls
-// UserAchievementTradeInfoList::removeAllObjects.  So an omitted list reads as
-// empty, never as stale, which is what makes the empty response safe.
-//
-// To populate this later: audit the four classes above with
-// tools/ida/readparam_audit.py, then join F_ACHIEVEMENT_SUBJECT_MST (already on
-// disk, 5058 rows) on M7SXoc31 / KT71m8Ae / 3rhygS9K — the request's category
-// and sub_category use the same keys as that MST's columns.
+// Not built yet, and the reason the shop is read-only for now: Accept
+// (dx5qvm7L), Deliver (vsaXI4M0), RewardReceive (uq69mTtR) and Trade
+// (m9LiF6P2) are all unregistered.
 HANDLEF(GetAchievementInfo)
 {
 	(void)session;
@@ -56,20 +60,49 @@ HANDLEF(GetAchievementInfo)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	// Log the selector so the first live capture tells us which lists the
-	// screen actually asks for, and in what order.
+	// The selector.  A body with no node asks for everything, which is what the
+	// first visit of a session looks like.
+	int32_t mode = 0, category = 0, condType = 0;
 	for (const auto& node : req.nodes)
 	{
-		LOG_INFO << "GetAchievementInfo: mode=" << node.mode
-			<< " category=" << node.category
-			<< " sub_category=" << node.sub_category
-			<< " (returning empty — response classes not yet decoded)";
+		mode = node.mode;
+		category = node.category;
+		condType = node.sub_category;
+		LOG_INFO << "GetAchievementInfo: mode=" << mode << " category=" << category
+			<< " sub_category=" << condType;
 	}
-	if (req.nodes.empty())
-		LOG_INFO << "GetAchievementInfo: no selector node for " << identity.userId;
 
 	GetAchievementInfoResp resp = {};
 	resp.signal_key.key = "5EdKHavF";
+
+	// The catalogues.  Cheap to repeat (the client stores them) and the only
+	// thing that makes the rows below legible.
+	const auto& cache = theServer()->cache();
+	resp.subject_mst = cache.achievementSubjectMst();
+	resp.trade_mst = cache.achievementTradeMst();
+	resp.deliver_rate_mst = cache.achievementDeliverRateMst();
+
+	// The balance the screen prints, which only this block writes.
+	resp.achievement_info = co_await gme::loadAchievementInfo(theDb(), identity);
+
+	// Mode 2 is the shop; anything else (including an empty selector) is the
+	// achievement list.  Both are answered when the selector is absent, because
+	// then the client has cleared neither and is asking for the screen as a
+	// whole.
+	if (mode != 2)
+		resp.subjects = co_await gme::loadAchievementSubjects(theDb(), identity, category, condType);
+	if (mode != 1)
+		resp.trades = co_await gme::loadAchievementTrades(theDb(), identity);
+
+	// LcFCx1Uz stays empty: the SP tab's conditions are Trials, which this
+	// server does not run, and an empty list is how "none" is spelled.
+
+	LOG_INFO << "GetAchievementInfo: " << cache.achievementSubjectMst().size()
+		<< " achievement(s), " << cache.achievementTradeMst().size()
+		<< " shop offer(s); sent "
+		<< (resp.subjects ? resp.subjects->size() : 0u) << " progress row(s) and "
+		<< (resp.trades ? resp.trades->size() : 0u) << " purchase row(s) for "
+		<< identity.userId << " (" << resp.achievement_info.id << " merit points)";
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)

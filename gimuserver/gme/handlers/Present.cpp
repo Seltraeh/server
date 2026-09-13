@@ -7,6 +7,8 @@
 
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/EventTokens.hpp>
+#include <gimuserver/gme/common/SummonTickets.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -222,6 +224,18 @@ HANDLEF(PresentReceipt)
 					<< " — " << all.size() << " unclaimed present(s)";
 			}
 
+			// What this request actually paid, so the reply refreshes exactly
+			// the client caches those payouts changed (PresentReceiptResp in
+			// present.kdl).  Units and items go through the shared reward
+			// emitter; keys, SP and arms only the present box pays.
+			gme::GrantedRewards paid;
+			bool keysChanged = false;
+			bool summonerChanged = false;
+			bool armsChanged = false;
+			bool selectorsChanged = false;
+			bool summonTicketsChanged = false;
+			bool eventTokensChanged = false;
+
 			for (const auto presentId : toClaim)
 			{
 
@@ -270,7 +284,10 @@ HANDLEF(PresentReceipt)
 						break;
 					}
 					for (int32_t i = 0; i < std::max(targetCnt, 1); ++i)
-						(co_await gme::addUserUnit(transaction, identity, *unit)).nonEmpty();
+					{
+						const auto added = (co_await gme::addUserUnit(transaction, identity, *unit)).nonEmpty();
+						paid.userUnitIds.push_back(static_cast<uint32_t>(added.user_unit_id));
+					}
 					granted = true;
 					break;
 				}
@@ -285,6 +302,7 @@ HANDLEF(PresentReceipt)
 					(co_await gme::addUserItem(
 						transaction, identity, itemId,
 						static_cast<uint32_t>(std::max(targetCnt, 1)))).nonEmpty();
+					paid.items = true;
 					granted = true;
 					break;
 				}
@@ -325,7 +343,12 @@ HANDLEF(PresentReceipt)
 						" (user_id, dungeon_key_id, possession, last_receipt_day, active_type)"
 						" VALUES ($1, $2, MIN($3, $4), 0, 0)"
 						" ON CONFLICT(user_id, dungeon_key_id) DO UPDATE SET"
-						" possession = MIN(possession + $3, $4);",
+						// MAX(possession, ...): a present caps what it ADDS, but must
+						// never LOWER a count already over the cap.  Saves granted
+						// test keys hold up to 99 against a limit of 50, and MIN
+						// alone turned 86 held into 50 — a key present that cost
+						// the player 36 keys.
+						" possession = MAX(possession, MIN(possession + $3, $4));",
 						identity.userId, keyId, std::max(targetCnt, 1),
 						static_cast<int32_t>(key->possession_limit));
 
@@ -341,6 +364,7 @@ HANDLEF(PresentReceipt)
 						<< std::max(targetCnt, 1) << " — now holding "
 						<< (held.empty() ? 0 : held[0]["possession"].as<int32_t>())
 						<< "/" << static_cast<int32_t>(key->possession_limit);
+					keysChanged = true;
 					granted = true;
 					break;
 				}
@@ -404,6 +428,7 @@ HANDLEF(PresentReceipt)
 						<< std::max(targetCnt, 1) << " — now holding "
 						<< (held.empty() ? 0 : held[0]["sp"].as<int32_t>())
 						<< "/" << kMaxSummonerSp;
+					summonerChanged = true;
 					granted = true;
 					break;
 				}
@@ -441,6 +466,93 @@ HANDLEF(PresentReceipt)
 						" VALUES ($1, $2, 0, 1)"
 						" ON CONFLICT(user_id, summoner_arm_id) DO NOTHING;",
 						identity.userId, targetId);
+					armsChanged = true;
+					granted = true;
+					break;
+				}
+				case 8000:  // plain summon ticket
+				{
+					// Type 8000 is the one-counter ticket: createPresentName
+					// @0x11C3900 names it with the loc key SUMMON_TICKET, and
+					// the client reads the balance off team_info
+					// (UserTeamInfo::getSummonTicket), which every reply already
+					// refreshes.  target_id is "0" on all nine rows that use it,
+					// so the count is all that matters.
+					// 99 is the display cap the Daily Spin already clamps
+					// tickets to (see DailySpin.cpp's kMaxTickets and handbook
+					// §10: past the cap the HUD renders zero).
+					constexpr int32_t kMaxSummonTickets = 99;
+					co_await transaction->execSqlCoro(
+						"UPDATE user_info SET summon_tickets = MIN(summon_tickets + $1, $2)"
+						" WHERE id = $3;",
+						std::max(targetCnt, 1), kMaxSummonTickets, identity.userId);
+					granted = true;
+					break;
+				}
+				case 8001:  // V2 summon ticket (a per-type inventory)
+				{
+					// createPresentName @0x11C3A2C names type 8001 after the
+					// SummonTicketV2Mst row whose id equals target_id, so this
+					// is the per-type ticket inventory (a3d5d12i), not the plain
+					// counter above.  Each type redeems on one gate.
+					const auto& catalog = theServer()->cache().userInfoResp().summon_ticket_v2;
+					const auto known = std::any_of(catalog.begin(), catalog.end(),
+						[&](const SummonTicketV2Mst& t) {
+							return t.id && std::to_string(*t.id) == targetId;
+						});
+					if (!known)
+					{
+						LOG_WARN << "PresentReceipt: summon ticket " << targetId
+							<< " is not in SummonTicketV2Mst — present left unclaimed";
+						break;
+					}
+
+					co_await gme::grantSummonTicketV2(transaction, identity, targetId, targetCnt);
+					summonTicketsChanged = true;
+					granted = true;
+					break;
+				}
+				case 8004:  // event token (the Frontier Gate's "Rift Token" is id 8)
+				{
+					// createPresentName @0x11C3AF8 formats target_id into
+					// `EVENT_TOKEN_%04d_NAME`, so target_id is a token id and
+					// the client already knows what to call it.
+					if (!gme::isKnownEventToken(targetId))
+					{
+						LOG_WARN << "PresentReceipt: event token " << targetId
+							<< " has no name in event_token_mst — present left unclaimed";
+						break;
+					}
+
+					co_await gme::grantEventToken(transaction, identity, targetId, targetCnt);
+					eventTokensChanged = true;
+					granted = true;
+					break;
+				}
+				case 8005:  // Unit Selector ticket
+				{
+					// PresentCommon::createPresentName @0x11C37F4 sends types
+					// 8000-8005 through a second jump table (0x232822C), and
+					// 8005 lands at 0x11C3B50: it walks UnitSelectorGachaMstList
+					// and names the present after the row whose getTicketId
+					// equals target_id.  So target_id is a selector ticket id
+					// (XIvaD6Jp), and the ticket joins the selector inventory,
+					// not the V2 summon tickets.
+					const auto& selectors = theServer()->cache().unitSelectorGacha();
+					const auto known = std::any_of(selectors.begin(), selectors.end(),
+						[&](const UnitSelectorGachaMst& s) { return std::to_string(s.selector_id) == targetId; });
+					if (!known)
+					{
+						LOG_WARN << "PresentReceipt: selector ticket " << targetId
+							<< " is not in UnitSelectorGachaMst — present left unclaimed";
+						break;
+					}
+
+					co_await transaction->execSqlCoro(
+						"INSERT INTO user_selector_tickets (user_id, ticket_id, count) VALUES ($1, $2, $3)"
+						" ON CONFLICT(user_id, ticket_id) DO UPDATE SET count = count + $3;",
+						identity.userId, targetId, std::max(targetCnt, 1));
+					selectorsChanged = true;
 					granted = true;
 					break;
 				}
@@ -473,6 +585,28 @@ HANDLEF(PresentReceipt)
 					<< " (type " << presentType << ", target " << targetId
 					<< " x" << targetCnt << ")";
 			}
+
+			// Refresh every client cache a payout changed.  The present scenes
+			// have no local apply path and HomeInfo rebuilds only the header and
+			// the roster, so a block not sent here stays stale until the next
+			// UserInfo.  Each is the complete current state, from the builder
+			// UserInfo uses; see PresentReceiptResp in present.kdl.
+			co_await gme::emitGrantedRewards(transaction, identity, paid, resp);
+			if (keysChanged)
+				resp.dungeon_key_info = co_await gme::dungeonKeyState(transaction, identity);
+			if (summonerChanged)
+			{
+				auto summoner = co_await gme::loadSummonerInfo(transaction, identity);
+				resp.summoner_info = std::vector<::UserSummonerInfo>{ std::move(summoner) };
+			}
+			if (armsChanged)
+				resp.summoner_arm_info = co_await gme::loadSummonerArms(transaction, identity);
+			if (selectorsChanged)
+				resp.selector_ticket_info = co_await gme::loadSelectorTickets(transaction, identity);
+			if (summonTicketsChanged)
+				resp.summon_ticket_v2_user = co_await gme::loadSummonTicketsV2(transaction, identity);
+			if (eventTokensChanged)
+				resp.event_token_info = co_await gme::loadEventTokens(transaction, identity);
 
 			resp.presents = co_await readPresents(transaction, identity.userId);
 			resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());

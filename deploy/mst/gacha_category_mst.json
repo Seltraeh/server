@@ -1,28 +1,36 @@
 {
-    "IBs49NiH": [
-        {
-            "vx9uyQVQ": "1",
-            "In7lGGLn": "top_banner_Anniv_Shiny_210331.png",
-            "2r4EoNt4": 1,
-            "3rCmq58M": "11960",
-            "qA7M9EjP": 0,
-            "SzV0Nps7": 2147483647
-        },
-        {
-            "vx9uyQVQ": "2",
-            "In7lGGLn": "small_banner_03Honor.png",
-            "2r4EoNt4": 2,
-            "3rCmq58M": "1000",
-            "qA7M9EjP": 0,
-            "SzV0Nps7": 2147483647
-        },
-        {
-            "vx9uyQVQ": "3",
-            "In7lGGLn": "small_banner_01Special.png",
-            "2r4EoNt4": 3,
-            "3rCmq58M": "2000",
-            "qA7M9EjP": 0,
-            "SzV0Nps7": 2147483647
-        }
-    ]
+  "IBs49NiH": [
+    {
+      "vx9uyQVQ": "1",
+      "In7lGGLn": "top_banner_Anniv_Shiny_210331.png",
+      "2r4EoNt4": 1,
+      "3rCmq58M": "11960",
+      "qA7M9EjP": 0,
+      "SzV0Nps7": 2147483647
+    },
+    {
+      "vx9uyQVQ": "2",
+      "In7lGGLn": "small_banner_03Honor.png",
+      "2r4EoNt4": 2,
+      "3rCmq58M": "1000",
+      "qA7M9EjP": 0,
+      "SzV0Nps7": 2147483647
+    },
+    {
+      "vx9uyQVQ": "3",
+      "In7lGGLn": "small_banner_01Special.png",
+      "2r4EoNt4": 3,
+      "3rCmq58M": "2000",
+      "qA7M9EjP": 0,
+      "SzV0Nps7": 2147483647
+    },
+    {
+      "vx9uyQVQ": "4",
+      "In7lGGLn": "small_banner_02Veteran.png",
+      "2r4EoNt4": 90,
+      "3rCmq58M": "99005,99006,99007,99008",
+      "qA7M9EjP": 0,
+      "SzV0Nps7": 2147483647
+    }
+  ]
 }

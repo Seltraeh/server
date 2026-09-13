@@ -12,12 +12,33 @@
 // UnitSelectorGachaTicket (GroupId k57TdKDj, AES 1IJ8SaNk) — "use a Unit
 // Selector Gacha Ticket".  The player taps a selector banner (e.g. "Brave Burst
 // Heroes Selector Ticket"), picks one unit from that selector's pool, and the
-// server grants it and consumes a matching V2 ticket.
+// server spends one of that selector's tickets and grants the unit.
 //
 // Request (bfdata/createbody/UnitSelectorGachaTicketRequest.txt):
-//   "CGHaOZda":[{ "7Ffmi96v":gacha_id, "XIvaD6Jp":selector_id,
-//                 "pn16CNah":picked_unit_id, "H6k1LIxC":?, "C5QbG2DM":? }]
-//   (H6k1LIxC / C5QbG2DM are UNVERIFIED — likely count / cost; ignored here.)
+//   "CGHaOZda":[{ "7Ffmi96v":gacha_id, "XIvaD6Jp":ticket_id,
+//                 "pn16CNah":picked_unit_id, "H6k1LIxC":"1", "C5QbG2DM":type }]
+//   Decoded 2026-09-11 from UnitSelectorGachaTicketRequest::createBody
+//   @0x1CCB8B8: H6k1LIxC is the constant "1" (one ticket per pick), and
+//   C5QbG2DM is UnitSelectorGachaUnitObjManager::getSelectedUnitType (+0x88) —
+//   the TYPE the player picked on the confirm screen.
+//   UnitSelectorGachaUnitConfirmScene::touchEnded @0x1D95860 stores the chosen
+//   button's index + 1, and initialize labels button i with
+//   UnitTypeMstList::getObject(i + 1) @0x1D943CC, so it is the UnitTypeMst id
+//   (1-6, Lord..Rex) the granted unit must carry.
+//
+// The selector ticket INVENTORY is not the V2 ticket list: no V2 ticket
+// targets a selector gacha.  Selector tickets live in user_selector_tickets,
+// keyed by the selector MST's ticket id (XIvaD6Jp — UnitSelectorGachaMst
+// setTicketId), arrive as type-8005 presents (PresentReceipt), and reach the
+// client as UnitSelectorGachaUserInfo (response key CGHaOZda, the same hash as
+// this request's group).  That list is a full replace and nothing on the
+// client decrements it, so this reply sends the whole inventory after the
+// spend — the spent ticket included, at 0 if it was the last one.
+//
+// One ticket buys one pick: the request's H6k1LIxC is the constant "1", and
+// the MST's required-tickets field (JRqU2bS6) is absent from the data, which
+// the client reads as 1.  A pick with no ticket left is refused rather than
+// granted free.
 //
 // Selector pools come from F_UNIT_SELECTOR_GACHA_TICKET_MST
 // (ServerCache::unitSelectorGacha, wrapper JukkSeNA — ported via port_mst.py).
@@ -31,16 +52,6 @@
 
 namespace
 {
-
-// Local shim for the sole-offline-user lookup.  The shared gme::getSoleUserId
-// bridge was retired upstream (decompfrontier/server PR #28 review [14]); this
-// debug-only selector is a local-only handler, so it keeps its own copy rather
-// than reintroducing the bridge into the shared header.
-drogon::Task<std::string> selectorSoleUserId(db::Database database)
-{
-	const auto rows = co_await database->execSqlCoro("SELECT id FROM user_info LIMIT 1;");
-	co_return rows.size() ? rows[0]["id"].as<std::string>() : std::string{};
-}
 
 // Weighted summon-animation effect for a rarity (mirrors Gacha.cpp's local
 // helper — kept local here to avoid coupling the two handlers).
@@ -76,12 +87,14 @@ std::optional<uint32_t> selectorGachaEffect(uint32_t rarity)
 struct SelectorReqItem
 {
 	std::string gacha_id;     // 7Ffmi96v
-	std::string selector_id;  // XIvaD6Jp
+	std::string ticket_id;    // XIvaD6Jp — the selector MST's ticket id
 	std::string unit_id;      // pn16CNah
+	std::string unit_type;    // C5QbG2DM — the UnitTypeMst id the player picked
 };
 
 struct SelectorReq
 {
+	LoginInfoReq login_info;               // IKqx1Cn9
 	std::vector<SelectorReqItem> entries;  // CGHaOZda
 };
 
@@ -92,14 +105,17 @@ template <> struct glz::meta<SelectorReqItem>
 	using T = SelectorReqItem;
 	static constexpr auto value = glz::object(
 		"7Ffmi96v", &T::gacha_id,
-		"XIvaD6Jp", &T::selector_id,
-		"pn16CNah", &T::unit_id);
+		"XIvaD6Jp", &T::ticket_id,
+		"pn16CNah", &T::unit_id,
+		"C5QbG2DM", &T::unit_type);
 };
 
 template <> struct glz::meta<SelectorReq>
 {
 	using T = SelectorReq;
-	static constexpr auto value = glz::object("CGHaOZda", &T::entries);
+	static constexpr auto value = glz::object(
+		"IKqx1Cn9", pkg::glaze::single_array<&T::login_info>(),
+		"CGHaOZda", &T::entries);
 };
 
 HANDLEF(UnitSelectorGachaTicket)
@@ -118,10 +134,10 @@ HANDLEF(UnitSelectorGachaTicket)
 	}
 
 	const auto& item = req.entries.front();
-	uint32_t selectorId = 0, gachaId = 0, pickedUnit = 0;
+	uint32_t ticketId = 0, gachaId = 0, pickedUnit = 0;
 	try
 	{
-		selectorId = static_cast<uint32_t>(std::stoul(item.selector_id));
+		ticketId   = static_cast<uint32_t>(std::stoul(item.ticket_id));
 		gachaId    = static_cast<uint32_t>(std::stoul(item.gacha_id));
 		pickedUnit = static_cast<uint32_t>(std::stoul(item.unit_id));
 	}
@@ -130,15 +146,34 @@ HANDLEF(UnitSelectorGachaTicket)
 		co_return HandleResult::error("UnitSelectorGachaTicket: non-numeric ids");
 	}
 
+	// The type the player picked (C5QbG2DM), if it names a real UnitTypeMst
+	// row.  The confirm screen only lets the tap through once a type is chosen,
+	// so a missing or out-of-range value is a malformed body; it falls back to a
+	// random normal type rather than refusing the pick.
+	uint32_t unitType = 0;
+	try
+	{
+		unitType = static_cast<uint32_t>(std::stoul(item.unit_type));
+	}
+	catch (const std::exception&)
+	{
+	}
+	if (unitType < 1 || unitType > 6)
+	{
+		LOG_WARN << "UnitSelectorGachaTicket: no valid chosen type ('" << item.unit_type
+			<< "'); rolling a random one";
+		unitType = UnitArchiver::getRandomType();
+	}
+
 	// Resolve the selector and validate the picked unit is in its pool.
 	const auto& selectors = theServer()->cache().unitSelectorGacha();
 	const auto sel = std::find_if(selectors.begin(), selectors.end(),
-		[selectorId](const UnitSelectorGachaMst& s)
-		{ return static_cast<uint32_t>(s.selector_id) == selectorId; });
+		[ticketId](const UnitSelectorGachaMst& s)
+		{ return static_cast<uint32_t>(s.selector_id) == ticketId; });
 	if (sel == selectors.end())
 	{
-		co_return HandleResult::error("UnitSelectorGachaTicket: unknown selector",
-			std::to_string(selectorId));
+		co_return HandleResult::error("UnitSelectorGachaTicket: unknown selector ticket",
+			std::to_string(ticketId));
 	}
 	if (std::find(sel->unit_pool.begin(), sel->unit_pool.end(),
 			static_cast<int32_t>(pickedUnit)) == sel->unit_pool.end())
@@ -146,47 +181,39 @@ HANDLEF(UnitSelectorGachaTicket)
 		co_return HandleResult::error("UnitSelectorGachaTicket: picked unit not in pool",
 			std::to_string(pickedUnit));
 	}
-
-	// Resolve the sole offline user (transitional — the request's login_info
-	// envelope is ignored by the lenient read above).  Uses the file-local
-	// shim since gme::getSoleUserId was retired upstream (this handler is
-	// local-only debug tooling).
-	gme::UserIdentity identity{};
-	identity.userId = co_await selectorSoleUserId(theDb());
-	if (identity.userId.empty())
+	if (static_cast<uint32_t>(sel->gacha_id) != gachaId)
 	{
-		co_return HandleResult::error("UnitSelectorGachaTicket: no user");
+		LOG_WARN << "UnitSelectorGachaTicket: ticket " << ticketId << " opens gate " << sel->gacha_id
+			<< " but the request names gate " << gachaId << " — going by the ticket";
 	}
-	identity.gumiUserId = (co_await db::DatabaseInterface::read(
-		theDb(), "gumi_live_users", { db::Data("id") })).front<std::string>("id");
+
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
 	GachaActionResp resp{};
+	int32_t ticketsLeft = 0;
 	{
 		auto transaction = co_await theDb()->newTransactionCoro();
 		try
 		{
-			// Consume one V2 ticket.  NOTE this spends whichever ticket the user
-			// happens to hold — it does NOT yet join the ticket type to this
-			// selector's door (target_gacha == selector.gacha_id), so a player
-			// holding an unrelated ticket can pay with it.  Best-effort besides:
-			// if the user holds no ticket at all we log and still grant, so
-			// beta testing on the tutorial account isn't blocked by seeding.
-			const auto ticketRows = co_await transaction->execSqlCoro(
-				"UPDATE user_summon_tickets_v2 SET count = count - 1"
-				" WHERE user_id = $1 AND count > 0 AND ticket_id IN ("
-				"   SELECT ticket_id FROM user_summon_tickets_v2"
-				"   WHERE user_id = $1 AND count > 0 LIMIT 1"
-				" ) RETURNING ticket_id;",
-				identity.userId);
-			if (ticketRows.empty())
+			// Spend one of THIS selector's tickets.  Guarded on count >= 1, so a
+			// pick without a ticket changes nothing and is refused.
+			const auto spent = co_await transaction->execSqlCoro(
+				"UPDATE user_selector_tickets SET count = count - 1"
+				" WHERE user_id = $1 AND ticket_id = $2 AND count >= 1 RETURNING count;",
+				identity.userId, std::to_string(ticketId));
+			if (spent.empty())
 			{
+				transaction->rollback();
 				LOG_WARN << "UnitSelectorGachaTicket: user " << identity.userId
-					<< " has no V2 ticket for gacha " << gachaId
-					<< " — granting anyway (beta).";
+					<< " holds no '" << sel->name << "' ticket (" << ticketId << ") — pick refused";
+				co_return HandleResult::error("UnitSelectorGachaTicket: no selector ticket",
+					std::to_string(ticketId));
 			}
+			ticketsLeft = spent[0]["count"].as<int32_t>();
 
-			// Grant the picked unit (a selector pick, like a summon).
-			auto unit = gme::fromArchivedUnit(pickedUnit, UnitArchiver::getRandomType());
+			// Grant the picked unit (a selector pick, like a summon), with the
+			// type the player picked for it.
+			auto unit = gme::fromArchivedUnit(pickedUnit, unitType);
 			if (!unit)
 			{
 				throw std::runtime_error(
@@ -196,14 +223,10 @@ HANDLEF(UnitSelectorGachaTicket)
 			auto added = std::move(
 				(co_await gme::addUserUnit(transaction, identity, *unit)).nonEmpty());
 
-			resp.unit_dictionary.push_back(std::move(
-				(co_await db::PacketInterfaceFor<UserUnitDictionary>::read(
-					transaction,
-					"user_unit_dictionary",
-					{
-						db::Lookup("user_id", identity.userId),
-						db::Lookup("unit_id", pickedUnit),
-					})).nonEmpty().front()));
+			// The COMPLETE dictionary, not just the picked species: this
+			// response rebuilds the reference list the summon lineup reads
+			// (UserUnitDictionary in net/user.kdl).
+			resp.unit_dictionary = co_await gme::loadUnitDictionary(transaction, identity);
 
 			const auto unitRecord = UnitArchiver::instance().lookup(pickedUnit);
 			const auto effect = unitRecord ? selectorGachaEffect(unitRecord->rarity) : std::nullopt;
@@ -214,6 +237,10 @@ HANDLEF(UnitSelectorGachaTicket)
 			resp.unit_info.push_back(std::move(added));
 
 			resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+
+			// The inventory after the spend.  The client never decrements it, so
+			// without this the banner would keep offering the ticket just used.
+			resp.selector_ticket_info = co_await gme::loadSelectorTickets(transaction, identity);
 		}
 		catch (...)
 		{
@@ -228,7 +255,8 @@ HANDLEF(UnitSelectorGachaTicket)
 		co_return HandleResult::error("Serialization error", glz::format_error(ec2, buffer));
 	}
 
-	LOG_INFO << "UnitSelectorGachaTicket: granted unit " << pickedUnit
-		<< " from selector " << selectorId << " (" << sel->name << ")";
+	LOG_INFO << "UnitSelectorGachaTicket: granted unit " << pickedUnit << " (type "
+		<< unitType << ") for a '" << sel->name << "' ticket (" << ticketId << "); "
+		<< ticketsLeft << " left";
 	co_return HandleResult::success(buffer);
 }

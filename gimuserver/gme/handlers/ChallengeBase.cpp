@@ -1,6 +1,8 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/HunterOrbs.hpp>
+
 // ChallengeBase (nUAW2B0a / uE5Tsv6P) — fires when the player opens the Survey
 // Office, which is the hub the Frontier Gate entrance sits behind.  Without it
 // registered the dispatcher answers "Unsupported request" and the client errors
@@ -26,13 +28,13 @@
 // content/event/randall_FG.txt — read zero because no event is live, which
 // would explain why the client ignores a perfectly good team_info fight_point.
 //
-// // UNVERIFIED: whether the hub also wants s7A3bGLe (ChallengeUserInfo, 8
-// fields) or kN2i7qds (ChallengeUserTeam, which carries a FrogateScore).  The
-// HR ladder does NOT belong here — challenge_hr_mst.json already ships under
-// h09mEvDR via Initialize, the same key ChallengeHrResponse uses.
-//
-// If this changes nothing, stop guessing at the hub and xref Hunter Orbs
-// directly in the binary instead.
+// RESOLVED 2026-09-13.  s7A3bGLe is ChallengeUserInfo's own reply, not the
+// hub's — it has its own GroupId (jF3AS4cp), which was unregistered and was
+// closing the session; see ChallengeUserInfo.cpp.  kN2i7qds does belong here,
+// and its three unnamed fields are now decoded from the binary rather than by
+// probe (see gme/common/HunterOrbs.hpp).  The HR ladder still does NOT belong
+// here — challenge_hr_mst.json already ships under h09mEvDR via Initialize,
+// the same key ChallengeHrResponse uses.
 
 HANDLEF(ChallengeBase)
 {
@@ -53,34 +55,28 @@ HANDLEF(ChallengeBase)
     // Hunter Orbs live here, not in team_info.  Binary xref 2026-08-07: orbs
     // are internally "Aube" and the counter is ChallengeHeaderInfo::getAube,
     // which this response feeds — UserTeamInfo::fight_point, which the server
-    // had been setting, is a different currency entirely.
-    resp.user_team.hr_id = 1;
-    resp.user_team.frogate_score = 0;
-
-    // THE ORB COUNT — and the one field group still carrying placeholders.
+    // had been setting, is a different currency entirely (the Arena Orbs).
     //
-    // ChallengeUserTeamResponse has five fields.  readparam_analysis names only
-    // vvXp7Uek (FrogateScore); Sv80kL5r is HRID by cross-class reuse.  The
-    // other three are inlined, and the candidate setters on ChallengeHeaderInfo
-    // are Aube, AubeTimer, AubeRestTimer, Order and Search.  One of the three
-    // IS the Hunter Orb count: before this response was sent at all the client
-    // reported zero orbs, and populating these made orbs work.
+    // The three fields that used to carry probe placeholders are decoded now —
+    // ChallengeUserTeamResponse::readParam @0x13D3F94 names all five setters in
+    // the open, so 38sHatGk is the count, 6mh0jiKJ the unread AubeTimer and
+    // RHKA30s5 the seconds to the next orb.  gme::loadChallengeHeader derives
+    // the live state from the save; see HunterOrbs.hpp for why the client and
+    // the server can both keep time without polling each other.
     //
-    // // UNVERIFIED which is which.  A probe sending 4/5/6 was INCONCLUSIVE
-    // because those values sit above the cap — ChallengeHeaderInfo::getAubeMax
-    // returns DefineMst::getMaxfrohunP, observed as 3, so the client clamped
-    // all of them to 3 and the reading was identical whichever field it read.
-    // The next probe must use values BELOW the cap (1/2/3); the displayed count
-    // then names the field outright.
-    //
-    // Until then all three carry the observed cap so the orb bar reads full and
-    // no field carries a number the client could interpret as a stale timer.
-    // This is a deliberate placeholder, not a decoded value — do not build
-    // orb spending on it (FrontierGateRetry deliberately does not debit).
-    constexpr int32_t kObservedOrbCap = 3;
-    resp.user_team.unk_first = kObservedOrbCap;
-    resp.user_team.unk_second = kObservedOrbCap;
-    resp.user_team.unk_third = kObservedOrbCap;
+    // Hunter Rank is still a flat 1: challenge_hr_mst.json ships the ladder,
+    // but nothing here scores Frontier Hunter yet, so a higher rank would be
+    // invented.  FrontierGateUtils::entryCheckHr reads it, so it has to be a
+    // real ladder value rather than 0.
+    ::FriendGetReq idOnly{};   // identity-only shape: IKqx1Cn9 and nothing else
+    {
+        glz::context ctx{};
+        if (const auto ec = glz::read<glz::opts{.error_on_unknown_keys = false}>(idOnly, json, ctx); ec)
+            LOG_WARN << "ChallengeBase: parse error: " << glz::format_error(ec, json);
+    }
+    const auto identity = (co_await gme::getUserIdentity(theDb(), idOnly.login_info)).nonEmpty();
+    constexpr int32_t kBaseHunterRank = 1;
+    resp.user_team = co_await gme::loadChallengeHeader(theDb(), identity, kBaseHunterRank, 0);
 
     co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }

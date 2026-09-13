@@ -4,6 +4,7 @@
 #include <gimuserver/db/DatabaseInterface.h>
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/PermitPlace.hpp>
 
 #include <charconv>
 #include <ctime>
@@ -139,58 +140,10 @@ bool distributedOn(const ::DungeonKeyMst& key, int isoWeekday)
 }
 
 /// One rung of DungeonKeyMst.usage_pattern.
-struct ParadeTier
-{
-	int32_t keysRequired = 0;
-	int32_t activeType = 0;
-};
+// Tier parsing lives in gme::parseUsagePatternTiers (Common.hpp) so PermitPlace
+// can reuse it — it also carries the tier's mission ids, which this file needs
+// to tell the client what the purchase just opened.
 
-/// Parses usage_pattern into its tiers.
-///
-/// Format is '/'-separated tiers, each ':'-separated as
-/// `keys_required : active_type : display_name : mission_ids : unknown`.
-/// Only the first two fields are needed here — the client owns the name and
-/// resolves the missions itself from the dungeon it opens.
-///
-/// Malformed tiers are skipped rather than throwing: this is MST data we did
-/// not author, and a single bad rung should cost that rung, not the request.
-std::vector<ParadeTier> parseTiers(std::string_view pattern)
-{
-	const auto toInt = [](std::string_view text, int32_t& out) {
-		const auto* begin = text.data();
-		const auto* end = text.data() + text.size();
-		const auto result = std::from_chars(begin, end, out);
-		return result.ec == std::errc{} && result.ptr == end;
-	};
-
-	std::vector<ParadeTier> tiers;
-	while (!pattern.empty())
-	{
-		const auto slash = pattern.find('/');
-		std::string_view tier = pattern.substr(0, slash);
-		pattern = slash == std::string_view::npos ? std::string_view{} : pattern.substr(slash + 1);
-
-		const auto firstColon = tier.find(':');
-		if (firstColon == std::string_view::npos)
-			continue;
-
-		const auto secondColon = tier.find(':', firstColon + 1);
-		if (secondColon == std::string_view::npos)
-			continue;
-
-		ParadeTier parsed{};
-		if (!toInt(tier.substr(0, firstColon), parsed.keysRequired))
-			continue;
-		if (!toInt(tier.substr(firstColon + 1, secondColon - firstColon - 1), parsed.activeType))
-			continue;
-		if (parsed.keysRequired <= 0)
-			continue;
-
-		tiers.push_back(parsed);
-	}
-
-	return tiers;
-}
 
 } // namespace
 
@@ -243,6 +196,72 @@ drogon::Task<std::vector<::UserDungeonKeyInfo>> dungeonKeyState(
 			LOG_INFO << "DungeonKey: seeded row for key " << key.id << " (" << key.name << ")";
 		}
 
+		// THE ACTIVE WINDOW.  active_until is an absolute epoch second written
+		// by DungeonKeyUse; cnt is what the client actually reads to decide how
+		// long the parade stays open, and it was never assigned — so every
+		// reply said "0 seconds left" and the parade re-locked the moment it
+		// opened, however many keys had been spent.
+		//
+		// Expiry is evaluated on READ rather than by a timer: nothing has to
+		// tick, and a window that lapsed while the server was down is correctly
+		// closed the next time anyone asks.
+		{
+			const auto nowSec = static_cast<int64_t>(
+				std::chrono::duration_cast<std::chrono::seconds>(
+					std::chrono::system_clock::now().time_since_epoch()).count());
+
+			int64_t activeUntil = 0;
+			int32_t activeTier = 0;
+			try
+			{
+				const auto rows = co_await db->execSqlCoro(
+					"SELECT active_until, active_tier FROM user_dungeon_keys"
+					" WHERE user_id = $1 AND dungeon_key_id = $2;",
+					identity.userId, static_cast<int32_t>(key.id));
+				if (rows.size() > 0)
+				{
+					activeUntil = rows[0]["active_until"].as<int64_t>();
+					activeTier = rows[0]["active_tier"].as<int32_t>();
+				}
+			}
+			catch (const drogon::orm::DrogonDbException& ex)
+			{
+				LOG_WARN << "DungeonKey: active_until read failed: " << ex.base().what();
+			}
+
+			// ⚠ TEST THE TIER, NOT active_type.  The Imp Key's usage_pattern is
+			// "1:0:Garden of Imps:102920:" — active_type 0 for a perfectly valid
+			// purchase — so keying expiry off active_type left that row claiming
+			// an open window for ever.  active_tier is the spend count and is
+			// non-zero for every real purchase.
+			if (activeTier != 0 && nowSec >= activeUntil)
+			{
+				// Lapsed — close it and persist, so the next read is cheap and
+				// the DB never claims an open parade that is not.
+				row.active_type = 0;
+				row.cnt = 0;
+				try
+				{
+					co_await db->execSqlCoro(
+						"UPDATE user_dungeon_keys SET active_type = 0, active_until = 0, active_tier = 0"
+						" WHERE user_id = $1 AND dungeon_key_id = $2;",
+						identity.userId, static_cast<int32_t>(key.id));
+				}
+				catch (const drogon::orm::DrogonDbException& ex)
+				{
+					LOG_WARN << "DungeonKey: expiry write failed: " << ex.base().what();
+				}
+			}
+			else if (activeTier != 0)
+			{
+				row.cnt = static_cast<uint32_t>(activeUntil - nowSec);
+			}
+			else
+			{
+				row.cnt = 0;
+			}
+		}
+
 		// Derived, never stored — see the migration comment for why.
 		const bool claimable =
 			distributedOn(key, day.isoWeekday)
@@ -269,6 +288,10 @@ std::string keyStateBody(const std::vector<::UserDungeonKeyInfo>& state)
 {
 	::DungeonKeyInfoResp resp{};
 	resp.keys = state;
+	// The key-ready badge.  BadgeInfo::setDungeonKeyNum is written ONLY by
+	// BadgeInfoResponse, so a claim has to re-send the count or the badge stays
+	// lit until the next login (BadgeKeyCount in net/badge_info.kdl).
+	resp.badge.dungeon_key_num = gme::claimableKeyCount(state);
 	return glz::write_json(resp).value_or("{}");
 }
 
@@ -379,69 +402,102 @@ HANDLEF(DungeonKeyUse)
 			LOG_WARN << "DungeonKeyUse: parse error: " << glz::format_error(ec, json);
 	}
 
-	const auto db = theDb();
-	const auto identity = (co_await gme::getUserIdentity(db, req.login_info)).nonEmpty();
-
-	const auto requestedId = req.use.dungeon_key_id;
-	const auto useCount = req.use.use_count;
-	LOG_INFO << "DungeonKeyUse: key " << requestedId << " x " << useCount;
-
-	auto state = co_await gme::dungeonKeyState(db, identity);
-
-	const auto& keyMst = theServer()->cache().dungeonKeyMst();
-	const auto key = std::find_if(
-		keyMst.begin(),
-		keyMst.end(),
-		[requestedId](const ::DungeonKeyMst& mst) { return mst.id == requestedId; });
-
-	if (key == keyMst.end())
+	const auto database = theDb();
+	const auto identity = (co_await gme::getUserIdentity(database, req.login_info)).nonEmpty();
+	// Read the balance, spend, and build the complete response on one transaction.
+	// A state/serialization failure must not leave a partial purchase behind.
+	auto db = co_await database->newTransactionCoro();
+	try
 	{
-		LOG_WARN << "DungeonKeyUse: no DungeonKeyMst row for id " << requestedId;
-		co_return HandleResult::success(keyStateBody(state));
-	}
+		const auto requestedId = req.use.dungeon_key_id;
+		const auto useCount = req.use.use_count;
+		LOG_INFO << "DungeonKeyUse: key " << requestedId << " x " << useCount;
 
-	auto row = std::find_if(
-		state.begin(),
-		state.end(),
-		[requestedId](const ::UserDungeonKeyInfo& entry) { return entry.dungeon_key_id == requestedId; });
+		auto state = co_await gme::dungeonKeyState(db, identity);
 
-	// The spend must match a real rung of the ladder, not just any number the
-	// client sends — otherwise a crafted request could drain an arbitrary count
-	// or set active_type to something the MST never offers.
-	const auto tiers = parseTiers(key->usage_pattern);
-	const auto tier = std::find_if(
-		tiers.begin(),
-		tiers.end(),
-		[useCount](const ParadeTier& candidate) { return candidate.keysRequired == useCount; });
+		const auto& keyMst = theServer()->cache().dungeonKeyMst();
+		const auto key = std::find_if(
+			keyMst.begin(),
+			keyMst.end(),
+			[requestedId](const ::DungeonKeyMst& mst) { return mst.id == requestedId; });
 
-	if (row == state.end() || tier == tiers.end())
-	{
-		LOG_WARN << "DungeonKeyUse: " << useCount << " is not a tier of \"" << key->usage_pattern
-		         << "\" — no change";
-		co_return HandleResult::success(keyStateBody(state));
-	}
-
-	if (row->possession < static_cast<uint32_t>(tier->keysRequired))
-	{
-		LOG_INFO << "DungeonKeyUse: holding " << row->possession << ", tier needs "
-		         << tier->keysRequired << " — no change";
-		co_return HandleResult::success(keyStateBody(state));
-	}
-
-	row->possession -= static_cast<uint32_t>(tier->keysRequired);
-	row->active_type = static_cast<uint32_t>(tier->activeType);
-
-	co_await db::PacketInterfaceFor<::UserDungeonKeyInfo>::update(
-		db,
-		"user_dungeon_keys",
-		*row,
+		if (key == keyMst.end())
 		{
-			db::Lookup("user_id", identity.userId),
-			db::Lookup("dungeon_key_id", requestedId),
-		});
+			LOG_WARN << "DungeonKeyUse: no DungeonKeyMst row for id " << requestedId;
+			co_return HandleResult::success(keyStateBody(state));
+		}
 
-	LOG_INFO << "DungeonKeyUse: spent " << tier->keysRequired << " x " << key->name
-	         << " — active_type " << row->active_type << ", " << row->possession << " left";
+		auto row = std::find_if(
+			state.begin(),
+			state.end(),
+			[requestedId](const ::UserDungeonKeyInfo& entry) { return entry.dungeon_key_id == requestedId; });
 
-	co_return HandleResult::success(keyStateBody(state));
+		// The spend must match a real rung of the ladder, not just any number the
+		// client sends — otherwise a crafted request could drain an arbitrary count
+		// or set active_type to something the MST never offers.
+		const auto tiers = gme::parseUsagePatternTiers(key->usage_pattern);
+		const auto tier = std::find_if(
+			tiers.begin(),
+			tiers.end(),
+			[useCount](const gme::UsagePatternTier& candidate) { return candidate.keysRequired == useCount; });
+
+		if (row == state.end() || tier == tiers.end())
+		{
+			LOG_WARN << "DungeonKeyUse: " << useCount << " is not a tier of \"" << key->usage_pattern
+			         << "\" — no change";
+			co_return HandleResult::success(keyStateBody(state));
+		}
+
+		if (row->possession < static_cast<uint32_t>(tier->keysRequired))
+		{
+			LOG_INFO << "DungeonKeyUse: holding " << row->possession << ", tier needs "
+			         << tier->keysRequired << " — no change";
+			co_return HandleResult::success(keyStateBody(state));
+		}
+
+		row->possession -= static_cast<uint32_t>(tier->keysRequired);
+		row->active_type = static_cast<uint32_t>(tier->activeType);
+
+		// Open the parade for DungeonKeyMst.limit_sec (1800 = the 30 minutes the
+		// live game gave you), stored as an absolute instant.  cnt goes out as the
+		// remaining seconds; without it the client closes the parade immediately.
+		const auto nowSec = static_cast<int64_t>(
+			std::chrono::duration_cast<std::chrono::seconds>(
+				std::chrono::system_clock::now().time_since_epoch()).count());
+		const int64_t activeUntil = nowSec + std::max<int32_t>(key->limit_sec, 0);
+		row->cnt = static_cast<uint32_t>(activeUntil - nowSec);
+
+		co_await db->execSqlCoro(
+			"UPDATE user_dungeon_keys SET active_until = $1, active_tier = $2"
+			" WHERE user_id = $3 AND dungeon_key_id = $4;",
+			activeUntil, tier->keysRequired,
+			identity.userId, static_cast<int32_t>(requestedId));
+
+		co_await db::PacketInterfaceFor<::UserDungeonKeyInfo>::update(
+			db,
+			"user_dungeon_keys",
+			*row,
+			{
+				db::Lookup("user_id", identity.userId),
+				db::Lookup("dungeon_key_id", requestedId),
+			});
+
+		LOG_INFO << "DungeonKeyUse: spent " << tier->keysRequired << " x " << key->name
+		         << " — active_type " << row->active_type << ", " << row->possession << " left";
+
+		// A fresh replacement also works before UserInfo and drops expired tiers.
+		::DungeonKeyUseResp resp{};
+		resp.keys = state;
+		std::string body;
+		if (const auto error = glz::write_json(resp, body); error)
+			throw std::runtime_error(glz::format_error(error, body));
+		gme::injectPermitPlace(body, co_await gme::buildPermitPlace(db, identity));
+
+		co_return HandleResult::success(body);
+	}
+	catch (...)
+	{
+		db->rollback();
+		throw;
+	}
 }

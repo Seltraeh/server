@@ -60,3 +60,67 @@ HANDLEF(UpdateInfoLight)
 
     co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
+
+// UpdateInfo (RUV94Dqz) — Home's 30-minute refresh (see the KDL for the timer).
+// Same payload as UpdateInfoLight, plus the server time that restarts the
+// client's timer.
+HANDLEF(UpdateInfo)
+{
+    ::UpdateInfoReq req{};
+    {
+        glz::context ctx{};
+        if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
+            LOG_WARN << "UpdateInfo: parse error: " << glz::format_error(ec, json);
+    }
+
+    const auto db = theDb();
+    const auto identity = (co_await gme::getUserIdentity(db, req.login_info)).nonEmpty();
+
+    ::UpdateInfoResp resp{};
+    resp.team_info = std::move((co_await gme::getTeamInfo(db, identity)).nonEmpty());
+    resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
+    resp.update_info.server_time = static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count());
+
+    LOG_INFO << "UpdateInfo: 30-minute refresh — team info + "
+             << resp.clear_mission_info.size() << " cleared mission(s)";
+
+    co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+}
+
+// NoticeUpdate (68pTQAJv) — the notice list.  There are no notices offline;
+// the empty lists are what tells the client the list finished loading.
+HANDLEF(NoticeUpdate)
+{
+    ::NoticeUpdateReq req{};
+    {
+        glz::context ctx{};
+        if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
+            LOG_WARN << "NoticeUpdate: parse error: " << glz::format_error(ec, json);
+    }
+
+    (void)(co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+    LOG_INFO << "NoticeUpdate: kind "
+             << (req.notice.empty() ? -1 : req.notice.front().notice_kind)
+             << " — no notices";
+
+    co_return HandleResult::success(glz::write_json(::NoticeUpdateResp{}).value_or("{}"));
+}
+
+// UserLoginCampaignInfo (5fc8bf2c) — Home's 12-hour login-campaign check.  No
+// login campaign runs offline, so there is nothing to report.
+HANDLEF(UserLoginCampaignInfo)
+{
+    ::UserLoginCampaignInfoReq req{};
+    {
+        glz::context ctx{};
+        if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
+            LOG_WARN << "UserLoginCampaignInfo: parse error: " << glz::format_error(ec, json);
+    }
+
+    (void)(co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+    LOG_INFO << "UserLoginCampaignInfo: no login campaign";
+    co_return HandleResult::success("{}");
+}

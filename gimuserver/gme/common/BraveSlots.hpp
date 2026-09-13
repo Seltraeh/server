@@ -12,6 +12,7 @@
 namespace gme
 {
 struct UserIdentity;
+struct GrantedRewards;
 
 /*!
 * The medal Brave Slots spends.
@@ -134,12 +135,15 @@ inline constexpr int32_t kBraveSlotMaxPulls = 10;
 * @param identity Resolved caller.
 * @param drawCount Pulls requested (d04gRmkE); clamped to what is affordable
 *        and to kBraveSlotMaxPulls.
+* @param granted Records any unit or item the pulls created, so the reply can
+*        refresh those client caches.
 * @return One result per pull actually played, empty when none were
 *         affordable — in which case nothing is spent and nothing is awarded.
 */
 drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 	db::Database database,
 	const UserIdentity& identity,
-	int32_t drawCount);
+	int32_t drawCount,
+	GrantedRewards& granted);
 
 } // namespace gme

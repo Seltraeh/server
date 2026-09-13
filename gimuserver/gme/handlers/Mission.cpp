@@ -3,8 +3,14 @@
 
 #include <gimuserver/archive/MissionArchiver.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/FriendPoints.hpp>
+#include <gimuserver/gme/common/MissionBreak.hpp>
+#include <gimuserver/gme/common/FrontierGate.hpp>
+#include <gimuserver/gme/common/PermitPlace.hpp>
 
 #include <chrono>
+#include <charconv>
+#include <set>
 #include <sstream>
 #include <utility>
 #include <vector>
@@ -195,6 +201,16 @@ drogon::Task<void> grantDungeonClearGem(
 	         << " missions) — awarded " << kDungeonClearGems << " gem";
 }
 
+// Fully consume decimal fields; std::stoul accepted suffixes and signed input.
+uint32_t dropNumber(const std::string& text)
+{
+	uint32_t value = 0;
+	const auto [end, error] = std::from_chars(text.data(), text.data() + text.size(), value);
+	if (error != std::errc{} || end != text.data() + text.size() || value == 0)
+		throw std::runtime_error("Invalid mission drop number: " + text);
+	return value;
+}
+
 std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 {
 	std::vector<UserUnitInfo> units;
@@ -214,24 +230,23 @@ std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 			|| !std::getline(parts, level, ':')
 			|| !std::getline(parts, type, ':'))
 		{
-			LOG_ERROR << "Invalid mission drop unit entry: " << drop;
-			return units;
+			throw std::runtime_error("Invalid mission drop unit entry: " + drop);
 		}
 
-		auto unit = gme::fromArchivedUnit(
-			static_cast<uint32_t>(std::stoul(id)),
-			static_cast<uint32_t>(std::stoul(type)));
+		const auto dropType = dropNumber(type);
+		if (dropType > 6)
+			throw std::runtime_error("Invalid mission drop unit type: " + type);
+		auto unit = gme::fromArchivedUnit(dropNumber(id), dropType);
 		if (!unit)
 		{
-			LOG_ERROR << "Unable to create mission drop unit from archive: " << drop;
-			return units;
+			throw std::runtime_error("Unknown mission drop unit or type: " + drop);
 		}
 
 		// A drop can specify a level above 1, and base_* must follow it.
 		// fromArchivedUnit hands back the LEVEL-1 statline, and the client
 		// displays user_units.base_* verbatim, so setting the level alone
 		// produced a "Lv 30" unit with level-1 stats.
-		const auto dropLevel = static_cast<uint32_t>(std::stoul(level));
+		const auto dropLevel = dropNumber(level);
 		unit->unit_lvl = dropLevel;
 		gme::scaleUnitBaseStats(*unit, static_cast<int>(dropLevel));
 		units.push_back(std::move(*unit));
@@ -243,10 +258,8 @@ std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 // Parses the client-reported item drops from MissionBattleResultInfo.item_rewards
 // (wire key 4T0Q2Bh5).
 //
-// UNVERIFIED wire format: assumed to mirror unit_rewards as a comma-separated
-// list of "itemId:count" pairs.  No live capture of an item drop exists yet —
-// this is the first thing to confirm with a Frida / http_log capture of a
-// mission that drops an item, then correct the split here if it differs.
+// APK BattleRewardList::getItemCsv @0x10DFA24 emits itemId:count pairs,
+// comma-separated. MissionEndRequest sends them under 4T0Q2Bh5 @0x13A7AE4.
 // Returns (item_id, count) pairs; malformed entries are skipped, not fatal.
 std::vector<std::pair<uint32_t, uint32_t>> parseItemDrops(const std::string& itemDrops)
 {
@@ -362,7 +375,7 @@ HANDLEF(MissionEnd)
 		co_return HandleResult::error("Deserialization error", error);
 	}
 
-	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).data;
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
 	// Same battle-content fallback as MissionStart — without it a mission that
 	// STARTS on template content would fail on completion instead, which is a
@@ -386,6 +399,21 @@ HANDLEF(MissionEnd)
 	}
 
 	MissionEndResp resp{};
+	std::string buffer;
+
+	// A Frontier Gate battle sends MissionEnd win or lose, and 2 is a win
+	// (UserState::getMissionState — the client subtracts the lost floor on
+	// anything else).  A lost battle is not a clear: it pays only what the
+	// client picked up, records no clear, and ends the run (below).
+	const bool frontierBattle = req.frontier_battle && !req.frontier_battle->empty();
+	const bool frontierLost = frontierBattle && req.mission_num.mission_status.has_value()
+		&& *req.mission_num.mission_status != 2;
+
+	// The same status decides a NORMAL mission: 103 of the 104 captured ends
+	// carry "2", the other "3" (a loss or a give-up).  Honor is paid for a
+	// cleared mission only, so a wipe cannot farm the helper.
+	const bool missionLost = req.mission_num.mission_status.has_value()
+		&& *req.mission_num.mission_status != 2;
 
 	// This needs to be wrapped as a transaction to prevent cases where we issue
 	// partial rewards upon mission completion.
@@ -402,6 +430,8 @@ HANDLEF(MissionEnd)
 					db::Data("zel"),
 					db::Data("karma"),
 					db::Data("brave_coin"),
+					db::Data("friend_points"),
+					db::Data("reinforce_user_id"),
 					db::Lookup("gumi_user_id", identity.gumiUserId),
 					db::Lookup("id", identity.userId),
 			});
@@ -412,11 +442,25 @@ HANDLEF(MissionEnd)
 			const auto currentLevel = userInfo.front<uint32_t>("level");
 			const auto currentExp = userInfo.front<uint32_t>("exp");
 			const auto currentBraveCoin = userInfo.front<int32_t>("brave_coin");
+			const auto currentHonor = userInfo.front<int32_t>("friend_points");
+			const auto helperUserId = userInfo.front<std::string>("reinforce_user_id");
 
-			// Fetch mission rewards from archive.
-			const auto rewardZel = req.battle_result.zel + missionRecord->zel;
-			const auto rewardKarma = req.battle_result.karma + missionRecord->karma;
-			const auto rewardExp = missionRecord->exp;
+			// HONOR for the Summoner Helper this run borrowed.  MissionStart
+			// recorded who it was; the amount is the one the card promised
+			// (gme::honorForMission picks the friend or stranger rate exactly
+			// as ReinforcementInfo::getFriendPoint does), and it is credited
+			// straight to the balance rather than paid into the present box,
+			// because the result screen counts it off team_info.
+			//
+			// Cleared and zeroed in the same UPDATE below whatever the outcome,
+			// so one start can only ever pay once.
+			const auto honorEarned = missionLost ? 0 : gme::honorForMission(helperUserId);
+
+			// Fetch mission rewards from archive (a lost Frontier Gate battle
+			// earns none of the clear's own).
+			const auto rewardZel = req.battle_result.zel + (frontierLost ? 0 : missionRecord->zel);
+			const auto rewardKarma = req.battle_result.karma + (frontierLost ? 0 : missionRecord->karma);
+			const auto rewardExp = frontierLost ? 0 : missionRecord->exp;
 	
 			// See if we leveled up.
 			auto newLevel = currentLevel;
@@ -433,6 +477,8 @@ HANDLEF(MissionEnd)
 					db::Data("exp", newExp),
 					db::Data("zel", currentZel + rewardZel),
 					db::Data("karma", currentKarma + rewardKarma),
+					db::Data("friend_points", currentHonor + honorEarned),
+					db::Data("reinforce_user_id", std::string{}),
 					db::Lookup("gumi_user_id", identity.gumiUserId),
 					db::Lookup("id", identity.userId)
 				})).nonEmpty();
@@ -446,14 +492,11 @@ HANDLEF(MissionEnd)
 			// replay completed steps.
 			if (req.mission_num.serial_id == kFirstTutorialMission)
 			{
-				(co_await db::DatabaseInterface::update(
-					transaction,
-					"user_info",
-					{
-						db::Data("tutorial_status", kFirstTutorialCheckpoint),
-						db::Lookup("gumi_user_id", identity.gumiUserId),
-						db::Lookup("id", identity.userId),
-					})).nonEmpty();
+				co_await transaction->execSqlCoro(
+					"UPDATE user_info SET tutorial_status = $1"
+					" WHERE id = $2 AND gumi_user_id = $3 AND tutorial_status < $1;",
+					kFirstTutorialCheckpoint, identity.userId, identity.gumiUserId);
+
 			}
 			else if (req.mission_num.serial_id == kSecondTutorialMission)
 			{
@@ -481,12 +524,50 @@ HANDLEF(MissionEnd)
 			// result screen's length check expects.
 			std::string firstClearBonus;
 
+			// A Frontier Gate battle reports the run's floors and score
+			// (eIQ79KO2).  They are stored for the next battle and the end of
+			// the run, and a LOST battle ends the run here: FG sends MissionEnd
+			// win or lose, and only this reply can carry the result that moves
+			// the client on (see gme/common/FrontierGate.hpp).
+			std::optional<gme::FrontierRun> frontierRun;
+			if (frontierBattle)
+			{
+				const auto& report = req.frontier_battle->front();
+				frontierRun = co_await gme::loadFrontierRun(transaction, identity);
+				if (frontierRun)
+				{
+					frontierRun->score = report.now_score;
+					frontierRun->progress = report.progress;
+					frontierRun->note = report.note;
+					frontierRun->odInfo = report.od_info;
+					co_await gme::storeFrontierRun(transaction, identity, *frontierRun);
+					// Pay whatever the run has now reached.  Waiting for the
+					// run to end loses it all if the player starts the gate
+					// again instead of retiring.
+					co_await gme::payFrontierRewards(transaction, identity, *frontierRun);
+					// Those payouts include the gate's own currencies, so the
+					// reply carries the lists they changed rather than leaving
+					// the client on a stale balance until the next login.
+					if (frontierRun->tokensChanged)
+						resp.event_token_info = co_await gme::loadEventTokens(transaction, identity);
+					if (frontierRun->ticketsChanged)
+						resp.summon_ticket_v2_user = co_await gme::loadSummonTicketsV2(transaction, identity);
+				}
+				else
+				{
+					LOG_WARN << "MissionEnd: Frontier Gate battle with no open run for "
+						<< identity.userId;
+				}
+			}
+
 			// Record the clear in the mission clear-history
 			// (user_campaign_missions, state=2).  UserInfo reports this set as
 			// UT1SVg59 (UserClearMissionInfo) — the list the client evaluates
 			// feature unlocks against (F_FUNCTION_RELEASE_MST conditions and
 			// the hardcoded town/early-feature gates), so every victorious
-			// MissionEnd must land here.
+			// MissionEnd must land here — and a lost Frontier Gate battle,
+			// the one MissionEnd that is not a victory, must not.
+			if (!frontierLost)
 			{
 				const auto clearedAt = static_cast<int64_t>(
 					std::chrono::duration_cast<std::chrono::seconds>(
@@ -537,6 +618,33 @@ HANDLEF(MissionEnd)
 				}
 			}
 
+			// Hand the run's state back (the client's only source for it), and
+			// when the battle was lost, end the run and pay it — before the
+			// team info below is read, so the header and the present badge
+			// already include what it paid.  The best is read first so the
+			// result scene measures the run against the previous best.
+			if (frontierRun)
+			{
+				const auto best = co_await gme::frontierBestScore(transaction, identity, frontierRun->gateId);
+				resp.frontier_battle = std::vector<::FrontierBattleInfo>{ gme::frontierBattleInfo(*frontierRun, best) };
+				if (frontierLost)
+				{
+					auto result = co_await gme::finishFrontierRun(transaction, identity, *frontierRun);
+					resp.frontier_end = std::vector<::FrontierEndInfo>{ std::move(result.end) };
+					resp.frontier_rewards = std::move(result.rewards);
+				}
+			}
+			else if (frontierLost)
+			{
+				// No run to pay (already ended, or never opened here) — still
+				// send a result, or the client never leaves the battle-end scene.
+				::FrontierEndInfo end{};
+				end.grade_id = gme::frontierGrade(0);
+				end.bonus_rate = 1.0f;
+				resp.frontier_end = std::vector<::FrontierEndInfo>{ std::move(end) };
+				resp.frontier_rewards = std::vector<::FrontierResRewardInfo>{};
+			}
+
 			auto loginInfo = std::move((co_await gme::getLoginInfo(transaction, identity)).nonEmpty());
 			auto teamInfo = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
 
@@ -562,15 +670,14 @@ HANDLEF(MissionEnd)
 						transaction,
 						identity,
 						dropped)).nonEmpty());
-				resp.unit_dictionary.push_back(std::move(
-					(co_await db::PacketInterfaceFor<UserUnitDictionary>::read(
-						transaction,
-						"user_unit_dictionary",
-						{
-							db::Lookup("user_id", identity.userId),
-							db::Lookup("unit_id", dropped.unit_id),
-						})).nonEmpty().front()));
 			}
+
+			// The COMPLETE dictionary, never just the dropped species: this
+			// response rebuilds the reference list the summon lineup reads
+			// (UserUnitDictionary in net/user.kdl).  Only when a unit dropped,
+			// so a clear without drops sends exactly what it always did.
+			if (!droppedUnits.empty())
+				resp.unit_dictionary = co_await gme::loadUnitDictionary(transaction, identity);
 
 			// Credit item/sphere drops reported by the client to the player's
 			// warehouse.  Spheres travel the same path as any other item — they
@@ -580,6 +687,14 @@ HANDLEF(MissionEnd)
 			for (const auto& [itemId, qty] : parseItemDrops(req.battle_result.item_rewards))
 			{
 				(co_await gme::addUserItem(transaction, identity, itemId, qty));
+			}
+
+			// UserWarehouseInfoResponse @0x14060E0 clears its list. Send every
+			// positive stack, preserving instance IDs and unrelated inventory.
+			{
+				auto warehouse = co_await gme::loadWarehouseSnapshot(transaction, identity);
+				resp.warehouse_info = std::move(warehouse.warehouse);
+				resp.item_dictionary_info = std::move(warehouse.dictionary);
 			}
 
 			resp.reward_info.clear_mission_id = req.mission_num.serial_id;
@@ -592,8 +707,8 @@ HANDLEF(MissionEnd)
 			resp.reward_info.clear_bonus = firstClearBonus;
 			// Tell the client the mission is cleared NOW, rather than leaving
 			// it to whenever UserInfo next runs.  Until this was here a
-			// freshly beaten mission kept its uncleared marker on the map and
-			// whatever it unlocked stayed out of reach.
+			// freshly beaten mission kept its uncleared marker on the map.
+			// PermitPlace below separately refreshes what that clear unlocks.
 			//
 			// Merges rather than replaces: readParam @0x13FD758 addObject()s
 			// without removeAllObjects, so this cannot drop clears the client
@@ -603,6 +718,12 @@ HANDLEF(MissionEnd)
 			// deadlocks the request.  Introduced as theDb() in dee3a1f and hung
 			// every MissionEnd from then until 2026-08-24 (handbook 6.14).
 			resp.clear_mission_info = co_await gme::getClearedMissions(transaction, identity);
+			std::set<int32_t> cleared;
+			for (const auto& done : resp.clear_mission_info) cleared.insert(done.mission_id);
+			// PermitRecipeResponse @0x13E9BB8 replaces the list. Rebuild all
+			// unlocked recipes, including ones gated by this newly cleared mission.
+			resp.permit_receipes = co_await gme::Town::permittedRecipes(transaction, identity, cleared);
+
 
 			// Fold this battle's statistics into the lifetime trophy archive.
 			// The client already reports all eight in rXvA1E5y with the same
@@ -616,31 +737,43 @@ HANDLEF(MissionEnd)
 			co_await gme::bumpArchiveCounters(transaction, identity, {
 				{ "zel_get",         static_cast<int64_t>(rewardZel)   },
 				{ "karma_get",       static_cast<int64_t>(rewardKarma) },
-				{ "quest_clear_cnt", 1 },
+				// A lost Frontier Gate battle is the one MissionEnd that is
+				// neither a clear nor a win.
+				{ "quest_clear_cnt", frontierLost ? 0 : 1 },
 				// TROPHY 200030 (total battle wins).  A cleared mission is a
-				// won battle; the two differ only once a mission can be failed
-				// part-way, which this flow has no concept of yet.
-				{ "quest_win_cnt",   1 },
+				// won battle.
+				{ "quest_win_cnt",   frontierLost ? 0 : 1 },
+				// TROPHY 100090 (Honor earned).  Its counterpart 100100 is
+				// bumped where Honor is spent, in Gacha.
+				{ "friend_p_get",    static_cast<int64_t>(honorEarned) },
 			});
+
+			// THE BATTLE IS OVER, won or lost, so it is no longer resumable.
+			// Inside the reward transaction: a rolled-back MissionEnd has to
+			// leave the resume offer standing, or a failed result would lose
+			// the run outright.
+			co_await gme::clearMissionBreak(transaction, identity);
 
 			resp.login_info = std::move(loginInfo);
 			resp.team_info = std::move(teamInfo);
+			// A level-up raises max energy, and with it the header's
+			// energy-refill threshold (see UserInfo).
+			resp.energy_recover.action_point_threshold = resp.team_info.max_action_point;
 			resp.unit_info = std::move(droppedUnits);
+
+			// Build and serialize before committing rewards. Any failure rolls
+			// back the clear too; all reads use the held SQLite transaction.
+			const auto permit = co_await gme::buildPermitPlace(transaction, identity);
+			if (const auto error = glz::write_json(resp, buffer); error)
+			    throw std::runtime_error(glz::format_error(error, buffer));
+			gme::injectPermitPlace(buffer, permit);
+
 		}
 		catch (...)
 		{
 			transaction->rollback();
 			throw;
 		}
-	}
-
-	std::string buffer;
-	const auto& writeError = glz::write_json(resp, buffer);
-	if (writeError)
-	{
-		const auto& glze = glz::format_error(writeError, buffer);
-		LOG_ERROR << "MissionEnd response serialization failed: " << glze;
-		co_return HandleResult::error("Serialization error", glze);
 	}
 
 	co_return HandleResult::success(buffer);
@@ -659,17 +792,9 @@ HANDLEF(MissionStart)
 
 	// BATTLE-CONTENT FALLBACK.
 	//
-	// deploy/archive/mission.json is the authored battle content — waves, AIs,
-	// monsters, battle groups — and it currently holds THREE missions (1, 2,
-	// 10).  Every other mission in the game has metadata in mission_mst.json
-	// but no authored fight, so starting one used to fail outright with
-	// "Archive error" (Frontier Gate hit this on mission 9010001 "Panache",
-	// 2026-08-07).
-	//
-	// Rather than block every unauthored mission, serve a template mission's
-	// content so the flow is exercisable.  This is the existing known
-	// limitation — "all missions use mission 10's enemy data" — made explicit
-	// and applied where it was previously an error.
+	// deploy/archive/mission.json supplies authored waves, monsters, and AIs.
+	// Only a mission missing from that archive borrows mission 10's content;
+	// an existing but malformed record must fail validation below.
 	//
 	// CRITICAL: only the CONTENT comes from the template.  resp.start_info is
 	// echoed from the request below, so the response still names the mission the
@@ -709,32 +834,36 @@ HANDLEF(MissionStart)
 		// own MST lists — only that the response is internally consistent about
 		// which mission it describes.
 		missionRecord->id = req.start_info.mission_id;
+		// Chest policies belong to authored content, not fallback missions.
+		missionRecord->mimic_chests.reset();
+		missionRecord->random_mimics.reset();
 
 		LOG_WARN << "MissionStart: mission " << req.start_info.mission_id
 		         << " has no authored battle content; serving mission "
 		         << kTemplateMissionId << "'s waves relabelled as this mission";
 	}
 
-	// Energy is only consumed for a mission we actually have data for.  The
-	// template's cost belongs to mission 10, not to whatever was requested, and
-	// charging a made-up amount is the §3.4 anti-pattern; the real per-mission
-	// cost lives in the archive (handbook §6.15 rule 3), which by definition
-	// does not have this one.  Frontier Gate in particular spends Hunter Orbs
-	// (Aube) client-side rather than energy — see §6.16.
-	if (!usingTemplate && missionRecord->energy_cost > 0)
-	{
-		const auto identity = (co_await gme::getUserIdentity(
-			theDb(),
-			req.login_info)).nonEmpty();
-		(co_await gme::UserEnergy::consume(
-			theDb(),
-			identity,
-			missionRecord->energy_cost)).nonEmpty();
-	}
-
 	MissionStartResp resp{};
 	resp.signal_key = req.signal_key;
 	resp.start_info = req.start_info;
+
+	// A Frontier Gate battle starts from the run's floors and score, which
+	// the client holds only when the server sends them (see
+	// gme/common/FrontierGate.hpp): zeros on a fresh run, the last
+	// MissionEnd's report after that.
+	if (req.frontier_run && !req.frontier_run->empty())
+	{
+		const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+		if (const auto run = co_await gme::loadFrontierRun(theDb(), identity))
+		{
+			const auto best = co_await gme::frontierBestScore(theDb(), identity, run->gateId);
+			resp.frontier_battle = std::vector<::FrontierBattleInfo>{ gme::frontierBattleInfo(*run, best) };
+		}
+		else
+		{
+			LOG_WARN << "MissionStart: Frontier Gate battle with no open run for " << identity.userId;
+		}
+	}
 
 	if (!MissionArchiver::populatePacket(*missionRecord, resp.mission_num)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.ais)
@@ -754,6 +883,49 @@ HANDLEF(MissionStart)
 		LOG_ERROR << "MissionStart response serialization failed: " << glze;
 		co_return HandleResult::error("Serialization error", glze);
 	}
+
+	// Preflight the complete response before spending: malformed archive data
+	// or a serialization failure must not consume energy or alter its timer.
+	// Energy is only consumed for a mission we actually have data for.  The
+	// template's cost belongs to mission 10, not to whatever was requested, and
+	// charging a made-up amount is the §3.4 anti-pattern; the real per-mission
+	// cost lives in the archive (handbook §6.15 rule 3), which by definition
+	// does not have this one.  Frontier Gate in particular spends Hunter Orbs
+	// (Aube) client-side rather than energy — see §6.16.
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	if (!usingTemplate && missionRecord->energy_cost > 0)
+	{
+		(co_await gme::UserEnergy::consume(
+			theDb(),
+			identity,
+			missionRecord->energy_cost)).nonEmpty();
+	}
+
+	// REMEMBER THE BORROWED HELPER so MissionEnd can pay the Honor for it.
+	//
+	// MissionEnd cannot work it out for itself: MissionEndRequest::createBody
+	// @0x13A78F8 sends 75 keys and h7eY3sAK is not one of them.  This request
+	// is where the helper is named -- "0" for a solo run, the helper's user id
+	// otherwise -- so it is recorded here and consumed (and cleared) there.
+	//
+	// Written unconditionally and outside the energy branch: a template mission
+	// still borrows a helper, an energy-free one still borrows a helper, and a
+	// solo start has to CLEAR whatever the last start left, or the next clear
+	// would pay for a helper it never took.  A start that fails validation
+	// above never reaches this line.
+	co_await theDb()->execSqlCoro(
+		"UPDATE user_info SET reinforce_user_id = $1 WHERE id = $2;",
+		gme::borrowedHelper(req.start_info.reinforce_user_id)
+			? req.start_info.reinforce_user_id
+			: std::string{},
+		identity.userId);
+
+	// A NEW BATTLE SUPERSEDES ANY INTERRUPTED ONE.  The resume path never comes
+	// through here -- MissionRestartScene fires MissionRestart and rebuilds from
+	// the client's own suspend data -- so a MissionStart means the player walked
+	// away from whatever was open.  The statement is a no-op when nothing is.
+	co_await gme::clearMissionBreak(theDb(), identity);
 
 	co_return HandleResult::success(buffer);
 }

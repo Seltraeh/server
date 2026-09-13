@@ -12,6 +12,7 @@
 namespace gme
 {
 struct UserIdentity;
+struct GrantedRewards;
 
 /*!
 * Loads the Mystery Chest definitions from archive_root/mystery_chest.json.
@@ -65,12 +66,15 @@ drogon::Task<std::vector<MysteryBoxInfo>> listMysteryChests(
 * @param identity Resolved caller.
 * @param boxId Chest to open, as sent in rEFRefr8.
 * @param rewards Filled with what was awarded, for the CoAp2aph reply.
+* @param granted Records any unit or item the chest created, so the reply can
+*        refresh those client caches.
 * @return true when a claimable chest matched and was opened.
 */
 drogon::Task<bool> claimMysteryChest(
 	db::Database database,
 	const UserIdentity& identity,
 	const std::string& boxId,
-	std::vector<MysteryBoxRewardInfo>& rewards);
+	std::vector<MysteryBoxRewardInfo>& rewards,
+	GrantedRewards& granted);
 
 } // namespace gme

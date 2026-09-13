@@ -2,6 +2,7 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/Trophies.hpp>
 
 // GetPlayerInfo (vUQrAV65 / 7pW4xF9H) — the Records / Archive screens' fetch.
 //
@@ -62,6 +63,12 @@ HANDLEF(GetPlayerInfo)
 
 	GetPlayerInfoResp resp = {};
 	resp.archive = co_await gme::loadTeamArchive(theDb(), identity);
+
+	// The star tiers beside those counters.  getTrophyGrade asks the client's
+	// UserTrophyGradeInfoList whether each grade row is present, so an absent
+	// list pins every trophy at 0 regardless of the numbers above.
+	if (!resp.archive.empty())
+		resp.trophy_grades = co_await gme::loadTrophyGrades(theDb(), identity, resp.archive.front());
 	resp.arena_archive = gme::zeroedArenaArchive(identity);
 	resp.arena_info = gme::zeroedArenaInfo(identity);
 	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());

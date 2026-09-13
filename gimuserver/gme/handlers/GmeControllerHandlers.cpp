@@ -86,6 +86,12 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("vUQrAV65", GetPlayerInfo, "7pW4xF9H");
 	REGISTER("9TvyNR5H", MissionEnd, "oINq0rfUFPx5MgmT");
 	REGISTER("jE6Sp0q4", MissionStart, "csiVLDKkxEwBfR70");
+	// An interrupted battle: the pay-to-revive prompt after a wipe, and the
+	// resume screen the next login lands on.  Both were unregistered, so both
+	// would have closed the session on use -- and without the first there is
+	// nothing for the second to resume.  See gme/handlers/MissionBreak.cpp.
+	REGISTER("p8B2i9rJ", MissionContinue, "G3FwvQfy5hcxHMen");
+	REGISTER("IP96ys7T", MissionRestart,  "0Zy3G9eD");
 	REGISTER("ruoB7bD8", ItemEdit, "DHEfRexCu0q5TAQm");
 	REGISTER("0IXGiC9t", ItemSphereEqp, "CZE56XAY");
 	REGISTER("I8il6EiI", ItemFavorite, "aRoIftRy");
@@ -96,6 +102,11 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("d36DaiJl", TutorialSkip, "p3qD61db");
 	REGISTER("T1nCVvx4", TutorialUpdate, "7hqzmR3T");
 	REGISTER("ynB7X5P9", UpdateInfoLight, "7kH9NXwC");
+	// Home's background polls (UpdateInfoLight.cpp).  Each closed the session
+	// with "Unsupported request" before it was registered — see the KDL.
+	REGISTER("RUV94Dqz", UpdateInfo,            "hy0P9xjsGJ6MAgb2");
+	REGISTER("68pTQAJv", NoticeUpdate,          "WHfcd53M");
+	REGISTER("5fc8bf2c", UserLoginCampaignInfo, "4eb7ce1b");
 	REGISTER("cTZ3W2JG", UserInfo, "ScJx6ywWEb0A3njT");
 	REGISTER("2p9LHCNh", UnitFavorite,            "cb4ESLa1");
 	REGISTER("0gUSE84e", UnitEvo,                 "biHf01DxcrPou5Qt");
@@ -116,6 +127,10 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("pTNB6yw3", CampaignBattleEnd,    "t06HFsXP");
 	REGISTER("5Imq3wC0", CampaignReceipt,      "4DAgP80B");
 	REGISTER("jF9Kkro4", CampaignEnd,          "4X9tBSg8");
+	REGISTER("D74TYRf1", CampaignDeckEdit,     "e2k4s6jc");
+	REGISTER("W2VU91I7", CampaignItemEdit,     "2Jd10iwn");
+	REGISTER("Utzc3oj5", CampaignSave,         "6xc3GhQF");
+	REGISTER("Ht2jeWV8", CampaignRestart,      "vm7LYZz4");
 
 	// Frontier Gate.  GroupIds/AES keys from the legacy handler registry; the
 	// remaining five (End cAJp7U4l, Save Ng73nFHJ, Continue uiFIMUH6, Ranking
@@ -125,6 +140,10 @@ static GmeHandler getHandler(std::string_view cmd)
 	// this the client errors before it ever requests M17pPotk.
 	REGISTER("nUAW2B0a", ChallengeBase,        "uE5Tsv6P");
 	REGISTER("2Kxi7rIB", ChallengeRanking,     "v1PzNE9f");
+	// The Frontier Hunter lobby's own state request.  It was unregistered until
+	// 2026-09-13, and deploy/log has it closing a live session at 07:28:53 that
+	// day right after the "challenge" intro played.
+	REGISTER("jF3AS4cp", ChallengeUserInfo,    "Nst6MK5m");
 	// Generic shop spend — reached by the Frontier Gate "use 1 Gem to restore
 	// Hunter Orbs" prompt.  Currently logs the body to capture ShopUseType.
 	REGISTER("xe8tiSf4", ShopUse,              "qthMXTQSkz3KfH9R");
@@ -159,6 +178,27 @@ static GmeHandler getHandler(std::string_view cmd)
 	// empty for now; registering it stops the unhandled-GroupId error from
 	// killing the screen before its other requests run.
 	REGISTER("YPBU7MD8", GetAchievementInfo, "AKjzyZ81");
+	// The Merit Point loop: claim a finished achievement, spend the points,
+	// and the detail page's Start / Give Up button.  Deliver (vsaXI4M0) is the
+	// one left — see gme/handlers/AchievementAction.cpp.
+	REGISTER("uq69mTtR", AchievementRewardReceive, "cbE74zBZ");
+	REGISTER("m9LiF6P2", AchievementTrade,         "0IWC9LVq");
+	REGISTER("dx5qvm7L", AchievementAccept,        "g9N1y7bc");
+
+	// Dual Brave Burst.  The Bond button on a unit's detail page only exists
+	// once DbbMst is on the wire, which UserInfo now does — so this had to be
+	// registered in the same change, or the first tap would close the session.
+	REGISTER("0EtanubR", DbbBond,       "Tr7dR4dR");
+	// The rank-up.  Named Unit*, not Dbb*, which is how it was missed on the
+	// first pass through this subsystem — see gme/handlers/UnitBondBoost.cpp.
+	REGISTER("tr5rOwro", UnitBondBoost, "fus9A2ut");
+
+	// Three requests with no state behind them here.  Registering them only
+	// stops an unhandled GroupId from closing the session, which looks like a
+	// crash on whatever screen fired it — see gme/handlers/Notice.cpp.
+	REGISTER("a5k36D28", BannerClick,      "a63Ghbi2");
+	REGISTER("5s4aVWfc", NoticeList,       "miMBpUZ3");
+	REGISTER("cuKwx5rF", NoticeReadUpdate, "o2rhxCmg");
 
 	// Brave Points & Rewards.  NOTE the 7-character key — every other key here
 	// is 8 or 16, and this one is correct: confirmed by a live decrypt.  It also
@@ -209,6 +249,16 @@ drogon::Task<GmeAction> GmeController::Handle(drogon::SessionPtr session, const 
 
 	if (!handler.func || !handler.key)
 	{
+		// Logged because nothing else records it: the request cannot be
+		// decrypted without its key, the client closes the session on this
+		// reply, and the missing http_log file is what once made a Home
+		// background poll (UpdateInfo) look like a Vortex crash.
+		LOG_ERROR << "Unsupported request " << header.id << " — no handler registered";
+		DumpLog logReq;
+		theServer()->tryOpenHttpDumpLog(header.id, logReq);
+		logReq << "UNSUPPORTED REQUEST: " << header.id
+			<< " (no handler registered; the client closes the session)\n";
+
 		GmeError err{};
 		err.cmd = GmeErrorCommand::Close;
 		err.flag = GmeErrorFlags::IsInError;

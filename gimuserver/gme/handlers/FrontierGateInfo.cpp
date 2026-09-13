@@ -5,8 +5,10 @@
 #include <gimuserver/gme/common/Common.hpp>
 
 #include <chrono>
+#include <sstream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 // FrontierGateInfo (M17pPotk) — the player's per-gate Frontier Gate progress.
 //
@@ -63,6 +65,7 @@ HANDLEF(FrontierGateInfo)
                 db::Data("score"),
                 db::Data("mission_id"),
                 db::Data("sel_support_id"),
+                db::Data("rewards_got"),
                 db::Lookup("user_id", identity.userId),
             });
     }
@@ -82,6 +85,7 @@ HANDLEF(FrontierGateInfo)
         int32_t score = 0;
         int32_t support_id = 0;
         std::string mission_id;
+        std::vector<std::string> rewards_got;
     };
     std::unordered_map<int32_t, Progress> savedById;
     for (const auto& row : rows.data)
@@ -92,6 +96,12 @@ HANDLEF(FrontierGateInfo)
         p.score      = row["score"].as<int32_t>();
         p.support_id = row["sel_support_id"].as<int32_t>();
         p.mission_id = row["mission_id"].as<std::string>();
+        std::stringstream got(row["rewards_got"].as<std::string>());
+        for (std::string id; std::getline(got, id, ',');)
+        {
+            if (!id.empty())
+                p.rewards_got.push_back(id);
+        }
         savedById.emplace(row["frogate_id"].as<int32_t>(), std::move(p));
     }
 
@@ -198,6 +208,10 @@ HANDLEF(FrontierGateInfo)
             // picked" and must stay an EMPTY list, not a list containing 0.
             if (it->second.support_id != 0)
                 entry.support_id_list.push_back(it->second.support_id);
+            // The rewards already paid on this gate.  FrontierGateRewardScene
+            // ::setList @0x15F5A54 draws the "obtained" mark on each reward
+            // whose id is in this list (gme::finishFrontierRun keeps it).
+            entry.reward_info_list.assign(it->second.rewards_got.begin(), it->second.rewards_got.end());
         }
         else
         {
@@ -211,11 +225,8 @@ HANDLEF(FrontierGateInfo)
             entry.state = 1;
         }
 
-        // progress_max (69bpUIXR), ranking (2wHGmJqm) and reward_info_list
-        // (JQ23rIvk) stay at their defaults.  The first two are named only from
-        // vtable slot position and may even be swapped for each other, so there
-        // is nothing honest to put in them; handbook §3.4 warns that guessing a
-        // value is worse than leaving the client its own default.
+        // ranking (2wHGmJqm) stays at its default: there is no leaderboard to
+        // rank against.
 
         resp.gates.emplace_back(std::move(entry));
     }

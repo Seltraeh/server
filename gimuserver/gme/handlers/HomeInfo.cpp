@@ -55,6 +55,8 @@ HANDLEF(HomeInfo)
     ::HomeInfoResp resp{};
 
     resp.team_info = std::move((co_await gme::getTeamInfo(db, identity)).nonEmpty());
+    // The header energy-refill threshold follows max energy (see UserInfo).
+    resp.energy_recover.action_point_threshold = resp.team_info.max_action_point;
 
     // Same read UserInfo makes at login — the shape the client provably
     // accepts.  Do not hand-assemble entries here: `received_order` is not a

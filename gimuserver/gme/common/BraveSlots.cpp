@@ -296,7 +296,8 @@ drogon::Task<bool> grantDailyBraveMedals(
 drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 	const db::Database database,
 	const UserIdentity& identity,
-	const int32_t drawCount)
+	const int32_t drawCount,
+	GrantedRewards& granted)
 {
 	// Seeds on first sight, so a player who goes straight to the machine can
 	// still pull.
@@ -381,7 +382,7 @@ drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 			}
 			for (uint32_t i = 0; i < prize->target_cnt; ++i)
 			{
-				co_await gme::addUserUnit(database, identity, *unit);
+				granted.userUnitIds.push_back(co_await gme::addUserUnit(database, identity, *unit));
 			}
 			break;
 		}
@@ -389,6 +390,7 @@ drogon::Task<std::vector<SlotgameResultInfo>> playBraveSlot(
 		case 5:
 		case 7:
 			co_await gme::addUserItem(database, identity, prize->target_id, prize->target_cnt);
+			granted.items = true;
 			break;
 		case 12:
 			// The medal symbol paying medals back — the wiki's "1 Raid Medal"

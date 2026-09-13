@@ -2,6 +2,7 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/FriendPoints.hpp>
 
 #include <ctime>
 
@@ -136,7 +137,7 @@ HANDLEF(FriendGet)
             // === ReinforcementInfo entry (xZH6EIQ7) — the production-canonical
             // shape for FriendGet responses.
             ReinforcementInfo ri{};
-            ri.user_id            = "n9ZMPC0t";       // placeholder friend account id
+            ri.user_id            = gme::kSyntheticHelperUserId;
             ri.handle_name        = "DecompFriend";
             ri.team_lv            = 999;
             ri.target_lv          = unitLv;
@@ -155,8 +156,14 @@ HANDLEF(FriendGet)
             ri.base_heal          = baseHeal;
             ri.add_heal           = addHeal;
             ri.ext_heal           = extHeal;
-            ri.friend_point       = 0;
-            ri.normal_friend_point = 0;
+            // THE HONOR GATE, not the amount.  ReinforcementInfo::
+            // getFriendPoint @0x126DDA8 returns 0 flat while this is < 1 and
+            // otherwise reads the 6e4b7sQt singleton below, so a zero here
+            // pinned every card to "Honor +0" no matter what else was sent.
+            // The values match what that singleton will hand back for this
+            // helper, which is a friend (friend_type 1 → existTypeOK).
+            ri.friend_point       = gme::kHonorPerFriendHelper;
+            ri.normal_friend_point = gme::kHonorPerNormalHelper;
             ri.skill_id           = skillId;
             ri.skill_lv           = skillLv;
             ri.unit_type_id       = unitTypeId;
@@ -169,7 +176,7 @@ HANDLEF(FriendGet)
             // === FriendInfo entry (tojMy68W) — same data into FriendInfoList
             // for any UI consumer that reads from there.
             FriendInfo fi{};
-            fi.user_id            = "n9ZMPC0t";
+            fi.user_id            = gme::kSyntheticHelperUserId;
             fi.handle_name        = "DecompFriend";
             fi.team_lv            = 999;
             fi.friend_type        = 1;
@@ -214,6 +221,11 @@ HANDLEF(FriendGet)
     {
         LOG_WARN << "FriendGet: friend query failed: " << ex.base().what();
     }
+
+    // What each of those cards is worth (6e4b7sQt).  A SINGLETON the client
+    // defaults to "0" in its ctor, and the picker this reply draws is its only
+    // reader — so it goes out with the list rather than only at login.
+    resp.friend_point_info = gme::friendPointInfo();
 
     std::string buffer{};
     if (const auto& ec = glz::write_json(resp, buffer); ec)

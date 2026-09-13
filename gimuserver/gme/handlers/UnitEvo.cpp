@@ -175,6 +175,7 @@ HANDLEF(UnitEvo)
 
     // Step 3: return spheres equipped on the evo materials, then DELETE them —
     // deleting without the return would destroy the equipped items.
+    uint32_t spheresReturned = 0;
     if (!matIds.empty())
     {
         std::string matList;
@@ -183,7 +184,7 @@ HANDLEF(UnitEvo)
             if (i) matList += ',';
             matList += std::to_string(matIds[i]);
         }
-        co_await gme::returnEquippedSpheres(theDb(), identity, matList);
+        spheresReturned = co_await gme::returnEquippedSpheres(theDb(), identity, matList);
         co_await theDb()->execSqlCoro(
             "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + matList + ");",
             std::string(kUserId)
@@ -247,6 +248,16 @@ HANDLEF(UnitEvo)
 
     resp.team_info = std::move(
         (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+
+    // Spheres handed back from the materials: no evolution scene touches the
+    // client warehouse, so they need the full snapshot (UnitEvoResp in
+    // handlers.kdl).
+    if (spheresReturned > 0)
+    {
+        auto warehouse = co_await gme::loadWarehouseSnapshot(theDb(), identity);
+        resp.warehouse_info = std::move(warehouse.warehouse);
+        resp.item_dictionary_info = std::move(warehouse.dictionary);
+    }
 
     {
         UnitReinforceEntry rd = {};

@@ -86,7 +86,7 @@ HANDLEF(UnitSell)
     // Step 2: return any spheres equipped on the sold units to the warehouse,
     // then delete the units.  Without the return, the equipped items would be
     // destroyed with the row.
-    co_await gme::returnEquippedSpheres(theDb(), identity, idList);
+    const auto spheresReturned = co_await gme::returnEquippedSpheres(theDb(), identity, idList);
     co_await theDb()->execSqlCoro(
         "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + idList + ");",
         std::string(kUserId)
@@ -101,6 +101,16 @@ HANDLEF(UnitSell)
     UnitSellResp resp = {};
     resp.team_info = std::move(
         (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+
+    // UnitSellTopScene2::sellUnit drops the sold units from the client roster
+    // itself, but nothing on the sale path touches the client warehouse, so
+    // spheres handed back need the full snapshot (UnitSellResp in handlers.kdl).
+    if (spheresReturned > 0)
+    {
+        auto warehouse = co_await gme::loadWarehouseSnapshot(theDb(), identity);
+        resp.warehouse_info = std::move(warehouse.warehouse);
+        resp.item_dictionary_info = std::move(warehouse.dictionary);
+    }
 
     std::string buffer{};
     if (const auto& ec2 = glz::write_json(resp, buffer); ec2)

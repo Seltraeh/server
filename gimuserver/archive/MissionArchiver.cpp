@@ -11,13 +11,78 @@
 #include <algorithm>
 #include <cstddef>
 #include <exception>
+#include <filesystem>
 #include <format>
 #include <set>
+#include <span>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
+
+namespace
+{
+// Wave groups retain ids 1..N; each chest has a single-monster side group.
+// entryMimic @0x10C218C looks up that group without advancing BattleGroupMst.
+std::vector<std::span<const BattleMonster>> missionMonsterGroups(const MissionRecord& record)
+{
+	std::vector<std::span<const BattleMonster>> groups;
+	groups.reserve(record.stages.size() + (record.mimic_chests ? record.mimic_chests->size() : 0));
+	for (const auto& stage : record.stages)
+		groups.emplace_back(stage.battle_monsters);
+	if (record.mimic_chests)
+		for (const auto& chest : *record.mimic_chests)
+			groups.emplace_back(&chest.monster, 1);
+	if (record.random_mimics && record.random_mimics->chance != 0)
+		for (const auto& monster : record.random_mimics->monsters)
+			groups.emplace_back(&monster, 1);
+	return groups;
+}
+
+bool validMimicMonster(const BattleMonster& monster)
+{
+	// Captures use the same species as the side-group monster, whose assets
+	// already travel with this response. Zero chance keeps the one-token form.
+	return monster.id != 0 && monster.hp != 0 && monster.unit_drop_chance <= 100
+		&& (monster.unit_drop_chance == 0
+			|| (monster.unit_drop_id != 0 && monster.unit_drop_id == monster.unit_id
+				&& monster.unit_drop_level > 0 && monster.unit_drop_type <= 6))
+		&& monster.treasure_chest_chance == 0 && monster.treasure_drops.empty();
+}
+
+bool validRandomMimics(const RandomMimicChests& policy)
+{
+	return policy.chance <= 100
+		&& (policy.chance == 0 || !policy.monsters.empty())
+		&& std::all_of(policy.monsters.begin(), policy.monsters.end(), validMimicMonster);
+}
+
+bool validMimicChests(const MissionRecord& record)
+{
+	if (record.random_mimics && !validRandomMimics(*record.random_mimics))
+	{
+		LOG_ERROR << "Invalid random Mimic policy in mission " << record.id;
+		return false;
+	}
+	if (!record.mimic_chests)
+		return true;
+	std::set<std::pair<uint32_t, uint32_t>> hosts;
+	for (const auto& chest : *record.mimic_chests)
+	{
+		const auto& monster = chest.monster;
+		if (chest.stage == 0 || chest.stage > record.stages.size()
+			|| chest.monster_order >= record.stages[chest.stage - 1].battle_monsters.size()
+			|| chest.chance > 100 || !hosts.emplace(chest.stage, chest.monster_order).second
+			|| !validMimicMonster(monster))
+		{
+			LOG_ERROR << "Invalid Mimic chest in mission " << record.id;
+			return false;
+		}
+	}
+	return true;
+}
+} // namespace
 
 std::string MissionArchiver::encodeAIConditions(const AiAction& action)
 {
@@ -157,6 +222,18 @@ std::string MissionArchiver::encodeUnitDrop(size_t monsterIdx, const BattleMonst
 		dropType);
 }
 
+std::string MissionArchiver::encodeMimicDrop(size_t host, size_t group, const BattleMonster& monster)
+{
+	auto drop = std::format("{}/2/{}", host, group);
+	// BattleTreasure::create @0x10E7AAC reads tokens 3/4/5 for capture;
+	// entryMimic @0x10C2314 attaches the BattleDropUnit to the side enemy.
+	// Reuse the normal drop roll with order zero: group:0:0:unit:level:type.
+	// Slots 1/2 are unused in that consumer. Never emit a 2-5 token payload.
+	const auto capture = encodeUnitDrop(0, monster);
+	if (!capture.empty()) drop += ':' + capture;
+	return drop;
+}
+
 std::string MissionArchiver::encodeTreasureDrop(size_t monsterIdx, const BattleMonster& monster)
 {
 	if (monster.treasure_drops.empty()
@@ -247,7 +324,37 @@ std::string MissionArchiver::encodeMissionDropInfo(const MissionRecord& record)
 			}
 			unitDrops += unitDrop;
 
-			const auto treasureDrop = encodeTreasureDrop(monsterIdx, stage.battle_monsters[monsterIdx]);
+			std::string treasureDrop;
+			bool mimicHost = false;
+			if (record.mimic_chests)
+			{
+				for (size_t i = 0; i < record.mimic_chests->size(); ++i)
+				{
+					const auto& chest = (*record.mimic_chests)[i];
+					if (chest.stage != stageId || chest.monster_order != monsterIdx)
+						continue;
+					mimicHost = true;
+					if (chest.chance != 0 && RandomUInt(1, 100) <= chest.chance)
+					{
+						treasureDrop = encodeMimicDrop(monsterIdx, record.stages.size() + i + 1, chest.monster);
+					}
+					break;
+				}
+			}
+			if (!mimicHost)
+				treasureDrop = encodeTreasureDrop(monsterIdx, stage.battle_monsters[monsterIdx]);
+			// Roll only AFTER an ordinary chest exists, preserving its original
+			// appearance rate. A failed substitution leaves its reward intact.
+			if (!mimicHost && !treasureDrop.empty() && record.random_mimics
+				&& record.random_mimics->chance != 0
+				&& RandomUInt(1, 100) <= record.random_mimics->chance)
+			{
+				const auto& pool = record.random_mimics->monsters;
+				const auto selected = RandomUInt(0, static_cast<uint32_t>(pool.size() - 1));
+				const auto fixedCount = record.mimic_chests ? record.mimic_chests->size() : 0;
+				treasureDrop = encodeMimicDrop(monsterIdx,
+					record.stages.size() + fixedCount + selected + 1, pool[selected]);
+			}
 			if (!treasureDrop.empty() && !treasureDrops.empty())
 			{
 				treasureDrops += '-';
@@ -293,6 +400,64 @@ void MissionArchiver::setup(const Json::Value& serverObj)
 		return;
 	}
 
+	// An optional shared archive policy avoids copying the same balanced
+	// catalog into hundreds of missions. No player state is persisted here.
+	randomMimics_.reset();
+	const auto policyPath = std::filesystem::path(archiveRoot) / "mimic.json";
+	if (std::filesystem::exists(policyPath))
+	{
+		try
+		{
+			auto policy = LoadJson<RandomMimicChests>(policyPath.string());
+			if (validRandomMimics(policy))
+				randomMimics_ = std::move(policy);
+			else
+				LOG_ERROR << "Invalid mimic.json: random chest substitution disabled";
+		}
+		catch (const std::exception& ex)
+		{
+			LOG_ERROR << "Unable to load mimic.json: " << ex.what();
+		}
+	}
+
+	// Every capturable monster gets at least a 40% capture chance.  Evan's
+	// offline policy (2026-09-11) — authored, not recovered data: the
+	// regenerated archive left 216 of 942 missions with nothing to capture and
+	// most of the rest at 5%.  "Capturable" is exactly what MissionEnd will
+	// accept — parseUnitDrops -> fromArchivedUnit needs a UnitArchiver record —
+	// so a special boss whose unit does not resolve stays loot-only rather than
+	// reporting a capture that would abort the whole reward.  A higher authored
+	// chance (the parades' 60, the tutorial's scripted 100) is left alone, and
+	// Mimic side-monsters keep their own policy (they are not stage monsters).
+	constexpr uint32_t kMinCaptureChance = 40;
+	size_t raisedCaptures = 0;
+	for (auto& mission : missions)
+	{
+		// The tutorial's missions 1 and 2 keep their scripted captures exactly:
+		// forced tutorial navigation walks a unit list it expects to know.
+		if (mission.id == 1 || mission.id == 2)
+			continue;
+
+		for (auto& stage : mission.stages)
+		{
+			for (auto& monster : stage.battle_monsters)
+			{
+				const auto unitId = monster.unit_drop_id != 0 ? monster.unit_drop_id : monster.unit_id;
+				if (unitId == 0 || monster.unit_drop_chance >= kMinCaptureChance
+					|| !UnitArchiver::instance().lookup(unitId))
+				{
+					continue;
+				}
+				monster.unit_drop_id = unitId;
+				monster.unit_drop_level = std::max<uint32_t>(monster.unit_drop_level, 1);
+				monster.unit_drop_chance = kMinCaptureChance;
+				++raisedCaptures;
+			}
+		}
+	}
+	LOG_INFO << "Mission archive: raised " << raisedCaptures << " capturable monster(s) to a "
+		<< kMinCaptureChance << "% capture chance";
+
 	AiRecordCache nextAiCache;
 	nextAiCache.reserve(ais.size());
 	for (auto& ai : ais)
@@ -325,16 +490,52 @@ std::optional<MissionRecord> MissionArchiver::lookup(MissionId mission_id) const
 		return std::nullopt;
 	}
 
-	return it->second;
+	auto record = it->second;
+	if (!record.random_mimics && randomMimics_ && randomMimics_->chance != 0)
+	{
+		bool hasChests = false;
+		for (const auto& stage : record.stages)
+			for (const auto& monster : stage.battle_monsters)
+				hasChests |= monster.treasure_chest_chance != 0 && !monster.treasure_drops.empty();
+		if (hasChests)
+		{
+			RandomMimicChests selected{};
+			selected.chance = randomMimics_->chance;
+			for (const auto& candidate : randomMimics_->monsters)
+			{
+				const BattleMonster* existing = nullptr;
+				for (const auto& stage : record.stages)
+					for (const auto& monster : stage.battle_monsters)
+						if (!existing && monster.unit_id == candidate.unit_id)
+							existing = &monster;
+				if (existing)
+				{
+					auto monster = *existing;
+					// Keep existing battle stats, but use the catalog's capture policy.
+					monster.unit_drop_id = candidate.unit_drop_id;
+					monster.unit_drop_level = candidate.unit_drop_level;
+					monster.unit_drop_type = candidate.unit_drop_type;
+					monster.unit_drop_chance = candidate.unit_drop_chance;
+					monster.treasure_chest_chance = 0;
+					monster.treasure_drops.clear();
+					selected.monsters.push_back(std::move(monster));
+				}
+			}
+			if (selected.monsters.empty())
+				selected.monsters.push_back(randomMimics_->monsters.front());
+			record.random_mimics = std::move(selected);
+		}
+	}
+	return record;
 }
 
 bool MissionArchiver::populatePacket(const MissionRecord& record, std::vector<AiMst>& msts)
 {
 	// Gather unique AI ids referenced by the mission record.
 	std::set<AiId> ids;
-	for (const auto& stage : record.stages)
+	for (const auto& monsters : missionMonsterGroups(record))
 	{
-		for (const auto& monster : stage.battle_monsters)
+		for (const auto& monster : monsters)
 		{
 			ids.insert(monster.ai_id);
 		}
@@ -438,12 +639,13 @@ bool MissionArchiver::populatePacket(const MissionRecord& record, std::vector<Mo
 {
 	msts.clear();
 	msts.reserve(record.stages.size() * kMaxMonstersPerStage);
-	for (size_t stageIdx = 0; stageIdx < record.stages.size(); ++stageIdx)
+	const auto groups = missionMonsterGroups(record);
+	for (size_t stageIdx = 0; stageIdx < groups.size(); ++stageIdx)
 	{
-		const auto& stage = record.stages[stageIdx];
-		for (size_t monsterIdx = 0; monsterIdx < stage.battle_monsters.size(); ++monsterIdx)
+		const auto& monsters = groups[stageIdx];
+		for (size_t monsterIdx = 0; monsterIdx < monsters.size(); ++monsterIdx)
 		{
-			const auto& monster = stage.battle_monsters[monsterIdx];
+			const auto& monster = monsters[monsterIdx];
 
 			// A special monster (a story boss) is one the client cannot resolve
 			// to a playable unit: GameScene::requestMonsterFiles @0x160F648 asks
@@ -562,9 +764,9 @@ bool MissionArchiver::populatePacket(
 	};
 
 	std::vector<MonsterCgsMst> rows;
-	for (const auto& stage : record.stages)
+	for (const auto& monsters : missionMonsterGroups(record))
 	{
-		for (const auto& monster : stage.battle_monsters)
+		for (const auto& monster : monsters)
 		{
 			if (!monster.visuals)
 			{
@@ -605,13 +807,14 @@ bool MissionArchiver::populatePacket(
 {
 	msts.clear();
 	msts.reserve(record.stages.size() * kMaxMonstersPerStage);
-	for (size_t stageIdx = 0; stageIdx < record.stages.size(); ++stageIdx)
+	const auto groups = missionMonsterGroups(record);
+	for (size_t stageIdx = 0; stageIdx < groups.size(); ++stageIdx)
 	{
-		const auto& stage = record.stages[stageIdx];
+		const auto& monsters = groups[stageIdx];
 		const auto stageId = static_cast<uint32_t>(stageIdx + 1);
-		for (size_t monsterIdx = 0; monsterIdx < stage.battle_monsters.size(); ++monsterIdx)
+		for (size_t monsterIdx = 0; monsterIdx < monsters.size(); ++monsterIdx)
 		{
-			const auto& monster = stage.battle_monsters[monsterIdx];
+			const auto& monster = monsters[monsterIdx];
 
 			msts.push_back({
 				.battle_monster_group_id = stageId,
@@ -670,6 +873,8 @@ bool MissionArchiver::populatePacket(const MissionRecord& record, std::vector<Ba
 
 bool MissionArchiver::populatePacket(const MissionRecord& record, MissionNumInfo& mst)
 {
+	if (!validMimicChests(record))
+		return false;
 	mst.serial_id = record.id;
 	mst.drop_info = encodeMissionDropInfo(record);
 	return true;

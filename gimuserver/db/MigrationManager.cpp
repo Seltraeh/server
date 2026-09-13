@@ -922,6 +922,297 @@ static void RegisterMigrations(MigrationMap& map)
 			"WHERE sphere_ext = 0 AND eqip_item_id2 = 0;");
 	});
 
+	// THE PARADE'S 30-MINUTE WINDOW.  DungeonKeyMst.limit_sec is 1800 on all
+	// three keys, but nothing ever tracked when a key was spent, so the window
+	// had nowhere to live: DungeonKeyUse set active_type and the parade was
+	// open forever in the DB while the client re-locked it instantly.
+	//
+	// It re-locked because UserDungeonKeyInfo.cnt (H6k1LIxC) was never assigned
+	// and went out as 0 -- the client reads it as the seconds remaining on the
+	// active tier, so every reply said "zero seconds left".  That also settles
+	// the field's open question in net/user.kdl, which had it CONFIRMED as
+	// setCnt but UNVERIFIED as to which count.
+	//
+	// Stored as an absolute epoch second rather than a countdown so it survives
+	// a restart and needs no ticking; cnt is derived from it per response.
+	migrate("06092026_AddUserDungeonKeysActiveUntil", {
+		p->execSqlSync(
+			"ALTER TABLE user_dungeon_keys ADD COLUMN active_until INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// WHICH TIER was bought.  active_type cannot answer that: DungeonKeyMst's
+	// usage_pattern gives tiers 1 and 3 the SAME active_type (1), so the spend
+	// count is the only thing that identifies the rung -- and the rung is what
+	// says which missions the player just paid to enter.
+	//
+	// Without it PermitPlace had to permit every parade mission unconditionally,
+	// which showed the Super and Mega variants alongside the basic ones you
+	// actually bought.
+	migrate("07092026_AddUserDungeonKeysActiveTier", {
+		p->execSqlSync(
+			"ALTER TABLE user_dungeon_keys ADD COLUMN active_tier INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// Grand Quest rewards (CampaignEnd).
+	//
+	// rewards_got: the once-only Grand Mission rewards (F_GRAND_MISSION_REWARD_MST
+	// rows with init_flag 1) this user has earned on a mission, as the comma list
+	// the client reads back from CampaignMissionInfo.get_reward (JQ23rIvk) —
+	// CampaignRewardScene::isGetRewardCheck splits it on ','.
+	migrate("11092026_AddUserCampaignMissionsRewardsGot", {
+		p->execSqlSync(
+			"ALTER TABLE user_campaign_missions ADD COLUMN rewards_got TEXT NOT NULL DEFAULT '';");
+	});
+
+	// The run in progress: the zel/karma totals the client reports in every
+	// CampaignBattleEnd archive (wVTBA6b5 — cumulative for the run, so the last
+	// one wins), paid out by a clearing CampaignEnd; run_open, which a
+	// CampaignEnd closes so a repeated end cannot pay twice; and the Grand Quest
+	// item loadout (equipped / reserve lists as JSON), which lives outside the
+	// warehouse while it is set.
+	migrate("11092026_AddUserCampaignStateRun", {
+		p->execSqlSync("ALTER TABLE user_campaign_state ADD COLUMN run_zel INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync("ALTER TABLE user_campaign_state ADD COLUMN run_karma INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync("ALTER TABLE user_campaign_state ADD COLUMN run_open INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync("ALTER TABLE user_campaign_state ADD COLUMN eqp_items TEXT NOT NULL DEFAULT '';");
+		p->execSqlSync("ALTER TABLE user_campaign_state ADD COLUMN rsv_items TEXT NOT NULL DEFAULT '';");
+	});
+
+	// Unit Selector tickets the user holds, keyed by the selector MST's ticket id
+	// (UnitSelectorGachaMst XIvaD6Jp).  They are not V2 summon tickets: a
+	// present of type 8005 grants them and UnitSelectorGachaTicket spends them;
+	// the client reads the counts from UnitSelectorGachaUserInfo (CGHaOZda).
+	// A spent-out row stays at 0 so the zero can still be sent.
+	migrate("11092026_CreateUserSelectorTickets", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_selector_tickets ("
+			"user_id   TEXT    NOT NULL,"
+			"ticket_id TEXT    NOT NULL,"
+			"count     INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, ticket_id)"
+			");"
+		);
+	});
+
+	// Frontier Gate rewards.
+	//
+	// user_frontier_gates.rewards_got: the F_FROGATE_REWARD_MST ids this user
+	// has been paid on the gate, as the comma list FrontierGateInfo sends back
+	// as reward_info_list (JQ23rIvk) — FrontierGateRewardScene::setList draws
+	// the "obtained" mark from exactly that list, so every reward pays once.
+	//
+	// The run row gains the state each Frontier Gate MissionEnd reports
+	// (eIQ79KO2): floors cleared, the running score, the bonus-tally note and
+	// the overdrive info.  The client only keeps them between battles if the
+	// server hands them back (FrontierBattleInfoResponse is their sole setter),
+	// and the end of the run is paid from them — FrontierGateEnd carries none.
+	migrate("11092026_AddFrontierGateRewards", {
+		p->execSqlSync("ALTER TABLE user_frontier_gates ADD COLUMN rewards_got TEXT NOT NULL DEFAULT '';");
+		p->execSqlSync("ALTER TABLE user_frontier_gate_run ADD COLUMN run_score INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync("ALTER TABLE user_frontier_gate_run ADD COLUMN run_progress INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync("ALTER TABLE user_frontier_gate_run ADD COLUMN run_note TEXT NOT NULL DEFAULT '';");
+		p->execSqlSync("ALTER TABLE user_frontier_gate_run ADD COLUMN run_od_info TEXT NOT NULL DEFAULT '';");
+	});
+
+	// Frontier Gate rewards pay the moment the run reaches them, not when it
+	// ends: a run abandoned by starting the gate again would otherwise lose
+	// everything it earned.  run_rewards is what this run has been paid, so the
+	// result screen can still list the whole run.
+	//
+	// achieve_point is the Merit Point balance — the number the Randall
+	// Achievement screen prints (RandallAchievementDedicateScene::setAchievePoint
+	// @0x1A39D58 reads UserAchievementInfo +0x18, which is wire key idfCDG70).
+	// Frontier Gate pays it at the end of a run.
+	migrate("12092026_AddFrontierGateRunRewardsAndMerit", {
+		p->execSqlSync("ALTER TABLE user_frontier_gate_run ADD COLUMN run_rewards TEXT NOT NULL DEFAULT '';");
+		p->execSqlSync("ALTER TABLE user_info ADD COLUMN achieve_point INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// The quest-prep screen's BONUS item slots (nAligJSQ), the second bar
+	// beside the battle items.  Same shape as user_equip_items, including the
+	// +100 second run ItemEditRequest::createBody writes.
+	migrate("12092026_CreateUserEquipBonusItems", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_equip_bonus_items ("
+			"user_id     TEXT    NOT NULL,"
+			"disp_order  INTEGER NOT NULL,"
+			"item_id     INTEGER NOT NULL,"
+			"item_num    INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, disp_order)"
+			");"
+		);
+	});
+
+	// Event tokens — the per-event currencies (token 8 "Rift Token" is the
+	// Frontier Gate's, paid by 505 F_FROGATE_REWARD_MST rows as present type
+	// 8004).  Token ids stay TEXT because the wire form is a string and the
+	// client normalises "0008" to "8" itself (readParam @0x1C492EC).
+	migrate("12092026_CreateUserEventTokens", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_event_tokens ("
+			"user_id  TEXT    NOT NULL,"
+			"token_id TEXT    NOT NULL,"
+			"count    INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, token_id)"
+			");"
+		);
+	});
+
+	// Where each Grand Quest deck stands on the map.  The client owns the
+	// position while a run is on screen and reports it back in the Yusr3Zg5
+	// group of CampaignSave / CampaignBattleEnd / CampaignEnd
+	// (createBodySaveDataPos @0x13B4170); CampaignStart sends it back so a
+	// resumed run picks up where it stopped instead of at point 0.
+	migrate("13092026_CreateUserCampaignDeckPos", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_campaign_deck_pos ("
+			"user_id       TEXT    NOT NULL,"
+			"deck_num      INTEGER NOT NULL,"
+			"now_point_num INTEGER NOT NULL DEFAULT 0,"
+			"arrival_order INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, deck_num)"
+			");"
+		);
+	});
+
+	// Randall Achievements.  `reward_received` is the claim latch: an
+	// achievement's Merit Points are paid once, by AchievementRewardReceive, and
+	// the row exists only once something has happened to it (progress itself is
+	// derived from the counters, not stored).
+	migrate("13092026_CreateUserAchievementSubjects", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_achievement_subjects ("
+			"user_id         TEXT    NOT NULL,"
+			"subject_id      TEXT    NOT NULL,"
+			"reward_received INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, subject_id)"
+			");"
+		);
+	});
+
+	// Purchases from the Merit Point shop, counted against
+	// AchievementTradeMst.limit_count.
+	migrate("13092026_CreateUserAchievementTrades", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_achievement_trades ("
+			"user_id  TEXT    NOT NULL,"
+			"trade_id TEXT    NOT NULL,"
+			"count    INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, trade_id)"
+			");"
+		);
+	});
+
+	// Dual Brave Burst bonds -- one row per PAIR, keyed by the main unit.
+	//
+	// Keyed that way because the client is: UserUnitDbbInfoList is a dictionary
+	// on the main user_unit_id and builds its own reverse map for the sub, so a
+	// mirror row would make each unit claim the other as its partner.  dbb_id
+	// is cached on the row rather than rediscovered, because the level list is
+	// keyed by it and a unit can be fused away under a stored bond.
+	migrate("13092026_CreateUserUnitDbb", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_unit_dbb ("
+			"user_id             TEXT    NOT NULL,"
+			"user_unit_id        INTEGER NOT NULL,"
+			"bonded_user_unit_id INTEGER NOT NULL,"
+			"dbb_id              TEXT    NOT NULL,"
+			"bond_level          INTEGER NOT NULL DEFAULT 1,"
+			"PRIMARY KEY (user_id, user_unit_id)"
+			");"
+		);
+	});
+
+	// Alternate unit art the player has unlocked (Merit shop reward type 15).
+	//
+	// Kept apart from user_unit_dictionary even though the flag it produces
+	// lives on that row: a dictionary row means "this player has SEEN this
+	// species", and inserting one to hold an art purchase would put an
+	// un-obtained unit in the Unit Guide.  The purchase is recorded here and
+	// the flag is derived at read time, so buying art for a unit you do not
+	// own yet simply lights up when you get it.
+	migrate("13092026_CreateUserUnitAltArt", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_unit_alt_art ("
+			"user_id TEXT    NOT NULL,"
+			"unit_id INTEGER NOT NULL,"
+			"PRIMARY KEY (user_id, unit_id)"
+			");"
+		);
+	});
+
+	// Honor ("Friend Point") lifetime totals -- trophies 100090 and 100100.
+	//
+	// Trophies.hpp already pointed 100090/100100 at UserTeamArchive::friend_p_get
+	// and friend_p_use, but no column fed them, so both trophies read 0 and
+	// Achievements.hpp had to leave the 2000 band (Honor Points accumulated)
+	// at -1 with a note saying user_info.friend_points is the CURRENT balance
+	// and falls when spent.  friend_p_get is that missing lifetime total.
+	migrate("13092026_AddUserTeamArchiveHonorCounters", {
+		for (const auto* col : {
+			"friend_p_get INTEGER NOT NULL DEFAULT 0",
+			"friend_p_use INTEGER NOT NULL DEFAULT 0" })
+		{
+			p->execSqlSync(std::string("ALTER TABLE user_team_archive ADD COLUMN ") + col + ";");
+		}
+	});
+
+	// Which Summoner Helper the open mission borrowed, so MissionEnd can pay
+	// the Honor for it.
+	//
+	// MissionEnd's request does not carry the helper -- MissionEndRequest::
+	// createBody @0x13A78F8 sends 75 keys and h7eY3sAK is not among them -- so
+	// the id has to survive from MissionStart, which does carry it (captures
+	// show "0" for a solo run and the helper's user id otherwise).  It is
+	// durable rather than in-memory on purpose: a battle can outlive the
+	// process, and a crashed client still ends its mission on the next launch.
+	migrate("13092026_AddUserInfoReinforceUserId", {
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN reinforce_user_id TEXT NOT NULL DEFAULT '';");
+	});
+
+	// Hunter Orbs -- the Frontier Gate / Frontier Hunter attempt currency.
+	//
+	// They are NOT team_info's fight_point (that is the Arena Orbs, per
+	// ShopHelFightScene's "Arena Orbs" title).  They live in the client's
+	// ChallengeHeaderInfo singleton, written only by the kN2i7qds response,
+	// which this server had never sent -- so the count sat at 0 forever and
+	// FrontierGateConditionScene::startCheck took its no-orbs branch on every
+	// entry.
+	//
+	// Stored the way energy is: the count, plus the unix time the orb currently
+	// regenerating will land.  `rest_ts` 0 means nothing is pending (the count
+	// is at the cap, or has never been spent).  Starting the column at the cap
+	// rather than 0 so an existing save is not retroactively broke; the cap
+	// itself is DefineMst max_frohun_p, read at runtime.
+	migrate("13092026_AddUserInfoHunterOrbs", {
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN hunter_orbs INTEGER NOT NULL DEFAULT 3;");
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN hunter_orb_rest_ts INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// An interrupted battle, so the next login can offer to resume it.
+	//
+	// The battle STATE is the client's -- MissionRestartScene reloads the blob
+	// from its own SaveData -- but the trigger is not: LoginScene only reaches
+	// the resume screen when the server's 5PR2VmH1 carries a non-zero state.
+	// Without somewhere to keep that, a revival paid for in gems is forgotten
+	// the moment the client closes.
+	//
+	// One battle at a time, so these live on user_info rather than a table:
+	// MissionInfo is a client singleton and the player cannot be in two.
+	// `state` 0 means nothing open, which is also the column's default, so an
+	// existing save is untouched until it actually pays for a continue.
+	migrate("13092026_AddUserInfoMissionBreak", {
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN mission_break_serial TEXT NOT NULL DEFAULT '';");
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN mission_break_info TEXT NOT NULL DEFAULT '';");
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN mission_break_state INTEGER NOT NULL DEFAULT 0;");
+	});
+
 }
 
 /*!

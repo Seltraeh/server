@@ -204,7 +204,8 @@ drogon::Task<bool> claimMysteryChest(
 	const db::Database database,
 	const UserIdentity& identity,
 	const std::string& boxId,
-	std::vector<MysteryBoxRewardInfo>& rewards)
+	std::vector<MysteryBoxRewardInfo>& rewards,
+	GrantedRewards& granted)
 {
 	const auto rows = (co_await db::DatabaseInterface::read(
 		database,
@@ -278,7 +279,7 @@ drogon::Task<bool> claimMysteryChest(
 			}
 			for (uint32_t i = 0; i < reward.target_cnt; ++i)
 			{
-				co_await gme::addUserUnit(database, identity, *unit);
+				granted.userUnitIds.push_back(co_await gme::addUserUnit(database, identity, *unit));
 			}
 			break;
 		}
@@ -286,6 +287,7 @@ drogon::Task<bool> claimMysteryChest(
 		case 5:
 		case 7:
 			co_await gme::addUserItem(database, identity, reward.target_id, reward.target_cnt);
+			granted.items = true;
 			break;
 		default:
 			LOG_WARN << "MysteryChest: present_type " << reward.present_type

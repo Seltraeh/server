@@ -60,6 +60,12 @@ auto_cache("P8V71kbw", ChallengeRankRewardMst)
 auto_cache("nUmaEC41", ChallengeMvpMst)
 auto_cache("2r9cNSdt", UnitMst)
 auto_cache("2C7LDzYk", ItemMst)
+// Randall Achievement tables.  These three are NOT getResponseObject keys:
+// their wrapper hashes are parseBodyTag tags, which the client writes into
+// its own MST store (DataMstManager::save*) and reads back at load*.
+auto_cache("H9ATfJ38", AchievementSubjectMst)
+auto_cache("82CcMZhp", AchievementTradeMst)
+auto_cache("1tJiqKgZ", AchievementDeliverRateMst)
 auto_cache("as8G75gK", GrandMissionMst)
 auto_cache("iyCP4N1h", GrandMissionMapMst)
 auto_cache("aqb6LS9y", GrandMissionSpotMst)
@@ -95,6 +101,9 @@ auto_cache("baD81eqw", GuildPointExchangeMst)
 auto_cache("UVz5cuZ4", PurchaseAgeLimitMst)
 auto_cache("olzMKWSZ", FrontierGateMst)
 auto_cache("uxpnA5rF", FrontierGateSupportMst)
+// No wire key exists for this table (the client loads it from its own MST
+// store), so the wrapper just names it — see FrontierGateRewardMst.
+auto_cache("F_FROGATE_REWARD_MST", FrontierGateRewardMst)
 auto_cache("aYcBePEP", SummonerAbilityMst)
 auto_cache("6XHRamCn", SummonerAbilityLevelMst)
 auto_cache("xUo0D9Xb", SummonerAbilityUpMst)

@@ -239,6 +239,10 @@ HANDLEF(UnitMix)
     float    gainedExpF     = 0.0f;
     int      burstLevelGain = 0;
     int      sphereFrogs    = 0;
+    // Counted for the great/super success roll below: matching elements are the
+    // one condition the game has always said improves a fusion.
+    int      matCount       = 0;
+    int      sameElementMats = 0;
     ImpBonus impGain{ 0, 0, 0, 0 };
     if (!matIds.empty())
     {
@@ -269,8 +273,12 @@ HANDLEF(UnitMix)
             matExp += (float)matAdjust;
             if (matRare >= 1 && matRare <= 8)
                 matExp += (float)kRarityBonus[matRare];
+            ++matCount;
             if (baseElement != 0 && matElem == baseElement)
+            {
                 matExp *= 1.5f;
+                ++sameElementMats;
+            }
 
             gainedExpF += matExp;
 
@@ -288,6 +296,50 @@ HANDLEF(UnitMix)
                 impGain.rec += imp->rec;
             }
         }
+    }
+
+    // GREAT / SUPER SUCCESS.  CONFIRMED from the client:
+    // UnitMixPlayScene::ConvSuccessSet @0x1C200A4 branches on the value straight
+    // out of UnitOpeResult::getSuccessType —
+    //     2 -> ConvSuccessSuper.sam   (Super Success)
+    //     1 -> ConvSuccessBig.sam     (Great Success)
+    //     0 -> ConvSuccess.sam        (normal)
+    // and all three animations ship in game_content.  This settles the KDL's
+    // "UNVERIFIED: the value set" note on 6hMI5xeF; the field had been pinned to
+    // 0, so the tier could never fire however good the displayed rate looked.
+    //
+    // The MULTIPLIERS are MST data, not invented: DefineMst.unit_mix_great_exp_rate
+    // (2inP0tCg) = 1.5 and unit_mix_super_exp_rate (zn65EXYF) = 2.0.
+    //
+    // The CHANCE is not in any MST — defines_mst carries the two rates and no
+    // probability — so the original server owned it and these numbers are ours.
+    // Same-element fusion improving the odds is the rule the game has always
+    // stated; baseExp already applies its own 1.5x for matching elements, and
+    // this is the second half of that bonus.
+    // // TUNABLE: 10% great / 2% super, doubled when every material matched the
+    // base unit's element.  No capture backs these figures.
+    int successType = 0;
+    {
+        const bool allSameElement = matCount > 0 && sameElementMats == matCount;
+        const int greatChance = allSameElement ? 20 : 10;
+        const int superChance = allSameElement ? 4 : 2;
+        const auto roll = RandomUInt(1, 100);
+        if (roll <= static_cast<uint32_t>(superChance))
+            successType = 2;
+        else if (roll <= static_cast<uint32_t>(superChance + greatChance))
+            successType = 1;
+    }
+
+    const auto& defines = theServer()->cache().initializeResp().defines;
+    const float successRate =
+        successType == 2 ? static_cast<float>(defines.unit_mix_super_exp_rate)
+      : successType == 1 ? static_cast<float>(defines.unit_mix_great_exp_rate)
+      : 1.0f;
+    if (successType != 0)
+    {
+        gainedExpF *= successRate;
+        LOG_INFO << "UnitMix: " << (successType == 2 ? "SUPER" : "GREAT")
+                 << " SUCCESS — exp x" << successRate;
     }
 
     const int gainedExp = (int)llroundf(gainedExpF);
@@ -462,9 +514,10 @@ HANDLEF(UnitMix)
 
     // Step 4: return spheres equipped on the fodder, then DELETE the material
     // units — deleting without the return would destroy the equipped items.
+    uint32_t spheresReturned = 0;
     if (!matIds.empty())
     {
-        co_await gme::returnEquippedSpheres(theDb(), identity, matList);
+        spheresReturned = co_await gme::returnEquippedSpheres(theDb(), identity, matList);
         co_await theDb()->execSqlCoro(
             "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + matList + ");",
             std::string(kUserId)
@@ -553,9 +606,10 @@ HANDLEF(UnitMix)
     //
     // It is needed because the client has no local apply path of its own: it
     // never writes the fused unit (no UserUnitInfo mutator is reachable from a
-    // fusion scene) and never drops the fodder (removeObject's only real callers
-    // are the FrontierGate/FGPlus friend lists; removeObjectWithUserUnitID has
-    // none), and it issues no request after the fusion.
+    // fusion scene) and never drops the fodder (removeObject is called by the
+    // sale scenes and the FrontierGate/FGPlus friend lists, never by a fusion
+    // scene; removeObjectWithUserUnitID has none), and it issues no request
+    // after the fusion.
     //
     // The historical objection was that removeAllObjects release()s every
     // CCObject in the list, dangling any raw UserUnitInfo* a live scene holds —
@@ -581,7 +635,7 @@ HANDLEF(UnitMix)
         r.user_unit_id  = std::to_string(baseId);
         r.zel           = zelCost;
         r.exp           = gainedExp;
-        r.success_type  = 0;                    // normal result; see the KDL note
+        r.success_type  = successType;          // 0 normal / 1 great / 2 super
         r.before_lv     = oldLevel;
         r.after_lv      = newLevel;
         r.before_exp    = oldExp;
@@ -713,6 +767,15 @@ HANDLEF(UnitMix)
 
     resp.team_info = std::move(
         (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+
+    // Spheres handed back from the fodder: no fusion scene touches the client
+    // warehouse, so they need the full snapshot (UnitMixResp in handlers.kdl).
+    if (spheresReturned > 0)
+    {
+        auto warehouse = co_await gme::loadWarehouseSnapshot(theDb(), identity);
+        resp.warehouse_info = std::move(warehouse.warehouse);
+        resp.item_dictionary_info = std::move(warehouse.dictionary);
+    }
 
     std::string buffer{};
     if (const auto& ec2 = glz::write_json(resp, buffer); ec2)

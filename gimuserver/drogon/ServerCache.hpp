@@ -93,6 +93,9 @@ public:
 	* tools/MST_PORTING_BACKLOG.md for the 2026-07-19 port pass.
 	* @return Vector of the matching GrandMission*Mst entries
 	*/
+	inline const auto& achievementSubjectMst() const { return m_achievementSubjectMst; }
+	inline const auto& achievementTradeMst() const { return m_achievementTradeMst; }
+	inline const auto& achievementDeliverRateMst() const { return m_achievementDeliverRateMst; }
 	inline const auto& grandMissionMst() const { return m_grandMissionMst; }
 	inline const auto& grandMissionMapMst() const { return m_grandMissionMapMst; }
 	inline const auto& grandMissionSpotMst() const { return m_grandMissionSpotMst; }
@@ -159,6 +162,7 @@ public:
 	*/
 	inline const auto& frontierGateMst() const { return m_frontierGateMst; }
 	inline const auto& frontierGateSupportMst() const { return m_frontierGateSupportMst; }
+	inline const auto& frontierGateRewardMst() const { return m_frontierGateRewardMst; }
 
 	/*!
 	* Dungeon -> its mission ids, ascending.  A DERIVED INDEX over
@@ -230,8 +234,37 @@ public:
 		std::set<int32_t> areas;
 		std::set<int32_t> dungeons;
 		std::set<int32_t> missions;
+
+		// Missions that carry a MissionMst.need_mission_id, held back from
+		// `missions` so PermitPlace can decide them per request against the
+		// player's cleared set.  Vortex ids sit above kSpecialIdFloor and so
+		// are skipped by the Grand Gaia progression gate; without this the
+		// parade tiers were all permitted at once and you could open Mega
+		// without ever clearing the base.  Same shape as missionNeeds():
+		// mission id -> the missions that must be cleared first.
+		std::map<int32_t, std::vector<int32_t>> gatedMissions;
+
+		// Missions belonging to a dungeon that a DungeonKey opens.  Held back
+		// entirely: which of them are permitted depends on WHICH TIER the
+		// player bought, which only UserInfo can know.  Blanket-permitting
+		// them showed every parade tier at once.
+		std::set<int32_t> keyGatedMissions;
 	};
 	inline const TopologyPermits& frontierGatePermits() const { return m_frontierGatePermits; }
+
+	/*!
+	* Grand Quest topology — the land, area, dungeons and missions of
+	* F_GRAND_MISSION_MST, permitted as a whole.
+	*
+	* The client will not even SHOW the mode without one of these entries:
+	* GameUtils::checkGrandPermit @0x11A767C walks the Grand Missions, looks each
+	* one's dungeon up in the permit list (the dungeon id comes from the
+	* like-numbered F_MISSION_MST row, copied over by
+	* CampaignUtils::missionMstReflect) and returns isEnterable() for the one
+	* whose place id is "5000000".  Grand ids sit above kSpecialIdFloor, so the
+	* Grand Gaia progression gate skips them; they are collected here instead.
+	*/
+	inline const TopologyPermits& grandQuestPermits() const { return m_grandQuestPermits; }
 
 	/*!
 	* Ids PermitPlace must allow before the Vortex (gate 99) renders any tile.
@@ -440,6 +473,9 @@ private:
 	* deploy/mst/grand_mission_*.json (wrapper keys documented in
 	* mst/grand_mission.kdl).
 	*/
+	std::vector<AchievementSubjectMst> m_achievementSubjectMst;
+	std::vector<AchievementTradeMst> m_achievementTradeMst;
+	std::vector<AchievementDeliverRateMst> m_achievementDeliverRateMst;
 	std::vector<GrandMissionMst> m_grandMissionMst;
 	std::vector<GrandMissionMapMst> m_grandMissionMapMst;
 	std::vector<GrandMissionSpotMst> m_grandMissionSpotMst;
@@ -490,6 +526,7 @@ private:
 	// Frontier Gate — mst/frontier_gate.kdl
 	std::vector<FrontierGateMst> m_frontierGateMst;
 	std::vector<FrontierGateSupportMst> m_frontierGateSupportMst;
+	std::vector<FrontierGateRewardMst> m_frontierGateRewardMst;
 
 	// dungeon_id -> ascending mission ids.  Derived index over F_MISSION_MST;
 	// the rows themselves are not retained.  Consumer: FrontierGateInfo.
@@ -506,6 +543,7 @@ private:
 	// Land/area/dungeon/mission ids Frontier Gate needs permitted.
 	// Consumer: UserInfo's PermitPlace injection.
 	TopologyPermits m_frontierGatePermits;
+	TopologyPermits m_grandQuestPermits;
 
 	// Land/area/dungeon/mission ids the Vortex (gate 99) needs permitted.
 	// Consumer: UserInfo's PermitPlace injection.

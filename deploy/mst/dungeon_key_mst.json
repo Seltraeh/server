@@ -1,5 +1,5 @@
 {
-	"4NG79sX1": [
+  "4NG79sX1": [
     {
       "16KMNJLb": "1",
       "BM29ZgnK": "Metal Key",
@@ -10,10 +10,11 @@
       "i9sBW8uD": "1800",
       "N7I9vYZb": "50",
       "EK5I6MQ9": "1",
-      "fK15a73g": "1,2,4,5",
+      "fK15a73g": "1,2,3,4,5,6,7",
       "zfdw7Ry1": "8",
-      "CR6aKWg8": "1:1:Metal Parade!:100600:6/3:1:Super Metal Parade:100601:6/5:3:Mega Metal Parade:100601,100614:6",
-      "j0Uszek2": "1"
+      "CR6aKWg8": "1:1:Metal Parade!:100600,100602,100603,100604,100605,100606,100607:6/3:1:Super Metal Parade:100601,100608,100609,100610,100611,100612,100613:6/5:3:Mega Metal Parade:100614:6",
+      "j0Uszek2": "1",
+      "khsb74Nq": "3"
     },
     {
       "16KMNJLb": "2",
@@ -25,10 +26,11 @@
       "i9sBW8uD": "1800",
       "N7I9vYZb": "50",
       "EK5I6MQ9": "1",
-      "fK15a73g": "3",
+      "fK15a73g": "1,2,3,4,5,6,7",
       "zfdw7Ry1": "8",
-      "CR6aKWg8": "1:1:Jewel Parade!:100650:7/3:1:Super Jewel Parade:100651:7/5:3:Mega Jewel Parade:100651,100652:7",
-      "j0Uszek2": "1"
+      "CR6aKWg8": "1:1:Jewel Parade!:100650:7/3:1:Super Jewel Parade:100651:7/5:3:Mega Jewel Parade:100652:7",
+      "j0Uszek2": "1",
+      "khsb74Nq": "3"
     },
     {
       "16KMNJLb": "3",
@@ -39,11 +41,12 @@
       "9unNZ6b0": "sp_quest_banner_evil_seal_3.png",
       "i9sBW8uD": "1800",
       "N7I9vYZb": "50",
-      "EK5I6MQ9": "0",
-      "fK15a73g": "",
+      "EK5I6MQ9": "1",
+      "fK15a73g": "1,2,3,4,5,6,7",
       "zfdw7Ry1": "8",
       "CR6aKWg8": "1:0:Garden of Imps:102920:",
-      "j0Uszek2": "1"
+      "j0Uszek2": "1",
+      "khsb74Nq": "3"
     }
   ]
 }

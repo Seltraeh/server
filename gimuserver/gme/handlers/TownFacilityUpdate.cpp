@@ -163,6 +163,12 @@ HANDLEF(TownFacilityUpdate)
         std::vector<::UserTownLocationInfo> unusedInfo;
         co_await gme::Town::locationState(
             theDb(), identity, cleared, unusedInfo, resp.town_location_detail);
+
+        // The header, because the karma this batch spent left the balance here
+        // and the deduction is clamped server-side (MAX(0, karma-cost)) — the
+        // client's own number can disagree, and nothing else on this screen
+        // brings a fresh one.
+        resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
     }
 
     std::string buffer{};

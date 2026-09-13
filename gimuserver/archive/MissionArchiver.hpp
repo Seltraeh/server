@@ -158,6 +158,9 @@ private:
 	*/
 	static std::string encodeUnitDrop(size_t monsterIdx, const BattleMonster& monster);
 
+	// Encode a side-group chest with optional capture data.
+	static std::string encodeMimicDrop(size_t host, size_t group, const BattleMonster& monster);
+
 	/*!
 	* Rolls a unit personality type using F_UNIT_TYPE_MST's own appearance
 	* rates (23/23/22/22/10/0 — Rex never rolls).  Used when a mission's
@@ -217,6 +220,7 @@ private:
 		}
 	}
 
+	std::optional<RandomMimicChests> randomMimics_;
 	MissionRecordCache missionCache_;
 	AiRecordCache aiCache_;
 };

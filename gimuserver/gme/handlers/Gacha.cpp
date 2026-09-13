@@ -3,6 +3,8 @@
 
 #include <gimuserver/archive/GachaArchiver.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/SelectorBanners.hpp>
+#include <gimuserver/gme/common/SummonTickets.hpp>
 #include <gimuserver/utils/Random.hpp>
 
 #include <algorithm>
@@ -75,11 +77,15 @@ HANDLEF(GachaAction)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	// TODO: Implement summon tickets. For now, just reject them.
-	if (req.gacha_action_info.using_gacha_ticket)
-	{
-		co_return HandleResult::error("Unsupported", "Summon tickets are not implemented");
-	}
+	// Summon tickets.  `324b023k` is set by SummonsDetailScene::touchBegan
+	// @0x16A80BC after it has already satisfied itself that the player holds a
+	// ticket for this gate — either a V2 ticket (it sums the amounts of the
+	// types whose SummonTicketV2Mst row targets the gate, @0x16A7FA8) or the
+	// plain counter it reads off team_info (UserTeamInfo::getSummonTicket,
+	// @0x16A7F1C).  The server decides which one actually pays, prefers the
+	// specific ticket over the generic one, and skips the currency cost when
+	// a ticket covers the pull.
+	const bool usingTicket = req.gacha_action_info.using_gacha_ticket;
 
 	// A count of 0 means one pull, not a bad request.
 	//
@@ -115,6 +121,25 @@ HANDLEF(GachaAction)
 		co_return HandleResult::error("Invalid gacha", "Missing in MST");
 	}
 
+	// A SELECTOR gate is never paid for.  Its SUMMON button is supposed to open
+	// the unit picker and come back as UnitSelectorGachaTicket, and the gate's
+	// own gem cost is the shipped 999 "not for sale" marker — so if a pull ever
+	// arrives here for one (a client that missed JukkSeNA, a replayed body), the
+	// only safe answer is to refuse it rather than take 999 gems per pull.
+	{
+		const auto& selectors = theServer()->cache().unitSelectorGacha();
+		const bool isSelectorGate = std::any_of(selectors.begin(), selectors.end(),
+			[&](const UnitSelectorGachaMst& sel)
+			{ return static_cast<uint32_t>(sel.gacha_id) == req.gacha_action_info.gacha_id; });
+		if (isSelectorGate)
+		{
+			LOG_WARN << "GachaAction: gate " << req.gacha_action_info.gacha_id
+				<< " is a selector gate and cannot be pulled for currency; refused";
+			co_return HandleResult::error("Invalid gacha request",
+				"This gate is redeemed with its selector ticket");
+		}
+	}
+
 	const auto gemCost = mst.gems * count;
 	const auto friendPointCost = mst.friend_points * count;
 
@@ -131,12 +156,24 @@ HANDLEF(GachaAction)
 		{
 			db::Data("gems"),
 			db::Data("friend_points"),
+			db::Data("summon_tickets"),
 			db::Lookup("gumi_user_id", identity.gumiUserId),
 			db::Lookup("id", identity.userId),
 		});
 	const auto currentGems = currency.front<int32_t>("gems");
 	const auto currentFriendPoints = currency.front<int32_t>("friend_points");
-	if (gemCost > currentGems || friendPointCost > currentFriendPoints)
+	const auto currentTickets = currency.front<int32_t>("summon_tickets");
+
+	// Which ticket, if any, is paying.  The V2 types that name this gate go
+	// first — they exist only to be spent here — and the plain counter is the
+	// fallback, because it works on any ticket-enabled gate.
+	const bool ticketTypesExist = !gme::summonTicketTypesForGate(req.gacha_action_info.gacha_id).empty();
+	const bool plainTicketsPay = currentTickets >= static_cast<int32_t>(count);
+	if (usingTicket && !ticketTypesExist && !plainTicketsPay)
+	{
+		co_return HandleResult::error("Invalid gacha request", "Not enough summon tickets");
+	}
+	if (!usingTicket && (gemCost > currentGems || friendPointCost > currentFriendPoints))
 	{
 		co_return HandleResult::error("Invalid gacha request", "Not enough currency");
 	}
@@ -149,16 +186,48 @@ HANDLEF(GachaAction)
 		auto transaction = co_await theDb()->newTransactionCoro();
 		try
 		{
-			// Deduct the currency for the summon.
-			(co_await db::DatabaseInterface::update(
-				transaction,
-				"user_info",
-				{
-					db::Data("gems", currentGems - gemCost),
-					db::Data("friend_points", currentFriendPoints - friendPointCost),
-					db::Lookup("gumi_user_id", identity.gumiUserId),
-					db::Lookup("id", identity.userId),
-				})).nonEmpty();
+			// Deduct what is paying for the pull: a ticket, or the currency.
+			// A gate can have V2 types the player happens to hold none of, so a
+			// failed V2 spend falls back to the plain counter before refusing.
+			bool v2Paid = false;
+			if (usingTicket && ticketTypesExist)
+			{
+				v2Paid = co_await gme::spendSummonTicketsV2(
+					transaction, identity, req.gacha_action_info.gacha_id, count);
+			}
+			if (v2Paid)
+			{
+				resp.summon_ticket_v2_user = co_await gme::loadSummonTicketsV2(transaction, identity);
+			}
+			else if (usingTicket && !plainTicketsPay)
+			{
+				transaction->rollback();
+				co_return HandleResult::error(
+					"Invalid gacha request", "Not enough summon tickets");
+			}
+			else if (usingTicket)
+			{
+				(co_await db::DatabaseInterface::update(
+					transaction,
+					"user_info",
+					{
+						db::Data("summon_tickets", currentTickets - static_cast<int32_t>(count)),
+						db::Lookup("gumi_user_id", identity.gumiUserId),
+						db::Lookup("id", identity.userId),
+					})).nonEmpty();
+			}
+			else
+			{
+				(co_await db::DatabaseInterface::update(
+					transaction,
+					"user_info",
+					{
+						db::Data("gems", currentGems - gemCost),
+						db::Data("friend_points", currentFriendPoints - friendPointCost),
+						db::Lookup("gumi_user_id", identity.gumiUserId),
+						db::Lookup("id", identity.userId),
+					})).nonEmpty();
+			}
 
 			// Commit the summoned units and populate the response.
 			for (const auto& unitId : summonedUnits)
@@ -180,15 +249,6 @@ HANDLEF(GachaAction)
 
 				auto added = std::move(
 					(co_await gme::addUserUnit(transaction, identity, *unit)).nonEmpty());
-				resp.unit_dictionary.push_back(std::move(
-					(co_await db::PacketInterfaceFor<UserUnitDictionary>::read(
-						transaction,
-						"user_unit_dictionary",
-						{
-							db::Lookup("user_id", identity.userId),
-							db::Lookup("unit_id", unitId),
-						})).nonEmpty().front()));
-
 				const auto gachaEffect = getGachaEffect(unitRecord->rarity);
 				if (!gachaEffect)
 				{
@@ -202,6 +262,19 @@ HANDLEF(GachaAction)
 				});
 				resp.unit_info.push_back(std::move(added));
 			}
+
+			// TROPHY 100100 (Honor spent).  Counted here because this is the
+			// only place Honor leaves the balance; its counterpart 100090 is
+			// bumped at MissionEnd, where it is earned.  Zero for a gem or
+			// ticket pull, and bumpArchiveCounters drops zero deltas.
+			co_await gme::bumpArchiveCounters(transaction, identity, {
+				{ "friend_p_use", usingTicket ? 0 : static_cast<int64_t>(friendPointCost) },
+			});
+
+			// The COMPLETE dictionary, not just the summoned species: this
+			// response rebuilds the reference list the summon lineup reads
+			// (UserUnitDictionary in net/user.kdl).
+			resp.unit_dictionary = co_await gme::loadUnitDictionary(transaction, identity);
 
 			resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
 		}
@@ -256,6 +329,21 @@ HANDLEF(GachaList)
 	GachaListResp resp = theServer()->cache().gachaListRsp();
 	resp.gacha_info = GachaArchiver::instance().populateAllPackets();
 	resp.signal_key = req.signal_key;
+
+	// The selector catalogue, which is what tells the detail scene that a gate
+	// is ticket-only — see the JukkSeNA field doc in net/handlers.kdl.
+	resp.unit_selector_gacha = theServer()->cache().unitSelectorGacha();
+
+	// Selector banners are per player: a selector gate is redeemable only with
+	// its own ticket, so its rail tile is added here and only while one is held
+	// (gme/common/SelectorBanners.hpp).  gacha_category_mst.json holds the
+	// permanent tiles.
+	{
+		auto selectors = co_await gme::selectorGachaCategories(theDb(), identity);
+		resp.gacha_categories.insert(resp.gacha_categories.end(),
+			std::make_move_iterator(selectors.begin()),
+			std::make_move_iterator(selectors.end()));
+	}
 
 	if (tutorialDone)
 	{

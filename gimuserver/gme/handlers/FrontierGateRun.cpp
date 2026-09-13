@@ -2,14 +2,18 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/db/DatabaseInterface.h>
+#include <gimuserver/gme/common/Achievements.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/FrontierGate.hpp>
+#include <gimuserver/gme/common/HunterOrbs.hpp>
 
 // Frontier Gate run control — the "Continue / Pause / Retire" prompt the client
 // shows between floors, which is the boss-rush loop's decision point.
 //
 //   Continue  uiFIMUH6 / ZiosS4cd   keep fighting; sends the run handle only
 //   Pause     Ng73nFHJ / 4SdtoczN   suspend; re-uploads the party, status 4
-//   Retire    cAJp7U4l / Vvpy7qZR   stop and bank rewards; status 3
+//   Retire    cAJp7U4l / Vvpy7qZR   stop and bank rewards; status 3 — the
+//                                   reply is the result screen's data
 //
 // The j3g5P4cq (MissionStatus) enum is DECODED from the createBody constants —
 // End hardcodes addParam(..., "j3g5P4cq", 3) and Save hardcodes 4.  Continue
@@ -18,9 +22,9 @@
 // Note Save addresses the run by GATE id while Continue and End use the run
 // handle; that asymmetry is the client's, not ours.
 //
-// None of the three has a dedicated response class in the binary.  Continue
-// returns the run under Mg8K8Y1a the way Start does; Save and Retire return an
-// empty OK, which is what the legacy fork did for every one of these GroupIds.
+// Continue returns the run under Mg8K8Y1a the way Start does and Save an empty
+// OK.  Retire answers with the run's result (mu0kXAlV) and rewards (QXFCkE67),
+// which FrontierGateResultScene reads — see gme/common/FrontierGate.hpp.
 
 namespace
 {
@@ -193,32 +197,58 @@ HANDLEF(FrontierGateEnd)
 
     const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
+    // Retire.  The interval scene changes to the result scene when this reply
+    // arrives, and the result scene reads the run's result and reward list from
+    // it (FrontierGateEndResp in net/handlers.kdl).  The request names only the
+    // run handle, so the run is paid from what its battles reported
+    // (gme::finishFrontierRun), which also closes it: the row's EXISTENCE is what
+    // marks a run in progress, and FrontierGateSuspendedInfo then reports
+    // nothing suspended.
+    ::FrontierGateEndResp resp{};
+    auto transaction = co_await theDb()->newTransactionCoro();
     try
     {
-        // Retiring closes the run.  The row's EXISTENCE is what marks a run in
-        // progress (see the migration note), so ending one deletes it — that is
-        // also what makes FrontierGateSuspendedInfo report "nothing suspended".
-        (co_await db::DatabaseInterface::remove(
-            theDb(),
-            "user_frontier_gate_run",
-            { db::Lookup("user_id", identity.userId) }));
+        if (const auto run = co_await gme::loadFrontierRun(transaction, identity))
+        {
+            auto result = co_await gme::finishFrontierRun(transaction, identity, *run);
+            resp.frontier_end.push_back(std::move(result.end));
+            resp.frontier_rewards = std::move(result.rewards);
+            // The gate's own currencies are credited, not gifted, so the result
+            // screen's reply carries the balances it changed.
+            if (result.tokensChanged)
+                resp.event_token_info = co_await gme::loadEventTokens(transaction, identity);
+            if (result.ticketsChanged)
+                resp.summon_ticket_v2_user = co_await gme::loadSummonTicketsV2(transaction, identity);
+        }
+        else
+        {
+            // Nothing to pay, but the result scene still needs a result.
+            LOG_WARN << "FrontierGateEnd: no open run for " << identity.userId;
+            ::FrontierEndInfo end{};
+            end.grade_id = gme::frontierGrade(0);
+            end.bonus_rate = 1.0f;
+            resp.frontier_end.push_back(std::move(end));
+        }
+        resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+
+        // Merit Points.  Retiring is the one thing in this fork that moves the
+        // balance, and the number the result screen prints is its OWN singleton
+        // (gme/common/Achievements.hpp) -- user_info does not carry it.  Sent
+        // unconditionally: even a run worth 0 points re-states the total, and a
+        // run with no open row above still leaves the client consistent.
+        resp.achievement_info = co_await gme::loadAchievementInfo(transaction, identity);
 
         LOG_INFO << "FrontierGateEnd: run " << req.run.frogate_num
-                 << " retired with status " << req.run.mission_status;
+                 << " retired with status " << req.run.mission_status
+                 << "; merit points now " << resp.achievement_info.id;
     }
-    catch (const drogon::orm::DrogonDbException& ex)
+    catch (...)
     {
-        LOG_ERROR << "FrontierGateEnd: delete failed: " << ex.base().what();
+        transaction->rollback();
+        throw;
     }
 
-    // // NOT IMPLEMENTED: the result payload.  FrontierGateEndInfo exposes
-    // getResScore / getResZel / getResKarma / getResGradeID / getResAchieveP /
-    // getResBonusRate / getPrestigePoints, so a real retire screen expects
-    // score and rewards.  None of those has a decoded response key yet, and
-    // handbook §3.4 is explicit that shipping invented reward values is worse
-    // than omitting them — the client falls back to its own defaults.  Decode
-    // the End response before paying anything out.
-    co_return HandleResult::success("{}");
+    co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
 
 HANDLEF(FrontierGateRetry)
@@ -263,14 +293,20 @@ HANDLEF(FrontierGateRetry)
         resp.party_deck = std::move(run->deck);
         resp.units = std::move(run->units);
 
-        // // NOT IMPLEMENTED: the Hunter Orb cost.  The prompt says a retry
-        // costs one orb, and orbs are ChallengeHeaderInfo::Aube (handbook
-        // §6.16) — which the server does not own a counter for yet.  ChallengeBase
-        // still sends probe values, so debiting here would be debiting a field we
-        // have not finished identifying.  Wire the orb column first, then charge.
+        // THE HUNTER ORB.  The prompt says a retry costs one, and the orb
+        // column now exists (gme/common/HunterOrbs.hpp), so this charges.
+        //
+        // Charged AFTER the run has been rebuilt: a retry that could not find
+        // its run has nothing to sell.  A player with none is let through
+        // rather than stranded mid-run — the entry was already paid for at
+        // FrontierGateStart, the client has its own count and does its own
+        // prompting, and refusing here would drop them out of a run they are
+        // standing in.  Refusing at the DOOR is safe; refusing inside is not.
+        const auto orbPaid = co_await gme::spendHunterOrb(theDb(), identity);
         LOG_INFO << "FrontierGateRetry: run " << run->num.frogate_num
                  << " retried with " << resp.party_deck.size() << " deck member(s), "
-                 << resp.units.size() << " unit(s); orb NOT debited (see comment)";
+                 << resp.units.size() << " unit(s); orb "
+                 << (orbPaid ? "debited" : "NOT debited (none held; retry allowed anyway)");
     }
     catch (const drogon::orm::DrogonDbException& ex)
     {

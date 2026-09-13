@@ -3,6 +3,7 @@
 
 #include <gimuserver/db/DatabaseInterface.h>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/PermitPlace.hpp>
 
 // DungeonEventUpdate (BjAt1D6b / k5EiNe9x) — fires when the client enters
 // the Grand Gaia world map after the opening cutscene.  The original handler
@@ -79,14 +80,21 @@ HANDLEF(DungeonEventUpdate)
 // GetScenarioPlayingInfo now lives in Scenario.cpp — it returns the real
 // viewed-cutscene set from user_scenarios instead of the old {} stub.
 
-// UpdatePermitPlaceInfo (1MJT6L3W / 3zip5Htw) — sent after entering an
-// area to refresh the server-side permit-place allow-list.  Original handler
-// returns {}.  Our PermitPlace is injected once in UserInfo so no update
-// action is required here.
+// APK createBody @0x13AFB58 sends only login and signal tags. The client
+// requests a refresh here; use the same current-state replacement as MissionEnd.
 HANDLEF(UpdatePermitPlaceInfo)
 {
-    LOG_INFO << "UpdatePermitPlaceInfo: " << json;
-    co_return HandleResult::success("{}");
+    ::UpdatePermitPlaceInfoReq req{};
+    if (const auto error = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); error)
+        co_return HandleResult::error("Deserialization error", glz::format_error(error, json));
+    const auto db = theDb();
+    const auto identity = (co_await gme::getUserIdentity(db, req.login_info)).nonEmpty();
+    ::UpdatePermitPlaceInfoResp resp{};
+    std::string body;
+    if (const auto error = glz::write_json(resp, body); error)
+        co_return HandleResult::error("Serialization error", glz::format_error(error, body));
+    gme::injectPermitPlace(body, co_await gme::buildPermitPlace(db, identity));
+    co_return HandleResult::success(body);
 }
 
 // UpdateEventInfo (rCB7ZI8x / L1o4eGbi) — updates the client's view of

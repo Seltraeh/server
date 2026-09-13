@@ -87,7 +87,8 @@ void loadDailySpinArchive(const std::string& archiveRoot)
 drogon::Task<std::string> awardDailySpin(
 	const db::Database database,
 	const UserIdentity& identity,
-	DailySpinState& state)
+	DailySpinState& state,
+	GrantedRewards& granted)
 {
 	const auto* row = rowForDay(state.spinDay);
 	if (row == nullptr)
@@ -142,6 +143,7 @@ drogon::Task<std::string> awardDailySpin(
 	if (prize.kind == "item")
 	{
 		co_await gme::addUserItem(database, identity, prize.id, prize.count);
+		granted.items = true;
 	}
 	else if (prize.kind == "unit")
 	{
@@ -155,7 +157,7 @@ drogon::Task<std::string> awardDailySpin(
 		}
 		for (uint32_t i = 0; i < prize.count; ++i)
 		{
-			co_await gme::addUserUnit(database, identity, *unit);
+			granted.userUnitIds.push_back(co_await gme::addUserUnit(database, identity, *unit));
 		}
 	}
 	else

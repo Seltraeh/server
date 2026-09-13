@@ -99,7 +99,8 @@ HANDLEF(SlotAction)
 	const int32_t drawCount = req.entries.empty() ? 1 : req.entries.front().draw_cnt;
 
 	SlotActionResp resp{};
-	resp.results = co_await gme::playBraveSlot(theDb(), identity, drawCount);
+	gme::GrantedRewards granted;
+	resp.results = co_await gme::playBraveSlot(theDb(), identity, drawCount, granted);
 	// A refused pull answers with the balance and header rather than an error,
 	// so the machine resynchronises instead of stranding the player.  The
 	// client gates on the medal count itself (RANDALL_SLOTGAME_MEDAL_ERROR), so
@@ -107,6 +108,9 @@ HANDLEF(SlotAction)
 
 	resp.medal_info = co_await gme::loadBraveMedals(theDb(), identity);
 	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+	// A unit or item prize has no other way onto the client: no slot scene
+	// touches the roster or the warehouse (SlotActionResp in handlers.kdl).
+	co_await gme::emitGrantedRewards(theDb(), identity, granted, resp);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
@@ -198,10 +202,15 @@ HANDLEF(MysteryBoxClaim)
 	// A refused claim — unknown, already opened or expired — still answers with
 	// the current chest list and header rather than an error, so the screen
 	// resynchronises instead of stranding the player on a chest that is gone.
-	co_await gme::claimMysteryChest(theDb(), identity, req.entries.front().box_id, resp.rewards);
+	gme::GrantedRewards granted;
+	co_await gme::claimMysteryChest(theDb(), identity, req.entries.front().box_id, resp.rewards, granted);
 
 	resp.boxes = co_await gme::listMysteryChests(theDb(), identity);
 	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+	// Chest units and items have no other way onto the client: no Mystery
+	// Chest scene touches the roster or the warehouse (MysteryBoxClaimResp in
+	// handlers.kdl).
+	co_await gme::emitGrantedRewards(theDb(), identity, granted, resp);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
@@ -280,9 +289,10 @@ HANDLEF(DailyLogin)
 	const int32_t spunDay = state.spinDay;
 
 	std::string awarded = "nothing (no spins left)";
+	gme::GrantedRewards granted;
 	if (state.spinsUsed < gme::kDailySpinLimit)
 	{
-		awarded = co_await gme::awardDailySpin(theDb(), identity, state);
+		awarded = co_await gme::awardDailySpin(theDb(), identity, state, granted);
 	}
 
 	const bool spun = co_await gme::consumeDailySpin(theDb(), identity, state);
@@ -313,6 +323,13 @@ HANDLEF(DailyLogin)
 	resp.daily_login_rewards.remaining_days_till_guaranteed_reward =
 		(7 - (spunDay % 7)) % 7;
 	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
+
+	// The wheel pays gems, zel, karma and summon tickets as well as units and
+	// items.  DailyLoginScene calls no zel/karma mutator and no roster or
+	// warehouse mutator, so the header and any prize block ride here
+	// (DailyLoginResp in handlers.kdl).
+	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+	co_await gme::emitGrantedRewards(theDb(), identity, granted, resp);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)

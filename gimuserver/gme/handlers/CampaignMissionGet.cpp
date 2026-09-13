@@ -1,7 +1,7 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
-#include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/Campaign.hpp>
 
 // CampaignMissionGet (RSm6p2d4) — returns per-mission progress/state.
 // Response is the CampaignMissionInfoResponse shape (group "2I9V0o6J"):
@@ -25,43 +25,30 @@ HANDLEF(CampaignMissionGet)
     }
 
     const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
-    const std::string kUserId = identity.userId;
 
     CampaignMissionGetResp resp{};
 
-    // Same MST scoping as CampaignStart: user_campaign_missions also holds
-    // quest clear-history rows (MissionEnd), which must not surface in the
-    // Grand Mission list.
-    const auto& gmMst = theServer()->cache().grandMissionMst();
-    std::set<std::string> gmIds;
-    for (const auto& m : gmMst)
-        gmIds.insert(std::to_string(m.mission_id));
-
+    // Grand Missions only, with the rewards already earned (get_reward) —
+    // see gme::loadCampaignMissions.
     try
     {
-        const auto rows = co_await theDb()->execSqlCoro(
-            "SELECT mission_id, attain_percent, state"
-            " FROM user_campaign_missions WHERE user_id=$1;",
-            std::string(kUserId));
-
-        resp.missions.reserve(rows.size());
-        for (const auto& r : rows)
-        {
-            CampaignMissionEntry e{};
-            e.mission_id     = r["mission_id"].as<std::string>();
-            if (!gmIds.contains(e.mission_id))
-                continue;
-            e.attain_percent = r["attain_percent"].as<int32_t>();
-            e.state          = r["state"].as<int32_t>();
-            e.mission_on_flg = (e.state >= 1) ? "1" : "0";
-            resp.missions.emplace_back(std::move(e));
-        }
+        resp.missions = co_await gme::loadCampaignMissions(theDb(), identity);
     }
     catch (const drogon::orm::DrogonDbException& ex)
     {
         LOG_WARN << "CampaignMissionGet: SELECT failed: " << ex.base().what();
         co_return HandleResult::success("{}");
     }
+
+    // The Grand Quest master tables.  They belong on THIS request rather than
+    // on CampaignStart: the mission-select screen resolves its
+    // CampaignMissionMst* when the quest is tapped, which is before the run
+    // starts, and a null pointer there costs the field its whole map.  See
+    // CampaignMissionGetResp in net/handlers.kdl.
+    gme::fillCampaignMst(resp);
+
+    LOG_INFO << "CampaignMissionGet: " << resp.missions.size() << " mission(s) and the "
+             << resp.spot_mst.size() << " map spots behind them";
 
     co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
