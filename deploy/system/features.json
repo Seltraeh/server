@@ -5,6 +5,7 @@
     "arx_punish_enable": 0,
     "autobattle_record": 0,
     "battle_item_limit": 100,
+    "bb_timer": 1000,
     "bf_achievement_ext": 0,
     "challenge_arena_banner_lock": 0,
     "corrupted_mst_check": 1,
