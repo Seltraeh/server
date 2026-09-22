@@ -2,7 +2,7 @@
  "01pzrTCm": [
   {
    "MHx05sXt": "1",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1_NAME",
+   "bWsLFP96": "Beginner's Prairie",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -21,7 +21,7 @@
   },
   {
    "MHx05sXt": "10",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10_NAME",
+   "bWsLFP96": "Adventurer's Prairie",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -40,7 +40,7 @@
   },
   {
    "MHx05sXt": "20",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20_NAME",
+   "bWsLFP96": "Cave of Flames",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -59,7 +59,7 @@
   },
   {
    "MHx05sXt": "30",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_30_NAME",
+   "bWsLFP96": "Egor Snowfield",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -78,7 +78,7 @@
   },
   {
    "MHx05sXt": "40",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_40_NAME",
+   "bWsLFP96": "Forest of Beasts",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -97,7 +97,7 @@
   },
   {
    "MHx05sXt": "50",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_50_NAME",
+   "bWsLFP96": "Magutagal Wetlands",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -116,7 +116,7 @@
   },
   {
    "MHx05sXt": "60",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_60_NAME",
+   "bWsLFP96": "Remains of Mirza",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -135,7 +135,7 @@
   },
   {
    "MHx05sXt": "70",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_70_NAME",
+   "bWsLFP96": "Monster's Nest",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -154,7 +154,7 @@
   },
   {
    "MHx05sXt": "80",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_80_NAME",
+   "bWsLFP96": "Tower of Mistral",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -173,7 +173,7 @@
   },
   {
    "MHx05sXt": "200",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_200_NAME",
+   "bWsLFP96": "Kagan Desert",
    "9C64Qwe0": "1",
    "VjCY7rX4": "200",
    "3hPeI1RV": "0",
@@ -192,7 +192,7 @@
   },
   {
    "MHx05sXt": "210",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_210_NAME",
+   "bWsLFP96": "Breeze Beach",
    "9C64Qwe0": "1",
    "VjCY7rX4": "200",
    "3hPeI1RV": "0",
@@ -211,7 +211,7 @@
   },
   {
    "MHx05sXt": "220",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_220_NAME",
+   "bWsLFP96": "Nocturnal Forest",
    "9C64Qwe0": "1",
    "VjCY7rX4": "200",
    "3hPeI1RV": "0",
@@ -230,7 +230,7 @@
   },
   {
    "MHx05sXt": "230",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_230_NAME",
+   "bWsLFP96": "Asekutt Wastelands",
    "9C64Qwe0": "1",
    "VjCY7rX4": "200",
    "3hPeI1RV": "0",
@@ -249,7 +249,7 @@
   },
   {
    "MHx05sXt": "240",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_240_NAME",
+   "bWsLFP96": "Shrine of Lystia",
    "9C64Qwe0": "1",
    "VjCY7rX4": "200",
    "3hPeI1RV": "0",
@@ -268,7 +268,7 @@
   },
   {
    "MHx05sXt": "250",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_250_NAME",
+   "bWsLFP96": "Destroyed Cathedral",
    "9C64Qwe0": "1",
    "VjCY7rX4": "200",
    "3hPeI1RV": "0",
@@ -287,7 +287,7 @@
   },
   {
    "MHx05sXt": "260",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_260_NAME",
+   "bWsLFP96": "Tower of Morgan",
    "9C64Qwe0": "1",
    "VjCY7rX4": "200",
    "3hPeI1RV": "0",
@@ -306,7 +306,7 @@
   },
   {
    "MHx05sXt": "300",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_300_NAME",
+   "bWsLFP96": "Volcano Eldent",
    "9C64Qwe0": "1",
    "VjCY7rX4": "300",
    "3hPeI1RV": "0",
@@ -325,7 +325,7 @@
   },
   {
    "MHx05sXt": "310",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_310_NAME",
+   "bWsLFP96": "Sacred Mt. Craylia",
    "9C64Qwe0": "1",
    "VjCY7rX4": "300",
    "3hPeI1RV": "0",
@@ -344,7 +344,7 @@
   },
   {
    "MHx05sXt": "320",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_320_NAME",
+   "bWsLFP96": "Blood Forest",
    "9C64Qwe0": "1",
    "VjCY7rX4": "300",
    "3hPeI1RV": "0",
@@ -363,7 +363,7 @@
   },
   {
    "MHx05sXt": "330",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_330_NAME",
+   "bWsLFP96": "Mt. Wistorea",
    "9C64Qwe0": "1",
    "VjCY7rX4": "300",
    "3hPeI1RV": "0",
@@ -382,7 +382,7 @@
   },
   {
    "MHx05sXt": "340",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_340_NAME",
+   "bWsLFP96": "Secluded Sanctuary",
    "9C64Qwe0": "1",
    "VjCY7rX4": "300",
    "3hPeI1RV": "0",
@@ -401,7 +401,7 @@
   },
   {
    "MHx05sXt": "350",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_350_NAME",
+   "bWsLFP96": "Cave of Malice",
    "9C64Qwe0": "1",
    "VjCY7rX4": "300",
    "3hPeI1RV": "0",
@@ -420,7 +420,7 @@
   },
   {
    "MHx05sXt": "360",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_360_NAME",
+   "bWsLFP96": "St. Lamia Palace",
    "9C64Qwe0": "1",
    "VjCY7rX4": "300",
    "3hPeI1RV": "0",
@@ -439,7 +439,7 @@
   },
   {
    "MHx05sXt": "370",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_370_NAME",
+   "bWsLFP96": "Egor Mountains",
    "9C64Qwe0": "1",
    "VjCY7rX4": "100",
    "3hPeI1RV": "0",
@@ -458,7 +458,7 @@
   },
   {
    "MHx05sXt": "400",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_400_NAME",
+   "bWsLFP96": "Julep Village",
    "9C64Qwe0": "3",
    "VjCY7rX4": "400",
    "3hPeI1RV": "0",
@@ -477,7 +477,7 @@
   },
   {
    "MHx05sXt": "410",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_410_NAME",
+   "bWsLFP96": "Ghost Ship Legnia",
    "9C64Qwe0": "3",
    "VjCY7rX4": "400",
    "3hPeI1RV": "0",
@@ -496,7 +496,7 @@
   },
   {
    "MHx05sXt": "420",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_420_NAME",
+   "bWsLFP96": "Elios Plains",
    "9C64Qwe0": "3",
    "VjCY7rX4": "400",
    "3hPeI1RV": "0",
@@ -515,7 +515,7 @@
   },
   {
    "MHx05sXt": "430",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_430_NAME",
+   "bWsLFP96": "Saji Mines",
    "9C64Qwe0": "3",
    "VjCY7rX4": "400",
    "3hPeI1RV": "0",
@@ -534,7 +534,7 @@
   },
   {
    "MHx05sXt": "440",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_440_NAME",
+   "bWsLFP96": "Lamellia Temple",
    "9C64Qwe0": "3",
    "VjCY7rX4": "400",
    "3hPeI1RV": "0",
@@ -553,7 +553,7 @@
   },
   {
    "MHx05sXt": "450",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_450_NAME",
+   "bWsLFP96": "Ghost Town Edila",
    "9C64Qwe0": "3",
    "VjCY7rX4": "400",
    "3hPeI1RV": "0",
@@ -572,7 +572,7 @@
   },
   {
    "MHx05sXt": "460",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_460_NAME",
+   "bWsLFP96": "Amdahl Castle",
    "9C64Qwe0": "3",
    "VjCY7rX4": "400",
    "3hPeI1RV": "0",
@@ -591,7 +591,7 @@
   },
   {
    "MHx05sXt": "500",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_500_NAME",
+   "bWsLFP96": "Elsta Crater",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -610,7 +610,7 @@
   },
   {
    "MHx05sXt": "510",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_510_NAME",
+   "bWsLFP96": "Lake Aldela",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -629,7 +629,7 @@
   },
   {
    "MHx05sXt": "520",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_520_NAME",
+   "bWsLFP96": "Castle Avenia",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -648,7 +648,7 @@
   },
   {
    "MHx05sXt": "530",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_530_NAME",
+   "bWsLFP96": "Gadillian Ravine",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -667,7 +667,7 @@
   },
   {
    "MHx05sXt": "540",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_540_NAME",
+   "bWsLFP96": "Alman Mausoleum",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -686,7 +686,7 @@
   },
   {
    "MHx05sXt": "550",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_550_NAME",
+   "bWsLFP96": "Land of the Dead",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -705,7 +705,7 @@
   },
   {
    "MHx05sXt": "560",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_560_NAME",
+   "bWsLFP96": "Sky Fort Solaris",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -724,7 +724,7 @@
   },
   {
    "MHx05sXt": "600",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_600_NAME",
+   "bWsLFP96": "Dejour Ruins",
    "9C64Qwe0": "3",
    "VjCY7rX4": "600",
    "3hPeI1RV": "0",
@@ -743,7 +743,7 @@
   },
   {
    "MHx05sXt": "610",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_610_NAME",
+   "bWsLFP96": "Obselion Castle",
    "9C64Qwe0": "3",
    "VjCY7rX4": "600",
    "3hPeI1RV": "0",
@@ -762,7 +762,7 @@
   },
   {
    "MHx05sXt": "620",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_620_NAME",
+   "bWsLFP96": "Emerald Path",
    "9C64Qwe0": "3",
    "VjCY7rX4": "600",
    "3hPeI1RV": "0",
@@ -781,7 +781,7 @@
   },
   {
    "MHx05sXt": "630",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_630_NAME",
+   "bWsLFP96": "Grandelt Ruins",
    "9C64Qwe0": "3",
    "VjCY7rX4": "600",
    "3hPeI1RV": "0",
@@ -800,7 +800,7 @@
   },
   {
    "MHx05sXt": "640",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_640_NAME",
+   "bWsLFP96": "Arlind Seminary",
    "9C64Qwe0": "3",
    "VjCY7rX4": "600",
    "3hPeI1RV": "0",
@@ -819,7 +819,7 @@
   },
   {
    "MHx05sXt": "650",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_650_NAME",
+   "bWsLFP96": "Noera Battleground",
    "9C64Qwe0": "3",
    "VjCY7rX4": "600",
    "3hPeI1RV": "0",
@@ -838,7 +838,7 @@
   },
   {
    "MHx05sXt": "660",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_660_NAME",
+   "bWsLFP96": "Spirit World Palmyna",
    "9C64Qwe0": "3",
    "VjCY7rX4": "600",
    "3hPeI1RV": "0",
@@ -857,7 +857,7 @@
   },
   {
    "MHx05sXt": "670",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_670_NAME",
+   "bWsLFP96": "Valmodora's Nest",
    "9C64Qwe0": "3",
    "VjCY7rX4": "500",
    "3hPeI1RV": "0",
@@ -876,7 +876,7 @@
   },
   {
    "MHx05sXt": "700",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_700_NAME",
+   "bWsLFP96": "Erinecht Plains",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -895,7 +895,7 @@
   },
   {
    "MHx05sXt": "710",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_710_NAME",
+   "bWsLFP96": "Golzo Mountains",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -914,7 +914,7 @@
   },
   {
    "MHx05sXt": "720",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_720_NAME",
+   "bWsLFP96": "Lodan Frozen Lake",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -933,7 +933,7 @@
   },
   {
    "MHx05sXt": "730",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_730_NAME",
+   "bWsLFP96": "The Impassable Marshlands",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -952,7 +952,7 @@
   },
   {
    "MHx05sXt": "740",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_740_NAME",
+   "bWsLFP96": "Lightning Forest Zaljiba",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -971,7 +971,7 @@
   },
   {
    "MHx05sXt": "750",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_750_NAME",
+   "bWsLFP96": "Lost City La Veda",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -990,7 +990,7 @@
   },
   {
    "MHx05sXt": "760",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_760_NAME",
+   "bWsLFP96": "The Black Bridge",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -1009,7 +1009,7 @@
   },
   {
    "MHx05sXt": "770",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_770_NAME",
+   "bWsLFP96": "Tower of Destruction",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -1028,7 +1028,7 @@
   },
   {
    "MHx05sXt": "780",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_780_NAME",
+   "bWsLFP96": "Golzo Underground Lake",
    "9C64Qwe0": "4",
    "VjCY7rX4": "700",
    "3hPeI1RV": "0",
@@ -1047,7 +1047,7 @@
   },
   {
    "MHx05sXt": "800",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800_NAME",
+   "bWsLFP96": "Glomore Hollow",
    "9C64Qwe0": "5",
    "VjCY7rX4": "800",
    "3hPeI1RV": "0",
@@ -1066,7 +1066,7 @@
   },
   {
    "MHx05sXt": "810",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_810_NAME",
+   "bWsLFP96": "Snow Area Khelne",
    "9C64Qwe0": "5",
    "VjCY7rX4": "800",
    "3hPeI1RV": "0",
@@ -1085,7 +1085,7 @@
   },
   {
    "MHx05sXt": "820",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_820_NAME",
+   "bWsLFP96": "Stokhelna Forest",
    "9C64Qwe0": "5",
    "VjCY7rX4": "800",
    "3hPeI1RV": "0",
@@ -1104,7 +1104,7 @@
   },
   {
    "MHx05sXt": "830",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_830_NAME",
+   "bWsLFP96": "Azura Ruins",
    "9C64Qwe0": "5",
    "VjCY7rX4": "800",
    "3hPeI1RV": "0",
@@ -1123,7 +1123,7 @@
   },
   {
    "MHx05sXt": "840",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_840_NAME",
+   "bWsLFP96": "Ryvern Mountains",
    "9C64Qwe0": "5",
    "VjCY7rX4": "800",
    "3hPeI1RV": "0",
@@ -1142,7 +1142,7 @@
   },
   {
    "MHx05sXt": "850",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_850_NAME",
+   "bWsLFP96": "The Abyss Cave",
    "9C64Qwe0": "5",
    "VjCY7rX4": "800",
    "3hPeI1RV": "0",
@@ -1161,7 +1161,7 @@
   },
   {
    "MHx05sXt": "860",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_860_NAME",
+   "bWsLFP96": "The White Tower",
    "9C64Qwe0": "5",
    "VjCY7rX4": "800",
    "3hPeI1RV": "0",
@@ -1180,7 +1180,7 @@
   },
   {
    "MHx05sXt": "900",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_900_NAME",
+   "bWsLFP96": "Agni Empire",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1199,7 +1199,7 @@
   },
   {
    "MHx05sXt": "910",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_910_NAME",
+   "bWsLFP96": "Agniria Coast",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1218,7 +1218,7 @@
   },
   {
    "MHx05sXt": "920",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_920_NAME",
+   "bWsLFP96": "Granasta Plateau",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1237,7 +1237,7 @@
   },
   {
    "MHx05sXt": "930",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_930_NAME",
+   "bWsLFP96": "Thunder Summit Navara",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1256,7 +1256,7 @@
   },
   {
    "MHx05sXt": "940",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_940_NAME",
+   "bWsLFP96": "King's Tomb",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1275,7 +1275,7 @@
   },
   {
    "MHx05sXt": "950",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_950_NAME",
+   "bWsLFP96": "Lognea Cove",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1294,7 +1294,7 @@
   },
   {
    "MHx05sXt": "960",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_960_NAME",
+   "bWsLFP96": "Ocean Shrine Albina",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1313,7 +1313,7 @@
   },
   {
    "MHx05sXt": "1000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1000_NAME",
+   "bWsLFP96": "Cave of Darkness",
    "9C64Qwe0": "5",
    "VjCY7rX4": "1000",
    "3hPeI1RV": "0",
@@ -1332,7 +1332,7 @@
   },
   {
    "MHx05sXt": "1010",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1010_NAME",
+   "bWsLFP96": "Arvest Snowfield",
    "9C64Qwe0": "5",
    "VjCY7rX4": "1000",
    "3hPeI1RV": "0",
@@ -1351,7 +1351,7 @@
   },
   {
    "MHx05sXt": "1020",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1020_NAME",
+   "bWsLFP96": "Marleg Ocean of Trees",
    "9C64Qwe0": "5",
    "VjCY7rX4": "1000",
    "3hPeI1RV": "0",
@@ -1370,7 +1370,7 @@
   },
   {
    "MHx05sXt": "1030",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1030_NAME",
+   "bWsLFP96": "Bog of Eternal Rain",
    "9C64Qwe0": "5",
    "VjCY7rX4": "1000",
    "3hPeI1RV": "0",
@@ -1389,7 +1389,7 @@
   },
   {
    "MHx05sXt": "1040",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1040_NAME",
+   "bWsLFP96": "Cape Narasta",
    "9C64Qwe0": "5",
    "VjCY7rX4": "1000",
    "3hPeI1RV": "0",
@@ -1408,7 +1408,7 @@
   },
   {
    "MHx05sXt": "1050",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1050_NAME",
+   "bWsLFP96": "Mirvana Ruins",
    "9C64Qwe0": "5",
    "VjCY7rX4": "1000",
    "3hPeI1RV": "0",
@@ -1427,7 +1427,7 @@
   },
   {
    "MHx05sXt": "1060",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1060_NAME",
+   "bWsLFP96": "Tower of the Gods",
    "9C64Qwe0": "5",
    "VjCY7rX4": "1000",
    "3hPeI1RV": "0",
@@ -1446,7 +1446,7 @@
   },
   {
    "MHx05sXt": "1070",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1070_NAME",
+   "bWsLFP96": "Agni Dungeon",
    "9C64Qwe0": "5",
    "VjCY7rX4": "900",
    "3hPeI1RV": "0",
@@ -1465,7 +1465,7 @@
   },
   {
    "MHx05sXt": "1100",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1100_NAME",
+   "bWsLFP96": "Ulga Lava Cave",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1100",
    "3hPeI1RV": "0",
@@ -1484,7 +1484,7 @@
   },
   {
    "MHx05sXt": "1110",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1110_NAME",
+   "bWsLFP96": "Sea Capital Almeria",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1100",
    "3hPeI1RV": "0",
@@ -1503,7 +1503,7 @@
   },
   {
    "MHx05sXt": "1120",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1120_NAME",
+   "bWsLFP96": "Forest of Old",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1100",
    "3hPeI1RV": "0",
@@ -1522,7 +1522,7 @@
   },
   {
    "MHx05sXt": "1130",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1130_NAME",
+   "bWsLFP96": "Danrard Fortress",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1100",
    "3hPeI1RV": "0",
@@ -1541,7 +1541,7 @@
   },
   {
    "MHx05sXt": "1140",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1140_NAME",
+   "bWsLFP96": "Lanara's Light Ruins",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1100",
    "3hPeI1RV": "0",
@@ -1560,7 +1560,7 @@
   },
   {
    "MHx05sXt": "1150",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1150_NAME",
+   "bWsLFP96": "Cave of Dark Crystals",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1100",
    "3hPeI1RV": "0",
@@ -1579,7 +1579,7 @@
   },
   {
    "MHx05sXt": "1160",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1160_NAME",
+   "bWsLFP96": "Alnakeid Castle",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1100",
    "3hPeI1RV": "0",
@@ -1598,7 +1598,7 @@
   },
   {
    "MHx05sXt": "1200",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1200_NAME",
+   "bWsLFP96": "Olmond Volcano",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1200",
    "3hPeI1RV": "0",
@@ -1617,7 +1617,7 @@
   },
   {
    "MHx05sXt": "1210",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1210_NAME",
+   "bWsLFP96": "Rownor Beach",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1200",
    "3hPeI1RV": "0",
@@ -1636,7 +1636,7 @@
   },
   {
    "MHx05sXt": "1220",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1220_NAME",
+   "bWsLFP96": "Principality of Vriksha",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1200",
    "3hPeI1RV": "0",
@@ -1655,7 +1655,7 @@
   },
   {
    "MHx05sXt": "1230",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1230_NAME",
+   "bWsLFP96": "The Red Lake",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1200",
    "3hPeI1RV": "0",
@@ -1674,7 +1674,7 @@
   },
   {
    "MHx05sXt": "1240",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1240_NAME",
+   "bWsLFP96": "Sky Palace Talahr",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1200",
    "3hPeI1RV": "0",
@@ -1693,7 +1693,7 @@
   },
   {
    "MHx05sXt": "1250",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1250_NAME",
+   "bWsLFP96": "Dark Castle Damrigia",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1200",
    "3hPeI1RV": "0",
@@ -1712,7 +1712,7 @@
   },
   {
    "MHx05sXt": "1260",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1260_NAME",
+   "bWsLFP96": "Adan's Tower",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1200",
    "3hPeI1RV": "0",
@@ -1731,7 +1731,7 @@
   },
   {
    "MHx05sXt": "1300",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1300_NAME",
+   "bWsLFP96": "Ogurono Desert",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1750,7 +1750,7 @@
   },
   {
    "MHx05sXt": "1310",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1310_NAME",
+   "bWsLFP96": "Great Temple Eveneze",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1769,7 +1769,7 @@
   },
   {
    "MHx05sXt": "1320",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1320_NAME",
+   "bWsLFP96": "Unarva Forest",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1788,7 +1788,7 @@
   },
   {
    "MHx05sXt": "1330",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1330_NAME",
+   "bWsLFP96": "Aldahlia of the Rain",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1807,7 +1807,7 @@
   },
   {
    "MHx05sXt": "1340",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1340_NAME",
+   "bWsLFP96": "Pilgrimage Path",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1826,7 +1826,7 @@
   },
   {
    "MHx05sXt": "1350",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1350_NAME",
+   "bWsLFP96": "La Grenna Deadlands",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1845,7 +1845,7 @@
   },
   {
    "MHx05sXt": "1360",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1360_NAME",
+   "bWsLFP96": "Wolf's Lair",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1864,7 +1864,7 @@
   },
   {
    "MHx05sXt": "1370",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1370_NAME",
+   "bWsLFP96": "Elnada Sea Temple",
    "9C64Qwe0": "6",
    "VjCY7rX4": "1300",
    "3hPeI1RV": "0",
@@ -1883,7 +1883,7 @@
   },
   {
    "MHx05sXt": "1400",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1400_NAME",
+   "bWsLFP96": "Ghost Town Ornea",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -1902,7 +1902,7 @@
   },
   {
    "MHx05sXt": "1410",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1410_NAME",
+   "bWsLFP96": "Great Argant Desert",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -1921,7 +1921,7 @@
   },
   {
    "MHx05sXt": "1420",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1420_NAME",
+   "bWsLFP96": "Ekmet River",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -1940,7 +1940,7 @@
   },
   {
    "MHx05sXt": "1430",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1430_NAME",
+   "bWsLFP96": "Great Forest Nalmea",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -1959,7 +1959,7 @@
   },
   {
    "MHx05sXt": "1440",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1440_NAME",
+   "bWsLFP96": "Mt. Granakia",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -1978,7 +1978,7 @@
   },
   {
    "MHx05sXt": "1450",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1450_NAME",
+   "bWsLFP96": "Lowe Grimm Garden",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -1997,7 +1997,7 @@
   },
   {
    "MHx05sXt": "1460",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1460_NAME",
+   "bWsLFP96": "Amuris Cemetery",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -2016,7 +2016,7 @@
   },
   {
    "MHx05sXt": "1470",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1470_NAME",
+   "bWsLFP96": "Crystal Palace",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -2035,7 +2035,7 @@
   },
   {
    "MHx05sXt": "1480",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1480_NAME",
+   "bWsLFP96": "Garnes Research Cave",
    "9C64Qwe0": "7",
    "VjCY7rX4": "1400",
    "3hPeI1RV": "0",
@@ -2054,7 +2054,7 @@
   },
   {
    "MHx05sXt": "1500",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1500_NAME",
+   "bWsLFP96": "Ancient Dragon's Wood",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2073,7 +2073,7 @@
   },
   {
    "MHx05sXt": "1510",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1510_NAME",
+   "bWsLFP96": "Boruk Blazing Dunes",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2092,7 +2092,7 @@
   },
   {
    "MHx05sXt": "1520",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1520_NAME",
+   "bWsLFP96": "Scarlet River Laorkia",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2111,7 +2111,7 @@
   },
   {
    "MHx05sXt": "1530",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1530_NAME",
+   "bWsLFP96": "Deserted Town Yuufim",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2130,7 +2130,7 @@
   },
   {
    "MHx05sXt": "1540",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1540_NAME",
+   "bWsLFP96": "Tower of the Oracle",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2149,7 +2149,7 @@
   },
   {
    "MHx05sXt": "1550",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1550_NAME",
+   "bWsLFP96": "Imperial Capital",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2168,7 +2168,7 @@
   },
   {
    "MHx05sXt": "1560",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1560_NAME",
+   "bWsLFP96": "Sacred Mt. Bari",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2187,7 +2187,7 @@
   },
   {
    "MHx05sXt": "1570",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1570_NAME",
+   "bWsLFP96": "Grand Gaia Crater",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2206,7 +2206,7 @@
   },
   {
    "MHx05sXt": "1580",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1580_NAME",
+   "bWsLFP96": "Subterranean Cave",
    "9C64Qwe0": "8",
    "VjCY7rX4": "1500",
    "3hPeI1RV": "0",
@@ -2225,7 +2225,7 @@
   },
   {
    "MHx05sXt": "10000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10000_NAME",
+   "bWsLFP96": "Forgotten Ruins",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2244,7 +2244,7 @@
   },
   {
    "MHx05sXt": "10010",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10010_NAME",
+   "bWsLFP96": "Lava Bridges",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2263,7 +2263,7 @@
   },
   {
    "MHx05sXt": "10020",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10020_NAME",
+   "bWsLFP96": "Hogun Acid Cascades",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2282,7 +2282,7 @@
   },
   {
    "MHx05sXt": "10030",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10030_NAME",
+   "bWsLFP96": "Farv Miasma Forest",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2301,7 +2301,7 @@
   },
   {
    "MHx05sXt": "10040",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10040_NAME",
+   "bWsLFP96": "Thunder Grotto Yuuram",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2320,7 +2320,7 @@
   },
   {
    "MHx05sXt": "10050",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10050_NAME",
+   "bWsLFP96": "Piercing Light Tower",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2339,7 +2339,7 @@
   },
   {
    "MHx05sXt": "10060",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10060_NAME",
+   "bWsLFP96": "Poisonous Bug Forest",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2358,7 +2358,7 @@
   },
   {
    "MHx05sXt": "10070",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10070_NAME",
+   "bWsLFP96": "Soaring Tree Tower",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2377,7 +2377,7 @@
   },
   {
    "MHx05sXt": "10080",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10080_NAME",
+   "bWsLFP96": "Cave of Sealed Might",
    "9C64Qwe0": "11",
    "VjCY7rX4": "10100",
    "3hPeI1RV": "0",
@@ -2396,7 +2396,7 @@
   },
   {
    "MHx05sXt": "10100",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10100_NAME",
+   "bWsLFP96": "Jimug Lava Caverns",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2415,7 +2415,7 @@
   },
   {
    "MHx05sXt": "10110",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10110_NAME",
+   "bWsLFP96": "Baraku Wetlands",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2434,7 +2434,7 @@
   },
   {
    "MHx05sXt": "10120",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10120_NAME",
+   "bWsLFP96": "Vordo Primeval Forest",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2453,7 +2453,7 @@
   },
   {
    "MHx05sXt": "10130",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10130_NAME",
+   "bWsLFP96": "Fossilized Dragon",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2472,7 +2472,7 @@
   },
   {
    "MHx05sXt": "10140",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10140_NAME",
+   "bWsLFP96": "Lem Shrine Ruins",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2491,7 +2491,7 @@
   },
   {
    "MHx05sXt": "10150",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10150_NAME",
+   "bWsLFP96": "Dark Sierra Oritira",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2510,7 +2510,7 @@
   },
   {
    "MHx05sXt": "10160",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10160_NAME",
+   "bWsLFP96": "Bridge of Despair",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2529,7 +2529,7 @@
   },
   {
    "MHx05sXt": "10170",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10170_NAME",
+   "bWsLFP96": "Cape of Sealed Ploys",
    "9C64Qwe0": "12",
    "VjCY7rX4": "10200",
    "3hPeI1RV": "0",
@@ -2548,7 +2548,7 @@
   },
   {
    "MHx05sXt": "10200",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10200_NAME",
+   "bWsLFP96": "Moldia Lava Road",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2567,7 +2567,7 @@
   },
   {
    "MHx05sXt": "10210",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10210_NAME",
+   "bWsLFP96": "Crimson Beach Shurin",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2586,7 +2586,7 @@
   },
   {
    "MHx05sXt": "10220",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10220_NAME",
+   "bWsLFP96": "Reis's Lab Ruins",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2605,7 +2605,7 @@
   },
   {
    "MHx05sXt": "10230",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10230_NAME",
+   "bWsLFP96": "Windmill Garden",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2624,7 +2624,7 @@
   },
   {
    "MHx05sXt": "10240",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10240_NAME",
+   "bWsLFP96": "Ancient City Maldoor",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2643,7 +2643,7 @@
   },
   {
    "MHx05sXt": "10250",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10250_NAME",
+   "bWsLFP96": "Endless Staircase",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2662,7 +2662,7 @@
   },
   {
    "MHx05sXt": "10260",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10260_NAME",
+   "bWsLFP96": "Beiorg Castle",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2681,7 +2681,7 @@
   },
   {
    "MHx05sXt": "10270",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10270_NAME",
+   "bWsLFP96": "Sealed Forest",
    "9C64Qwe0": "13",
    "VjCY7rX4": "10300",
    "3hPeI1RV": "0",
@@ -2700,7 +2700,7 @@
   },
   {
    "MHx05sXt": "10300",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10300_NAME",
+   "bWsLFP96": "Burning Capital Garm",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2719,7 +2719,7 @@
   },
   {
    "MHx05sXt": "10310",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10310_NAME",
+   "bWsLFP96": "Waste Disposal Lake",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2738,7 +2738,7 @@
   },
   {
    "MHx05sXt": "10320",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10320_NAME",
+   "bWsLFP96": "Wulgee Flower Bed",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2757,7 +2757,7 @@
   },
   {
    "MHx05sXt": "10330",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10330_NAME",
+   "bWsLFP96": "Avor Lighting Bridge",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2776,7 +2776,7 @@
   },
   {
    "MHx05sXt": "10340",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10340_NAME",
+   "bWsLFP96": "Forsaken Disciple's Lair",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2795,7 +2795,7 @@
   },
   {
    "MHx05sXt": "10350",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10350_NAME",
+   "bWsLFP96": "Demon Cavern Feig",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2814,7 +2814,7 @@
   },
   {
    "MHx05sXt": "10360",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10360_NAME",
+   "bWsLFP96": "Forsaken Castle Biorad",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2833,7 +2833,7 @@
   },
   {
    "MHx05sXt": "10370",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10370_NAME",
+   "bWsLFP96": "Sealed Ship Graveyard",
    "9C64Qwe0": "14",
    "VjCY7rX4": "10400",
    "3hPeI1RV": "0",
@@ -2852,7 +2852,7 @@
   },
   {
    "MHx05sXt": "10400",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10400_NAME",
+   "bWsLFP96": "Gadoum Furnace",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -2871,7 +2871,7 @@
   },
   {
    "MHx05sXt": "10410",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10410_NAME",
+   "bWsLFP96": "Luminous River Falun",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -2890,7 +2890,7 @@
   },
   {
    "MHx05sXt": "10420",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10420_NAME",
+   "bWsLFP96": "Botanical Garden",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -2909,7 +2909,7 @@
   },
   {
    "MHx05sXt": "10430",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10430_NAME",
+   "bWsLFP96": "Gimo Junkyard",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -2928,7 +2928,7 @@
   },
   {
    "MHx05sXt": "10440",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10440_NAME",
+   "bWsLFP96": "Shining Capital",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -2947,7 +2947,7 @@
   },
   {
    "MHx05sXt": "10450",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10450_NAME",
+   "bWsLFP96": "Rakshult Underground",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -2966,7 +2966,7 @@
   },
   {
    "MHx05sXt": "10460",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10460_NAME",
+   "bWsLFP96": "Weather Tower",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -2985,7 +2985,7 @@
   },
   {
    "MHx05sXt": "10470",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_10470_NAME",
+   "bWsLFP96": "Sealed Empty Garden",
    "9C64Qwe0": "15",
    "VjCY7rX4": "10500",
    "3hPeI1RV": "0",
@@ -3707,7 +3707,7 @@
   },
   {
    "MHx05sXt": "20000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20000_NAME",
+   "bWsLFP96": "Greskya Caves",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3726,7 +3726,7 @@
   },
   {
    "MHx05sXt": "20010",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20010_NAME",
+   "bWsLFP96": "Ignia Falls",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3745,7 +3745,7 @@
   },
   {
    "MHx05sXt": "20020",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20020_NAME",
+   "bWsLFP96": "Lomass Forest",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3764,7 +3764,7 @@
   },
   {
    "MHx05sXt": "20030",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20030_NAME",
+   "bWsLFP96": "Valtan Fortress",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3783,7 +3783,7 @@
   },
   {
    "MHx05sXt": "20040",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20040_NAME",
+   "bWsLFP96": "Tower of Light",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3802,7 +3802,7 @@
   },
   {
    "MHx05sXt": "20050",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20050_NAME",
+   "bWsLFP96": "Cordelica Mine",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3821,7 +3821,7 @@
   },
   {
    "MHx05sXt": "20060",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20060_NAME",
+   "bWsLFP96": "Giant's Ruins",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3840,7 +3840,7 @@
   },
   {
    "MHx05sXt": "20070",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_20070_NAME",
+   "bWsLFP96": "Ignia Cavern",
    "9C64Qwe0": "2",
    "VjCY7rX4": "20000",
    "3hPeI1RV": "0",
@@ -3859,7 +3859,7 @@
   },
   {
    "MHx05sXt": "20100",
-   "bWsLFP96": "灰雲鉄街",
+   "bWsLFP96": "Iron District",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -3878,7 +3878,7 @@
   },
   {
    "MHx05sXt": "20110",
-   "bWsLFP96": "セルザ工廠",
+   "bWsLFP96": "Selza Arsenal",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -3897,7 +3897,7 @@
   },
   {
    "MHx05sXt": "20120",
-   "bWsLFP96": "壊材廃場",
+   "bWsLFP96": "Demolished Site",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -3916,7 +3916,7 @@
   },
   {
    "MHx05sXt": "20130",
-   "bWsLFP96": "機電都市メルサス",
+   "bWsLFP96": "Tech City Mersas",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -3935,7 +3935,7 @@
   },
   {
    "MHx05sXt": "20140",
-   "bWsLFP96": "情報管理塔",
+   "bWsLFP96": "Information Tower",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -3954,7 +3954,7 @@
   },
   {
    "MHx05sXt": "20150",
-   "bWsLFP96": "ゾリダス山地",
+   "bWsLFP96": "Zoldas Mountains",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -3973,7 +3973,7 @@
   },
   {
    "MHx05sXt": "20160",
-   "bWsLFP96": "機神高郭",
+   "bWsLFP96": "Elevated Station",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -3992,7 +3992,7 @@
   },
   {
    "MHx05sXt": "20170",
-   "bWsLFP96": "ミセルス祀殿",
+   "bWsLFP96": "Michele's Sepulcher",
    "9C64Qwe0": "100",
    "VjCY7rX4": "20100",
    "3hPeI1RV": "7",
@@ -4011,7 +4011,7 @@
   },
   {
    "MHx05sXt": "20200",
-   "bWsLFP96": "バリウラ湖城",
+   "bWsLFP96": "Bariura Lake Castle",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4030,7 +4030,7 @@
   },
   {
    "MHx05sXt": "20210",
-   "bWsLFP96": "城前朽街",
+   "bWsLFP96": "Castle Road",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4049,7 +4049,7 @@
   },
   {
    "MHx05sXt": "20220",
-   "bWsLFP96": "風雪深林",
+   "bWsLFP96": "Snowstorm Woods",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4068,7 +4068,7 @@
   },
   {
    "MHx05sXt": "20230",
-   "bWsLFP96": "ラウジス寒湖",
+   "bWsLFP96": "Raujis Lake",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4087,7 +4087,7 @@
   },
   {
    "MHx05sXt": "20240",
-   "bWsLFP96": "幻楼雪原",
+   "bWsLFP96": "Mirage Snowfields",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4106,7 +4106,7 @@
   },
   {
    "MHx05sXt": "20250",
-   "bWsLFP96": "零壁の密道",
+   "bWsLFP96": "Subzero Road",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4125,7 +4125,7 @@
   },
   {
    "MHx05sXt": "20260",
-   "bWsLFP96": "ガルム砕氷帯",
+   "bWsLFP96": "Gallum Ice Ridge",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4144,7 +4144,7 @@
   },
   {
    "MHx05sXt": "20270",
-   "bWsLFP96": "神狼極域",
+   "bWsLFP96": "Mystical Wolf's Lair",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4163,7 +4163,7 @@
   },
   {
    "MHx05sXt": "20280",
-   "bWsLFP96": "封獣の獄処",
+   "bWsLFP96": "Divine Beast's Prison",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4182,7 +4182,7 @@
   },
   {
    "MHx05sXt": "20290",
-   "bWsLFP96": "慈栄聖領",
+   "bWsLFP96": "Merciful Glory",
    "9C64Qwe0": "101",
    "VjCY7rX4": "20200",
    "3hPeI1RV": "7",
@@ -4201,7 +4201,7 @@
   },
   {
    "MHx05sXt": "20300",
-   "bWsLFP96": "碧陽の竹道",
+   "bWsLFP96": "Bluesun Grove Path",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4220,7 +4220,7 @@
   },
   {
    "MHx05sXt": "20310",
-   "bWsLFP96": "沃涼田園",
+   "bWsLFP96": "Prosperity Fields",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4239,7 +4239,7 @@
   },
   {
    "MHx05sXt": "20320",
-   "bWsLFP96": "禍戦ヶ原",
+   "bWsLFP96": "Calamity Plains",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4258,7 +4258,7 @@
   },
   {
    "MHx05sXt": "20330",
-   "bWsLFP96": "護領関",
+   "bWsLFP96": "Defensive Checkpoint",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4277,7 +4277,7 @@
   },
   {
    "MHx05sXt": "20340",
-   "bWsLFP96": "州街の大橋",
+   "bWsLFP96": "Grand Bridge",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4296,7 +4296,7 @@
   },
   {
    "MHx05sXt": "20350",
-   "bWsLFP96": "高阻の城壁",
+   "bWsLFP96": "Skyblock Walls",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4315,7 +4315,7 @@
   },
   {
    "MHx05sXt": "20360",
-   "bWsLFP96": "千畳御殿",
+   "bWsLFP96": "Thousand-Mat Hall",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4334,7 +4334,7 @@
   },
   {
    "MHx05sXt": "20370",
-   "bWsLFP96": "妖凰天守",
+   "bWsLFP96": "Phoenix Tower",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4353,7 +4353,7 @@
   },
   {
    "MHx05sXt": "20380",
-   "bWsLFP96": "機武の廃寺",
+   "bWsLFP96": "Abandoned Temple",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4372,7 +4372,7 @@
   },
   {
    "MHx05sXt": "20390",
-   "bWsLFP96": "寂寞の野原",
+   "bWsLFP96": "Fields of Despair",
    "9C64Qwe0": "102",
    "VjCY7rX4": "20300",
    "3hPeI1RV": "7",
@@ -4391,7 +4391,7 @@
   },
   {
    "MHx05sXt": "20400",
-   "bWsLFP96": "遠望の高地",
+   "bWsLFP96": "Vista Plateau",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4410,7 +4410,7 @@
   },
   {
    "MHx05sXt": "20410",
-   "bWsLFP96": "巨虚古跡",
+   "bWsLFP96": "Ancient Cave",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4429,7 +4429,7 @@
   },
   {
    "MHx05sXt": "20420",
-   "bWsLFP96": "アンカシュ湿跡",
+   "bWsLFP96": "Ankash Ruins",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4448,7 +4448,7 @@
   },
   {
    "MHx05sXt": "20430",
-   "bWsLFP96": "掌流瀑布",
+   "bWsLFP96": "Flowing Waterfall",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4467,7 +4467,7 @@
   },
   {
    "MHx05sXt": "20440",
-   "bWsLFP96": "厳塊の峡壁",
+   "bWsLFP96": "Hollow Ravine",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4486,7 +4486,7 @@
   },
   {
    "MHx05sXt": "20450",
-   "bWsLFP96": "神兜殿",
+   "bWsLFP96": "Divine Helm",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4505,7 +4505,7 @@
   },
   {
    "MHx05sXt": "20460",
-   "bWsLFP96": "鎧核廊",
+   "bWsLFP96": "Armor Hall",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4524,7 +4524,7 @@
   },
   {
    "MHx05sXt": "20470",
-   "bWsLFP96": "崩柱の墓群",
+   "bWsLFP96": "Demolished Tomb",
    "9C64Qwe0": "103",
    "VjCY7rX4": "20400",
    "3hPeI1RV": "7",
@@ -4543,7 +4543,7 @@
   },
   {
    "MHx05sXt": "20500",
-   "bWsLFP96": "星降りの丘",
+   "bWsLFP96": "Hill of Falling Stars",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4562,7 +4562,7 @@
   },
   {
    "MHx05sXt": "20510",
-   "bWsLFP96": "竜の炎墓",
+   "bWsLFP96": "Dragon's Flame Tomb",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4581,7 +4581,7 @@
   },
   {
    "MHx05sXt": "20520",
-   "bWsLFP96": "雷晶山",
+   "bWsLFP96": "Thunder Gem Mountain",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4600,7 +4600,7 @@
   },
   {
    "MHx05sXt": "20530",
-   "bWsLFP96": "月影の鏡湖",
+   "bWsLFP96": "Moonlit Mirror Lake",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4619,7 +4619,7 @@
   },
   {
    "MHx05sXt": "20540",
-   "bWsLFP96": "神樹海",
+   "bWsLFP96": "Deep Divine Forest",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4638,7 +4638,7 @@
   },
   {
    "MHx05sXt": "20550",
-   "bWsLFP96": "カーラル遺殿",
+   "bWsLFP96": "Kahral Temple Ruins",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4657,7 +4657,7 @@
   },
   {
    "MHx05sXt": "20560",
-   "bWsLFP96": "導星の暗洞",
+   "bWsLFP96": "Guiding Star Cave",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4676,7 +4676,7 @@
   },
   {
    "MHx05sXt": "20570",
-   "bWsLFP96": "神竜の寝所",
+   "bWsLFP96": "Dragon's Chambers",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4695,7 +4695,7 @@
   },
   {
    "MHx05sXt": "20580",
-   "bWsLFP96": "審決の神闘場",
+   "bWsLFP96": "Judgement Battlefield",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4714,7 +4714,7 @@
   },
   {
    "MHx05sXt": "20590",
-   "bWsLFP96": "再臨の炉",
+   "bWsLFP96": "Resurrection Furnace",
    "9C64Qwe0": "104",
    "VjCY7rX4": "20500",
    "3hPeI1RV": "7",
@@ -4733,7 +4733,7 @@
   },
   {
    "MHx05sXt": "20600",
-   "bWsLFP96": "崩序の草原",
+   "bWsLFP96": "Disordered Plains",
    "9C64Qwe0": "105",
    "VjCY7rX4": "20600",
    "3hPeI1RV": "7",
@@ -4752,7 +4752,7 @@
   },
   {
    "MHx05sXt": "20610",
-   "bWsLFP96": "灰尽の森",
+   "bWsLFP96": "Ashen Forest",
    "9C64Qwe0": "105",
    "VjCY7rX4": "20600",
    "3hPeI1RV": "7",
@@ -4771,7 +4771,7 @@
   },
   {
    "MHx05sXt": "20620",
-   "bWsLFP96": "砕礫原野",
+   "bWsLFP96": "Stony Wastelands",
    "9C64Qwe0": "105",
    "VjCY7rX4": "20600",
    "3hPeI1RV": "7",
@@ -4790,7 +4790,7 @@
   },
   {
    "MHx05sXt": "20630",
-   "bWsLFP96": "亡街ルーチェス",
+   "bWsLFP96": "Roux Chess Ghost Town",
    "9C64Qwe0": "105",
    "VjCY7rX4": "20600",
    "3hPeI1RV": "7",
@@ -4809,7 +4809,7 @@
   },
   {
    "MHx05sXt": "20640",
-   "bWsLFP96": "清憩の広場",
+   "bWsLFP96": "Purity Square",
    "9C64Qwe0": "105",
    "VjCY7rX4": "20600",
    "3hPeI1RV": "7",
@@ -4828,7 +4828,7 @@
   },
   {
    "MHx05sXt": "20650",
-   "bWsLFP96": "葬魔の禁碑",
+   "bWsLFP96": "Demon Tomb Monument",
    "9C64Qwe0": "105",
    "VjCY7rX4": "20600",
    "3hPeI1RV": "7",
@@ -4847,7 +4847,7 @@
   },
   {
    "MHx05sXt": "100000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100000_NAME",
+   "bWsLFP96": "Gathering of Souls",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100000",
    "3hPeI1RV": "0",
@@ -4866,7 +4866,7 @@
   },
   {
    "MHx05sXt": "100050",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100050_NAME",
+   "bWsLFP96": "Souls Training Ground",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -4885,7 +4885,7 @@
   },
   {
    "MHx05sXt": "100100",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100100_NAME",
+   "bWsLFP96": "Faerie Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -4904,7 +4904,7 @@
   },
   {
    "MHx05sXt": "100200",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100200_NAME",
+   "bWsLFP96": "Cave of Greed",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -4923,7 +4923,7 @@
   },
   {
    "MHx05sXt": "100300",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100300_NAME",
+   "bWsLFP96": "Garden of God",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -4942,7 +4942,7 @@
   },
   {
    "MHx05sXt": "100310",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100310_NAME",
+   "bWsLFP96": "Ruins of Light and Dark",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100310",
    "3hPeI1RV": "0",
@@ -4961,7 +4961,7 @@
   },
   {
    "MHx05sXt": "100320",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100320_NAME",
+   "bWsLFP96": "The Mecha Gods Awaken",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -4980,7 +4980,7 @@
   },
   {
    "MHx05sXt": "100400",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100400_NAME",
+   "bWsLFP96": "Remains of Eternity",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -4999,7 +4999,7 @@
   },
   {
    "MHx05sXt": "100500",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100500_NAME",
+   "bWsLFP96": "Golden Slumberland",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -5018,7 +5018,7 @@
   },
   {
    "MHx05sXt": "100600",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100600_NAME",
+   "bWsLFP96": "Metal Parade!",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100600",
    "3hPeI1RV": "0",
@@ -5037,7 +5037,7 @@
   },
   {
    "MHx05sXt": "100650",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100650_NAME",
+   "bWsLFP96": "Jewel Parade!",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100600",
    "3hPeI1RV": "0",
@@ -5056,7 +5056,7 @@
   },
   {
    "MHx05sXt": "100660",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100660_NAME",
+   "bWsLFP96": "Guardians of Lore",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -5094,7 +5094,7 @@
   },
   {
    "MHx05sXt": "100700",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100700_NAME",
+   "bWsLFP96": "Lone Traveller of the Wind",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100700",
    "3hPeI1RV": "0",
@@ -5113,7 +5113,7 @@
   },
   {
    "MHx05sXt": "100800",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100800_NAME",
+   "bWsLFP96": "Dweller in the Darkness",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100800",
    "3hPeI1RV": "0",
@@ -5132,7 +5132,7 @@
   },
   {
    "MHx05sXt": "100900",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_100900_NAME",
+   "bWsLFP96": "Bearer of the Flaming God Arm",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100900",
    "3hPeI1RV": "0",
@@ -5151,7 +5151,7 @@
   },
   {
    "MHx05sXt": "101000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101000_NAME",
+   "bWsLFP96": "Flower In the Frost",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101000",
    "3hPeI1RV": "0",
@@ -5170,7 +5170,7 @@
   },
   {
    "MHx05sXt": "101100",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101100_NAME",
+   "bWsLFP96": "The Iron-Fisted Lady",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101100",
    "3hPeI1RV": "0",
@@ -5189,7 +5189,7 @@
   },
   {
    "MHx05sXt": "101200",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101200_NAME",
+   "bWsLFP96": "When Lightning Strikes",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101200",
    "3hPeI1RV": "0",
@@ -5208,7 +5208,7 @@
   },
   {
    "MHx05sXt": "101400",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101400_NAME",
+   "bWsLFP96": "Year-End Dungeon Day 1",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101400",
    "3hPeI1RV": "0",
@@ -5227,7 +5227,7 @@
   },
   {
    "MHx05sXt": "101410",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101410_NAME",
+   "bWsLFP96": "Year-End Dungeon Day 2",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101410",
    "3hPeI1RV": "0",
@@ -5246,7 +5246,7 @@
   },
   {
    "MHx05sXt": "101420",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101420_NAME",
+   "bWsLFP96": "Year-End Dungeon Day 3",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101420",
    "3hPeI1RV": "0",
@@ -5265,7 +5265,7 @@
   },
   {
    "MHx05sXt": "101500",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101500_NAME",
+   "bWsLFP96": "Affectionate Flames",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101500",
    "3hPeI1RV": "0",
@@ -5284,7 +5284,7 @@
   },
   {
    "MHx05sXt": "101600",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101600_NAME",
+   "bWsLFP96": "Absolute Zero",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101600",
    "3hPeI1RV": "0",
@@ -5303,7 +5303,7 @@
   },
   {
    "MHx05sXt": "101700",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101700_NAME",
+   "bWsLFP96": "Gaia's Voice",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101700",
    "3hPeI1RV": "0",
@@ -5322,7 +5322,7 @@
   },
   {
    "MHx05sXt": "101800",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101800_NAME",
+   "bWsLFP96": "In the Name of Thunder",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101800",
    "3hPeI1RV": "0",
@@ -5341,7 +5341,7 @@
   },
   {
    "MHx05sXt": "101900",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_101900_NAME",
+   "bWsLFP96": "Protected by the Sky",
    "9C64Qwe0": "99",
    "VjCY7rX4": "101900",
    "3hPeI1RV": "0",
@@ -5360,7 +5360,7 @@
   },
   {
    "MHx05sXt": "102000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102000_NAME",
+   "bWsLFP96": "Enthralled by the Moon",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102000",
    "3hPeI1RV": "0",
@@ -5379,7 +5379,7 @@
   },
   {
    "MHx05sXt": "102600",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102600_NAME",
+   "bWsLFP96": "Mysterious Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102600",
    "3hPeI1RV": "0",
@@ -5398,7 +5398,7 @@
   },
   {
    "MHx05sXt": "102610",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102610_NAME",
+   "bWsLFP96": "Mysterious Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102610",
    "3hPeI1RV": "0",
@@ -5417,7 +5417,7 @@
   },
   {
    "MHx05sXt": "102620",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102620_NAME",
+   "bWsLFP96": "Ultimate Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102620",
    "3hPeI1RV": "0",
@@ -5436,7 +5436,7 @@
   },
   {
    "MHx05sXt": "102630",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102630_NAME",
+   "bWsLFP96": "Ultimate Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102630",
    "3hPeI1RV": "0",
@@ -5455,7 +5455,7 @@
   },
   {
    "MHx05sXt": "102640",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102640_NAME",
+   "bWsLFP96": "Ultimate Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102640",
    "3hPeI1RV": "0",
@@ -5474,7 +5474,7 @@
   },
   {
    "MHx05sXt": "102650",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102650_NAME",
+   "bWsLFP96": "Ultimate Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102650",
    "3hPeI1RV": "0",
@@ -5493,7 +5493,7 @@
   },
   {
    "MHx05sXt": "102660",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102660_NAME",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102660",
    "3hPeI1RV": "0",
@@ -5512,7 +5512,7 @@
   },
   {
    "MHx05sXt": "102670",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102670_NAME",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102670",
    "3hPeI1RV": "0",
@@ -5531,7 +5531,7 @@
   },
   {
    "MHx05sXt": "102680",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102680_NAME",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102680",
    "3hPeI1RV": "0",
@@ -5550,7 +5550,7 @@
   },
   {
    "MHx05sXt": "102690",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102690_NAME",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102690",
    "3hPeI1RV": "0",
@@ -5569,7 +5569,7 @@
   },
   {
    "MHx05sXt": "102700",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102700_NAME",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102700",
    "3hPeI1RV": "0",
@@ -5588,7 +5588,7 @@
   },
   {
    "MHx05sXt": "102710",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102710_NAME",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102710",
    "3hPeI1RV": "0",
@@ -5607,7 +5607,7 @@
   },
   {
    "MHx05sXt": "102720",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102720_NAME",
+   "bWsLFP96": "Garden of Imps",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100600",
    "3hPeI1RV": "0",
@@ -5626,7 +5626,7 @@
   },
   {
    "MHx05sXt": "102800",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102800_NAME",
+   "bWsLFP96": "Great Fire of Hope",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102800",
    "3hPeI1RV": "0",
@@ -5645,7 +5645,7 @@
   },
   {
    "MHx05sXt": "102900",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_102900_NAME",
+   "bWsLFP96": "Swift Blue Silence",
    "9C64Qwe0": "99",
    "VjCY7rX4": "102900",
    "3hPeI1RV": "0",
@@ -5664,7 +5664,7 @@
   },
   {
    "MHx05sXt": "103000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_103000_NAME",
+   "bWsLFP96": "Dark Green Wisdom",
    "9C64Qwe0": "99",
    "VjCY7rX4": "103000",
    "3hPeI1RV": "0",
@@ -5683,7 +5683,7 @@
   },
   {
    "MHx05sXt": "103100",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_103100_NAME",
+   "bWsLFP96": "Golden Purpose",
    "9C64Qwe0": "99",
    "VjCY7rX4": "103100",
    "3hPeI1RV": "0",
@@ -5702,7 +5702,7 @@
   },
   {
    "MHx05sXt": "103200",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_103200_NAME",
+   "bWsLFP96": "Guided by White Light",
    "9C64Qwe0": "99",
    "VjCY7rX4": "103200",
    "3hPeI1RV": "0",
@@ -5721,7 +5721,7 @@
   },
   {
    "MHx05sXt": "103300",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_103300_NAME",
+   "bWsLFP96": "Black Whirlwind",
    "9C64Qwe0": "99",
    "VjCY7rX4": "103300",
    "3hPeI1RV": "0",
@@ -5740,7 +5740,7 @@
   },
   {
    "MHx05sXt": "103400",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_103400_NAME",
+   "bWsLFP96": "Songstress of Light",
    "9C64Qwe0": "99",
    "VjCY7rX4": "103400",
    "3hPeI1RV": "0",
@@ -5778,7 +5778,7 @@
   },
   {
    "MHx05sXt": "104100",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_104100_NAME",
+   "bWsLFP96": "Soul Island Forest",
    "9C64Qwe0": "99",
    "VjCY7rX4": "103900",
    "3hPeI1RV": "0",
@@ -5797,7 +5797,7 @@
   },
   {
    "MHx05sXt": "104200",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_104200_NAME",
+   "bWsLFP96": "Holy Knight's Castle",
    "9C64Qwe0": "99",
    "VjCY7rX4": "104000",
    "3hPeI1RV": "0",
@@ -5987,7 +5987,7 @@
   },
   {
    "MHx05sXt": "105900",
-   "bWsLFP96": "王都グランシェルト",
+   "bWsLFP96": "Royal Capital Grandshelt",
    "9C64Qwe0": "99",
    "VjCY7rX4": "105700",
    "3hPeI1RV": "0",
@@ -6006,7 +6006,7 @@
   },
   {
    "MHx05sXt": "105910",
-   "bWsLFP96": "コロシアムへの道",
+   "bWsLFP96": "Road to the Colosseum",
    "9C64Qwe0": "99",
    "VjCY7rX4": "105710",
    "3hPeI1RV": "0",
@@ -6025,7 +6025,7 @@
   },
   {
    "MHx05sXt": "106000",
-   "bWsLFP96": "ネオニューヨーク",
+   "bWsLFP96": "Neo New York",
    "9C64Qwe0": "99",
    "VjCY7rX4": "105800",
    "3hPeI1RV": "0",
@@ -6044,7 +6044,7 @@
   },
   {
    "MHx05sXt": "106010",
-   "bWsLFP96": "イリュリア城",
+   "bWsLFP96": "Royal Court",
    "9C64Qwe0": "99",
    "VjCY7rX4": "105810",
    "3hPeI1RV": "0",
@@ -6082,7 +6082,7 @@
   },
   {
    "MHx05sXt": "110012",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110012",
    "3hPeI1RV": "0",
@@ -6101,7 +6101,7 @@
   },
   {
    "MHx05sXt": "110013",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110013",
    "3hPeI1RV": "0",
@@ -6120,7 +6120,7 @@
   },
   {
    "MHx05sXt": "110014",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110014",
    "3hPeI1RV": "0",
@@ -6139,7 +6139,7 @@
   },
   {
    "MHx05sXt": "110015",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110015",
    "3hPeI1RV": "0",
@@ -6158,7 +6158,7 @@
   },
   {
    "MHx05sXt": "110016",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110016",
    "3hPeI1RV": "0",
@@ -6177,7 +6177,7 @@
   },
   {
    "MHx05sXt": "110017",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110017",
    "3hPeI1RV": "0",
@@ -6196,7 +6196,7 @@
   },
   {
    "MHx05sXt": "110018",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110018",
    "3hPeI1RV": "0",
@@ -6215,7 +6215,7 @@
   },
   {
    "MHx05sXt": "110019",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110019",
    "3hPeI1RV": "0",
@@ -6234,7 +6234,7 @@
   },
   {
    "MHx05sXt": "110020",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110020",
    "3hPeI1RV": "0",
@@ -6253,7 +6253,7 @@
   },
   {
    "MHx05sXt": "110021",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110021",
    "3hPeI1RV": "0",
@@ -6272,7 +6272,7 @@
   },
   {
    "MHx05sXt": "110022",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110022",
    "3hPeI1RV": "0",
@@ -6291,7 +6291,7 @@
   },
   {
    "MHx05sXt": "110023",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110023",
    "3hPeI1RV": "0",
@@ -6310,7 +6310,7 @@
   },
   {
    "MHx05sXt": "110024",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110024",
    "3hPeI1RV": "0",
@@ -6329,7 +6329,7 @@
   },
   {
    "MHx05sXt": "110025",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110025",
    "3hPeI1RV": "0",
@@ -6348,7 +6348,7 @@
   },
   {
    "MHx05sXt": "110026",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110026",
    "3hPeI1RV": "0",
@@ -6367,7 +6367,7 @@
   },
   {
    "MHx05sXt": "110027",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110027",
    "3hPeI1RV": "0",
@@ -6386,7 +6386,7 @@
   },
   {
    "MHx05sXt": "110028",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110028",
    "3hPeI1RV": "0",
@@ -6405,7 +6405,7 @@
   },
   {
    "MHx05sXt": "110029",
-   "bWsLFP96": "天上の楽園",
+   "bWsLFP96": "Heavenly Paradise",
    "9C64Qwe0": "99",
    "VjCY7rX4": "110029",
    "3hPeI1RV": "0",
@@ -6671,7 +6671,7 @@
   },
   {
    "MHx05sXt": "150013",
-   "bWsLFP96": "至公たる叡智",
+   "bWsLFP96": "A Master's Wisdom",
    "9C64Qwe0": "99",
    "VjCY7rX4": "150000",
    "3hPeI1RV": "0",
@@ -6690,7 +6690,7 @@
   },
   {
    "MHx05sXt": "150014",
-   "bWsLFP96": "新時代の英雄たち",
+   "bWsLFP96": "Heroes of a New Era",
    "9C64Qwe0": "99",
    "VjCY7rX4": "150000",
    "3hPeI1RV": "0",
@@ -6709,7 +6709,7 @@
   },
   {
    "MHx05sXt": "150015",
-   "bWsLFP96": "蒼き血の真実",
+   "bWsLFP96": "Blue-Blood Revelation",
    "9C64Qwe0": "99",
    "VjCY7rX4": "150000",
    "3hPeI1RV": "0",
@@ -6728,7 +6728,7 @@
   },
   {
    "MHx05sXt": "500000",
-   "bWsLFP96": "経験訓練場",
+   "bWsLFP96": "Experience Training",
    "9C64Qwe0": "999",
    "VjCY7rX4": "500000",
    "3hPeI1RV": "7",
@@ -6747,7 +6747,7 @@
   },
   {
    "MHx05sXt": "500020",
-   "bWsLFP96": "召喚術訓練場",
+   "bWsLFP96": "Summoning Arts Training",
    "9C64Qwe0": "999",
    "VjCY7rX4": "500000",
    "3hPeI1RV": "7",
@@ -6766,7 +6766,7 @@
   },
   {
    "MHx05sXt": "500040",
-   "bWsLFP96": "武器訓練場",
+   "bWsLFP96": "Weapon Training",
    "9C64Qwe0": "999",
    "VjCY7rX4": "500000",
    "3hPeI1RV": "7",
@@ -6785,7 +6785,7 @@
   },
   {
    "MHx05sXt": "500060",
-   "bWsLFP96": "能力強化訓練場",
+   "bWsLFP96": "Parameters Training",
    "9C64Qwe0": "999",
    "VjCY7rX4": "500000",
    "3hPeI1RV": "7",
@@ -6804,7 +6804,7 @@
   },
   {
    "MHx05sXt": "600000",
-   "bWsLFP96": "バトルルーム",
+   "bWsLFP96": "Battle Hall",
    "9C64Qwe0": "999",
    "VjCY7rX4": "600000",
    "3hPeI1RV": "9",
@@ -6823,7 +6823,7 @@
   },
   {
    "MHx05sXt": "800011",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800011_NAME",
+   "bWsLFP96": "Unholy Tower",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800011",
    "3hPeI1RV": "0",
@@ -6842,7 +6842,7 @@
   },
   {
    "MHx05sXt": "800012",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800012_NAME",
+   "bWsLFP96": "Unholy Tower - Dark Side -",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800012",
    "3hPeI1RV": "0",
@@ -6861,7 +6861,7 @@
   },
   {
    "MHx05sXt": "800013",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800013_NAME",
+   "bWsLFP96": "XE Prologue",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800013",
    "3hPeI1RV": "0",
@@ -6880,7 +6880,7 @@
   },
   {
    "MHx05sXt": "800020",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800020_NAME",
+   "bWsLFP96": "Leon's Deception",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800020",
    "3hPeI1RV": "0",
@@ -6899,7 +6899,7 @@
   },
   {
    "MHx05sXt": "800021",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800021_NAME",
+   "bWsLFP96": "Moonlight Parade",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800021",
    "3hPeI1RV": "0",
@@ -6918,7 +6918,7 @@
   },
   {
    "MHx05sXt": "800051",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800051_NAME",
+   "bWsLFP96": "Trial of the Gods",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800051",
    "3hPeI1RV": "0",
@@ -6956,7 +6956,7 @@
   },
   {
    "MHx05sXt": "800061",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800061_NAME",
+   "bWsLFP96": "Machine of Destruction",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800060",
    "3hPeI1RV": "0",
@@ -6975,7 +6975,7 @@
   },
   {
    "MHx05sXt": "800062",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800062_NAME",
+   "bWsLFP96": "Abyssal Fury",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800060",
    "3hPeI1RV": "0",
@@ -6994,7 +6994,7 @@
   },
   {
    "MHx05sXt": "800063",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800063_NAME",
+   "bWsLFP96": "Sanctuary Skirmish",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800060",
    "3hPeI1RV": "0",
@@ -7013,7 +7013,7 @@
   },
   {
    "MHx05sXt": "800064",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800064_NAME",
+   "bWsLFP96": "Pinnacle of Command",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800060",
    "3hPeI1RV": "0",
@@ -7032,7 +7032,7 @@
   },
   {
    "MHx05sXt": "800065",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800065_NAME",
+   "bWsLFP96": "Spiteful Passion",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800060",
    "3hPeI1RV": "0",
@@ -7051,7 +7051,7 @@
   },
   {
    "MHx05sXt": "800066",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800066_NAME",
+   "bWsLFP96": "Underworld Umbrage",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800060",
    "3hPeI1RV": "0",
@@ -7070,7 +7070,7 @@
   },
   {
    "MHx05sXt": "800070",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800070_NAME",
+   "bWsLFP96": "Hall of Melody",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -7089,7 +7089,7 @@
   },
   {
    "MHx05sXt": "800080",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800080_NAME",
+   "bWsLFP96": "Easter Madness",
    "9C64Qwe0": "99",
    "VjCY7rX4": "800080",
    "3hPeI1RV": "0",
@@ -7127,7 +7127,7 @@
   },
   {
    "MHx05sXt": "800100",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_800100_NAME",
+   "bWsLFP96": "Bulb Haven",
    "9C64Qwe0": "99",
    "VjCY7rX4": "100001",
    "3hPeI1RV": "0",
@@ -8362,7 +8362,7 @@
   },
   {
    "MHx05sXt": "801000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_801000_NAME",
+   "bWsLFP96": "Flaming Rocket of Justice",
    "9C64Qwe0": "99",
    "VjCY7rX4": "801000",
    "3hPeI1RV": "0",
@@ -8381,7 +8381,7 @@
   },
   {
    "MHx05sXt": "801006",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_801006_NAME",
+   "bWsLFP96": "Hero of Agni: Vargas",
    "9C64Qwe0": "99",
    "VjCY7rX4": "801006",
    "3hPeI1RV": "0",
@@ -8438,7 +8438,7 @@
   },
   {
    "MHx05sXt": "801030",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_801030_NAME",
+   "bWsLFP96": "Prosperity Brawl",
    "9C64Qwe0": "99",
    "VjCY7rX4": "801030",
    "3hPeI1RV": "0",
@@ -8457,7 +8457,7 @@
   },
   {
    "MHx05sXt": "801999",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_801999_NAME",
+   "bWsLFP96": "Burny & Friends UNLEASHED!",
    "9C64Qwe0": "99",
    "VjCY7rX4": "801999",
    "3hPeI1RV": "0",
@@ -8476,7 +8476,7 @@
   },
   {
    "MHx05sXt": "802000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_802000_NAME",
+   "bWsLFP96": "Gun Goddess of the Tides",
    "9C64Qwe0": "99",
    "VjCY7rX4": "802000",
    "3hPeI1RV": "0",
@@ -8495,7 +8495,7 @@
   },
   {
    "MHx05sXt": "802006",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_802006_NAME",
+   "bWsLFP96": "Heroine of Sama: Selena",
    "9C64Qwe0": "99",
    "VjCY7rX4": "802006",
    "3hPeI1RV": "0",
@@ -8514,7 +8514,7 @@
   },
   {
    "MHx05sXt": "802011",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_802011_NAME",
+   "bWsLFP96": "Winter Glades Blitz",
    "9C64Qwe0": "99",
    "VjCY7rX4": "802011",
    "3hPeI1RV": "0",
@@ -8571,7 +8571,7 @@
   },
   {
    "MHx05sXt": "803000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_803000_NAME",
+   "bWsLFP96": "Slashing Fist of the Wild",
    "9C64Qwe0": "99",
    "VjCY7rX4": "803000",
    "3hPeI1RV": "0",
@@ -8590,7 +8590,7 @@
   },
   {
    "MHx05sXt": "803006",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_803006_NAME",
+   "bWsLFP96": "Hero of Vriksha: Lance",
    "9C64Qwe0": "99",
    "VjCY7rX4": "803006",
    "3hPeI1RV": "0",
@@ -8609,7 +8609,7 @@
   },
   {
    "MHx05sXt": "804000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_804000_NAME",
+   "bWsLFP96": "The Lightning Bomber",
    "9C64Qwe0": "99",
    "VjCY7rX4": "804000",
    "3hPeI1RV": "0",
@@ -8628,7 +8628,7 @@
   },
   {
    "MHx05sXt": "804006",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_804006_NAME",
+   "bWsLFP96": "Hero of Atharva: Eze",
    "9C64Qwe0": "99",
    "VjCY7rX4": "804006",
    "3hPeI1RV": "0",
@@ -8647,7 +8647,7 @@
   },
   {
    "MHx05sXt": "804999",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_804999_NAME",
+   "bWsLFP96": "Thunder Turnout",
    "9C64Qwe0": "99",
    "VjCY7rX4": "804999",
    "3hPeI1RV": "0",
@@ -8666,7 +8666,7 @@
   },
   {
    "MHx05sXt": "805000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_805000_NAME",
+   "bWsLFP96": "Queen of the High Skies",
    "9C64Qwe0": "99",
    "VjCY7rX4": "805000",
    "3hPeI1RV": "0",
@@ -8685,7 +8685,7 @@
   },
   {
    "MHx05sXt": "805006",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_805006_NAME",
+   "bWsLFP96": "Hero of La Veda: Atro",
    "9C64Qwe0": "99",
    "VjCY7rX4": "805006",
    "3hPeI1RV": "0",
@@ -8704,7 +8704,7 @@
   },
   {
    "MHx05sXt": "806000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_806000_NAME",
+   "bWsLFP96": "The Half-blood Princess",
    "9C64Qwe0": "99",
    "VjCY7rX4": "806000",
    "3hPeI1RV": "0",
@@ -8723,7 +8723,7 @@
   },
   {
    "MHx05sXt": "806006",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_806006_NAME",
+   "bWsLFP96": "Hero of Bariura: Magress",
    "9C64Qwe0": "99",
    "VjCY7rX4": "806006",
    "3hPeI1RV": "0",
@@ -8742,7 +8742,7 @@
   },
   {
    "MHx05sXt": "806050",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_806050_NAME",
+   "bWsLFP96": "Witch of the Abyss",
    "9C64Qwe0": "99",
    "VjCY7rX4": "806050",
    "3hPeI1RV": "0",
@@ -8780,7 +8780,7 @@
   },
   {
    "MHx05sXt": "840000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_840000_NAME",
+   "bWsLFP96": "Magic Renaissance",
    "9C64Qwe0": "99",
    "VjCY7rX4": "840000",
    "3hPeI1RV": "0",
@@ -9027,7 +9027,7 @@
   },
   {
    "MHx05sXt": "900000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_900000_NAME",
+   "bWsLFP96": "Great Tree's Melody",
    "9C64Qwe0": "99",
    "VjCY7rX4": "900000",
    "3hPeI1RV": "0",
@@ -9046,7 +9046,7 @@
   },
   {
    "MHx05sXt": "900010",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_900010_NAME",
+   "bWsLFP96": "Dark Sakura Dance",
    "9C64Qwe0": "99",
    "VjCY7rX4": "900001",
    "3hPeI1RV": "0",
@@ -9065,7 +9065,7 @@
   },
   {
    "MHx05sXt": "1000000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1000000_NAME",
+   "bWsLFP96": "Frontier Hunter",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000000",
    "3hPeI1RV": "1",
@@ -9084,7 +9084,7 @@
   },
   {
    "MHx05sXt": "1000001",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_1000001_NAME",
+   "bWsLFP96": "Frontier Hunter 2",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000001",
    "3hPeI1RV": "3",
@@ -9103,7 +9103,7 @@
   },
   {
    "MHx05sXt": "1000010",
-   "bWsLFP96": "第１回領域調査",
+   "bWsLFP96": "1st Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9122,7 +9122,7 @@
   },
   {
    "MHx05sXt": "1000020",
-   "bWsLFP96": "第２回領域調査",
+   "bWsLFP96": "2nd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9141,7 +9141,7 @@
   },
   {
    "MHx05sXt": "1000030",
-   "bWsLFP96": "第３回領域調査",
+   "bWsLFP96": "3rd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9160,7 +9160,7 @@
   },
   {
    "MHx05sXt": "1000040",
-   "bWsLFP96": "第４回領域調査",
+   "bWsLFP96": "4th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9179,7 +9179,7 @@
   },
   {
    "MHx05sXt": "1000050",
-   "bWsLFP96": "第５回領域調査",
+   "bWsLFP96": "5th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9198,7 +9198,7 @@
   },
   {
    "MHx05sXt": "1000060",
-   "bWsLFP96": "第６回領域調査",
+   "bWsLFP96": "6th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9217,7 +9217,7 @@
   },
   {
    "MHx05sXt": "1000070",
-   "bWsLFP96": "第７回領域調査",
+   "bWsLFP96": "7th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9236,7 +9236,7 @@
   },
   {
    "MHx05sXt": "1000080",
-   "bWsLFP96": "第８回領域調査",
+   "bWsLFP96": "8th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9255,7 +9255,7 @@
   },
   {
    "MHx05sXt": "1000090",
-   "bWsLFP96": "第９回領域調査",
+   "bWsLFP96": "9th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9274,7 +9274,7 @@
   },
   {
    "MHx05sXt": "1000100",
-   "bWsLFP96": "第１０回領域調査",
+   "bWsLFP96": "10th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9293,7 +9293,7 @@
   },
   {
    "MHx05sXt": "1000110",
-   "bWsLFP96": "第１１回領域調査",
+   "bWsLFP96": "11th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9312,7 +9312,7 @@
   },
   {
    "MHx05sXt": "1000120",
-   "bWsLFP96": "第１２回領域調査",
+   "bWsLFP96": "12th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9331,7 +9331,7 @@
   },
   {
    "MHx05sXt": "1000130",
-   "bWsLFP96": "第１３回領域調査",
+   "bWsLFP96": "13th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9350,7 +9350,7 @@
   },
   {
    "MHx05sXt": "1000140",
-   "bWsLFP96": "第１４回領域調査",
+   "bWsLFP96": "14th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9369,7 +9369,7 @@
   },
   {
    "MHx05sXt": "1000150",
-   "bWsLFP96": "第１５回領域調査",
+   "bWsLFP96": "15th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9388,7 +9388,7 @@
   },
   {
    "MHx05sXt": "1000160",
-   "bWsLFP96": "第１６回領域調査",
+   "bWsLFP96": "16th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9407,7 +9407,7 @@
   },
   {
    "MHx05sXt": "1000170",
-   "bWsLFP96": "第１７回領域調査",
+   "bWsLFP96": "17th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9426,7 +9426,7 @@
   },
   {
    "MHx05sXt": "1000180",
-   "bWsLFP96": "第１８回領域調査",
+   "bWsLFP96": "18th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9445,7 +9445,7 @@
   },
   {
    "MHx05sXt": "1000190",
-   "bWsLFP96": "第１９回領域調査",
+   "bWsLFP96": "19th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9464,7 +9464,7 @@
   },
   {
    "MHx05sXt": "1000200",
-   "bWsLFP96": "第２０回領域調査",
+   "bWsLFP96": "20th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9483,7 +9483,7 @@
   },
   {
    "MHx05sXt": "1000210",
-   "bWsLFP96": "第２１回領域調査",
+   "bWsLFP96": "21st Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9502,7 +9502,7 @@
   },
   {
    "MHx05sXt": "1000220",
-   "bWsLFP96": "第２２回領域調査",
+   "bWsLFP96": "22nd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9521,7 +9521,7 @@
   },
   {
    "MHx05sXt": "1000230",
-   "bWsLFP96": "第２３回領域調査",
+   "bWsLFP96": "23rd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9540,7 +9540,7 @@
   },
   {
    "MHx05sXt": "1000240",
-   "bWsLFP96": "第２４回領域調査",
+   "bWsLFP96": "24th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9559,7 +9559,7 @@
   },
   {
    "MHx05sXt": "1000250",
-   "bWsLFP96": "第２５回領域調査",
+   "bWsLFP96": "25th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9578,7 +9578,7 @@
   },
   {
    "MHx05sXt": "1000260",
-   "bWsLFP96": "第２６回領域調査",
+   "bWsLFP96": "26th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9597,7 +9597,7 @@
   },
   {
    "MHx05sXt": "1000270",
-   "bWsLFP96": "第２７回領域調査",
+   "bWsLFP96": "27th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9616,7 +9616,7 @@
   },
   {
    "MHx05sXt": "1000280",
-   "bWsLFP96": "第２８回領域調査",
+   "bWsLFP96": "28th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9635,7 +9635,7 @@
   },
   {
    "MHx05sXt": "1000290",
-   "bWsLFP96": "第２９回領域調査",
+   "bWsLFP96": "29th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9654,7 +9654,7 @@
   },
   {
    "MHx05sXt": "1000300",
-   "bWsLFP96": "第３０回領域調査",
+   "bWsLFP96": "30th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9673,7 +9673,7 @@
   },
   {
    "MHx05sXt": "1000310",
-   "bWsLFP96": "第３１回領域調査",
+   "bWsLFP96": "31st Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9692,7 +9692,7 @@
   },
   {
    "MHx05sXt": "1000311",
-   "bWsLFP96": "第３２回領域調査",
+   "bWsLFP96": "32nd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9711,7 +9711,7 @@
   },
   {
    "MHx05sXt": "1000312",
-   "bWsLFP96": "第３３回領域調査",
+   "bWsLFP96": "33rd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9730,7 +9730,7 @@
   },
   {
    "MHx05sXt": "1000313",
-   "bWsLFP96": "第３４回領域調査",
+   "bWsLFP96": "34th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9749,7 +9749,7 @@
   },
   {
    "MHx05sXt": "1000314",
-   "bWsLFP96": "第３５回領域調査",
+   "bWsLFP96": "35th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9768,7 +9768,7 @@
   },
   {
    "MHx05sXt": "1000315",
-   "bWsLFP96": "第３６回領域調査",
+   "bWsLFP96": "36th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9787,7 +9787,7 @@
   },
   {
    "MHx05sXt": "1000316",
-   "bWsLFP96": "第３７回領域調査",
+   "bWsLFP96": "37th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9806,7 +9806,7 @@
   },
   {
    "MHx05sXt": "1000317",
-   "bWsLFP96": "第３８回領域調査",
+   "bWsLFP96": "38th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9825,7 +9825,7 @@
   },
   {
    "MHx05sXt": "1000318",
-   "bWsLFP96": "第３９回領域調査",
+   "bWsLFP96": "39th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9844,7 +9844,7 @@
   },
   {
    "MHx05sXt": "1000319",
-   "bWsLFP96": "第４０回領域調査",
+   "bWsLFP96": "40th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9863,7 +9863,7 @@
   },
   {
    "MHx05sXt": "1000320",
-   "bWsLFP96": "第４１回領域調査",
+   "bWsLFP96": "41st Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9882,7 +9882,7 @@
   },
   {
    "MHx05sXt": "1000321",
-   "bWsLFP96": "第４２回領域調査",
+   "bWsLFP96": "42nd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9901,7 +9901,7 @@
   },
   {
    "MHx05sXt": "1000322",
-   "bWsLFP96": "第４３回領域調査",
+   "bWsLFP96": "43nd Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9920,7 +9920,7 @@
   },
   {
    "MHx05sXt": "1000323",
-   "bWsLFP96": "第４４回領域調査",
+   "bWsLFP96": "44th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9939,7 +9939,7 @@
   },
   {
    "MHx05sXt": "1000324",
-   "bWsLFP96": "第４５回領域調査",
+   "bWsLFP96": "45th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -9958,7 +9958,7 @@
   },
   {
    "MHx05sXt": "1000325",
-   "bWsLFP96": "第４６回領域調査",
+   "bWsLFP96": "46th Expedition",
    "9C64Qwe0": "99",
    "VjCY7rX4": "1000010",
    "3hPeI1RV": "1",
@@ -10946,7 +10946,7 @@
   },
   {
    "MHx05sXt": "2000000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_2000000_NAME",
+   "bWsLFP96": "Trial Test",
    "9C64Qwe0": "99",
    "VjCY7rX4": "2000000",
    "3hPeI1RV": "2",
@@ -10965,7 +10965,7 @@
   },
   {
    "MHx05sXt": "2100000",
-   "bWsLFP96": "闘舞の間",
+   "bWsLFP96": "Strategy Zone",
    "9C64Qwe0": "99",
    "VjCY7rX4": "2100000",
    "3hPeI1RV": "8",
@@ -10984,7 +10984,7 @@
   },
   {
    "MHx05sXt": "3000000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_3000000_NAME",
+   "bWsLFP96": "Frontier Gate",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000000",
    "3hPeI1RV": "3",
@@ -11250,7 +11250,7 @@
   },
   {
    "MHx05sXt": "3000021",
-   "bWsLFP96": "秩序の追憶",
+   "bWsLFP96": "Recalling Order",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000001",
    "3hPeI1RV": "5",
@@ -11269,7 +11269,7 @@
   },
   {
    "MHx05sXt": "3000022",
-   "bWsLFP96": "神鎖の追憶",
+   "bWsLFP96": "Recalling Bondage",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000001",
    "3hPeI1RV": "5",
@@ -11288,7 +11288,7 @@
   },
   {
    "MHx05sXt": "3000023",
-   "bWsLFP96": "雷光の回廊",
+   "bWsLFP96": "Flash of Lightning",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000001",
    "3hPeI1RV": "5",
@@ -11307,7 +11307,7 @@
   },
   {
    "MHx05sXt": "3000024",
-   "bWsLFP96": "闇炎の回廊",
+   "bWsLFP96": "Flame of Darkness",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000001",
    "3hPeI1RV": "5",
@@ -11326,7 +11326,7 @@
   },
   {
    "MHx05sXt": "3000025",
-   "bWsLFP96": "水樹の回廊",
+   "bWsLFP96": "Sea of Trees",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000001",
    "3hPeI1RV": "5",
@@ -11345,7 +11345,7 @@
   },
   {
    "MHx05sXt": "3000026",
-   "bWsLFP96": "連煌演習",
+   "bWsLFP96": "Relentless Practice",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000001",
    "3hPeI1RV": "5",
@@ -11364,7 +11364,7 @@
   },
   {
    "MHx05sXt": "3000027",
-   "bWsLFP96": "永劫血戦",
+   "bWsLFP96": "Eternal Crusade",
    "9C64Qwe0": "99",
    "VjCY7rX4": "3000001",
    "3hPeI1RV": "5",
@@ -11383,7 +11383,7 @@
   },
   {
    "MHx05sXt": "5000000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000000_NAME",
+   "bWsLFP96": "Demonic Agitation",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11398,11 +11398,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "grand_01_op.txt,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000000_DESCRIPTION"
+   "qp37xTDh": "After defeating Maxwell, Karl has a request for the Summoner. What could it be about?"
   },
   {
    "MHx05sXt": "5000001",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000001_NAME",
+   "bWsLFP96": "Proud Soldier's Feast",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11417,7 +11417,7 @@
    "sYsa10a3": "",
    "N4XVE1uA": "grand_02_op.txt,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000001_DESCRIPTION"
+   "qp37xTDh": "After Cordelica, the Summoner receives a request from the Hall. Another Summoner and a Guard tag along..."
   },
   {
    "MHx05sXt": "5000002",
@@ -11440,7 +11440,7 @@
   },
   {
    "MHx05sXt": "5000003",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000003_NAME",
+   "bWsLFP96": "The Crimson God's Cry",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11455,11 +11455,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "grand_04_op.txt,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000003_DESCRIPTION"
+   "qp37xTDh": "An urgent message from Lin comes in after defeating Zevalhua. Apparently Seria has run off somewhere..."
   },
   {
    "MHx05sXt": "5000004",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000004_NAME",
+   "bWsLFP96": "The Old Dawn General",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11474,11 +11474,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "grand_05_op.txt,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000004_DESCRIPTION"
+   "qp37xTDh": "Grahdens asks the Summoner to help him with his training, but his expectations are demanding..."
   },
   {
    "MHx05sXt": "5000005",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000005_NAME",
+   "bWsLFP96": "Lin's Long Day",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11493,11 +11493,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "grand_06_op.txt,grand_06_07.txt",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000005_DESCRIPTION"
+   "qp37xTDh": "The Summoner and Lin go to survey an area connected to Grand Gaia. However, there are lots of monsters..."
   },
   {
    "MHx05sXt": "5000006",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000006_NAME",
+   "bWsLFP96": "Virtual Garden",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11512,11 +11512,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "grand_07_op.txt,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000006_DESCRIPTION"
+   "qp37xTDh": "Paris explores a new land at Noel's request. But the Summoner and her run into unexpected individuals..."
   },
   {
    "MHx05sXt": "5000007",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000007_NAME",
+   "bWsLFP96": "Warped Reflection",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11531,11 +11531,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000007_DESCRIPTION"
+   "qp37xTDh": "Lugina and the Summoner go demon hunting. However, the doppleganger demon is a tough opponent..."
   },
   {
    "MHx05sXt": "5000008",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000008_NAME",
+   "bWsLFP96": "Gathering Hope",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000001",
    "3hPeI1RV": "4",
@@ -11550,11 +11550,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000008_DESCRIPTION"
+   "qp37xTDh": "Edea and her three friends gather forces from the Kingdom of Palmyna to fight off the invading God Army ."
   },
   {
    "MHx05sXt": "5000009",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000009_NAME",
+   "bWsLFP96": "Four Heroes of Palmyna",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000001",
    "3hPeI1RV": "4",
@@ -11569,11 +11569,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000009_DESCRIPTION"
+   "qp37xTDh": "Edea falls into a deep slumber in order to seal off Cardes, so her friends begin a journey to save her..."
   },
   {
    "MHx05sXt": "5000010",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5000010_NAME",
+   "bWsLFP96": "Ten-Winged Tormentor",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000001",
    "3hPeI1RV": "4",
@@ -11588,7 +11588,7 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5000010_DESCRIPTION"
+   "qp37xTDh": "After meeting the otherworldly Duel-GX, Michele sets off on a journey to destroy its target, Melchio."
   },
   {
    "MHx05sXt": "5000011",
@@ -11649,7 +11649,7 @@
   },
   {
    "MHx05sXt": "5000014",
-   "bWsLFP96": "乙女の憂鬱",
+   "bWsLFP96": "A Maiden's Despair",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000000",
    "3hPeI1RV": "4",
@@ -11664,11 +11664,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "普段とは様子が違うセラを怪しむリ<br/>ム。エリーゼと召喚師を誘い、仕事<br/>終わりのセラの後を追うことに…。"
+   "qp37xTDh": "Lin is a bit worried about Sera, who has been acting strange. She decides to follow Sera after work, and invites Elise and the Summoner along..."
   },
   {
    "MHx05sXt": "5000015",
-   "bWsLFP96": "導きし者たち",
+   "bWsLFP96": "Those Who Lead",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000001",
    "3hPeI1RV": "4",
@@ -11683,11 +11683,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "神々との大戦末期、リードたちは民<br />衆を率い、ミストラルにあるとされ<br />る約束の地を目指すが……。"
+   "qp37xTDh": "Reed and the others head for the promised land in Mistral in order to rescue survivors during the war's final days. However..."
   },
   {
    "MHx05sXt": "5000016",
-   "bWsLFP96": "帝国最後の日",
+   "bWsLFP96": "The End of an Empire",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000001",
    "3hPeI1RV": "4",
@@ -11702,11 +11702,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "神々との大戦末期、バリウラ帝国が<br />滅亡の危機を迎える中で、第一皇子<br />シリウスはある決断を迫られる……。"
+   "qp37xTDh": "During the final stages of the war against the gods, the Bariura Empire is surrounded by the God Army. As the capital crumbles before their eyes, Sirius and the first princess Selvia decide to act to protect the imperial family's legacy. However, their plan could result in national unrest, which drives Sirius to question whether he should go forth with it..."
   },
   {
    "MHx05sXt": "5008001",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5008001_NAME",
+   "bWsLFP96": "The Tinkerer’s Deceit",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5000002",
    "3hPeI1RV": "4",
@@ -11721,7 +11721,7 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "99",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5008001_DESCRIPTION"
+   "qp37xTDh": "Noel’s thirst for knowledge has the summoner searching for a particular figure…"
   },
   {
    "MHx05sXt": "5008002",
@@ -11839,7 +11839,7 @@
   },
   {
    "MHx05sXt": "5200000",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_5200000_NAME",
+   "bWsLFP96": "Otherworldly Visitors",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5100000",
    "3hPeI1RV": "4",
@@ -11854,11 +11854,11 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "10470",
-   "qp37xTDh": "MST_DUNGEONS_DUNGEON_5200000_DESCRIPTION"
+   "qp37xTDh": "Grahdens asks the Summoner to defeat a certain demon, when three beings from another world appear..."
   },
   {
    "MHx05sXt": "5200002",
-   "bWsLFP96": "未来への選択",
+   "bWsLFP96": "Choice for the Future",
    "9C64Qwe0": "99",
    "VjCY7rX4": "5100002",
    "3hPeI1RV": "4",
@@ -11873,7 +11873,7 @@
    "sYsa10a3": "",
    "N4XVE1uA": "0,0",
    "0u1nvMeS": "10603",
-   "qp37xTDh": "異界の神らしき力の発生報告がアク<br>ラス召喚院に入る。依頼を受け召喚<br>師はその地へと向かうが…。"
+   "qp37xTDh": "The Akras Summoners' Hall has caught word that a god-like presence from another world has appeared..."
   },
   {
    "MHx05sXt": "6000000",
@@ -11896,7 +11896,7 @@
   },
   {
    "MHx05sXt": "7000000",
-   "bWsLFP96": "ネオニューヨーク再び",
+   "bWsLFP96": "Neo New York Again",
    "9C64Qwe0": "999",
    "VjCY7rX4": "7000000",
    "3hPeI1RV": "7",
@@ -12333,7 +12333,7 @@
   },
   {
    "MHx05sXt": "8050001",
-   "bWsLFP96": "MST_DUNGEONS_DUNGEON_8050001_NAME",
+   "bWsLFP96": "The Keymaster's Eclipse",
    "9C64Qwe0": "99",
    "VjCY7rX4": "8050001",
    "3hPeI1RV": "0",

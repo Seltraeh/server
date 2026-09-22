@@ -67,8 +67,9 @@ HANDLEF(CampaignBattleStart)
             " base_atk, add_atk, ext_atk,"
             " base_def, add_def, ext_def,"
             " base_rec,add_rec,ext_rec,"
-            " skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
-            " unit_type_id, element"
+            " bb_id, bb_lvl, sbb_id, sbb_lvl,"
+            " unit_type_id, element,"
+            " eqip_item_id, eqip_item_id2"
             " FROM user_units"
             " WHERE user_id=$1"
             " ORDER BY unit_lvl DESC, user_unit_id DESC LIMIT 1;",
@@ -113,12 +114,22 @@ HANDLEF(CampaignBattleStart)
             friend_entry.base_heal          = r["base_rec"].as<int32_t>();
             friend_entry.add_heal           = r["add_rec"].as<int32_t>();
             friend_entry.ext_heal           = r["ext_rec"].as<int32_t>();
-            friend_entry.skill_id           = std::to_string(r["skill_id"].as<int32_t>());
-            friend_entry.skill_lv           = r["skill_lv"].as<int32_t>();
-            friend_entry.extra_skill_id     = std::to_string(r["extra_skill_id"].as<int32_t>());
-            friend_entry.extra_skill_lv    = r["extra_skill_lv"].as<int32_t>();
+            // The Brave Burst, from bb_id/sbb_id -- NOT user_units.skill_id.
+            // Those four keys are bb/sbb (net/user.kdl); the same mis-read left
+            // the quest helper's BB gauge permanently empty.  See FriendGet.
+            friend_entry.skill_id           = r["bb_id"].as<std::string>();
+            friend_entry.skill_lv           = r["bb_lvl"].as<int32_t>();
+            friend_entry.extra_skill_id     = r["sbb_id"].as<std::string>();
+            friend_entry.extra_skill_lv    = r["sbb_lvl"].as<int32_t>();
             friend_entry.unit_type_id       = r["unit_type_id"].as<int32_t>();
             friend_entry.element            = elemId;
+            // The helper's spheres.  Ge8Yo32T / mZA7fH2v are setEquipItemID /
+            // setEquipItemID2, and a blank id means no sphere passive applies
+            // in battle -- see the long note in FriendGet.
+            // eqip_item_id is an INTEGER column and FriendInfo models these as
+            // strings, so convert explicitly rather than leaning on the driver.
+            friend_entry.equipitem_id       = std::to_string(r["eqip_item_id"].as<int32_t>());
+            friend_entry.equipitem_id2      = std::to_string(r["eqip_item_id2"].as<int32_t>());
             friend_entry.friend_id          = "DECOMP01";
             friend_entry.friend_message     = "GG WP";
             friend_entry.favorite           = 1;

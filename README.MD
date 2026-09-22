@@ -7,10 +7,15 @@ the feasibility of a server emulator.
 
 For more information about the strategy of the offline mod/purpose of this server, please check [How the offline mod works](https://decompfrontier.github.io/pages/Architecture/Offlinemod-architecture.html) and [Emulator (Server) architecture](https://decompfrontier.github.io/pages/Architecture/Emulator-architecture.html)
 
+## Portable Windows release
+See [RELEASE.md](RELEASE.md) to build the standalone server ZIP and separate game-content downloads. Players run `Start Server.bat`; they do not need the packet-generator or a development toolchain.
+
 ## Requirements
 - Visual Studio 2022 (Windows)
 - Ninja, GCC/Clang (Linux)
-- CMake
+- CMake 4.0+
+- Rust 1.87+ (build-time packet generator)
+- Initialize the `packet-generator` Git submodule (`git submodule update --init --recursive`)
 - vcpkg
 
 ## Building

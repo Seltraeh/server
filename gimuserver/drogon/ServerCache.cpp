@@ -46,6 +46,17 @@ static constexpr int32_t kQuestSpecialIdFloor = 100000;
 // it is a different consumer, and trusting it put this constant at 1 and Parade
 // Garden dead last.  99999 is above every shipped land-99 row (the highest is
 // 9800, "Year-End Dungeon").
+// "Trial of the Gods" — dungeon and area share the id.
+// THE TRIAL DUNGEONS.  All above kSpecialIdFloor, so the Grand Gaia
+// progression gate never reaches them and nothing else permits them.
+//   800051  Trial of the Gods  -- the six elemental Trials
+//   2000000 Trial Test         -- Mock Unit / EX / X trials (none built yet)
+//   2100000 Strategy Zone      -- the Main Trials, incl. 2100004 The Creation
+//                                 God, the Maxwell trial
+// Listing a dungeon here does NOT advertise its missions: PermitPlace adds only
+// the ones MissionArchiver has a battle for, so an unbuilt trial stays off the
+// map and the list can name a whole series before any of it is authored.
+static constexpr int32_t kTrialDungeonIds[] = { 800051, 2000000, 2100000 };
 static constexpr int32_t kParadeGardenAreaId = 100600;
 static constexpr int32_t kParadeGardenDispOrder = 99999;
 
@@ -304,6 +315,56 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_userrsp.resummon_gacha = LoadJson<ResummonGachaMstCache>(mstRoot, "resummon_gacha_mst.json").data;
 
 		m_unitMst = LoadJson<UnitMstCache>(mstRoot, "unit_mst.json").data;
+
+		// HOMEBREW UNITS.  tools/unit-forge writes unit_mst_homebrew.json from
+		// the community's packs, in the same wrapper and the same 60-field shape
+		// as the shipped table -- each row is a real unit's row with a handful
+		// of fields overridden, which is how a forged unit inherits artwork it
+		// could never supply itself.
+		//
+		// Kept as a SEPARATE file and merged here rather than written into
+		// unit_mst.json: the shipped data stays pristine, the overlay can be
+		// deleted to undo everything, and a bad pack cannot corrupt the 2,291
+		// units the game depends on.  Absent is the normal case and not an
+		// error -- LoadJson throws on a missing file, so the existence check is
+		// what keeps a server with no homebrew booting.
+		{
+			const auto overlay = std::string(mstRoot) + "/unit_mst_homebrew.json";
+			std::error_code overlayEc;
+			if (std::filesystem::is_regular_file(overlay, overlayEc) && !overlayEc)
+			{
+				try
+				{
+					auto forged = LoadJson<UnitMstCache>(overlay).data;
+					// A forged id must not shadow a shipped unit.  The forge
+					// refuses to write one, but the file is hand-editable and
+					// arrives from strangers, so the server checks it too.
+					size_t added = 0, skipped = 0;
+					for (auto& unit : forged)
+					{
+						const auto clash = std::find_if(m_unitMst.begin(), m_unitMst.end(),
+							[&unit](const UnitMst& u) { return u.id == unit.id; });
+						if (clash != m_unitMst.end())
+						{
+							LOG_WARN << "homebrew unit " << unit.id
+								<< " collides with a shipped unit; ignored";
+							++skipped;
+							continue;
+						}
+						m_unitMst.push_back(std::move(unit));
+						++added;
+					}
+					LOG_INFO << "homebrew units: " << added << " added, "
+						<< skipped << " ignored (" << overlay << ")";
+				}
+				catch (const std::exception& ex)
+				{
+					// A broken overlay must not take the server down with it.
+					LOG_ERROR << "homebrew unit overlay could not be read, "
+						"continuing without it: " << ex.what();
+				}
+			}
+		}
 		m_itemMst = LoadJson<ItemMstCache>(mstRoot, "item_mst.json").data;
 
 		// Grand Mission ("Campaign") master data — wrapper keys and field
@@ -366,6 +427,7 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_frontierGateMst = LoadJson<FrontierGateMstCache>(mstRoot, "frontier_gate_mst.json").data;
 		m_frontierGateSupportMst = LoadJson<FrontierGateSupportMstCache>(mstRoot, "frontier_gate_support_mst.json").data;
 		m_frontierGateRewardMst = LoadJson<FrontierGateRewardMstCache>(mstRoot, "frontier_gate_reward_mst.json").data;
+		m_functionReleaseMst = LoadJson<FunctionReleaseMstCache>(mstRoot, "function_release_mst.json").data;
 
 		// Build the dungeon -> missions index, then drop the rows.  Only the id
 		// and dungeon_id columns survive; see missionsByDungeon() for why this
@@ -491,6 +553,92 @@ void ServerCache::Setup(const Json::Value& serverObj)
 					m_grandQuestPermits.lands.insert(mit->second->land_id);
 			}
 
+			// FRONTIER HUNTER.  The Survey Office's Enter button routes to the
+			// ordinary quest-select screen (ChallengeLobbyScene::missionScene
+			// @0x155C45C -> MissionSelectScene2 with ChallengeBase::getDunMst),
+			// so the mode needs no battle machinery of its own -- only its
+			// topology permitted, the same way Frontier Gate and Vortex are.
+			// ChallengeStartRequest exists in the binary but has ZERO callers,
+			// so nothing here can fire an unregistered request.
+			//
+			// Only the ACTIVE challenge is collected.  Every row of
+			// challenge_mst.json is a real 2014-2022 window and all of them have
+			// expired; ServerCache keeps the newest one open and that is the one
+			// the lobby reports, so permitting the other 96 would put 380-odd
+			// unreachable missions on the map.
+			for (const auto& challenge : m_initrsp.challenge)
+			{
+				if (challenge.id != m_activeChallengeId || challenge.dungeon_id == 0)
+					continue;
+
+				m_challengePermits.dungeons.insert(challenge.dungeon_id);
+
+				const auto it = m_missionsByDungeon.find(challenge.dungeon_id);
+				if (it == m_missionsByDungeon.end())
+					continue;
+				for (const auto missionId : it->second)
+				{
+					m_challengePermits.missions.insert(missionId);
+					const auto mit = missionById.find(missionId);
+					if (mit == missionById.end())
+						continue;
+					if (mit->second->area_id != 0)
+						m_challengePermits.areas.insert(mit->second->area_id);
+					if (mit->second->land_id != 0)
+						m_challengePermits.lands.insert(mit->second->land_id);
+				}
+			}
+
+			// THE TRIALS.  Collected by dungeon id because that is the whole of
+			// it; there is no MST listing the series.  Trial of the Gods was the
+			// first: the client knew its names ("Trial 01 - Burning Desire") and
+			// the map had no tile, because these all sit above kSpecialIdFloor
+			// where the progression gate never looks.
+			//
+			// ⚠ THE PREREQUISITE CHAIN IS NOT APPLIED HERE and must not be.
+			// PermitPlace adds these WITHOUT the need_mission_id check every
+			// campaign tile gets, which is deliberate: a Strategy Zone trial
+			// needs the two before it, those are unbuilt, and an unbuilt mission
+			// can never be cleared -- so honouring the chain would lock the
+			// whole series behind content that does not exist.
+			//
+			// The archive check that keeps an unbuildable tile off the map lives
+			// in PermitPlace, NOT here: GimuServer::Setup runs m_cache.Setup
+			// BEFORE MissionArchiver::setup, so asking the archiver anything at
+			// this point gets "no" for every mission in the game.
+			{
+				for (const auto dungeonId : kTrialDungeonIds)
+				{
+					const auto it = m_missionsByDungeon.find(dungeonId);
+					if (it == m_missionsByDungeon.end())
+						continue;
+					for (const auto missionId : it->second)
+					{
+						m_trialPermits.missions.insert(missionId);
+						const auto mit = missionById.find(missionId);
+						if (mit == missionById.end())
+							continue;
+						m_trialPermits.dungeons.insert(dungeonId);
+						if (mit->second->area_id != 0)
+							m_trialPermits.areas.insert(mit->second->area_id);
+						if (mit->second->land_id != 0)
+							m_trialPermits.lands.insert(mit->second->land_id);
+					}
+				}
+			}
+
+			LOG_INFO << "ServerCache: Trial of the Gods permits — "
+			         << m_trialPermits.areas.size() << " area(s), "
+			         << m_trialPermits.dungeons.size() << " dungeon(s), "
+			         << m_trialPermits.missions.size() << " mission(s)";
+
+			LOG_INFO << "ServerCache: Frontier Hunter permits — event "
+			         << m_activeChallengeId << ", "
+			         << m_challengePermits.lands.size() << " land(s), "
+			         << m_challengePermits.areas.size() << " area(s), "
+			         << m_challengePermits.dungeons.size() << " dungeon(s), "
+			         << m_challengePermits.missions.size() << " mission(s)";
+
 			LOG_INFO << "ServerCache: Grand Quest permits — "
 			         << m_grandQuestPermits.lands.size() << " land(s), "
 			         << m_grandQuestPermits.areas.size() << " area(s), "
@@ -583,9 +731,33 @@ void ServerCache::Setup(const Json::Value& serverObj)
 					     < std::tie(rhs->display_order, rhs->area_id);
 				});
 
-			size_t empty = 0, untranslated = 0, duplicate = 0;
+			// ⚠ A PARENT CATEGORY IS NEVER HIDDEN.  Every rule below judges an
+			// area by its OWN dungeons, which is right for a leaf tile and
+			// wrong for a category: area 100002 "Travellers" has a single
+			// dungeon whose banner duplicates 100004's, so it was dropped — and
+			// it is the tile the player opens to reach 47 other areas, Trial of
+			// the Gods among them.  That is why the Trials had a permitted
+			// area, a permitted dungeon and six permitted missions and still
+			// drew no tile, and the same was true of four more categories
+			// covering 84 child areas in total.
+			std::set<int32_t> parentAreas;
+			for (const auto& area : m_areaMst)
+			{
+				const auto parent = area.parent_area_id;
+				if (!parent || parent->empty() || *parent == "0")
+					continue;
+				try { parentAreas.insert(std::stoi(*parent)); }
+				catch (const std::exception&) {}
+			}
+
+			size_t empty = 0, untranslated = 0, duplicate = 0, parents = 0;
 			for (const auto* area : vortexAreas)
 			{
+				if (parentAreas.contains(area->area_id))
+				{
+					++parents;
+					continue;
+				}
 				const auto it = vortexDungeons.find(area->area_id);
 				if (it == vortexDungeons.end())
 				{
@@ -622,7 +794,8 @@ void ServerCache::Setup(const Json::Value& serverObj)
 			LOG_INFO << "ServerCache: Vortex tiles — "
 			         << (vortexAreas.size() - m_vortexHiddenAreas.size()) << " kept of "
 			         << vortexAreas.size() << " (" << empty << " empty, "
-			         << untranslated << " untranslated, " << duplicate << " duplicate)";
+			         << untranslated << " untranslated, " << duplicate << " duplicate, "
+			         << parents << " kept as parent categories)";
 		}
 
 		// The area table the client is served, which is what actually draws the
@@ -725,6 +898,12 @@ void ServerCache::Setup(const Json::Value& serverObj)
 					[&dungeon](const DungeonKeyMst& k) { return k.dungeon_id == dungeon.dungeon_id; });
 
 				const auto place = [this, keyGated](TopologyPermits& permits, int32_t missionId) {
+					// Every mission reachable inside the Vortex, however it is
+					// gated.  The daily task code VV asks "did you clear a
+					// Vortex mission", and MissionEnd has only the mission id —
+					// the MissionMst rows that carry land_id are dropped after
+					// this block, so the answer has to be collected here.
+					m_vortexMissions.insert(missionId);
 					if (keyGated)
 					{
 						permits.keyGatedMissions.insert(missionId);

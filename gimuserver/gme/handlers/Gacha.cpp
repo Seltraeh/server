@@ -3,6 +3,7 @@
 
 #include <gimuserver/archive/GachaArchiver.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/SelectorRotation.hpp>
 #include <gimuserver/gme/common/SelectorBanners.hpp>
 #include <gimuserver/gme/common/SummonTickets.hpp>
 #include <gimuserver/utils/Random.hpp>
@@ -333,6 +334,11 @@ HANDLEF(GachaList)
 	// The selector catalogue, which is what tells the detail scene that a gate
 	// is ticket-only — see the JukkSeNA field doc in net/handlers.kdl.
 	resp.unit_selector_gacha = theServer()->cache().unitSelectorGacha();
+	// Same rotation UserInfo applies.  BOTH senders have to do it: this is the
+	// reply the summon screen itself reads, so applying it in only one place
+	// would leave the picker showing the placeholder pool on whichever screen
+	// happened to refresh last.
+	gme::applyWeeklySelector(resp.unit_selector_gacha);
 
 	// Selector banners are per player: a selector gate is redeemable only with
 	// its own ticket, so its rail tile is added here and only while one is held

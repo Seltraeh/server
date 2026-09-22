@@ -82,18 +82,23 @@ bool UnitArchiver::populatePacket(
 	// the client resolves this against its own skill table.  Materials and
 	// enhancers (Ghosts, Frogs, Imps, Metals) legitimately have none.
 	//
-	// sbb_id is honoured rather than forced empty.  It used to be hardcoded to
-	// "" here, and correctly so at the time: every archived value was fabricated
-	// (110011-style ids that exist nowhere in skill_mst's 33381 rows).  Those
-	// have been cleared, so the field can be trusted again.  It is still empty
-	// for everything currently archived — unit_mst carries exactly one skill per
-	// unit, and Super Brave Burst is a 5-star-and-up mechanic, so no 3-star
-	// summon pool has one.  The plumbing is here for when higher-rarity units
-	// are archived with a verified SBB.
+	// sbb_id now comes from unit_mst's iEFZ6H19 (see tools/gen_unit_archive.py):
+	// non-zero for rarity 6 and up and, below that, for exactly one unit —
+	// 810212 Nice Burny, which is the single exception the wiki names.  The old
+	// comment here claimed unit_mst carried one skill per unit and there was no
+	// verified SBB source; it carries three (BB nj9Lw7mV, SBB iEFZ6H19, UBB
+	// cb0P4mp1) and 1195 archived units now have a real SBB id.
+	//
+	// ⚠ A NEW UNIT'S SUPER BRAVE BURST STARTS LOCKED, at level 0, even when it
+	// has an id.  Global wiki, Unit Skills: "The normal Brave Burst must first
+	// be levelled to 10 (MAX), after which the Super Brave Burst will become
+	// available, at Level 1."  UnitMix is what performs that transition.
+	// Granting it at 1 would hand every 6-star reward a burst the player is
+	// supposed to earn.
 	unit.bb_id = unitRecord.bb_id;
 	unit.bb_lvl = unitRecord.bb_id.empty() ? 0 : 1;
 	unit.sbb_id = unitRecord.sbb_id;
-	unit.sbb_lvl = unitRecord.sbb_id.empty() ? 0 : 1;
+	unit.sbb_lvl = 0;
 	unit.base_hp = stats.hp;
 	unit.base_atk = stats.atk;
 	unit.base_def = stats.def;

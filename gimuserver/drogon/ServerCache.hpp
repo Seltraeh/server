@@ -163,6 +163,7 @@ public:
 	inline const auto& frontierGateMst() const { return m_frontierGateMst; }
 	inline const auto& frontierGateSupportMst() const { return m_frontierGateSupportMst; }
 	inline const auto& frontierGateRewardMst() const { return m_frontierGateRewardMst; }
+	inline const auto& functionReleaseMst() const { return m_functionReleaseMst; }
 
 	/*!
 	* Dungeon -> its mission ids, ascending.  A DERIVED INDEX over
@@ -184,6 +185,9 @@ public:
 	* stops needing it, delete it.
 	*/
 	inline const auto& missionsByDungeon() const { return m_missionsByDungeon; }
+
+	/*! Every mission that lives inside the Vortex, for the VV daily task. */
+	inline const auto& vortexMissions() const { return m_vortexMissions; }
 
 	/*!
 	* mission id -> its FIRST-CLEAR reward string, for the 787 missions that
@@ -289,6 +293,28 @@ public:
 	* vortexDayPermits() instead.
 	*/
 	inline const TopologyPermits& vortexPermits() const { return m_vortexPermits; }
+
+	/*!
+	* Land/area/dungeon/mission ids the ACTIVE Frontier Hunter challenge needs
+	* permitted.
+	*
+	* The lobby's Enter button does not fire a request of its own:
+	* ChallengeLobbyScene::missionScene @0x155C45C goes straight to
+	* MissionSelectScene2 with ChallengeBase::getDunMst(), the ordinary
+	* quest-select screen.  So entry reuses the whole existing mission pipeline
+	* and the only thing standing in its way is the permit list -- without these
+	* ids the select screen has nothing to draw.
+	*/
+	inline const TopologyPermits& challengePermits() const { return m_challengePermits; }
+
+	/*!
+	* Land/area/dungeon/mission ids for Trial of the Gods (dungeon 800051).
+	*
+	* Its six missions sit above PermitPlace's kSpecialIdFloor, so the Grand
+	* Gaia progression gate never reaches them and nothing else permitted them:
+	* the client already knew their names and the map had no tile.
+	*/
+	inline const TopologyPermits& trialPermits() const { return m_trialPermits; }
 
 	/*!
 	* The Vortex weekday rotation, indexed 0 = Monday .. 6 = Sunday.
@@ -527,10 +553,12 @@ private:
 	std::vector<FrontierGateMst> m_frontierGateMst;
 	std::vector<FrontierGateSupportMst> m_frontierGateSupportMst;
 	std::vector<FrontierGateRewardMst> m_frontierGateRewardMst;
+	std::vector<FunctionReleaseMst> m_functionReleaseMst;
 
 	// dungeon_id -> ascending mission ids.  Derived index over F_MISSION_MST;
 	// the rows themselves are not retained.  Consumer: FrontierGateInfo.
 	std::map<int32_t, std::vector<int32_t>> m_missionsByDungeon;
+	std::set<int32_t> m_vortexMissions;
 	std::map<int32_t, std::string> m_missionClearRewards;
 
 	// mission id -> prerequisite mission ids.  Only missions that HAVE a
@@ -548,6 +576,13 @@ private:
 	// Land/area/dungeon/mission ids the Vortex (gate 99) needs permitted.
 	// Consumer: UserInfo's PermitPlace injection.
 	TopologyPermits m_vortexPermits;
+
+	// Trial of the Gods' topology.
+	// Consumer: PermitPlace's static base.
+	TopologyPermits m_trialPermits;
+
+	// The active Frontier Hunter challenge's topology.
+	TopologyPermits m_challengePermits;
 
 	// The Vortex weekday rotation, 0 = Monday .. 6 = Sunday.  Dungeons and
 	// missions only; areas stay in m_vortexPermits.

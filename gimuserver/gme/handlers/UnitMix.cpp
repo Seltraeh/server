@@ -5,6 +5,8 @@
 
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/DailyTask.hpp>
+#include <gimuserver/gme/common/Dbb.hpp>
 #include <cmath>
 #include <deque>
 
@@ -208,7 +210,7 @@ HANDLEF(UnitMix)
         " skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
         " element, unit_type_id,"
         " eqip_item_id, eqip_item_frame_id, eqip_item_id2, eqip_item_frame_id2,"
-        " sphere_ext"
+        " sphere_ext, dbb_unlocked"
         " FROM user_units WHERE user_id=$1 AND user_unit_id=$2 LIMIT 1;",
         std::string(kUserId), baseId
     );
@@ -231,6 +233,7 @@ HANDLEF(UnitMix)
     for (const auto& u : unitMst) { if (u.id == baseMstIdInt) { baseMstData = &u; break; } }
 
     const int baseElement   = baseMstData ? baseMstData->element       : 0;
+    const int baseRare      = baseMstData ? baseMstData->rarity        : 0;
     const int expPatternId  = baseMstData ? baseMstData->exp_pattern_id: 10;
     const int maxLevel      = baseMstData ? baseMstData->max_lv        : 100;
 
@@ -238,6 +241,9 @@ HANDLEF(UnitMix)
     // effects that are not exp at all (see unitMix_impBonus above).
     float    gainedExpF     = 0.0f;
     int      burstLevelGain = 0;
+    int      golemMats = 0;
+    int      matchingGolems = 0;
+    int      mismatchedGolemElement = 0;
     int      sphereFrogs    = 0;
     // Counted for the great/super success roll below: matching elements are the
     // one condition the game has always said improves a fusion.
@@ -288,6 +294,18 @@ HANDLEF(UnitMix)
                 burstLevelGain += matData->burst_level_boost;
             if (matMstIdInt == kSphereFrogUnitId)
                 ++sphereFrogs;
+            // ELEMENTAL GOLEM -> the DBB slot.  Same element only; the wiki is
+            // explicit ("e.g. a Fire Golem can only be fused to a Fire Element
+            // unit") and a mismatch is spent as ordinary fodder, which is what
+            // the real game's own screen would have prevented.
+            if (const auto golem = gme::dbbGolemElement(matMstId); golem != 0)
+            {
+                ++golemMats;
+                if (golem == baseElement)
+                    ++matchingGolems;
+                else
+                    mismatchedGolemElement = golem;
+            }
             if (const ImpBonus* imp = unitMix_impBonus(matMstIdInt))
             {
                 impGain.hp  += imp->hp;
@@ -418,8 +436,71 @@ HANDLEF(UnitMix)
     const int oldSbbLvl = br["sbb_lvl"].as<int32_t>();
     const int newBbLvl  = hasBb
         ? std::min(std::max(oldBbLvl, 1) + burstLevelGain, kMaxBurstLevel) : oldBbLvl;
-    const int newSbbLvl = hasSbb
-        ? std::min(std::max(oldSbbLvl, 1) + burstLevelGain, kMaxBurstLevel) : oldSbbLvl;
+
+    // SUPER BRAVE BURST UNLOCKS WHEN THE NORMAL ONE MAXES, AT LEVEL 1.
+    // Global wiki, Unit Skills: "Only 6-star units and up and Nice Burny are
+    // capable of acquiring a Super Brave Burst.  The normal Brave Burst must
+    // first be levelled to 10 (MAX), after which the Super Brave Burst will
+    // become available, at Level 1."
+    //
+    // So a locked SBB (level 0) does NOT take levels from the feeding that
+    // maxed BB -- it appears at exactly 1, and the NEXT feeding starts raising
+    // it.  The previous code started from max(oldSbbLvl, 1), which handed a
+    // level-1 SBB to any unit with an id the first time it ate a frog, whatever
+    // its BB level was.
+    int newSbbLvl = oldSbbLvl;
+    if (hasSbb)
+    {
+        if (oldSbbLvl <= 0)
+            newSbbLvl = (newBbLvl >= kMaxBurstLevel) ? 1 : 0;
+        else
+            newSbbLvl = std::min(oldSbbLvl + burstLevelGain, kMaxBurstLevel);
+    }
+    if (hasSbb && oldSbbLvl <= 0 && newSbbLvl == 1)
+    {
+        LOG_INFO << "UnitMix: unit " << baseId
+                 << " maxed its Brave Burst — Super Brave Burst unlocked at level 1";
+    }
+
+    // THE DBB SLOT.  Global wiki, Bonding: fusing an Elemental Golem of the
+    // unit's OWN element "will now permanently unlock the unit's DBB Slot",
+    // after which it can be bonded to its partner.
+    //
+    // ⚠ THE CLIENT CANNOT ENFORCE THIS.  UserUnitInfo::isDbbEligible @0x12B5EA4
+    // tests only "has a DbbMst partner AND rarity >= 8 AND SBB level 10" -- it
+    // has no notion of a golem ever having been fused -- so the slot appears on
+    // the detail screen regardless and the gate has to live here and in
+    // DbbBond.  gme::dbbEligible mirrors that same test so the two agree about
+    // WHO may do it; the golem is the extra step only this server knows about.
+    const int32_t oldDbbUnlocked = br["dbb_unlocked"].as<int32_t>();
+    int32_t newDbbUnlocked = oldDbbUnlocked;
+    if (matchingGolems > 0)
+    {
+        if (oldDbbUnlocked != 0)
+        {
+            LOG_INFO << "UnitMix: unit " << baseId << " already has its DBB slot — "
+                     << matchingGolems << " golem(s) spent as exp fodder only";
+        }
+        else if (!gme::dbbEligible(baseMstId, baseRare, newSbbLvl, newLevel, maxLevel))
+        {
+            LOG_INFO << "UnitMix: unit " << baseId << " (" << baseMstId
+                     << ") is not DBB-eligible yet — needs a catalogued partner, "
+                     << "rarity 8, Super Brave Burst 10 and level " << maxLevel
+                     << " (it is " << newLevel << "); golem spent as exp fodder";
+        }
+        else
+        {
+            newDbbUnlocked = 1;
+            LOG_INFO << "UnitMix: unit " << baseId << " (" << baseMstId
+                     << ") DBB SLOT UNLOCKED by an element-" << baseElement << " golem";
+        }
+    }
+    else if (golemMats > 0)
+    {
+        LOG_WARN << "UnitMix: unit " << baseId << " is element " << baseElement
+                 << " but was fed an element-" << mismatchedGolemElement
+                 << " golem — no DBB slot, spent as exp fodder";
+    }
 
     if (burstLevelGain > 0 && !hasBb)
     {
@@ -503,12 +584,14 @@ HANDLEF(UnitMix)
         "UPDATE user_units SET unit_lvl=$1, exp=$2, total_exp=$3,"
         " ext_hp=$4, ext_atk=$5, ext_def=$6, ext_rec=$7, bb_lvl=$8, sbb_lvl=$9,"
         " sphere_ext=$10, eqip_item_frame_id2=$11,"
-        " base_hp=$12, base_atk=$13, base_def=$14, base_rec=$15"
-        " WHERE user_unit_id=$16 AND user_id=$17;",
+        " base_hp=$12, base_atk=$13, base_def=$14, base_rec=$15,"
+        " dbb_unlocked=$16"
+        " WHERE user_unit_id=$17 AND user_id=$18;",
         newLevel, newExp, newTotalExp,
         newImpHp, newImpAtk, newImpDef, newImpRec, newBbLvl, newSbbLvl,
         newSphereExt, newEqpFrame2,
         newBaseHp, newBaseAtk, newBaseDef, newBaseRec,
+        newDbbUnlocked,
         baseId, std::string(kUserId)
     );
 
@@ -570,7 +653,10 @@ HANDLEF(UnitMix)
         rd.extra_skill_id = br["sbb_id"].as<std::string>();
         rd.extra_skill_lv = newSbbLvl;
         rd.unit_type_id   = br["unit_type_id"].as<int32_t>();
-        rd.mission_id     = "";
+        // Ge8Yo32T is setEquipItemID, not a mission id -- and xZH6EIQ7 is a
+        // full REPLACE of the reinforcement record, so sending a blank here
+        // wiped the sphere off the fused unit on the result screen.
+        rd.equipitem_id   = br["eqip_item_id"].as<int32_t>();
         resp.reinforce.emplace_back(std::move(rd));
     }
 
@@ -765,6 +851,13 @@ HANDLEF(UnitMix)
                  << " (+" << gainedExp << "), lvup=" << r.lvup_status;
     }
 
+    // DAILY TASK `PU`.  ⚠ IT COUNTS UNITS FUSED, NOT FUSIONS PERFORMED — the
+    // wiki and the client agree the task is "Fuse 5 units", and feeding five
+    // fodder in one go is five.  Counting the operation instead made a full
+    // five-material fusion read [1/5], which is what Evan hit on 2026-09-20.
+    co_await gme::advanceDailyTask(theDb(), identity, "PU",
+        static_cast<int32_t>(matIds.size()));
+
     resp.team_info = std::move(
         (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
 
@@ -776,6 +869,20 @@ HANDLEF(UnitMix)
         resp.warehouse_info = std::move(warehouse.warehouse);
         resp.item_dictionary_info = std::move(warehouse.dictionary);
     }
+
+    // THE DBB LIST, whenever this fusion could have changed it.
+    //
+    // A golem fusion opens the unit's DBB slot, and the ONLY way the client
+    // learns a slot is open is by finding the unit in this list
+    // (GameUtils::setDbbFusedIcon @0x1EC4CF8 -> objectForKey).  Nothing in the
+    // fusion scene refreshes it, so without this the column was set correctly
+    // in the database and the screen showed no slot, no icon and no animation
+    // -- handbook §6: a successful SQL update is not a UI refresh.
+    //
+    // Sent when the unlock changed, and also when the unit already had a slot,
+    // because the fusion reply is the only refresh this scene gets.
+    if (newDbbUnlocked != 0)
+        co_await gme::fillDbb(theDb(), identity, resp);
 
     std::string buffer{};
     if (const auto& ec2 = glz::write_json(resp, buffer); ec2)

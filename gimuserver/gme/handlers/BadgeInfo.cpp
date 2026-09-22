@@ -1,11 +1,13 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/Achievements.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 
 // BadgeInfo (nJ3A7qFp) — the badge singleton the client asks for at login,
-// answered under h23iRjGN (BadgeInfoResponse::readParam @0x13CDCB8).  Of its
-// six counters only the key-ready badge has a reader in this build; see
+// answered under h23iRjGN (BadgeInfoResponse::readParam @0x13CDCB8).  Two of
+// its six fields are filled: the key-ready count and the packed achievement
+// badge string.  The other four have no getter call site in this build; see
 // BadgeInfo in net/badge_info.kdl.
 HANDLEF(BadgeInfo)
 {
@@ -28,6 +30,14 @@ HANDLEF(BadgeInfo)
 		{
 			resp.badge_info.dungeon_key_num =
 				gme::claimableKeyCount(co_await gme::dungeonKeyState(theDb(), identity.data));
+
+			// The achievement badges.  This block went out with badge_data
+			// empty, so parseBadgeData cleared the list and every
+			// getBadgeCount() answered 0 — the Randall town tile, the
+			// achievement top screen and each record row all drew no badge.
+			// See gme::achievementBadgeData for the grammar and the readers.
+			resp.badge_info.badge_data =
+				co_await gme::achievementBadgeData(theDb(), identity.data);
 		}
 	}
 	catch (const std::exception& ex)

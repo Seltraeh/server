@@ -315,14 +315,16 @@ HANDLEF(DailyLogin)
 	resp.daily_login_rewards.user_spin_limit_count = gme::kDailySpinLimit;
 	resp.daily_login_rewards.next_reward_id = gme::dailySpinAnchor(spunDay + 1);
 
-	// u8iD6ka7 is prepended to the message by the client (setDay, a STRING
-	// setter at +0x30 — the KDL types it i32::str, which happens to serialise
-	// compatibly).  The live game guaranteed a Gem on the first spin of days
-	// 7 / 14 / 21 / 28, so this is the distance to the next such day and the
-	// label reads "N day(s) more to guaranteed Gem!".
-	resp.daily_login_rewards.remaining_days_till_guaranteed_reward =
-		(7 - (spunDay % 7)) % 7;
-	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
+	// u8iD6ka7 is prepended to the message by the client (setDay, a string
+	// setter at +0x30), giving "N day(s) more to guaranteed Gem!".  Shared with
+	// Initialize rather than recomputed here — see dailySpinGemLabel — and BOTH
+	// HALVES go empty once the terminal row is reached, because that row
+	// guarantees nothing and the label would otherwise promise a Gem forever.
+	{
+		auto label = gme::dailySpinGemLabel(spunDay);
+		resp.daily_login_rewards.remaining_days_till_guaranteed_reward = std::move(label.counter);
+		resp.daily_login_rewards.message = std::move(label.message);
+	}
 
 	// The wheel pays gems, zel, karma and summon tickets as well as units and
 	// items.  DailyLoginScene calls no zel/karma mutator and no roster or

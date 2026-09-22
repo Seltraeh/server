@@ -108,6 +108,22 @@ inline int32_t deriveHunterOrbs(int32_t& orbs, int64_t& restTs)
 	return static_cast<int32_t>(restTs - now);
 }
 
+// Read-only partial refresh for polls and purchases. The APK reader does not
+// reset the singleton; omitted HR/score fields retain the client's current values.
+inline drogon::Task<::HunterOrbRefresh> loadHunterOrbRefresh(
+	const db::Database database, const UserIdentity identity)
+{
+	const auto rows = co_await database->execSqlCoro(
+		"SELECT hunter_orbs, hunter_orb_rest_ts FROM user_info WHERE id = $1;", identity.userId);
+	if (rows.empty()) throw std::runtime_error("Missing Hunter Orb account");
+	auto orbs = rows[0]["hunter_orbs"].as<int32_t>();
+	auto deadline = rows[0]["hunter_orb_rest_ts"].as<int64_t>();
+	::HunterOrbRefresh result{};
+	result.aube_rest_timer = deriveHunterOrbs(orbs, deadline);
+	result.aube = orbs;
+	co_return result;
+}
+
 /*!
 * Fills the `kN2i7qds` header block for a user.
 *

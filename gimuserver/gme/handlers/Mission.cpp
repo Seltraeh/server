@@ -3,11 +3,14 @@
 
 #include <gimuserver/archive/MissionArchiver.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/DailyTask.hpp>
 #include <gimuserver/gme/common/FriendPoints.hpp>
+#include <gimuserver/gme/common/Friends.hpp>
 #include <gimuserver/gme/common/MissionBreak.hpp>
 #include <gimuserver/gme/common/FrontierGate.hpp>
 #include <gimuserver/gme/common/PermitPlace.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <charconv>
 #include <set>
@@ -247,6 +250,12 @@ std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 		// displays user_units.base_* verbatim, so setting the level alone
 		// produced a "Lv 30" unit with level-1 stats.
 		const auto dropLevel = dropNumber(level);
+		const auto& catalogue = theServer()->cache().unitMst();
+		const auto mst = std::find_if(catalogue.begin(), catalogue.end(),
+			[&](const auto& row) { return row.id == static_cast<int32_t>(unit->unit_id); });
+		if (mst == catalogue.end() || mst->max_lv < 1 || dropLevel > static_cast<uint32_t>(mst->max_lv))
+			throw std::runtime_error("Mission drop level exceeds unit master: " + drop);
+
 		unit->unit_lvl = dropLevel;
 		gme::scaleUnitBaseStats(*unit, static_cast<int>(dropLevel));
 		units.push_back(std::move(*unit));
@@ -260,41 +269,31 @@ std::vector<UserUnitInfo> parseUnitDrops(const std::string& unitDrops)
 //
 // APK BattleRewardList::getItemCsv @0x10DFA24 emits itemId:count pairs,
 // comma-separated. MissionEndRequest sends them under 4T0Q2Bh5 @0x13A7AE4.
-// Returns (item_id, count) pairs; malformed entries are skipped, not fatal.
+// Reject an invalid batch before any grants are committed. The producer emits
+// exactly two positive decimal fields; a bare id is not an observed wire form.
 std::vector<std::pair<uint32_t, uint32_t>> parseItemDrops(const std::string& itemDrops)
 {
 	std::vector<std::pair<uint32_t, uint32_t>> items;
-	std::istringstream drops(itemDrops);
-	for (std::string drop; std::getline(drops, drop, ',');)
+	const auto& catalogue = theServer()->cache().itemMst();
+	if (itemDrops.empty()) return items;
+	size_t at = 0;
+	while (at < itemDrops.size())
 	{
-		if (drop.empty())
-		{
-			continue;
-		}
-
-		std::istringstream parts(drop);
-		std::string id;
-		std::string count;
-		std::getline(parts, id, ':');
-		// count is optional; default to 1 when the entry is a bare item id.
-		const bool hasCount = static_cast<bool>(std::getline(parts, count, ':'));
-		try
-		{
-			const auto itemId = static_cast<uint32_t>(std::stoul(id));
-			const auto qty = hasCount && !count.empty()
-				? static_cast<uint32_t>(std::stoul(count))
-				: 1u;
-			if (itemId != 0)
-			{
-				items.emplace_back(itemId, qty);
-			}
-		}
-		catch (const std::exception&)
-		{
-			LOG_ERROR << "Invalid mission drop item entry: " << drop;
-		}
+		const auto comma = itemDrops.find(',', at);
+		const auto entry = itemDrops.substr(at, comma == std::string::npos ? comma : comma - at);
+		const auto colon = entry.find(':');
+		if (colon == std::string::npos || entry.find(':', colon + 1) != std::string::npos)
+			throw std::runtime_error("Invalid mission item drop: " + entry);
+		const auto id = dropNumber(entry.substr(0, colon));
+		const auto count = dropNumber(entry.substr(colon + 1));
+		if (id > INT32_MAX || count > INT32_MAX || std::none_of(catalogue.begin(), catalogue.end(),
+			[id](const auto& row) { return row.id == static_cast<int32_t>(id); }))
+			throw std::runtime_error("Unknown or oversized mission item drop: " + entry);
+		items.emplace_back(id, count);
+		if (comma == std::string::npos) break;
+		at = comma + 1;
+		if (at == itemDrops.size()) throw std::runtime_error("Trailing mission item delimiter");
 	}
-
 	return items;
 }
 
@@ -454,13 +453,19 @@ HANDLEF(MissionEnd)
 			//
 			// Cleared and zeroed in the same UPDATE below whatever the outcome,
 			// so one start can only ever pay once.
-			const auto honorEarned = missionLost ? 0 : gme::honorForMission(helperUserId);
+			//
+			// The roster decides the rate, and it is read on THIS transaction:
+			// the SQLite pool has one connection, so a helper that opened its
+			// own would deadlock against the one already held here.
+			const auto helperWasFriend =
+				co_await gme::isFriend(transaction, identity, helperUserId);
+			const auto honorEarned =
+				missionLost ? 0 : gme::honorForMission(helperUserId, helperWasFriend);
 
-			// Fetch mission rewards from archive (a lost Frontier Gate battle
-			// earns none of the clear's own).
-			const auto rewardZel = req.battle_result.zel + (frontierLost ? 0 : missionRecord->zel);
-			const auto rewardKarma = req.battle_result.karma + (frontierLost ? 0 : missionRecord->karma);
-			const auto rewardExp = frontierLost ? 0 : missionRecord->exp;
+			// A reported loss earns none of the archive clear rewards.
+			const auto rewardZel = req.battle_result.zel + (missionLost ? 0 : missionRecord->zel);
+			const auto rewardKarma = req.battle_result.karma + (missionLost ? 0 : missionRecord->karma);
+			const auto rewardExp = missionLost ? 0 : missionRecord->exp;
 	
 			// See if we leveled up.
 			auto newLevel = currentLevel;
@@ -490,7 +495,7 @@ HANDLEF(MissionEnd)
 
 			// Persist tutorial checkpoints so leaving and returning mid-tutorial does not
 			// replay completed steps.
-			if (req.mission_num.serial_id == kFirstTutorialMission)
+			if (!missionLost && req.mission_num.serial_id == kFirstTutorialMission)
 			{
 				co_await transaction->execSqlCoro(
 					"UPDATE user_info SET tutorial_status = $1"
@@ -498,7 +503,7 @@ HANDLEF(MissionEnd)
 					kFirstTutorialCheckpoint, identity.userId, identity.gumiUserId);
 
 			}
-			else if (req.mission_num.serial_id == kSecondTutorialMission)
+			else if (!missionLost && req.mission_num.serial_id == kSecondTutorialMission)
 			{
 				// Chapter 10 arms the free-summon tutorial, and tuto15.txt opens
 				// with Karl handing over the gems for it ("You received 5 Gems",
@@ -565,9 +570,8 @@ HANDLEF(MissionEnd)
 			// UT1SVg59 (UserClearMissionInfo) — the list the client evaluates
 			// feature unlocks against (F_FUNCTION_RELEASE_MST conditions and
 			// the hardcoded town/early-feature gates), so every victorious
-			// MissionEnd must land here — and a lost Frontier Gate battle,
-			// the one MissionEnd that is not a victory, must not.
-			if (!frontierLost)
+			// MissionEnd must land here. A reported loss must not create a clear.
+			if (!missionLost)
 			{
 				const auto clearedAt = static_cast<int64_t>(
 					std::chrono::duration_cast<std::chrono::seconds>(
@@ -591,6 +595,52 @@ HANDLEF(MissionEnd)
 					identity.userId,
 					std::to_string(req.mission_num.serial_id),
 					clearedAt);
+
+				// DAILY TASKS.  Both quest codes are fed from here because this
+				// is the one place that knows a mission was WON: the client
+				// reads them in MissionResultScene, but nothing reports the
+				// completion back, so the count has to be derived server-side.
+				// A Vortex clear is a quest clear too, so QE always advances
+				// and VV additionally when the mission is in the Vortex land.
+				// advanceDailyTask ignores a code that is not offered today,
+				// so both calls are unconditional.
+				// ⚠ QUEST EXPLORER IS SCOPED TO TWO AREAS, not to any mission:
+				// "Complete 3 Missions in (any 2 randomly selected Areas)".
+				// gme::dailyTaskQuestAreas picks the day's pair and
+				// fillDailyTaskTables names them on the tile, so the counter
+				// has to agree with what the player was told.
+				{
+					const auto areas = co_await gme::dailyTaskQuestAreas(
+						transaction, identity,
+						std::chrono::duration_cast<std::chrono::seconds>(
+							std::chrono::system_clock::now().time_since_epoch()).count() / 86400);
+					if (std::find(areas.begin(), areas.end(),
+							gme::missionAreaId(req.mission_num.serial_id)) != areas.end())
+					{
+						co_await gme::advanceDailyTask(transaction, identity, "QE");
+					}
+				}
+				if (theServer()->cache().vortexMissions().count(req.mission_num.serial_id))
+					co_await gme::advanceDailyTask(transaction, identity, "VV");
+
+				// "CLEARED (NO CONTINUES)".  A continue during this run left a
+				// row behind; its absence is what earns the flag.  Sticky —
+				// once a mission has been done cleanly, a later messy clear
+				// must not take it back, so this only ever sets 1.
+				const auto continued = co_await transaction->execSqlCoro(
+					"SELECT 1 FROM user_mission_continues"
+					" WHERE user_id = $1 AND mission_id = $2;",
+					identity.userId, std::to_string(req.mission_num.serial_id));
+				if (continued.empty())
+				{
+					co_await transaction->execSqlCoro(
+						"UPDATE user_campaign_missions SET no_continue = 1"
+						" WHERE user_id = $1 AND mission_id = $2;",
+						identity.userId, std::to_string(req.mission_num.serial_id));
+				}
+				co_await transaction->execSqlCoro(
+					"DELETE FROM user_mission_continues WHERE user_id = $1 AND mission_id = $2;",
+					identity.userId, std::to_string(req.mission_num.serial_id));
 
 				if (firstClear)
 				{
@@ -686,6 +736,12 @@ HANDLEF(MissionEnd)
 			// only need to persist ownership here.
 			for (const auto& [itemId, qty] : parseItemDrops(req.battle_result.item_rewards))
 			{
+				const auto stack = co_await transaction->execSqlCoro(
+					"SELECT item_num FROM user_items WHERE user_id = $1 AND item_id = $2;",
+					identity.userId, itemId);
+				const auto owned = stack.empty() ? int64_t{0} : stack[0]["item_num"].as<int64_t>();
+				if (owned < 0 || owned > INT32_MAX - static_cast<int64_t>(qty))
+					throw std::runtime_error("Mission item stack exceeds wire range");
 				(co_await gme::addUserItem(transaction, identity, itemId, qty));
 			}
 
@@ -698,6 +754,43 @@ HANDLEF(MissionEnd)
 			}
 
 			resp.reward_info.clear_mission_id = req.mission_num.serial_id;
+
+			// WHERE the clear happened, not just what was cleared.  Both keys
+			// have real consumers and were going out empty:
+			//
+			//   GameUtils::getAppearDungeon @0x1196FE4 reads clear_dungeon_id,
+			//   looks it up in DungeonMstList and returns
+			//   DungeonMstList::getNext(areaId, dungeonId) -- the dungeon that
+			//   follows the one just cleared.  With the field empty it takes
+			//   the `cbz` at 0x1197028 and returns null, and both
+			//   DungeonSelectScene2::initialize @0x184DC60 and
+			//   AnotherDungeonSelectScene::initialize `cbz x0` straight past
+			//   it, so the dungeon list never lands on the newly opened
+			//   dungeon.  MissionResultFriendRequestScene::changeNextScene
+			//   reads all three for its post-result routing.
+			//
+			// This is NOT the progression gate -- PermitPlace opens the next
+			// mission and that works.  This is the polish on top: clearing a
+			// dungeon should leave the player looking at the next one instead
+			// of back at the top of the list.
+			{
+				const auto& cache = theServer()->cache();
+				const auto dungeonIt = cache.missionQuestDungeon().find(
+					static_cast<int32_t>(req.mission_num.serial_id));
+				if (dungeonIt != cache.missionQuestDungeon().end())
+				{
+					resp.reward_info.clear_dungeon_id = std::to_string(dungeonIt->second);
+					const auto& dungeons = cache.dungeonMst();
+					const auto row = std::find_if(dungeons.begin(), dungeons.end(),
+						[&dungeonIt](const ::DungeonMst& d)
+						{ return d.dungeon_id == dungeonIt->second; });
+					if (row != dungeons.end())
+						resp.reward_info.clear_area_id = std::to_string(row->area_id);
+				}
+				// A mission with no quest dungeon -- Vortex, Frontier Gate,
+				// event content -- leaves both empty, which is the same
+				// early-out the client already handles.
+			}
 			resp.reward_info.zel = rewardZel;
 			resp.reward_info.karma = rewardKarma;
 			resp.reward_info.before_level = currentLevel;
@@ -737,12 +830,11 @@ HANDLEF(MissionEnd)
 			co_await gme::bumpArchiveCounters(transaction, identity, {
 				{ "zel_get",         static_cast<int64_t>(rewardZel)   },
 				{ "karma_get",       static_cast<int64_t>(rewardKarma) },
-				// A lost Frontier Gate battle is the one MissionEnd that is
-				// neither a clear nor a win.
-				{ "quest_clear_cnt", frontierLost ? 0 : 1 },
+				// Losses in either normal quests or Frontier Gate are not wins.
+				{ "quest_clear_cnt", missionLost ? 0 : 1 },
 				// TROPHY 200030 (total battle wins).  A cleared mission is a
 				// won battle.
-				{ "quest_win_cnt",   frontierLost ? 0 : 1 },
+				{ "quest_win_cnt",   missionLost ? 0 : 1 },
 				// TROPHY 100090 (Honor earned).  Its counterpart 100100 is
 				// bumped where Honor is spent, in Gacha.
 				{ "friend_p_get",    static_cast<int64_t>(honorEarned) },
@@ -920,6 +1012,13 @@ HANDLEF(MissionStart)
 			? req.start_info.reinforce_user_id
 			: std::string{},
 		identity.userId);
+
+	// A FRESH RUN STARTS WITH A CLEAN CONTINUE RECORD, or a continue spent in an
+	// earlier attempt would still be counted against this one and the "Cleared
+	// (No Continues)" achievements could never be earned after a single bad run.
+	co_await theDb()->execSqlCoro(
+		"DELETE FROM user_mission_continues WHERE user_id = $1 AND mission_id = $2;",
+		identity.userId, std::to_string(req.start_info.mission_id));
 
 	// A NEW BATTLE SUPERSEDES ANY INTERRUPTED ONE.  The resume path never comes
 	// through here -- MissionRestartScene fires MissionRestart and rebuilds from

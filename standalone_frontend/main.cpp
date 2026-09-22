@@ -39,12 +39,23 @@ int main(int argc, char** argv)
     //   1. Command-line argument (argv[1]) — explicit always wins.
     //   2. GIMU_DEFAULT_CONFIG_PATH — baked in at compile time for Debug
     //      builds so F5 from VS works without touching the launch config.
-    //   3. "./config.json" — fallback for Release / command-line usage where
-    //      the caller cd's into deploy/ first (e.g. rebuild.bat).
+    //   3. Windows Release: config.json beside this executable.
+    //      Other platforms: ./config.json in the caller's working directory.
 #ifndef GIMU_DEFAULT_CONFIG_PATH
 #define GIMU_DEFAULT_CONFIG_PATH "./config.json"
 #endif
-    const char* configArg = (argc > 1) ? argv[1] : GIMU_DEFAULT_CONFIG_PATH;
+    std::filesystem::path configArg = (argc > 1) ? argv[1] : GIMU_DEFAULT_CONFIG_PATH;
+#ifdef _WIN32
+#ifndef _DEBUG
+    if (argc <= 1)
+    {
+        wchar_t executable[32768];
+        const auto length = GetModuleFileNameW(nullptr, executable, 32768);
+        if (length == 0 || length >= 32768) return 1;
+        configArg = std::filesystem::path(executable).parent_path() / "config.json";
+    }
+#endif
+#endif
 
     try
     {
@@ -81,6 +92,7 @@ int main(int argc, char** argv)
         OutputDebugStringA(ex.what());
         OutputDebugStringA("\n");
 #endif
+        return 1;
     }
 
     drogon::HttpAppFramework::instance().getLoop()->queueInLoop([]()

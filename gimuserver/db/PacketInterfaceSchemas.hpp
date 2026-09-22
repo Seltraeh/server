@@ -157,18 +157,23 @@ PacketInterfaceFor<::UserTeamInfo>::fields()
 		field<&::UserTeamInfo::want_gift>("want_gift", {
 			.read = true,
 		}),
-		// Send the single `gems` column to BOTH gem fields. The HUD reads FREE
-		// gems (92uj7oXB) — it was being sent as 0, which is why the balance
-		// never updated (while zel, whose field IS read, did). The summon/paid
-		// path reads PAID gems (d37CaiX1) — the user could summon earlier when
-		// only paid was populated, so keep it set too. A captured production
-		// team_info has both populated (free=10000, paid=20000); mirroring one
-		// column to both keeps display + summon working without double-counting
-		// (the HUD shows free, not the sum).
+		// ONE WALLET, ONE FIELD.  `gems` used to be mirrored into BOTH
+		// free_gems and paid_gems, on the reasoning that the HUD reads free and
+		// the summon path reads paid.  Half of that was wrong and the result
+		// double-counted: `UserTeamInfo::getTotalGems` @0x12AC62C SUMS the two,
+		// so the Gem Balance screen showed Bonus 4713 + Paid 4713 = 9426 for a
+		// player holding 4713.
+		//
+		// Neither field is a spend path.  getPaidGems and getFreeGems have
+		// three call sites between them — createExpWindow and
+		// UserPiadFreeGemsInfoScene, both DISPLAY.  The real wallet is
+		// brave_coin (03UGMHxF) above, whose getter has 132 call sites and is
+		// what every purchase, revive, heal and summon actually reads.
+		//
+		// So the balance goes entirely to FREE, which is also what it honestly
+		// is: no money changes hands on this server, so every gem is a bonus
+		// gem and Paid is 0.  Total then agrees with the HUD.
 		field<&::UserTeamInfo::free_gems>("gems", {
-			.read = true,
-		}),
-		field<&::UserTeamInfo::paid_gems>("gems", {
 			.read = true,
 		}),
 	};
@@ -283,6 +288,13 @@ PacketInterfaceFor<::UserUnitInfo>::fields()
 		field<&::UserUnitInfo::limit_over_def>("limit_over_def", { .read = true, .update = true, .insert = true, }),
 		field<&::UserUnitInfo::limit_over_rec>("limit_over_rec", { .read = true, .update = true, .insert = true, }),
 		field<&::UserUnitInfo::element>("element", { .read = true, .update = true, .insert = true, }),
+		// ⚠ THE LEADER SKILL WAS NEVER MAPPED.  The column exists, the struct
+		// has the member and the client reads it off UserUnitInfo.oS3kTZ2W --
+		// but nothing here bound the two, so every unit serialised a leader
+		// skill of 0 no matter what the row held.  Nothing wrote the column
+		// either (see the grant path in Common.hpp), so the defect was
+		// invisible from the database side as well.
+		field<&::UserUnitInfo::leader_skill_id>("leader_skill_id", { .read = true, .update = true, .insert = true, }),
 		field<&::UserUnitInfo::equipitem_id>("eqip_item_id", { .read = true, .update = true, .insert = true, }),
 		field<&::UserUnitInfo::equipitem_frame_id>("eqip_item_frame_id", { .read = true, .update = true, .insert = true, }),
 		field<&::UserUnitInfo::equipitem_id2>("eqip_item_id2", { .read = true, .update = true, .insert = true, }),
@@ -347,9 +359,17 @@ PacketInterfaceFor<::UserWarehouseInfo>::fields()
 			.update = true,
 			.insert = true,
 		}),
-		field<&::UserWarehouseInfo::favorite_flg>("favorite_flg", {
+		// READ-ONLY, AND THE NAMES DO NOT MATCH ON PURPOSE.  The column is the
+		// lock (user_items.favorite_flg); the MEMBER is the client's NEW badge
+		// (`dJNpLc81` -> UserWarehouseInfo::setNewFlg @0x14060E0), which is a
+		// different thing entirely.  The column is read here only so
+		// loadWarehouseSnapshot can build UserInfoResp.item_favorite from it --
+		// that is how locks survive a reload -- and that function ZEROES the
+		// member immediately afterwards so the lock never reaches the wire as a
+		// NEW badge.  Do not add .update here: ItemFavorite.cpp writes the
+		// column with its own SQL.
+		field<&::UserWarehouseInfo::new_flg>("favorite_flg", {
 			.read = true,
-			.update = true,
 		}),
 		field<&::UserWarehouseInfo::disp_order>("disp_order", {
 			.read = true,

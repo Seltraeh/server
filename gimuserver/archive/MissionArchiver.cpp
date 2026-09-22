@@ -429,6 +429,12 @@ void MissionArchiver::setup(const Json::Value& serverObj)
 	// reporting a capture that would abort the whole reward.  A higher authored
 	// chance (the parades' 60, the tutorial's scripted 100) is left alone, and
 	// Mimic side-monsters keep their own policy (they are not stage monsters).
+	//
+	// A monster flagged `authored_capture` is left alone at ANY chance,
+	// including 0.  The floor cannot tell a junk 5 from a deliberate 10, so the
+	// event dungeons say which theirs is: their rule is a top-form boss whose
+	// BASE form is capturable at 10% and escorts that are not capturable at all
+	// (Evan, 2026-09-19), and a blanket raise to 40 would erase both halves.
 	constexpr uint32_t kMinCaptureChance = 40;
 	size_t raisedCaptures = 0;
 	for (auto& mission : missions)
@@ -442,6 +448,9 @@ void MissionArchiver::setup(const Json::Value& serverObj)
 		{
 			for (auto& monster : stage.battle_monsters)
 			{
+				if (monster.authored_capture.value_or(false))
+					continue;
+
 				const auto unitId = monster.unit_drop_id != 0 ? monster.unit_drop_id : monster.unit_id;
 				if (unitId == 0 || monster.unit_drop_chance >= kMinCaptureChance
 					|| !UnitArchiver::instance().lookup(unitId))
@@ -479,6 +488,11 @@ void MissionArchiver::setup(const Json::Value& serverObj)
 	LOG_INFO << "Loaded " << missionCache_.size()
 		<< " mission archive records and " << aiCache_.size()
 		<< " AI archive records from " << archiveRoot;
+}
+
+bool MissionArchiver::archived(MissionId mission_id) const
+{
+	return missionCache_.contains(mission_id);
 }
 
 std::optional<MissionRecord> MissionArchiver::lookup(MissionId mission_id) const

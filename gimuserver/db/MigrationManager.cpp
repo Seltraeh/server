@@ -1103,6 +1103,31 @@ static void RegisterMigrations(MigrationMap& map)
 		);
 	});
 
+	// Merit Point deliveries -- the Trade Zel / Karma / Units / Spheres screens.
+	//
+	// One row per (user, flow, day).  `points` is what the ceiling is measured
+	// against: DefineMst carries a separate per-day maximum for each flow
+	// (max_achieve_point_zel_per_day and friends), and it is a cap on POINTS
+	// EARNED that day, not on goods handed over.  `amount` is the goods
+	// themselves -- zel, karma, or a count of units/spheres -- and the lifetime
+	// total the "Traded 10000 Zel Total" achievements measure is the SUM of it
+	// across days, so no second table is needed to track them.
+	//
+	// `kind` is the request's cond_type, which is what the client sends to say
+	// which of the four screens it came from: 4 zel, 5 karma, 6 sphere, 8 unit.
+	migrate("15092026_CreateUserAchievementDeliver", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_achievement_deliver ("
+			"user_id TEXT    NOT NULL,"
+			"kind    INTEGER NOT NULL,"
+			"day     TEXT    NOT NULL,"
+			"points  INTEGER NOT NULL DEFAULT 0,"
+			"amount  INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, kind, day)"
+			");"
+		);
+	});
+
 	// Dual Brave Burst bonds -- one row per PAIR, keyed by the main unit.
 	//
 	// Keyed that way because the client is: UserUnitDbbInfoList is a dictionary
@@ -1204,6 +1229,24 @@ static void RegisterMigrations(MigrationMap& map)
 	// MissionInfo is a client singleton and the player cannot be in two.
 	// `state` 0 means nothing open, which is also the column's default, so an
 	// existing save is untouched until it actually pays for a continue.
+	// Music House tracks the player has bought.
+	//
+	// The purchase is client-local -- MyTownSoundRoomScene::confirmAnswerYes
+	// adds the row to its own UserSoundInfoList and decrements Zel itself --
+	// and only reaches the server as a comma list on the next TownUpdate.  With
+	// nowhere to put it, every track the player paid Zel for vanished at the
+	// next launch, because d98mjNDc is a FULL REPLACE and this server was
+	// sending it empty.
+	migrate("13092026_CreateUserSounds", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_sounds ("
+			"user_id  TEXT    NOT NULL,"
+			"sound_id INTEGER NOT NULL,"
+			"PRIMARY KEY (user_id, sound_id)"
+			");"
+		);
+	});
+
 	migrate("13092026_AddUserInfoMissionBreak", {
 		p->execSqlSync(
 			"ALTER TABLE user_info ADD COLUMN mission_break_serial TEXT NOT NULL DEFAULT '';");
@@ -1211,6 +1254,251 @@ static void RegisterMigrations(MigrationMap& map)
 			"ALTER TABLE user_info ADD COLUMN mission_break_info TEXT NOT NULL DEFAULT '';");
 		p->execSqlSync(
 			"ALTER TABLE user_info ADD COLUMN mission_break_state INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// The gift inbox.  One row per gift a friend has sent this player.
+	//
+	// `id` IS the wire's gift_identify_id (gNE76SLp), which is what
+	// FixGiftInfo names when claiming, so it has to be stable and unique per
+	// row rather than per gift kind.
+	//
+	// `day` is what keeps the daily drop idempotent: the simulated friend
+	// sends once per UTC day, and a second login on the same day must not
+	// mint another gift.
+	// The friend roster.
+	//
+	// Deliberately small: a row names WHO the friend is, never what they field.
+	// The unit is derived at read time from the player's own progression, so
+	// friends grow with the player without a migration and a levelled save
+	// needs no backfill.  The handbook's rule -- keep persistent state minimal,
+	// derive views from authoritative state.
+	//
+	// `base_unit_id` is the LOWEST-rarity form of that friend's evolution
+	// chain.  How far up the chain they are shown is a function of the player,
+	// not of this row.
+	migrate("15092026_CreateUserFriends", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_friends ("
+			"user_id       TEXT    NOT NULL,"
+			"friend_id     TEXT    NOT NULL,"
+			"handle_name   TEXT    NOT NULL,"
+			"base_unit_id  INTEGER NOT NULL,"
+			"is_dev        INTEGER NOT NULL DEFAULT 0,"
+			"favorite      INTEGER NOT NULL DEFAULT 0,"
+			"added_day     TEXT    NOT NULL DEFAULT '',"
+			"PRIMARY KEY (user_id, friend_id)"
+			");"
+		);
+	});
+
+	migrate("17092026_AddUserInfoStarterSelector", {
+		p->execSqlSync(
+			"ALTER TABLE user_info ADD COLUMN starter_selector_granted INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	migrate("17092026_AddUserFriendsSpheres", {
+		// Spheres are LOCKED IN when a friend is added, like a Pokemon IV -- see
+		// gme::friendSpheresFor.  0 means "not rolled yet", which is what every
+		// existing roster row gets and what the next read backfills.
+		p->execSqlSync("ALTER TABLE user_friends ADD COLUMN sphere_1 INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync("ALTER TABLE user_friends ADD COLUMN sphere_2 INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// THE DBB SLOT, unlocked by fusing an Elemental Golem of the unit's own
+	// element.  Global wiki, Bonding: "players must first fuse it with an
+	// Elemental Golem of the same element type.  Doing this will now permanently
+	// unlock the unit's DBB Slot."
+	//
+	// It lives on user_units and not on user_unit_dbb because it is a property
+	// of ONE unit and survives being unbonded -- user_unit_dbb holds pairs, and
+	// a released pair deletes its row.
+	// THE SUMMONER AVATAR ARC.
+	//
+	// `user_summoner` held one column, `sp`, and loadSummonerInfo sent the other
+	// 31 fields at the values UserSummonerInfo::init() @0x127E9E8 assigns — so
+	// the whole arc was a constant.  That is why 94 Randall achievements read 0
+	// forever, and it was NOT because the subsystem cannot draw: 33
+	// layout_summoner_*.csv files ship in _dlcbundle and the block is fully
+	// modelled and already on the wire.
+	//
+	// The columns mirror the wire block one for one (wiki: Summoner Avatar —
+	// gender, hairstyle, element, level, EXP, stats, SP, weapon, Leader Skill,
+	// Summoning Arts), so nothing here is invented shape:
+	//   level/exp            the avatar's own level      (achievement band 52000)
+	//   level1..6 / exp1..6  the SIX ELEMENT levels      (bands 56000-61000,
+	//                        Fire=1 .. Dark=6, which is the order of the bands)
+	//   sp                   Skill Points                (band 54000)
+	//   friend_point         Summoner Training Points    (band 53000)
+	//   summon_limit         Summoning Pedestals unlocked(band 63000)
+	//   ability_info         Parameters, packed          (band 65000)
+	//   arm_id               the equipped Weapon         (band 55000 reads its level)
+	//   ls_spheres_created   a COUNTER, not a holding    (band 62000)
+	migrate("20092026_ExtendUserSummoner", {
+		for (const auto& column : {
+			"sex INTEGER NOT NULL DEFAULT 1",
+			"element INTEGER NOT NULL DEFAULT 1",
+			"hair_id TEXT NOT NULL DEFAULT ''",
+			"level INTEGER NOT NULL DEFAULT 1",
+			"exp INTEGER NOT NULL DEFAULT 0",
+			"level1 INTEGER NOT NULL DEFAULT 1", "exp1 INTEGER NOT NULL DEFAULT 0",
+			"level2 INTEGER NOT NULL DEFAULT 1", "exp2 INTEGER NOT NULL DEFAULT 0",
+			"level3 INTEGER NOT NULL DEFAULT 1", "exp3 INTEGER NOT NULL DEFAULT 0",
+			"level4 INTEGER NOT NULL DEFAULT 1", "exp4 INTEGER NOT NULL DEFAULT 0",
+			"level5 INTEGER NOT NULL DEFAULT 1", "exp5 INTEGER NOT NULL DEFAULT 0",
+			"level6 INTEGER NOT NULL DEFAULT 1", "exp6 INTEGER NOT NULL DEFAULT 0",
+			"friend_point INTEGER NOT NULL DEFAULT 0",
+			"summon_limit INTEGER NOT NULL DEFAULT 1",
+			"ability_info TEXT NOT NULL DEFAULT ''",
+			"arm_id TEXT NOT NULL DEFAULT '10'",
+			"eqp_item_id TEXT NOT NULL DEFAULT ''",
+			"extra_passive_skill_id TEXT NOT NULL DEFAULT ''",
+			"extra_passive_skill_id2 TEXT NOT NULL DEFAULT ''",
+			"ls_spheres_created INTEGER NOT NULL DEFAULT 0",
+		})
+		{
+			p->execSqlSync(std::string("ALTER TABLE user_summoner ADD COLUMN ") + column + ";");
+		}
+	});
+
+	// The Summoner's weapons, each with its own level.  Band 55000 asks for the
+	// BEST weapon level reached, so the row has to survive unequipping.
+	migrate("20092026_CreateUserSummonerArms", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_summoner_arm_levels ("
+			"user_id TEXT    NOT NULL,"
+			"arm_id  TEXT    NOT NULL,"
+			"lv      INTEGER NOT NULL DEFAULT 1,"
+			"exp     INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, arm_id)"
+			");"
+		);
+	});
+
+	// "CLEARED WITHOUT CONTINUING" and the per-quest high scores.
+	//
+	// Both exist because MissionEnd is the only place that knows how a battle
+	// actually went, and neither fact survives anywhere today: the clear history
+	// records THAT a mission was cleared, not how, and the battle result is
+	// parsed and thrown away.
+	migrate("20092026_CreateBattleRecords", {
+		// A continue is recorded against the MISSION rather than the battle
+		// serial: MissionContinueReq carries mission_num.serial_id and no
+		// serial, and a run is bounded by MissionStart/MissionEnd anyway, so
+		// the mission id is enough to scope it.  Rows are transient — Start
+		// clears, End consumes.
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_mission_continues ("
+			"user_id    TEXT    NOT NULL,"
+			"mission_id TEXT    NOT NULL,"
+			"PRIMARY KEY (user_id, mission_id)"
+			");"
+		);
+		// The per-quest SPARK maximum.  Its two siblings already exist --
+		// b_crystal_max and h_crystal_max were added for trophies 100290/100300
+		// -- so this joins them rather than starting a table of its own.
+		//
+		// ⚠ NOT battle_turn_max_spark, which is the best single TURN, and not
+		// battle_spark_cnt, which is the lifetime total.  "1000 Sparks Produced
+		// in 1 Quest" is a third number and neither of those answers it.
+		p->execSqlSync(
+			"ALTER TABLE user_team_archive"
+			" ADD COLUMN spark_cnt_max INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	migrate("20092026_AddNoContinueClear", {
+		// Sticky once set: the achievement asks whether it has EVER been done
+		// cleanly, so a later sloppy clear must not take it away.
+		p->execSqlSync(
+			"ALTER TABLE user_campaign_missions"
+			" ADD COLUMN no_continue INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// DAILY TASKS.  Two tables because the two halves expire differently: task
+	// progress resets every UTC day, a claim is permanent.
+	//
+	// Progress is keyed on the TASK CODE (AV/QE/VV/CM/UU/PU) rather than on a
+	// row id, because the rotation picks which codes are offered today and the
+	// same code can be offered again tomorrow with a different target.  Keying
+	// on a row id would lose a player's progress the moment the pool rotated.
+	migrate("20092026_CreateUserDailyTasks", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_daily_tasks ("
+			"user_id         TEXT    NOT NULL,"
+			"task_key        TEXT    NOT NULL,"
+			"times_completed INTEGER NOT NULL DEFAULT 0,"
+			"utc_day         INTEGER NOT NULL DEFAULT 0,"
+			"rewarded        INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, task_key)"
+			");"
+		);
+		// `claim_count` rather than a boolean: the regular shop prizes are
+		// repeatable (max_claim_count runs to 4294967295), and one of them caps
+		// at 5, so the count is the thing that has to be enforced.
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_daily_task_claims ("
+			"user_id     TEXT    NOT NULL,"
+			"prize_id    INTEGER NOT NULL,"
+			"claim_count INTEGER NOT NULL DEFAULT 0,"
+			"PRIMARY KEY (user_id, prize_id)"
+			");"
+		);
+	});
+
+	migrate("19092026_AddUserUnitsDbbUnlocked", {
+		p->execSqlSync(
+			"ALTER TABLE user_units ADD COLUMN dbb_unlocked INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	migrate("17092026_CreateUserGuilds", {
+		// guild_id is the client-facing id (GuildInfo.sD73jd20), so it is an
+		// INTEGER PRIMARY KEY and lets SQLite assign it.
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_guilds ("
+			"guild_id       INTEGER PRIMARY KEY AUTOINCREMENT,"
+			"owner_user_id  TEXT    NOT NULL,"
+			"name           TEXT    NOT NULL,"
+			"description    TEXT    NOT NULL DEFAULT '',"
+			"guild_art_id   INTEGER NOT NULL DEFAULT 1,"
+			"experience     INTEGER NOT NULL DEFAULT 0,"
+			"prestige_point INTEGER NOT NULL DEFAULT 0,"
+			"created_day    TEXT    NOT NULL DEFAULT ''"
+			");"
+		);
+		// The founder is stored here too, so membership has exactly one source.
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_guild_members ("
+			"guild_id   INTEGER NOT NULL,"
+			"member_id  TEXT    NOT NULL,"
+			"joined_day TEXT    NOT NULL DEFAULT '',"
+			"PRIMARY KEY (guild_id, member_id)"
+			");"
+		);
+	});
+
+	migrate("17092026_CreateUserLoginCampaign", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_login_campaign ("
+			"user_id      TEXT    NOT NULL PRIMARY KEY,"
+			"current_day  INTEGER NOT NULL DEFAULT 0,"
+			"last_day     TEXT    NOT NULL DEFAULT ''"
+			");"
+		);
+	});
+
+	migrate("15092026_CreateUserGifts", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_gifts ("
+			"id           INTEGER PRIMARY KEY AUTOINCREMENT,"
+			"user_id      TEXT    NOT NULL,"
+			"from_user_id TEXT    NOT NULL,"
+			"gift_id      INTEGER NOT NULL,"
+			"day          TEXT    NOT NULL,"
+			"received     INTEGER NOT NULL DEFAULT 0"
+			");"
+		);
+		p->execSqlSync(
+			"CREATE INDEX IF NOT EXISTS idx_user_gifts_user"
+			" ON user_gifts (user_id, received);");
 	});
 
 }

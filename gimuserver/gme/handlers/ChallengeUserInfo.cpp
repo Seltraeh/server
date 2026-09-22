@@ -31,18 +31,29 @@
 // draws the blue "collect your reward" button, so 3 is the ended-and-payable
 // phase and the rest fall through to the red entry button.
 //
-// THIS SERVER REPORTS 0 — NOT RUNNING — AND THAT IS DELIBERATE.
+// THIS SERVER REPORTS 1 — RUNNING — SINCE 2026-09-14.
 //
-// Reporting 1 would light the Start button, and the request behind it,
-// ChallengeStart (sQfU18kH / m4sdYv9e), is NOT REGISTERED.  That would move
-// the session kill one tap further in rather than fixing it: the player would
-// get past this screen only to have the client close on Start.  Frontier
-// Hunter has no scoring, no battle flow and no result path here, so "the event
-// is not running" is both the safe answer and the true one — every row of
-// challenge_mst.json is a real 2014-2022 window and all 289 of them expired.
+// It reported 0 for a day on the theory that a lit Enter button would fire
+// ChallengeStart (sQfU18kH) and, that being unregistered, move the session kill
+// one tap further in.  THAT WAS WRONG, and the binary says so plainly:
+// ChallengeStartRequest has ZERO callers.  Nothing constructs it.
 //
-// To turn Frontier Hunter on later, register ChallengeStart FIRST, then flip
-// this to 1.  Do not flip it alone.
+// What Enter actually does is ChallengeLobbyScene::missionScene @0x155C45C ->
+// MissionSelectScene2 with ChallengeBase::getDunMst() — the ordinary
+// quest-select screen.  Frontier Hunter therefore reuses the whole existing
+// mission pipeline and needs no battle machinery of its own; all it needed was
+// its topology in the permit list, which ServerCache now collects for the
+// active event only.
+//
+// The event is a DECIDED one: every row of challenge_mst.json is a real
+// 2014-2022 window and all 97 have expired, so a date-derived status would shut
+// the mode forever.  ServerCache already makes that call in the other direction
+// by keeping the newest event open, and this agrees with it rather than
+// contradicting it.
+//
+// ⚠ The four missions of event 97 (1009700-1009703) have no authored battle
+// content, so they take MissionStart's documented mission-10 template fallback.
+// They are enterable and winnable; the waves are not the real ones.
 //
 // None of this touches Frontier Gate.  FG sits behind the same Survey Office
 // but its entry check reads Hunter Orbs out of ChallengeHeaderInfo and never
@@ -56,10 +67,10 @@
 
 namespace
 {
-// The lobby gate.  1 = running (and would light a Start button whose request
-// is unregistered), 3 = ended with rewards to collect, 0 = not running.  See
-// the note above for why this server says 0.
-constexpr int32_t kFrohunStatNotRunning = 0;
+// The lobby gate.  ChallengeLobbyScene::startCheck @0x155CDB8 proceeds only on
+// exactly 1; btnSetSt @0x155B904 treats 3 as ended-with-rewards and everything
+// else draws the red entry button.  See the note above.
+constexpr int32_t kFrohunStatRunning = 1;
 
 // Hunter Rank.  Flat 1 for the same reason ChallengeBase sends 1: the ladder
 // ships in challenge_hr_mst.json but nothing scores Frontier Hunter yet, and
@@ -104,7 +115,7 @@ HANDLEF(ChallengeUserInfo)
 	resp.signal_key = req.signal_key;
 
 	resp.challenge_user.frohun_id = eventId;
-	resp.challenge_user.frohun_stat = kFrohunStatNotRunning;
+	resp.challenge_user.frohun_stat = kFrohunStatRunning;
 	// Score and ladder position: this server does not run Frontier Hunter
 	// scoring, so both are 0 rather than an invented standing.  They are
 	// display-only (the header rank and the survey score), not gates.
@@ -122,9 +133,8 @@ HANDLEF(ChallengeUserInfo)
 
 	resp.user_team = co_await gme::loadChallengeHeader(theDb(), identity, kBaseHunterRank, 0);
 
-	LOG_INFO << "ChallengeUserInfo: event " << eventId << " reported NOT running for "
-		<< identity.userId << " (ChallengeStart is unregistered; see the header note); "
-		<< resp.user_team.aube << " Hunter Orb(s), "
+	LOG_INFO << "ChallengeUserInfo: event " << eventId << " reported RUNNING for "
+		<< identity.userId << "; " << resp.user_team.aube << " Hunter Orb(s), "
 		<< resp.user_team.aube_rest_timer << "s to the next";
 
 	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));

@@ -214,6 +214,83 @@ drogon::Task<std::map<std::string, int32_t>> deriveProgress(
 		out[key] = rows.empty() ? 0 : rows[0]["lv"].as<int32_t>();
 	}
 
+	// --- closed 2026-09-20 --------------------------------------------------
+	//
+	// Every one of these is derivable for the same reason the block above is:
+	// the account either satisfies the condition or does not, so reading the
+	// state makes them retroactive instead of only counting from now on.
+
+	out["friendship"] = co_await scalar(
+		"SELECT COUNT(*) FROM user_friends WHERE user_id = $1;");
+
+	// "Receive 3 honor drops from friends" -- user_gifts records them, and
+	// `received` is what separates a claimed drop from a pending one.
+	out["friend_gifts"] = co_await scalar(
+		"SELECT COUNT(*) FROM user_gifts WHERE user_id = $1 AND received <> 0;");
+
+	// "Obtain a total of 2000 or more Merit Points" -- the LIFETIME figure, so
+	// spending in the Merit shop must not walk it backwards.  achieve_point is
+	// the live balance, so this is the closest honest answer available; a
+	// lifetime counter would need its own column.
+	out["randall_missions"] = co_await scalar(
+		"SELECT COALESCE(achieve_point, 0) FROM user_info WHERE id = $1;");
+
+	// Crafted spheres and potions.  The recipe is what the player actually
+	// performs; its output item is only how the mission names it.
+	const std::pair<const char*, int> recipes[] = {
+		{ "forge_sphere_i",   2005 },   // Famous Blade  (item 30000)
+		{ "forge_sphere_ii",  2006 },   // Holy Blade    (item 30001)
+		{ "forge_sphere_iii", 2028 },   // Muramasa      (item 31000)
+		{ "synthesis_ii",     1036 },   // Revive        (item 22400)
+	};
+	for (const auto& [key, recipeId] : recipes)
+	{
+		const auto rows = co_await database->execSqlCoro(
+			"SELECT COALESCE(SUM(craft_count), 0) AS n FROM user_recipe_crafts"
+			" WHERE user_id = $1 AND recipe_id = $2;",
+			identity.userId, recipeId);
+		out[key] = rows.empty() ? 0 : rows[0]["n"].as<int32_t>();
+	}
+
+	// The parades and the Trials, by the missions that make them up.  Tiers are
+	// separate missions in one dungeon, so "Super Metal Parade" cannot be
+	// counted off the dungeon alone -- see the dungeon-key usage pattern, which
+	// is where these groupings come from.
+	const std::pair<const char*, const char*> missionSets[] = {
+		{ "metal_parade",           "'100600','100602','100603','100604','100605','100606','100607'" },
+		{ "super_metal_parade",     "'100601','100608','100609','100610','100611','100612','100613'" },
+		{ "mega_metal_parade",      "'100614'" },
+		{ "jewel_parade",           "'100650'" },
+		{ "super_jewel_parade",     "'100651'" },
+		{ "mega_jewel_parade",      "'100652'" },
+		{ "garden_of_imps",         "'102920'" },
+		{ "summoners_research_lab", "'8380000'" },
+	};
+	for (const auto& [key, ids] : missionSets)
+	{
+		out[key] = co_await scalar(
+			"SELECT COALESCE(SUM(clear_count), 0) FROM user_campaign_missions"
+			" WHERE user_id = $1 AND mission_id IN (" + std::string(ids) + ");");
+	}
+
+	// "Clear any daily vortex quests" and "Clear 5 quests in any special
+	// dungeons" both measure Vortex clears; the first is the rotating slice the
+	// cache already collects, the second is everything in the Vortex land.
+	{
+		const auto& vortex = theServer()->cache().vortexMissions();
+		if (!vortex.empty())
+		{
+			std::string ids;
+			for (const auto id : vortex)
+				ids += (ids.empty() ? "'" : ",'") + std::to_string(id) + "'";
+			const auto n = co_await scalar(
+				"SELECT COALESCE(SUM(clear_count), 0) FROM user_campaign_missions"
+				" WHERE user_id = $1 AND mission_id IN (" + ids + ");");
+			out["daily_vortex_mission"] = n;
+			out["vortex_special_events"] = n;
+		}
+	}
+
 	co_return out;
 }
 

@@ -1,184 +1,1264 @@
 {
-  "a3IgzZ0q": [
-    {"f1LKBoM9": "1", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_1_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "1"},
-    {"f1LKBoM9": "2", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_2_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "2"},
-    {"f1LKBoM9": "3", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_3_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "3"},
-    {"f1LKBoM9": "4", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_4_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "4"},
-    {"f1LKBoM9": "5", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_5_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "5"},
-    {"f1LKBoM9": "6", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_6_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "6"},
-    {"f1LKBoM9": "7", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_7_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "7"},
-    {"f1LKBoM9": "8", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_8_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "8"},
-    {"f1LKBoM9": "9", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_9_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "9"},
-    {"f1LKBoM9": "10", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_10_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "10"},
-    {"f1LKBoM9": "11", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_11_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "11"},
-    {"f1LKBoM9": "12", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_12_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "12"},
-    {"f1LKBoM9": "13", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_13_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "13"},
-    {"f1LKBoM9": "14", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_14_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "14"},
-    {"f1LKBoM9": "15", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_100_15_DESCRIPTION", "v9dyS8fi": "100", "meg8fhr1": "15"},
-    {"f1LKBoM9": "16", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_200_1_DESCRIPTION", "v9dyS8fi": "200", "meg8fhr1": "16"},
-    {"f1LKBoM9": "17", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_200_2_DESCRIPTION", "v9dyS8fi": "200", "meg8fhr1": "17"},
-    {"f1LKBoM9": "18", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_200_3_DESCRIPTION", "v9dyS8fi": "200", "meg8fhr1": "18"},
-    {"f1LKBoM9": "19", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_200_4_DESCRIPTION", "v9dyS8fi": "200", "meg8fhr1": "19"},
-    {"f1LKBoM9": "20", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_300_1_DESCRIPTION", "v9dyS8fi": "300", "meg8fhr1": "20"},
-    {"f1LKBoM9": "21", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_300_2_DESCRIPTION", "v9dyS8fi": "300", "meg8fhr1": "21"},
-    {"f1LKBoM9": "22", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_300_3_DESCRIPTION", "v9dyS8fi": "300", "meg8fhr1": "22"},
-    {"f1LKBoM9": "23", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_400_1_DESCRIPTION", "v9dyS8fi": "400", "meg8fhr1": "23"},
-    {"f1LKBoM9": "24", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_400_2_DESCRIPTION", "v9dyS8fi": "400", "meg8fhr1": "24"},
-    {"f1LKBoM9": "25", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_400_3_DESCRIPTION", "v9dyS8fi": "400", "meg8fhr1": "25"},
-    {"f1LKBoM9": "26", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_400_4_DESCRIPTION", "v9dyS8fi": "400", "meg8fhr1": "26"},
-    {"f1LKBoM9": "27", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_400_5_DESCRIPTION", "v9dyS8fi": "400", "meg8fhr1": "27"},
-    {"f1LKBoM9": "28", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_400_6_DESCRIPTION", "v9dyS8fi": "400", "meg8fhr1": "28"},
-    {"f1LKBoM9": "29", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_500_1_DESCRIPTION", "v9dyS8fi": "500", "meg8fhr1": "29"},
-    {"f1LKBoM9": "30", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_1_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "30"},
-    {"f1LKBoM9": "31", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_2_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "31"},
-    {"f1LKBoM9": "32", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_3_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "32"},
-    {"f1LKBoM9": "33", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_4_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "33"},
-    {"f1LKBoM9": "34", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_5_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "34"},
-    {"f1LKBoM9": "35", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_6_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "35"},
-    {"f1LKBoM9": "36", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_7_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "36"},
-    {"f1LKBoM9": "37", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_17_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "37"},
-    {"f1LKBoM9": "38", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_8_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "38"},
-    {"f1LKBoM9": "39", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_9_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "39"},
-    {"f1LKBoM9": "40", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_10_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "40"},
-    {"f1LKBoM9": "41", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_11_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "41"},
-    {"f1LKBoM9": "42", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_12_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "42"},
-    {"f1LKBoM9": "43", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_13_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "43"},
-    {"f1LKBoM9": "44", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_16_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "44"},
-    {"f1LKBoM9": "45", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_14_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "45"},
-    {"f1LKBoM9": "46", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_600_15_DESCRIPTION", "v9dyS8fi": "600", "meg8fhr1": "46"},
-    {"f1LKBoM9": "47", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_700_1_DESCRIPTION", "v9dyS8fi": "700", "meg8fhr1": "47"},
-    {"f1LKBoM9": "48", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_700_2_DESCRIPTION", "v9dyS8fi": "700", "meg8fhr1": "48"},
-    {"f1LKBoM9": "49", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_700_3_DESCRIPTION", "v9dyS8fi": "700", "meg8fhr1": "49"},
-    {"f1LKBoM9": "50", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_700_4_DESCRIPTION", "v9dyS8fi": "700", "meg8fhr1": "50"},
-    {"f1LKBoM9": "51", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_700_5_DESCRIPTION", "v9dyS8fi": "700", "meg8fhr1": "51"},
-    {"f1LKBoM9": "52", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_700_6_DESCRIPTION", "v9dyS8fi": "700", "meg8fhr1": "52"},
-    {"f1LKBoM9": "53", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800_1_DESCRIPTION", "v9dyS8fi": "800", "meg8fhr1": "53"},
-    {"f1LKBoM9": "54", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800_2_DESCRIPTION", "v9dyS8fi": "800", "meg8fhr1": "54"},
-    {"f1LKBoM9": "55", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800_3_DESCRIPTION", "v9dyS8fi": "800", "meg8fhr1": "55"},
-    {"f1LKBoM9": "56", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800_6_DESCRIPTION", "v9dyS8fi": "800", "meg8fhr1": "56"},
-    {"f1LKBoM9": "57", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800_7_DESCRIPTION", "v9dyS8fi": "800", "meg8fhr1": "57"},
-    {"f1LKBoM9": "58", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800_4_DESCRIPTION", "v9dyS8fi": "800", "meg8fhr1": "58"},
-    {"f1LKBoM9": "59", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800_5_DESCRIPTION", "v9dyS8fi": "800", "meg8fhr1": "59"},
-    {"f1LKBoM9": "60", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_850_1_DESCRIPTION", "v9dyS8fi": "850", "meg8fhr1": "60"},
-    {"f1LKBoM9": "61", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_850_2_DESCRIPTION", "v9dyS8fi": "850", "meg8fhr1": "61"},
-    {"f1LKBoM9": "62", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_850_3_DESCRIPTION", "v9dyS8fi": "850", "meg8fhr1": "62"},
-    {"f1LKBoM9": "63", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_850_4_DESCRIPTION", "v9dyS8fi": "850", "meg8fhr1": "63"},
-    {"f1LKBoM9": "64", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_850_5_DESCRIPTION", "v9dyS8fi": "850", "meg8fhr1": "64"},
-    {"f1LKBoM9": "65", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_850_6_DESCRIPTION", "v9dyS8fi": "850", "meg8fhr1": "65"},
-    {"f1LKBoM9": "66", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_850_7_DESCRIPTION", "v9dyS8fi": "850", "meg8fhr1": "66"},
-    {"f1LKBoM9": "67", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900_1_DESCRIPTION", "v9dyS8fi": "900", "meg8fhr1": "67"},
-    {"f1LKBoM9": "68", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900_2_DESCRIPTION", "v9dyS8fi": "900", "meg8fhr1": "68"},
-    {"f1LKBoM9": "69", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900_3_DESCRIPTION", "v9dyS8fi": "900", "meg8fhr1": "69"},
-    {"f1LKBoM9": "70", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900_4_DESCRIPTION", "v9dyS8fi": "900", "meg8fhr1": "70"},
-    {"f1LKBoM9": "71", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900_5_DESCRIPTION", "v9dyS8fi": "900", "meg8fhr1": "71"},
-    {"f1LKBoM9": "72", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_910_1_DESCRIPTION", "v9dyS8fi": "910", "meg8fhr1": "72"},
-    {"f1LKBoM9": "73", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_910_2_DESCRIPTION", "v9dyS8fi": "910", "meg8fhr1": "73"},
-    {"f1LKBoM9": "74", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_910_3_DESCRIPTION", "v9dyS8fi": "910", "meg8fhr1": "74"},
-    {"f1LKBoM9": "75", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_910_4_DESCRIPTION", "v9dyS8fi": "910", "meg8fhr1": "75"},
-    {"f1LKBoM9": "76", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_1_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "76"},
-    {"f1LKBoM9": "77", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_2_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "77"},
-    {"f1LKBoM9": "78", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_3_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "78"},
-    {"f1LKBoM9": "79", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_4_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "79"},
-    {"f1LKBoM9": "80", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_5_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "80"},
-    {"f1LKBoM9": "81", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_8_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "81"},
-    {"f1LKBoM9": "82", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_9_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "82"},
-    {"f1LKBoM9": "83", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_6_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "83"},
-    {"f1LKBoM9": "84", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_7_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "84"},
-    {"f1LKBoM9": "85", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_8_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "85"},
-    {"f1LKBoM9": "86", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_9_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "86"},
-    {"f1LKBoM9": "87", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1000_10_DESCRIPTION", "v9dyS8fi": "1000", "meg8fhr1": "87"},
-    {"f1LKBoM9": "88", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1100_1_DESCRIPTION", "v9dyS8fi": "1100", "meg8fhr1": "88"},
-    {"f1LKBoM9": "89", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1100_2_DESCRIPTION", "v9dyS8fi": "1100", "meg8fhr1": "89"},
-    {"f1LKBoM9": "90", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1100_3_DESCRIPTION", "v9dyS8fi": "1100", "meg8fhr1": "90"},
-    {"f1LKBoM9": "91", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_10000_1_DESCRIPTION", "v9dyS8fi": "10000", "meg8fhr1": "91"},
-    {"f1LKBoM9": "93", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_1_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "93"},
-    {"f1LKBoM9": "94", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_2_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "94"},
-    {"f1LKBoM9": "95", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_13_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "95"},
-    {"f1LKBoM9": "96", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_3_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "96"},
-    {"f1LKBoM9": "97", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_4_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "97"},
-    {"f1LKBoM9": "98", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_5_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "98"},
-    {"f1LKBoM9": "99", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_6_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "99"},
-    {"f1LKBoM9": "100", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_7_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "100"},
-    {"f1LKBoM9": "101", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_8_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "101"},
-    {"f1LKBoM9": "102", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_9_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "102"},
-    {"f1LKBoM9": "103", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_10_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "103"},
-    {"f1LKBoM9": "104", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_11_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "104"},
-    {"f1LKBoM9": "105", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_12_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "105"},
-    {"f1LKBoM9": "106", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_14_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "106"},
-    {"f1LKBoM9": "107", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1200_15_DESCRIPTION", "v9dyS8fi": "1200", "meg8fhr1": "107"},
-    {"f1LKBoM9": "108", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1300_1_DESCRIPTION", "v9dyS8fi": "1300", "meg8fhr1": "108"},
-    {"f1LKBoM9": "109", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1400_1_DESCRIPTION", "v9dyS8fi": "1400", "meg8fhr1": "109"},
-    {"f1LKBoM9": "115", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_1_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "115"},
-    {"f1LKBoM9": "116", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_2_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "116"},
-    {"f1LKBoM9": "117", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_3_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "117"},
-    {"f1LKBoM9": "118", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_4_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "118"},
-    {"f1LKBoM9": "119", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_5_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "119"},
-    {"f1LKBoM9": "120", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_6_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "120"},
-    {"f1LKBoM9": "121", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_7_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "121"},
-    {"f1LKBoM9": "122", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_8_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "122"},
-    {"f1LKBoM9": "123", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1700_9_DESCRIPTION", "v9dyS8fi": "1700", "meg8fhr1": "123"},
-    {"f1LKBoM9": "124", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800000_1_DESCRIPTION", "v9dyS8fi": "800000", "meg8fhr1": "124"},
-    {"f1LKBoM9": "125", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800000_2_DESCRIPTION", "v9dyS8fi": "800000", "meg8fhr1": "125"},
-    {"f1LKBoM9": "126", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_800000_3_DESCRIPTION", "v9dyS8fi": "800000", "meg8fhr1": "126"},
-    {"f1LKBoM9": "127", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900000_1_DESCRIPTION", "v9dyS8fi": "900000", "meg8fhr1": "127"},
-    {"f1LKBoM9": "128", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900000_2_DESCRIPTION", "v9dyS8fi": "900000", "meg8fhr1": "128"},
-    {"f1LKBoM9": "129", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_900000_3_DESCRIPTION", "v9dyS8fi": "900000", "meg8fhr1": "129"},
-    {"f1LKBoM9": "130", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_888000_1_DESCRIPTION", "v9dyS8fi": "888000", "meg8fhr1": "130"},
-    {"f1LKBoM9": "131", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_888000_2_DESCRIPTION", "v9dyS8fi": "888000", "meg8fhr1": "131"},
-    {"f1LKBoM9": "132", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_888000_3_DESCRIPTION", "v9dyS8fi": "888000", "meg8fhr1": "132"},
-    {"f1LKBoM9": "133", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_888000_4_DESCRIPTION", "v9dyS8fi": "888000", "meg8fhr1": "133"},
-    {"f1LKBoM9": "134", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_888000_5_DESCRIPTION", "v9dyS8fi": "888000", "meg8fhr1": "134"},
-    {"f1LKBoM9": "135", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_888000_6_DESCRIPTION", "v9dyS8fi": "888000", "meg8fhr1": "135"},
-    {"f1LKBoM9": "136", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_888000_7_DESCRIPTION", "v9dyS8fi": "888000", "meg8fhr1": "136"},
-    {"f1LKBoM9": "238", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_80001_1_DESCRIPTION", "v9dyS8fi": "80001", "meg8fhr1": "238"},
-    {"f1LKBoM9": "239", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_80001_2_DESCRIPTION", "v9dyS8fi": "80001", "meg8fhr1": "239"},
-    {"f1LKBoM9": "240", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_80001_3_DESCRIPTION", "v9dyS8fi": "80001", "meg8fhr1": "240"},
-    {"f1LKBoM9": "241", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_80001_4_DESCRIPTION", "v9dyS8fi": "80001", "meg8fhr1": "241"},
-    {"f1LKBoM9": "242", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_80001_5_DESCRIPTION", "v9dyS8fi": "80001", "meg8fhr1": "242"},
-    {"f1LKBoM9": "243", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_80001_6_DESCRIPTION", "v9dyS8fi": "80001", "meg8fhr1": "243"},
-    {"f1LKBoM9": "300", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3000_1_DESCRIPTION", "v9dyS8fi": "3000", "meg8fhr1": "300"},
-    {"f1LKBoM9": "301", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3000_2_DESCRIPTION", "v9dyS8fi": "3000", "meg8fhr1": "301"},
-    {"f1LKBoM9": "302", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_1_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "302"},
-    {"f1LKBoM9": "303", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_2_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "303"},
-    {"f1LKBoM9": "304", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_3_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "304"},
-    {"f1LKBoM9": "305", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_4_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "305"},
-    {"f1LKBoM9": "306", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_5_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "306"},
-    {"f1LKBoM9": "307", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_6_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "307"},
-    {"f1LKBoM9": "308", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_7_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "308"},
-    {"f1LKBoM9": "309", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_8_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "309"},
-    {"f1LKBoM9": "310", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_9_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "310"},
-    {"f1LKBoM9": "311", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_10_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "311"},
-    {"f1LKBoM9": "312", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3100_11_DESCRIPTION", "v9dyS8fi": "3100", "meg8fhr1": "312"},
-    {"f1LKBoM9": "313", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3200_1_DESCRIPTION", "v9dyS8fi": "3200", "meg8fhr1": "313"},
-    {"f1LKBoM9": "314", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_3200_2_DESCRIPTION", "v9dyS8fi": "3200", "meg8fhr1": "314"},
-    {"f1LKBoM9": "315", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_1_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "315"},
-    {"f1LKBoM9": "316", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_2_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "316"},
-    {"f1LKBoM9": "317", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_3_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "317"},
-    {"f1LKBoM9": "318", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_4_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "318"},
-    {"f1LKBoM9": "319", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_5_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "319"},
-    {"f1LKBoM9": "320", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_6_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "320"},
-    {"f1LKBoM9": "321", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_7_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "321"},
-    {"f1LKBoM9": "322", "b5VveUd8": "", "qp37xTDh": "MST_HELP_SUBTOPIC_1110_8_DESCRIPTION", "v9dyS8fi": "1110", "meg8fhr1": "322"},
-    {"f1LKBoM9": "8001", "b5VveUd8": "", "qp37xTDh": "In Guild Raid season, every Guild will be able to create a maximum of 3 teams of 15 Summoners. During the season, teams will be matched against an opposing Guild’s team to compete and obtain Battle Conquest Points (BCP) in a battle lasting 24 hours. Teams will fight against monsters, taking over Outposts and defeating the opposing teams' Guardian to earn BCP. The team with the highest BCP at the end of the match will be the winner.", "v9dyS8fi": "80002", "meg8fhr1": "8001"},
-    {"f1LKBoM9": "8002", "b5VveUd8": "", "qp37xTDh": "During the Preparation phase, each Guild will create teams, set up their defending Guardians and select their Squad for the battle. Once the battle begins, this setup cannot be changed.  Players will then fight against monsters and opposing Guardians to earn BCP. At the end of the battle phase, the Guild’s BCP will be tabulated and the winner determined.", "v9dyS8fi": "80002", "meg8fhr1": "8002"},
-    {"f1LKBoM9": "8003", "b5VveUd8": "", "qp37xTDh": "Guardians customized by Room master will be placed in conquered Outpost and Boss dungeons. New Guardians can be summoned from the Guild Research Centre and Guild members can be improved their Guild’s Guardian skills through resource contribution as well.", "v9dyS8fi": "80002", "meg8fhr1": "8003"},
-    {"f1LKBoM9": "8004", "b5VveUd8": "", "qp37xTDh": "Outpost dungeons (neutral ones) can be conquered by defeating the monsters within them. Once an Outpost is conquered, your team Guardian will defend it. Any opposing teams will have to defeat your Guardian in the Outpost to conquer it. It will release a mix of energies that can make your Boss Guardian or Units stronger and simultaneously weaken the opposing team’s Guardian or Units. Conquering a number of Outposts will also reveal the Boss’s dungeon location. However, the locations of Outposts change after a period of time and eventually become neutral again!  ", "v9dyS8fi": "80002", "meg8fhr1": "8004"},
-    {"f1LKBoM9": "8005", "b5VveUd8": "", "qp37xTDh": "Boss locations are unknown at the start of the battle, so your team will need to locate it through exploration or by conquering Outposts to reveal its location. Boss Guardians will also move around the map from time to time. Therefore, once your team has located the Boss Guardian, you must aim to bring it down before it changes its location. Once defeated, Boss Guardians will only reappear in a new location after a period of time.", "v9dyS8fi": "80002", "meg8fhr1": "8005"},
-    {"f1LKBoM9": "8006", "b5VveUd8": "", "qp37xTDh": "Camp allows Units to Rest and recover HP. Units which were knocked out in battle will also revive at Camp after a period of healing.", "v9dyS8fi": "80002", "meg8fhr1": "8006"},
-    {"f1LKBoM9": "8007", "b5VveUd8": "", "qp37xTDh": "This allows you to teleport between portals, allowing you to move around the map instantly.", "v9dyS8fi": "80002", "meg8fhr1": "8007"},
-    {"f1LKBoM9": "8008", "b5VveUd8": "", "qp37xTDh": "Action points are used to Move, Battle, Rest, and Teleport around the battlefield. Each activity uses a different amount of action points and they will regenerate after a short period of time.", "v9dyS8fi": "80002", "meg8fhr1": "8008"},
-    {"f1LKBoM9": "8009", "b5VveUd8": "", "qp37xTDh": "Points are rewarded based on the total damage dealt, Heart Crystals, Battle Crystals, and Sparks generated. Bonuses based on total Guardian damage, Victory and Sparks will be awarded when any set requirements are met. Dungeon types will also affect the amount of BCP awarded. An additional BCP bonus will be given to the winning team of the battle, which contributes to weekly and season rankings!", "v9dyS8fi": "80002", "meg8fhr1": "8009"},
-    {"f1LKBoM9": "8010", "b5VveUd8": "", "qp37xTDh": "After every match (24 hours), both teams will be rewarded based on the results of the match (victory/defeat). At the end of each week and season, you will receive Mystery Chests of various tiers based on the overall Guild BCP ranking. The amount of rewards in the chest is determined based on the Guild Ranking and individual BCP earned in the Guild.", "v9dyS8fi": "80002", "meg8fhr1": "8010"},
-    {"f1LKBoM9": "8011", "b5VveUd8": "", "qp37xTDh": "Members of the Officer rank and above can create a room with a maximum of 15 Summoners. The room master will select the defending Guardians and customize their skills. ", "v9dyS8fi": "80003", "meg8fhr1": "8011"},
-    {"f1LKBoM9": "8012", "b5VveUd8": "", "qp37xTDh": "The room master will select one Guardian to defend the Outposts, and one Guardian as the Boss Guardian. Any Guardians that are being used by other rooms will not be selectable. Guardians will be automatically selected if the room master fails to do so during the preparation phase.", "v9dyS8fi": "80003", "meg8fhr1": "8012"},
-    {"f1LKBoM9": "8013", "b5VveUd8": "", "qp37xTDh": "Each Guardian will have its own skill slots. The room master will customize each skill slot based on the slot type and available skills unlocked by the Guild. Skills can be shared among Guardians. Guardians’ skills will be automatically selected if the room master fails to do so during the preparation phase.", "v9dyS8fi": "80003", "meg8fhr1": "8013"},
-    {"f1LKBoM9": "88000", "b5VveUd8": "", "qp37xTDh": "The Event Bazaar can be found in the Town.<br><br>This is where you exchange special tokens that you obtain from events. <br><br>Items such as Spheres, Units, and many others will be avalaible in the Event Bazaar. <br><br>Some Event Bazaars are limited by time and can contain exclusive items available for exchange.", "v9dyS8fi": "88000", "meg8fhr1": "88000"},
-    {"f1LKBoM9": "88001", "b5VveUd8": "", "qp37xTDh": "Event Tokens are a special currency that are obtained exclusively from various events.<br><br>Events Tokens are limited to their own events, and as some Event Bazaars are time-limited, they should be used within the limited time period.", "v9dyS8fi": "88000", "meg8fhr1": "88001"},
-    {"f1LKBoM9": "88002", "b5VveUd8": "", "qp37xTDh": "In some events, units which have been specially featured will give various bonuses that help the Summoner obtain more Tokens as they complete the missions.<br><br>Each event will have a different format for said bonus units that will be announced in the news for the event itself.", "v9dyS8fi": "88000", "meg8fhr1": "88002"},
-    {"f1LKBoM9": "100001", "b5VveUd8": "", "qp37xTDh": "MST_HELP_DBB_100001_DESCRIPTION", "v9dyS8fi": "100000", "meg8fhr1": "100001"},
-    {"f1LKBoM9": "100002", "b5VveUd8": "", "qp37xTDh": "MST_HELP_DBB_100002_DESCRIPTION", "v9dyS8fi": "100000", "meg8fhr1": "100002"},
-    {"f1LKBoM9": "100003", "b5VveUd8": "", "qp37xTDh": "MST_HELP_DBB_100003_DESCRIPTION", "v9dyS8fi": "100000", "meg8fhr1": "100003"},
-    {"f1LKBoM9": "800001", "b5VveUd8": "", "qp37xTDh": "An Omni Unit can be boosted into an Omni+ Unit. After boosting, the Unit's Skill Points (SP) and Raised parameters limits are increased. The boosted Unit also unlocks a new Squad passive effect mechanic called \"Elemental Paradigm.\"<br><color=255:165:0>There are two methods available for boosting an Omni Unit:</color><br>- Elemental<br>- Duplicate<br><color=255:255:0>* Duplicate Units refer to the duplicates of the Unit undergoing Boosting.</color><br><color=255:165:0>The following conditions must be met to boost a Unit:</color><br>- The Unit to be boosted must be at max level.<br>- You must have the Materials required.<br>- You must have the required amount of Zel.<br>- You must have the required amount of Karma.<br>* Please see the \"Elemental Paradigm\" portion of the Help section for more details on how Elemental Paradigms work.", "v9dyS8fi": "90000", "meg8fhr1": "800001"},
-    {"f1LKBoM9": "800002", "b5VveUd8": "", "qp37xTDh": "Adding 3 or more Omni+ Units of the same element to your Squad will activate an Elemental Paradigm corresponding to that element which provides additional passive parameters and damage boost effects of increasing effectiveness relative to the number of same element Omni+ Units.\r \r <br><color=255:165:0>The following conditions must be met for an Elemental Paradigm to activate:</color>\r <br>- At least 3 Omni+ Units of the same element\r <br>- Other Units in Squad need to be at least Omni rarity\r <br><color=255:255:0>* Helper Unit will not contribute to the activation.</color>\r \r <br><color=255:165:0>Elemental Paradigm level activated depends on the Omni+ Units used:</color>\r <br>Lv. 1 ⇒ 3 Omni+1 Units\r <br>Lv. 2 ⇒ 3 Omni+2 Units\r <br>Lv. 3 ⇒ 3 Omni+3 Units\r \r <br><color=255:255:0>* Elemental Paradigm will not be available in Strategy Zone nor the Summoner Arc.</color>\r \r <br><br>The following effects last for the entire battle when an Elemental Paradigm is activated:\r <br><color=255:165:0>■ Same Element Type Parameter Boost</color><br>Boost to max HP, Attack (Atk), Defense (Def), and Recovery (Rec) of all Unit(s) in Squad. \r <br><color=255:165:0>■ Same Element Type Spark Damage Boost</color><br>Boost to Spark damage of the all Unit(s) in Squad.\r <br><color=255:165:0>■ Same Element Type Critical Damage Boost</color><br>Boost to critical damage of the all Unit(s) in Squad.\r <br><color=255:165:0>■ Elemental Damage Boost</color><br>Boost to elemental damage of the all Unit(s) in Squad.  \r \r <br><color=255:255:0>* The best way to take advantage of this effect is to have as many Omni+ Units of the same element in your Squad.", "v9dyS8fi": "90000", "meg8fhr1": "800002"}
-  ]
+ "a3IgzZ0q": [
+  {
+   "f1LKBoM9": "1",
+   "b5VveUd8": "",
+   "qp37xTDh": "On the Manage Units screen, you can manage the Squads that will fight in the Arena or in Quests.<br><br>A Squad can be composed of a maximum of five Units.<br><br>The total cost of the selected Units cannot exceed your current cost limit.<br>The cost limit increases according to the player level.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "1"
+  },
+  {
+   "f1LKBoM9": "2",
+   "b5VveUd8": "",
+   "qp37xTDh": "By fusing a unit with another unit, you can strengthen that Unit by raising its level.<br><br>You must have Zel and Material Units in order to Fuse Units.<br>Units used as fusion material disappear after use.<br><br>You can gain bonus XP by using Units of the same element as material.<br><br>If the material unit has a Sphere equipped, it will be unequipped automatically.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "2"
+  },
+  {
+   "f1LKBoM9": "3",
+   "b5VveUd8": "",
+   "qp37xTDh": "When fusing Units, the base Unit's Brave Burst may level up if the Unit(s) used as fusion material has the same type of Brave Burst (Attack, Recovery, etc.).<br>When a Brave Burst levels up, its abilities increase.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "3"
+  },
+  {
+   "f1LKBoM9": "4",
+   "b5VveUd8": "",
+   "qp37xTDh": "Some units have the ability to evolve. When a Unit is evolved, a more powerful version of the Unit is born.<br>The following conditions must be met to make a Unit evolve:<br>- The Unit to be evolved must be at max level.<br>- You must have the Material Units required for Evolution.<br>- You must have the required amount of Zel.<br><br>Besides the usual conditions stated above, the following conditions must also be met when attempting to evolve any Unit to their Omni rarity:<br>- You must have the required amount of Karma.<br><br>After a Unit is evolved, a certain portion of the Brave Burst level belonging to that Unit's previous form will be passed on to its new version.<br>The Brave Burst level amount that will be passed on is as follows:<br>(Pre-Evolution  ⇒  Post-Evolution)<br>BBLv1   ⇒   BBLv1<br>BBLv2  ⇒  BBLv1<br>BBLv3  ⇒  BBLv1<br>BBLv4  ⇒  BBLv2<br>BBLv5  ⇒  BBLv2<br>BBLv6  ⇒  BBLv3<br>BBLv7  ⇒  BBLv3<br>BBLv8  ⇒  BBLv4<br>BBLv9  ⇒  BBLv4<br>BBLv10, SBBLv1  ⇒  BBLv5<br>BBLv10, SBBLv2  ⇒  BBLv5<br>BBLv10, SBBLv3  ⇒  BBLv6<br>BBLv10, SBBLv4  ⇒  BBLv6<br>BBLv10, SBBLv5  ⇒  BBLv7<br>BBLv10, SBBLv6  ⇒  BBLv7<br>BBLv10, SBBLv7  ⇒  BBLv8<br>BBLv10, SBBLv8  ⇒  BBLv8<br>BBLv10, SBBLv9  ⇒  BBLv9<br>BBLv10, SBBLv10,  ⇒  BBLv10, SBBLv1",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "4"
+  },
+  {
+   "f1LKBoM9": "5",
+   "b5VveUd8": "",
+   "qp37xTDh": "Some Units have Leader Skills. In order to active a Unit's Leader Skill, they must be selected as Leader. <br><br>Also, when you choose a friend as a Summon Helper, their Unit's Leader Skill is also activated.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "5"
+  },
+  {
+   "f1LKBoM9": "6",
+   "b5VveUd8": "",
+   "qp37xTDh": "Each Unit has a type.<br>The unit type affects how its parameters increase when leveling up.<br><br>Lord: Balanced type<br>Anima: HP-oriented type<br>Breaker: Attack-oriented type<br>Guardian: Defense-oriented type<br>Oracle: Recovery-oriented type<br><br>A Unit's type can be confirmed on their Details screen. Similar Units may differ in their final abilities depending on their type.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "6"
+  },
+  {
+   "f1LKBoM9": "7",
+   "b5VveUd8": "",
+   "qp37xTDh": "Units whose rarity is 6 or higher can learn a Super Brave Burst.<br><br>A 6 star Unit must attain a Brave Burst level of 10 to unlock their Super Brave Burst.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "7"
+  },
+  {
+   "f1LKBoM9": "8",
+   "b5VveUd8": "",
+   "qp37xTDh": "When using the unit \"Sphere Frog\" as a material in Fusion, the sphere capacity of the base unit will increase. <br>You can only add 1 extra sphere per unit, so you cannot fuse 2 or more Sphere Frogs into 1 unit.<br><br>Those units who have increased their sphere capacity will inherit this trait even when they evolve.<br>However, even if you fuse them with other materials afterwards, their sphere capacity will not increase any further.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "8"
+  },
+  {
+   "f1LKBoM9": "9",
+   "b5VveUd8": "",
+   "qp37xTDh": "\"Imps\" are special units that when used in fusion have the unique ability of increasing all of the base unit's status parameters. When using this material in fusion, parameters are influenced as listed below:<br><br>-Power Imp Pakpak: Atk +20<br>-Guard Imp Ganju: Def +20<br>-Healing Imp Fwahl: Rec +20<br>-Vigor Imp Molin: HP +50<br>*This stats increase will be shown on the right side of the status numbers provided for each unit in the Details screen.<br><br> Because there are status limits set, if a particular parameter goes over the allowed limit, Fusion will not take place.<br><br>Those units who have increased all of their parameters will inherit this trait even when they evolve.<br>However, even if you fuse them with other materials afterwards, their overall parameters will not increase any further.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "9"
+  },
+  {
+   "f1LKBoM9": "10",
+   "b5VveUd8": "",
+   "qp37xTDh": "A 7 star Unit can learn an Ultimate Brave Burst when its Super Brave Burst level reaches 10.<br><br>Ultimate Brave Bursts don't have levels and are maxed out when learned.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "10"
+  },
+  {
+   "f1LKBoM9": "11",
+   "b5VveUd8": "",
+   "qp37xTDh": "A 7 star Unit can learn an Extra Skill when its Super Brave Burst level reaches 10.<br><br>Extra Skills activate under certain conditions.<br><br>Unlike Leader Skills, an Extra Skill can activate for a Unit that isn't the Leader.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "11"
+  },
+  {
+   "f1LKBoM9": "12",
+   "b5VveUd8": "",
+   "qp37xTDh": "The <color=255:165:0>Imbued Tablet Elgif</color> is a special Unit that when fused gives the Base Unit a new Extra Skill.<br>All Elgifs have many different skills which you can check by opening the Unit details screen.<br>The number of <color=224:102:255>purple stars</color> that appear next to an Elgif's Unit number displays the rarity level for the skill they carry.<br>An Elgif's <color=224:102:255>Extra Skill</color> can be added to any Unit, except for Fusion, Evolution, and Sellable Units. <br>When added to a 7-star Unit, the Elgif's Extra Skill will show as a second Extra Skill colored in <color=224:102:255>pink</color>.<br>You can view a Unit's Extra Skills under the Unit details screen by tapping and holding your finger over the \"Skills\" label, or by pressing the \"Switch\" button on the lower right-hand side of the screen.<br><br>Fusion & Evolution<br>When you evolve a Unit with an Extra Skill gained from an Elgif, its evolution will inherit the same Extra Skill.<br>However, when a Unit with an Extra Skill gained from an Elgif is fused into another Unit, the base Unit will not inherit the Skill. The Extra Skill will then be lost.<br><br>Overwriting and Extracting Extra Skills<br>When fusing an Elgif with a Unit that already has an Elgif Extra Skill, the original Elgif Extra Skill will be overwritten by the new one.<br>You can use a <color=255:69:0>Void Tablet Emgif</color> to extract an Elgif Extra Skill from a Unit. This will cause the Extra Skill to turn back into an Elgif, which will then be sent back to you through your Gift Box.<br>*The Emgif used to extract Extra Skills will disappear after it is fused.<br>*The original skill a 7-star Unit learns naturally cannot be extracted with an Emgif.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "12"
+  },
+  {
+   "f1LKBoM9": "13",
+   "b5VveUd8": "",
+   "qp37xTDh": "There are some Units which have alternate illustrations (still images).<br>You can choose which image will display for each Unit that has various designs.<br><br>Changing a Unit's Illustration<br>Units which have alternate illustrations will show a \"Switch Display\" button on the top right-hand side of the Unit detail screen. Tapping this button will switch through the illustrations available.<br>You can also change the set illustration for a Unit through the Unit Guide by following the same steps written above. <br>*The sprites of the Units will not change, only their still images.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "13"
+  },
+  {
+   "f1LKBoM9": "14",
+   "b5VveUd8": "",
+   "qp37xTDh": "Enhancements for Omni Units can be customized once they have reached their maximum level (Lv. 150), and their Super Brave Burst has reached level 10. <br><br>Afterwards, you can use Skill Points (SP) to unlock any enhancements you would like your Unit to have.<br>Enhancements can alter a Unit's parameters, as well as the effects of its Brave Burst or Super Brave Burst. However, some Enhancements have prerequisites that must be met before they can be unlocked.<br>Unless otherwise specified, all Enhancements unlocked will only affect the Unit enhanced, and not any other Units in your Squad.<br>Finally, the maximum amount of SP allotted per Unit is 100 pts, which makes it virtually impossible for any one Unit to attain all Enhancements available.<br><br>Whenever you would like to change the Enhancements you have unlocked for a particular Unit, you can use Gems to reset them. Once the enhancements have been reset, you will reacquire all of the SP you had previously spent, and will be able to choose different enhancements.<br>Customize all of your Omni Units in a way that best fits your Squad and fighting style!<br>* Please see the \"Omni Evolution - Skill Points\" portion of the Help section for more details on how to obtain SP.",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "14"
+  },
+  {
+   "f1LKBoM9": "15",
+   "b5VveUd8": "",
+   "qp37xTDh": "Skill Points (SP) are needed to unlock Enhancements available for Omni Units. <br>You will have 10 SP available once you unlock the ability to customize your Omni Unit's Enhancements. Afterwards, you can gain more SP by fusing other Units on to your Omni Unit in the same manner that you can gain BB levels by fusing certain Units together.<br>However, all Omni Units are restricted to a maximum of 100 SP total, and may not earn any more SP past this limit.<br><br><color=255:165:0>Fixed Rate for SP Giving Ingredients</color><br>■ Normal Units　1 pt<br><color=255:165:0>Ingredients Guaranteed to Give SP</color><br>■ Units Used to Level BB/SBB<br>・ Burst Frog             1 pt<br>・ Burst Emperor        5 pts<br>■ Identical Units 5 pts<br><color=255:255:0>* Identical Units can refer to the previous or future evolutions of the Unit undergoing Fusion.</color><br>■ Sphere Capacity Increasing Units<br>・ Sphere Frogs 10 pts<br>* You can only fuse a maximum of 2 Sphere Frogs to gain SP.<br><color=255:165:0>Ingredients that do NOT Give SP</color><br>■ Evolution Units<br>・ Nymphs<br>・ Spirits<br>・ Idols<br>・ Pots<br>・ Totems<br>・ Mecha Gods<br>・ Miracle Totems<br>・ Mimics<br>・ Bat Mimics<br>・ Dragon Mimics<br>・ Metal Mimics<br>■ Enhancing Units<br>・ Ghosts<br>・ Kings<br>・ Gods<br>・ Crystals<br><br>■ Sellable Units<br>・ Jewel Ghosts<br>・ Jewel Kings<br>・ Jewel Gods<br>・ Golden Gods<br>■ Imps<br>・ Power Imp Pakpak<br>・ Guard Imp Ganju<br>・ Healing Imp Fwahl<br>・ Vigor Imp Molin<br>・ Almighty Imp Arton<br>■ Tablet Units<br>・ Imbued Tablet Elgif<br>・ Void Tablet Emgif",
+   "v9dyS8fi": "100",
+   "meg8fhr1": "15"
+  },
+  {
+   "f1LKBoM9": "16",
+   "b5VveUd8": "",
+   "qp37xTDh": "Use Manage Items to configure the Items you carry with you on Quests.<br><br>A maximum of 5 types of Items can be carried on Quests, and the quantity you can carry differs by Item.<br><br>Items cannot be created during Quests.<br>Items sets can also be configured from the screen before you begin a Quest.",
+   "v9dyS8fi": "200",
+   "meg8fhr1": "16"
+  },
+  {
+   "f1LKBoM9": "17",
+   "b5VveUd8": "",
+   "qp37xTDh": "Spheres are equipment that strengthen a Unit's abilities. Spheres can have a variety of effects, from raising abilities to providing resistance to status effects.<br><br>Only 1 Sphere can be equipped to each Unit.<br><br>If a Unit equipped with a Sphere is sold or used as material in fusion or evolution, the Sphere will automatically be unequipped.",
+   "v9dyS8fi": "200",
+   "meg8fhr1": "17"
+  },
+  {
+   "f1LKBoM9": "18",
+   "b5VveUd8": "",
+   "qp37xTDh": "There are 12 different types of spheres with different effects.<br>You may not equip two spheres of the same type at the same time.<br><br>Examples of Corresponding Sphere Types<br>-<color=255:165:0>Status Boost Type</color><br>Famous Blade, Muramasa<br><br>-<color=255:165:0>Critical Type</color><br>Champion Axe, Death Axe<br><br>-<color=255:165:0>Drop Type</color><br>Skill Bracer, Thief Bracer<br><br>-<color=255:165:0>Status Ailment Type</color><br>Venom Knives, Demon Rifle<br><br>-<color=255:165:0>Status Ailments Resistant Types</color><br>Poison Light, Faint Light<br><br>-<color=255:165:0>BB Gauge Type</color><br>Star Blade, Evil Shard<br><br>-<color=255:165:0>HP Recovery Type</color><br>Divine Crest, Cursed Robe<br><br>-<color=255:165:0>Expose Target Type</color><br>Clear Cloak, Wise Mask<br><br>-<color=255:165:0>Damage Reflecting Type</color><br>Glass Crown<br><br>-<color=255:165:0>Damage Reducing Type</color><br>Monster Robe<br><br>-<color=255:165:0>Spark Type</color><br>Royal Bud<br><br>-<color=255:165:0>Defense Penetrating Type</color><br>Demon Lance",
+   "v9dyS8fi": "200",
+   "meg8fhr1": "18"
+  },
+  {
+   "f1LKBoM9": "19",
+   "b5VveUd8": "",
+   "qp37xTDh": "Booster Items can be used to raise the amount of experience gained from a Quest, or to increase the number of Item drops from Raid missions.<br>Different Booster Items can be used in different situations, and only one of each type can be used at a time.<br><br>Using Booster Items<br>・<color=255:165:0>Booster Items for Quests</color><br>Example: Experience Token, Experience Badge<br>You can use Booster Items for Map and Vortex Quests by equipping them on the screen that displays the \"Begin Quest\" button before a Quest starts.<br><br>If your settings have allowed the Auto-Equip function for Booster Items, the Booster Item will be automatically  used once your Quest starts. When you run out of Booster Items, the Auto-Equip function will continue once you have replenished your stock.<br><br>Booster Items cannot be used for Frontier Hunter, Frontier Gate, Grand Quest, or any of the Trials in the Summoners' Research Lab.<br><br>・<color=255:165:0>Booster Items for Raid Battle</color>Example: Fortune Box, Fortune Coffer<br>You can use Booster Items for Raid by equipping them on the screen that displays the \"Mobilize\" button before a Mission starts.<br>Booster Items can be activated from the map by tapping on the \"Items\" icon and selecting the one you want to use. However, they cannot be activated mid-battle.<br>The effects of the Booster Item(s) will be shown on the Results Screen once that Raid Mission has been cleared.",
+   "v9dyS8fi": "200",
+   "meg8fhr1": "19"
+  },
+  {
+   "f1LKBoM9": "20",
+   "b5VveUd8": "",
+   "qp37xTDh": "When you add another player as a Friend, you'll both get a variety of benefits.<br><br>- When a friend is selected as a Summoner Helper, you get the added effect of their Leader Unit's Leader Skill. <br>- You can get more Honor Pts when you hire a friend as a Summoner Helper.<br>- You can give each other Gifts.<br><br>Friend requests can be made after completing Quests or when searching by Player ID<br>You can also find other players close to your own Rank by going to the Friends menu and tapping Add Friend, and then Search from List..<br><br>The maximum number of Friends you can have increases with your player level.Once you reach the 50 Friends slots mark, you can add more slots through the Shop menu by using Gems.",
+   "v9dyS8fi": "300",
+   "meg8fhr1": "20"
+  },
+  {
+   "f1LKBoM9": "21",
+   "b5VveUd8": "",
+   "qp37xTDh": "Friends can give each other Gifts once a day.Select an Item, Zel, Karma, or Honor Pts to send to your Friends, or use the \"Preferred Gift\" option, which will automatically send them the Gifts they have requested (beginning with the one on the very left if they are requesting multiple types of Gifts) without much hassle.Items sent as Gifts are not taken from the player's inventory, so go ahead and send your Friends exactly what they want. Only 200 Gifts can be held at once. As new Gifts are received, old Gifts are replaced in the order in which they arrived. Be sure to check and receive your Gifts regularly.",
+   "v9dyS8fi": "300",
+   "meg8fhr1": "21"
+  },
+  {
+   "f1LKBoM9": "22",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can select your Desired Gifts through the Gifts menu.If you select the \"Preferred Gift\" option when sending Gifts to your Friends, it will automatically send them the Gifts they have requested (beginning with the one on the very left if they are requesting multiple types of Gifts) without much hassle.*If a Friend has no Desired Gifts set, the Preferred Gift option will send them Honor Points instead.If you would like to send your Gifts separately, you can scroll through the Gift options and check the \"Friends who want this\" box to find out which friends would like what type of gift. However, this will only display Friends who have set Desired Gifts.If your Friends have Desired Gifts set, please be kind enough to send them what they are requesting.",
+   "v9dyS8fi": "300",
+   "meg8fhr1": "22"
+  },
+  {
+   "f1LKBoM9": "23",
+   "b5VveUd8": "",
+   "qp37xTDh": "Get on Quests by selecting Area > Dungeon > Quest.<br><br>When all of the Quests in a Dungeon are completed that Dungeon is marked Clear, then a new Dungeon will appear. The Area is completed when all Dungeons in it have been cleared, at which time the next Area will be unlocked if there is one. Areas are unlocked sequentially.<br><br>Areas can be changed by flicking left or right.",
+   "v9dyS8fi": "400",
+   "meg8fhr1": "23"
+  },
+  {
+   "f1LKBoM9": "24",
+   "b5VveUd8": "",
+   "qp37xTDh": "Energy is consumed during Quests. Each Quest requires a different amount of Energy. Energy gradually recovers with time.<br><br>XP builds up as Quests are completed, and when the player receives a certain amount they level up.<br>When a player levels up, their Energy, Cost limit, and Friend limit increase.<br><br>Also, Energy and Arena Orbs are fully recovered when leveling up.",
+   "v9dyS8fi": "400",
+   "meg8fhr1": "24"
+  },
+  {
+   "f1LKBoM9": "25",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can select one Summoner Helper to join you in battle when you go on a Quest.<br>Unit's whose help you enlist won't show up on the list again for a certain period of time.<br><br>If the help of a Friend's Unit is enlisted, you also receive the effect of that Unit's Leader Skill.",
+   "v9dyS8fi": "400",
+   "meg8fhr1": "25"
+  },
+  {
+   "f1LKBoM9": "26",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can set 3 Squads at a time for Grand Quest.<br><br>Go to the Menu, and tap on Settings. Then tap on Set Squad and build the Squads you would like to use in the future. <br>The Leader of each Squad will register as your Summoner Helper.<br><br>However, even if you use the same Leader for multiple Squads, the same Leader will not be available multiple times.<br>*If the Unit shares the same name as another Unit, it will not appear multiple times either.",
+   "v9dyS8fi": "400",
+   "meg8fhr1": "26"
+  },
+  {
+   "f1LKBoM9": "27",
+   "b5VveUd8": "",
+   "qp37xTDh": "When the Auto Quest-Repeat function is set to on before a Quest, it will allow you to automatically repeat the same Quest multiple times.<br>However, Auto Quest-Repeat is restricted to normal Quests and certain Vortex Dungeons. <br>The Quest you want to repeat multiple times must have also been cleared before time in order to allow for the use of this function.<br>The repeat function will automatically terminate after the set amount of repetitions you have selected in the settings have been completed. However, it can also be canceled during battle by pressing the \"Stop Repeat\" button. <br><br>■ Conditions that may terminate Quest-Repeat<br>・ The number of set repetitions has been completed<br>・ You have no more open Unit/Item slots<br>・ Dungeon time has expired<br>・ Insufficient Energy<br>・ Squad has fallen in battle<br><br>* Automatic Gem usage for restoring depleted Energy can be set from the settings.<br>* Please see \"Quest-Repeat Settings\" for details.<br><br>The Auto Quest-Repeat function requires that you maintain the Brave Frontier application open and running. Please be aware that if your device is turned off, in sleep mode, or if the application is minimized, the Quest-Repeat function will not continue running.",
+   "v9dyS8fi": "400",
+   "meg8fhr1": "27"
+  },
+  {
+   "f1LKBoM9": "28",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can alter any of the settings below for the Quest-Repeat function. <br>Please be aware that when turned on, some settings allow for the automatic use of Gems under certain circumstances.<br>The Quest-Repeat function will automatically terminate after the set amount of repetitions you have selected in the settings has been completed.<br><br>■ Repetition Times<br>The maximum times you can set a request to automatically repeat itself is 100.<br>The function will automatically terminate after the set amount of repetitions has been completed. <br><br>■Gem Usage<br>You will be able to set the maximum amount of Gems you want to use during your Quest repetitions.<br>However, you cannot set a number of Gems which surpasses the actual number of Gems you currently have on hand.<br><br>■ Auto Energy Recovery<br>Turning this setting on will allow for the automatic use of Gems once your Energy has been completely depleted. <br>In the event that you have depleted all of your Energy and the allotted amount of Gems has already been used, the Quest-Repeat function will be automatically terminated.<br><br>■ Auto Continues<br>Turning this setting on will allow for the automatic use of Gems whenever your Squad has fallen in battle.<br>In the event that your Squad has fallen and the allotted amount of Gems has already been used, the Quest-Repeat function will be automatically terminated.<br><br>■ Redos<br>Turning this setting on will allow your fallen Squad to retry the same Quest from the beginning.<br>If the Auto Continues setting is set to on, then Continues will be prioritized over Redos.<br><br>■ Display Unit Details<br>Turning this setting on will display the details of any Units you acquire during your Quests while the repetition function is in place.<br>This will momentarily stop the Quest-Repeat function, but once you tap the screen that displays the Unit's details, the function will resume until it completes the number of repetitions set in the settings.<br><br>■ Summoner Helpers<br>Turning this setting on will allow for the random selection of a Summoner Helper.<br>In the event that any Summoner Helpers from your Friend List are available, they will be prioritized as your reinforcement.<br>However, if none of your Friends are available, another user will be selected at random to act as your Summoner Helper while the Quest-Repeat function is in place.<br>* When doing a Quest with a set Guest as your reinforcement, the Quest-Repeat function will not alter this setting and will continue to use the Guest provided.",
+   "v9dyS8fi": "400",
+   "meg8fhr1": "28"
+  },
+  {
+   "f1LKBoM9": "29",
+   "b5VveUd8": "",
+   "qp37xTDh": "Vortex Gates allow players to enter Special Dungeons that only appear on certain days or for a limited time.<br><br>These Dungeons allow players to get normally difficult-to-obtain Units, lots of Zel or Karma, or materials all in fun and interesting to play Quests.<br><br>There are some Dungeons where players can also get extremely valuable Units, so be sure to check for new Dungeons regularly.",
+   "v9dyS8fi": "500",
+   "meg8fhr1": "29"
+  },
+  {
+   "f1LKBoM9": "30",
+   "b5VveUd8": "",
+   "qp37xTDh": "During a battle, touch a Unit's Action Button at the bottom of the screen to have the corresponding Unit attack.<br><br>When all of your allied Units have finished their attack, it will be the enemy's turn.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "30"
+  },
+  {
+   "f1LKBoM9": "31",
+   "b5VveUd8": "",
+   "qp37xTDh": "Touch the enemy you want to attack to put target and lock on to a specific enemy.<br><br>When an enemy is selected, their health gauge and elemental weakness will appear on the sceen.<br><br>Once an enemy is targeted the target doesn't change even after the enemy has been defeated. This is important to remember when attempting Overkill.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "31"
+  },
+  {
+   "f1LKBoM9": "32",
+   "b5VveUd8": "",
+   "qp37xTDh": "Brave Burst (BB) is the special skill that each Unit has.<br><br>Brave Bursts can be triggered after the Brave Burst gauge becomes full. It fills up when Units absorb Battle Crystals that appear when attacking enemies during battle.<br><br>Once a Unit's Brave Burst can be triggered, put your finger on their Action button and drag diagonally up and to the right to unleash it.<br><br>Holding your finger on a Unit's Action Button will display information about their Brave Burst. You can cancel a Brave Burst or even a normal attack by simply releasing your finger without moving it.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "32"
+  },
+  {
+   "f1LKBoM9": "33",
+   "b5VveUd8": "",
+   "qp37xTDh": "Put your finger on a Unit's Action Button and slide it down to have your Unit Guard.<br><br>When guarding, damage taken from an enemy is drastically reduced, but the Unit cannot attack or perform a Brave Burst during that turn.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "33"
+  },
+  {
+   "f1LKBoM9": "34",
+   "b5VveUd8": "",
+   "qp37xTDh": "Enemies drop Battle Crystals (BC) and Heart Crystals (HC) when attacked. Dropped crystals are absorbed randomly by each Unit at the end of a turn.<br><br>The following effects can be obtained from acquiring crystals:<br>- Battle Crystals increase a Unit's Brave Burst gauge.<br>- Heart Crystals increase a fixed amount of a Unit's HP.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "34"
+  },
+  {
+   "f1LKBoM9": "35",
+   "b5VveUd8": "",
+   "qp37xTDh": "During battle, touch the icon of the Item you wish to use at the bottom of the screen, then select a Unit, or Units, to use that Item.<br><br>Items can only be used at the beginning of a turn. Once a Unit has performed an action, Items can no longer be used during that turn.<br><br>Only the Items configured into your Item set before battle can be used during battle.<br>Don't forget to manage your Items before starting a Quest.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "35"
+  },
+  {
+   "f1LKBoM9": "36",
+   "b5VveUd8": "",
+   "qp37xTDh": "Sparks occur when multiple Units cause damage to the same enemy at the same time whilst attacking.<br><br>When a Spark is triggered, it causes more damage than normal.<br><br>Work on your Unit order as well as your tap timing to produce more Sparks and inflict more damage.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "36"
+  },
+  {
+   "f1LKBoM9": "37",
+   "b5VveUd8": "",
+   "qp37xTDh": "When an Omni Unit hits a target at the same time as another Unit of the same element, it may produce a Cross Spark. <br>If a Cross Spark occurs during battle, your whole Squad will benefit from the effects of Resonance.<br><br>The following effects last for 2 turns and take place when Resonance is activated:<br><color=255:165:0>■ Same Element Type Parameters Boost</color><br>Boost to Attack (Atk), Defense (Def), and Recovery (Rec) of the Unit(s) of the same type as the non-Omni Unit that helped to activate the Cross Spark.<br>The best way to take advantage of this effect is to have as many Units of the same type as your Omni Unit in your Squad.<br><color=255:165:0>■ Overdrive (OD) Gauge Boost</color><br>All actions performed by the Units of the same type as that of the non-Omni Unit which helped to activate the Cross Spark will boost the OD gauge.<br>The best way to take advantage of this effect is, again, to have as many Units of the same type as your Omni Unit in your Squad.<br><br><color=255:165:0>■ Elemental Damage Reduction </color><br>Damage received from the element type weaker than the type of the Unit(s) which activated the Cross Spark will be reduced.<br>For example, when two Fire Units have managed a Cross Spark, any damage done to your Squad by Earth type Units will be reduced.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "37"
+  },
+  {
+   "f1LKBoM9": "38",
+   "b5VveUd8": "",
+   "qp37xTDh": "Overkill occurs when additional attacks are made on an enemy after if has already fallen to 0 HP.<br><br>Perform Overkill for a high probability of producing more Battle Crystals. This is very effective when you want to gather BC quickly.<br><br>Overkill is easy to do when using the target feature.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "38"
+  },
+  {
+   "f1LKBoM9": "39",
+   "b5VveUd8": "",
+   "qp37xTDh": "Treasure Chests sometimes appear when enemies are defeated. Touch a Treasure Chest after a battle to see what's inside.<br><br>However, some Treasure Chests contain vicious monsters, so be careful.<br><br>If you don't want to open a Treasure Chest, simply tap Advance to proceed to the next screen.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "39"
+  },
+  {
+   "f1LKBoM9": "40",
+   "b5VveUd8": "",
+   "qp37xTDh": "Each Unit has an Element, each of which has its own strength and weakness.<br><br>[Fire/Water/Earth/Thunder]<br>These elements have the following relationships.<br>- Fire is strong against Earth, but weak to Water.<br>- Earth is strong against Thunder, but weak to Fire.<br>- Thunder is strong against Water, but weak to Earth.<br>- Water is strong against Fire, but weak to Thunder.<br><br>When a Unit attacks an enemy of an Element against which it is strong, damage increases. In the opposite case, the damage is decreased.<br><br>[Light / Dark]<br>Light and Dark oppose each other, so when Light attacks Dark or vice versa, the damage will be greater than normal.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "40"
+  },
+  {
+   "f1LKBoM9": "41",
+   "b5VveUd8": "",
+   "qp37xTDh": "The following status effects can be afflicted during battle.<br><br>- Poison: HP decreases every turn.<br>- Weak: Defense decreases.<br>- Sick: Recovery ability decreases.<br>- Injury: Attack power decreases.<br>- Paralysis: Causes immobility for a fixed number of turns.<br>- Curse: Causes the BB gauge to stop charging, making Brave Bursts unavailable.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "41"
+  },
+  {
+   "f1LKBoM9": "42",
+   "b5VveUd8": "",
+   "qp37xTDh": "During battle, you can see any status effects currently active represented by an icon floating over a Unit.<br><br>When multiple status effects are in place at once, the icon will change from one status to another intermittently to display them all.<br><br>To see all status effects currently active, press and hold a Unit to open a window at the bottom of the screen which will display them, as well as those ready to be refurbished.<br><br>You will only have access to this screen at the start of your turn (during the same time you can use Items).<br><br>Status effects for all Units (including enemies) can be shown by tapping on the desired Unit in this screen.<br><br>Also, if you tap on the left or right arrows, you can change which group's information you'd like to see (enemy or ally).<br><br>For more information about what each icon stands for, please refer to \"Status Effects\" under the Help section in the Menu.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "42"
+  },
+  {
+   "f1LKBoM9": "43",
+   "b5VveUd8": "",
+   "qp37xTDh": "If game performance slows down during battle, you can fix this by turning off various effects in display settings.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "43"
+  },
+  {
+   "f1LKBoM9": "44",
+   "b5VveUd8": "",
+   "qp37xTDh": "Tap Auto during battle to turn the mode on or off.<br><br>To turn the following Auto Battle settings on or off, tap Menu > Settings:<br><br>-Auto Claim Treasure<br><br>-Auto Brave Burst<br><br>-Super Brave Burst Priority<br><br>-Healing Brave Burst Priority",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "44"
+  },
+  {
+   "f1LKBoM9": "45",
+   "b5VveUd8": "",
+   "qp37xTDh": "Units who learned an Ultimate Brave Burst can activate it after activating Overdrive.<br><br>See the Overdrive section for details.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "45"
+  },
+  {
+   "f1LKBoM9": "46",
+   "b5VveUd8": "",
+   "qp37xTDh": "Only Units with Ultimate Brave Bursts can activate Overdrive.<br><br>Even if there are multiple Units in a Squad with Ultimate Brave Bursts, only 1 can activate Overdrive at a time.<br><br>Overdrive has the effects described below:<br><br>-Greatly boosts Atk, Def, Rec<br><br>-Enables Ultimate Brave Burst<br><br>-Disables Brave Burst, Super Brave Burst<br><br>Once active, Overdrive lasts until you activate Ultimate Brave Burst or 3 turns pass.<br><br>How to Activate Overdrive<br><br>An Overdrive gauge appears for Units with an Ultimate Brave Burst. You can fill it by:<br><br>-Completing turns<br><br>-Performing regular attacks<br><br>-Activating Brave Burst<br><br>-Attacking weaker elements<br><br>When the Overdrive gauge fills up, swipe left over a Unit with an Ultimate Brave Burst to activate its Overdrive.",
+   "v9dyS8fi": "600",
+   "meg8fhr1": "46"
+  },
+  {
+   "f1LKBoM9": "47",
+   "b5VveUd8": "",
+   "qp37xTDh": "There are four gathering points in Village of the Venturer: Farm, Mountain, Forest, and River.<br><br>Tap each terrain when it lights up to harvest various Items from it.<br><br>Once an area has been harvested, it can't be harvested again for 3 hours.",
+   "v9dyS8fi": "700",
+   "meg8fhr1": "47"
+  },
+  {
+   "f1LKBoM9": "48",
+   "b5VveUd8": "",
+   "qp37xTDh": "Use Karma to upgrade your facilities and gathering points.<br><br>When upgrading gathering points, the types of Items that can be obtained from each location and the amount gathered per tap increases.<br><br>Upgrade the Synthesis House and the Sphere House to add new types of Items to create.",
+   "v9dyS8fi": "700",
+   "meg8fhr1": "48"
+  },
+  {
+   "f1LKBoM9": "49",
+   "b5VveUd8": "",
+   "qp37xTDh": "Here you can synthesize consumable Items for use in battle.<br><br>To synthesize an Item, you must have the materials required for synthesis.<br><br>Upgrade your Synthesis House in Facility Upgrades to unlock new Items to synthesize.",
+   "v9dyS8fi": "700",
+   "meg8fhr1": "49"
+  },
+  {
+   "f1LKBoM9": "50",
+   "b5VveUd8": "",
+   "qp37xTDh": "Create Spheres to enhance Unit abilities when equipped.<br><br>To create a Sphere, you must have the materials and Karma required for Sphere creation.<br><br>Upgrade your Sphere House in Facility Upgrades to unlock new Spheres to synthesize.",
+   "v9dyS8fi": "700",
+   "meg8fhr1": "50"
+  },
+  {
+   "f1LKBoM9": "51",
+   "b5VveUd8": "",
+   "qp37xTDh": "Here you can listen to all the BGM from Brave Frontier. Zel is required to unlock BGM.<br><br>You must complete Quests to add new BGM to the line-up.",
+   "v9dyS8fi": "700",
+   "meg8fhr1": "51"
+  },
+  {
+   "f1LKBoM9": "52",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can create Leader Spheres that grant your Summoner Avatar a Leader Skill when equipped.<br><br>However, you must gather any necessary ingredients and Karma required to create them.<br><br>You can unlock more Leader Skill Spheres for creation as you gather more ingredients throughout your journey.",
+   "v9dyS8fi": "700",
+   "meg8fhr1": "52"
+  },
+  {
+   "f1LKBoM9": "53",
+   "b5VveUd8": "",
+   "qp37xTDh": "The Arena is a combat stadium where players can test their skill in battle against each other.<br><br>Each battle consumes one Arena Orb.<br>Arena Orbs recover once per hour.<br><br>Your Summoner Rank increases with each Arena victory, and you can get special rewards when you level up.",
+   "v9dyS8fi": "800",
+   "meg8fhr1": "53"
+  },
+  {
+   "f1LKBoM9": "54",
+   "b5VveUd8": "",
+   "qp37xTDh": "During an Arena battle, all Units attack automatically. Players cannot control anything during battle.<br><br>Victory goes to the Squad able to knock out all members of the opposing Squad within the time limit.<br><br>If one of the teams is not annihilated within the time limit, the the winning team will be decided according to the following sequence of conditions:<br>- The team with the greater number of surviving Units.<br>- The team with the greatest remaining HP.<br>- The team that inflicted the greatest total damage.",
+   "v9dyS8fi": "800",
+   "meg8fhr1": "54"
+  },
+  {
+   "f1LKBoM9": "55",
+   "b5VveUd8": "",
+   "qp37xTDh": "Arena Battle Points (ABP) increase with victories in Arena battles and decrease with defeats.<br><br>Get more ABP by defeating players with a higher ABP rank than that of your own. You must also be careful as you will lose more ABP if you lose to an opponent whose rank is lower than your own.<br><br>ABP only goes up or down when a player attempts a battle. Even if a player is attacked and loses, their ABP don't change (Though it will be recorded in your Battle Record as a win or loss).",
+   "v9dyS8fi": "800",
+   "meg8fhr1": "55"
+  },
+  {
+   "f1LKBoM9": "56",
+   "b5VveUd8": "",
+   "qp37xTDh": "Depending on your victory conditions, actions in battle, and win streak, you can get Bonus Points added to your Arena Battle Points.<br><br>Victory Conditions<br>-You won with fewer Units than your opponent.<br>-None of your units were knocked out. *You'll get even more Bonus Points if your Units have max HP or BB gauges.<br><br>Actions in Battle<br>-Your Units beat via their weaknesses (e.g. Fire beat Earth).<br>-Your Units used Brave Bursts.<br>-You beat more than 1 Unit in a turn. *Bonus Points are based on max damage per turn. If you beat 2 Units in a turn and then beat 3 in the next turn, the later turn's Bonus Points will count.<br><br>Win Streak<br><br>Win 3 battles in a row to start getting Bonus Points. You'll get more Bonus Points with each consecutive win, until the 10th. From then on, you'll get the same number of Bonus Points.",
+   "v9dyS8fi": "800",
+   "meg8fhr1": "56"
+  },
+  {
+   "f1LKBoM9": "57",
+   "b5VveUd8": "",
+   "qp37xTDh": "If you turn Random Rules on before starting an Arena battle, there is a chance that one will apply. If you win with a Random Rule applied, you'll get Bonus Points.<br>*Random Rules aren't guaranteed to apply even if they are turned on.<br><br>Below are the Random Rules that may apply:<br>*They apply to both you and your opponent.<br>-Empty BB Gauge Start<br>-No Brave Bursts<br>-Atk Parameter Halved<br>-Status Effects Active<br>-Fire Element Advantage<br>- Water Element Advantage<br>-Earth Element Advantage<br>-Thunder Element Advantage<br>-Light Element Advantage<br>-Dark Element Advantage<br>-Male Unit Advantage<br>-Female Unit Advantage<br>-<br>-Genderless Unit Advantage<br>No Leader Skills<br>-No Sphere Effects",
+   "v9dyS8fi": "800",
+   "meg8fhr1": "57"
+  },
+  {
+   "f1LKBoM9": "58",
+   "b5VveUd8": "",
+   "qp37xTDh": "Increase your Summoner Rank by accumulating a certain amount of ABP.<br><br>You will get a special reward when you reach a new rank for the first time, so aim to rank up by actively participating in Arena battles.<br><br>Your rank can go down if you lose once more after reaching 0 ABP, so be careful.",
+   "v9dyS8fi": "800",
+   "meg8fhr1": "58"
+  },
+  {
+   "f1LKBoM9": "59",
+   "b5VveUd8": "",
+   "qp37xTDh": "If the App terminates during an Arena battle, it counts as an automatic loss.",
+   "v9dyS8fi": "800",
+   "meg8fhr1": "59"
+  },
+  {
+   "f1LKBoM9": "60",
+   "b5VveUd8": "",
+   "qp37xTDh": "The Colosseum is a battleground where players experienced with the Arena can test each other's skill.<br>To battle in the Colosseum, you will need 1 Colosseum Ticket. <br>You can get Colosseum Tickets by participating in the Arena, or by exchanging them for Gems.",
+   "v9dyS8fi": "850",
+   "meg8fhr1": "60"
+  },
+  {
+   "f1LKBoM9": "61",
+   "b5VveUd8": "",
+   "qp37xTDh": "In a Colosseum battle, you will be given the chance to attack first in one round, and then attack second in the next.<br>The player with the most victories after two rounds, wins the battle.<br>However, if each player has the same amount of round victories, the winner of the battle will be decided by judging certain battle factors.<br>In the event that the value of the battle factors above are the same, victory will be granted to whoever initially placed the challenge.<br>Random Rules will also be added to each battle in the Colosseum.<br>*All Units' applicable Extra Skills will be active during Colosseum battles, regardless of whether the Units belong to the player or his/her opponent.",
+   "v9dyS8fi": "850",
+   "meg8fhr1": "61"
+  },
+  {
+   "f1LKBoM9": "62",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can select a Battle Formation and Support type for both your First Strike Squad, and your Second Strike Squad. If your choice of Battle Formation doesn't win against your opponent's selection, the effects of your Battle Formation will not activate and you will start your battle with an empty Brave Burst gauge.<br><br>The compatibility of Battle Formations are as follows:<br>Power Strike <br>Wins against Tetra Wall; loses against Kaiser Shield.<br>Martial Formation <br>Wins against Chain Formation; loses against Tetra Wall.<br>Raid Vanguard<br>Wins against Kaiser Shield; loses against Chain Formation.<br>Tetra Wall<br>Wins against Martial Formation; loses against Power Strike.<br>Chain FormationWins against Raid Vanguard; loses against Martial Formation.<br>Kaiser Shield<br>Wins against Power Strike; loses against Raid Vanguard.<br>*Any combination not included above is an automatic tie, and both players will start the battle in the same condition.<br>Try to predict your opponent's moves to select an appropriate Battle Formation.<br>Any Support provided will always be active regardless of the results concerning Battle Formation compatibility.",
+   "v9dyS8fi": "850",
+   "meg8fhr1": "62"
+  },
+  {
+   "f1LKBoM9": "63",
+   "b5VveUd8": "",
+   "qp37xTDh": "When you first begin battling in the Colosseum, you can select as many as seven of your Units to participate. From those seven Units, you will have to select five Units for your First Strike Squad, and 5 Units for your Second Strike Squad as well.You will also be able to choose which Units you would like to be in the front, middle, or back of your Squad.<br><br>Your Units can be positioned according to the diagram below:<br>A        C<br>     B<br>A        C<br>A = Units at the front<br>B = Unit in the middle<br>C = Units in the back<br>The positions above will benefit from certain effects depending on what Battle Formations you select.<br>Position your Units in a way where you can make the best of your Battle Formation effects.",
+   "v9dyS8fi": "850",
+   "meg8fhr1": "63"
+  },
+  {
+   "f1LKBoM9": "64",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can gain Colosseum Battle Points (CBP) by winning battles in the Colosseum. These points will be used to determine your ranking in various categories, and can also be exchanged for exclusive Colosseum rewards.<br>Your overall CBP count will be used to determine your ranking, so any CBP you spend in exchange for rewards will not affect it.<br><br>The Colosseum's rewards are divided into various different stages. At the beginning of every stage, you will be able to choose whatever treasure chest you like. You can use your CBP to claim the rewards found inside the chest, but a new treasure chest will not open until you have claimed all the rewards available at present.<br><br>Once you have claimed all the rewards from all the treasure chests in one stage, you will move to the next stage of rewards.<br>When you claim all of the rewards in every stage available, you will proceed to a another where you can continuously reclaim various rewards.<br>When a new rewards stage is added afterwards, you will be taken to the previous stage once again.<br><br>Tapping the Exchange All button will allow you to exchange all the rewards available for that specific stage.<br>The exchange will begin with the best reward and will stop if any rewards cannot be exchanged.<br><br>You can have a maximum of 99999 CBP at a time.",
+   "v9dyS8fi": "850",
+   "meg8fhr1": "64"
+  },
+  {
+   "f1LKBoM9": "65",
+   "b5VveUd8": "",
+   "qp37xTDh": "There are many classes available in the Colosseum, and you may choose to participate in any of them at any given time.<br>However, each class has restrictions on Unit Cost, amongst other things.<br>You can change which class you want to battle in at any time.<br><br>Select what class you would like to enter by matching its restrictions to the properties of the Units you would like to use in your Colosseum Squad.",
+   "v9dyS8fi": "850",
+   "meg8fhr1": "65"
+  },
+  {
+   "f1LKBoM9": "66",
+   "b5VveUd8": "",
+   "qp37xTDh": "Rankings in the Colosseum are determined from the amount of CBP collected during a specific period of time, or season.<br>All classes have their own ranking system, and will not display or take into account any CBP acquired from battles in other classes.<br>At the end of each season, all rankings will be reset.<br>Those with the highest rankings will receive special prices, including bonus CBP.<br>*Any bonus CBP received as a reward will not be reflected in the ranking calculations.<br><br>Win as many battles as you can at the Colosseum to raise your rank and gain awesome rewards!",
+   "v9dyS8fi": "850",
+   "meg8fhr1": "66"
+  },
+  {
+   "f1LKBoM9": "67",
+   "b5VveUd8": "",
+   "qp37xTDh": "Search the frontier and receive various rewards based on the results of your search.<br>The Survey Office is open for fixed periods of time, at the end of which your Hunter Rank will increase according to the record you achieve.",
+   "v9dyS8fi": "900",
+   "meg8fhr1": "67"
+  },
+  {
+   "f1LKBoM9": "68",
+   "b5VveUd8": "",
+   "qp37xTDh": "When going on Quests from the Survey Office, though you can't take normal items with you, you are provided special Items from the Akras Summoners' Hall.<br>Unused items are collected at the end of a Quest, so please use them freely.",
+   "v9dyS8fi": "900",
+   "meg8fhr1": "68"
+  },
+  {
+   "f1LKBoM9": "69",
+   "b5VveUd8": "",
+   "qp37xTDh": "Hunter Rank (HR) increases according to how much Frontier Service you rack up during the survey period. <br>*Please claim your rewards from the Survey Office after a survey period ends but before the next begins. <br>Please be aware that if you don't claim your rewards before the next survey begins they will be removed.",
+   "v9dyS8fi": "900",
+   "meg8fhr1": "69"
+  },
+  {
+   "f1LKBoM9": "70",
+   "b5VveUd8": "",
+   "qp37xTDh": "Each Quest consumes 1 Hunter Orb.<br>Hunter Orbs recover 1 every three hours. <br>When Hunter Orbs have run out, tap the Participate button and you'll be given the option to use 1 Gem to restore your orbs.",
+   "v9dyS8fi": "900",
+   "meg8fhr1": "70"
+  },
+  {
+   "f1LKBoM9": "71",
+   "b5VveUd8": "",
+   "qp37xTDh": "Your Frontier Service increases depending on how many Esteem pts you rack up on Quests from the Survey Office.<br>Your Frontier Service increases at a faster rate when you challenge more difficult Quests.",
+   "v9dyS8fi": "900",
+   "meg8fhr1": "71"
+  },
+  {
+   "f1LKBoM9": "72",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can access Frontier Gate from the Survey Office in the Imperial Capital Randall.<br>Each Quest will consume 1 Hunter Orb. You can receive many different rewards depending on how many Quests you clear, and how many Service and or Training Points  you accumulate.<br>You cannot bring the Items you have usually equipped on your Frontier Gate Quests.<br><br>Every time you win 5 battles in Frontier Gate, you will have 3 choices available on how to proceed: \"Continue,\" \"Pause,\" or \"Retire.\"",
+   "v9dyS8fi": "910",
+   "meg8fhr1": "72"
+  },
+  {
+   "f1LKBoM9": "73",
+   "b5VveUd8": "",
+   "qp37xTDh": "Every time you win 5 battles in Frontier Gate, you will have 3 choices available on how to proceed: \"Continue,\" \"Pause,\" or \"Retire.\"<br><br>・Continue<br>You can continue fighting with the same amount of remaining HP, BB gauge, and OD gauge, as well as with any status effects that were still active on your last turn.<br><br>・Pause<br>This choice will save your current position, allowing you to continue from the same point whenever you decide to resume the same Quest.<br><br>・Retire<br>When you retire, you can collect all rewards available based on how many battles you won and how many Service Points you accumulated during your Quest.<br>However, the next time you attempt the same Quest you will have to start again from the beginning.",
+   "v9dyS8fi": "910",
+   "meg8fhr1": "73"
+  },
+  {
+   "f1LKBoM9": "74",
+   "b5VveUd8": "",
+   "qp37xTDh": "Before your Quest starts, you will be able to select either one Friend to help you, or a Unit of your own to aid you on the battlefield.<br>Once you have chosen a Helper Unit, you cannot change it until you retire.",
+   "v9dyS8fi": "910",
+   "meg8fhr1": "74"
+  },
+  {
+   "f1LKBoM9": "75",
+   "b5VveUd8": "",
+   "qp37xTDh": "Before you set off on your first battle, Noel will provide you with special support. After you have won 5 battles, you will be able to choose a new type of Support if you decide to continue.<br>However, you can only receive one type of Support at a time, so any new choice you make will render Noel's previous Support invalid.<br><br>There are many different types of Support available, such as parameter boosts for your Units, or Item Sets for use in battle.",
+   "v9dyS8fi": "910",
+   "meg8fhr1": "75"
+  },
+  {
+   "f1LKBoM9": "76",
+   "b5VveUd8": "",
+   "qp37xTDh": "This is where you pick up keys to unlock the Metal Parade and Jewel Parade that appear in the Vortex Gate.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "76"
+  },
+  {
+   "f1LKBoM9": "77",
+   "b5VveUd8": "",
+   "qp37xTDh": "Keys given out at the Administration Office can be used to unlock the Metal Parade and Jewel Parade which appear in the Vortex Gate. <br>Each Parade requires its own special key to unlock, each of which are given out on specific days of the week. Be careful not to forget to receive yours.<br><br>Distribution times:<br>Metal Keys<br>Every Monday, Tuesday, Thursday, and Friday<br><br>Jewel Keys<br>Every Wednesday <br><br>*Keys are distributed at 5:00 a.m. each day.<br>*You can hold in stock a maximum of 10 of each key.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "77"
+  },
+  {
+   "f1LKBoM9": "78",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can use the Brave Slots by inserting 3 Brave Medals into the machine. Once the slots begin to spin, you will be awarded a prize depending on what pictures match up.<br><br>You can obtain Brave Medals by clearing Quests in Raid Battle.<br><br>A maximum of 9999 Brave Medals can be carried at a time.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "78"
+  },
+  {
+   "f1LKBoM9": "79",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can collect Merit Points you have earned through your Missions by accessing your Mission Record.<br><br>The entries in this section will be automatically marked as completed once their requirements have been fulfilled.<br><br>Special Challenges will award you more points than usual, but they must be manually selected from the Challenges menu.<br>Special Challenges are also often updated, so make sure to visit the Akras Summoners' Hall Administration Office often to check them out.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "79"
+  },
+  {
+   "f1LKBoM9": "80",
+   "b5VveUd8": "",
+   "qp37xTDh": "Challenges are tests given out by the Akras Summoners' Hall.<br>Some of these challenges are time sensitive, and can be failed when not completed in the amount of time allotted.<br><br>There are challenges which can only be completed once, and will therefore become unavailable once completed.<br><br>The challenges available change from time to time, so make sure to visit the Akras Summoners' Hall Administration Office often to check them out.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "80"
+  },
+  {
+   "f1LKBoM9": "81",
+   "b5VveUd8": "",
+   "qp37xTDh": "When you complete a certain number of Challenges under Missions, Special Challenges (SP Challenges) will appear. You may only choose one SP Challenge out of the several that appear on screen. Any unselected Challenges will be discarded after one is chosen, so please keep in mind the difficulty of the Challenge and its rewards before settling on one.<br>If you tap the \"Discard Challenges\" button without choosing a SP Challenge, all SP Challenges will be discarded, and you will have to complete the required amount of regular Challenges before you're able to choose a SP Challenge again.<br>If you tap the \"Back\" button while the SP Challenges are on screen, once you return to that same screen the SP Challenges will be displayed yet again. However, you will be unable to select anything from the list of regular Challenges until you have either completed or given up on the SP Challenge you have chosen.<br>If you give up on any SP Challenge you have chosen, a new list of SP Challenges will not be displayed. If you would like to try a different SP Challenge, you will have to give up on your current SP Challenge and complete the required amount of regular Challenges before you're able to choose a SP Challenge again.<br>SP Challenges are not included in the number of regular Challenges you can accept at a time, so it is possible to take on 5 regular Challenges and 1 SP Challenge at the same time.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "81"
+  },
+  {
+   "f1LKBoM9": "82",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can collect Merit Points you have earned through your Missions by accessing your Mission Record.<br>The entries in this section will be automatically marked as completed once their requirements have been fulfilled.<br>Special Challenges will award you more points than usual, but they must be manually selected from the Challenges menu.<br>Special Challenges are also often updated, so make sure to visit the Akras Summoners' Hall Administration Office often to check them out.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "82"
+  },
+  {
+   "f1LKBoM9": "83",
+   "b5VveUd8": "",
+   "qp37xTDh": "In the Trade menu, you can exchange eligible Units, Zel and Karma for Merit Points.<br>There is a limit as to how many Merit Points you can obtain in one day, so you will not be allowed to receive more than the amount allotted.<br><br>The higher the level of the Units you trade, or the higher their rarity, the more Merit Points you will receive in exchange for them.<br>*2-star Units or lower, Fusion, and Evolution Units are not eligible for Trade.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "83"
+  },
+  {
+   "f1LKBoM9": "84",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can spend your Merit Points at the Exchange Hall to obtain various Items and Units.<br><br>Each Item and Unit available in the Exchange Hall has a limit as to how many times it can be exchanged for. Some of them are also time sensitive offers, but may become available again in the future once their time has expired.<br><br>The Items and Units available in the Exchange Hall are updated from time to time to include limited edition content, so make sure to visit the Akras Summoners' Hall Administration Office often to check them out.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "84"
+  },
+  {
+   "f1LKBoM9": "85",
+   "b5VveUd8": "",
+   "qp37xTDh": "When you complete a certain number of Challenges under Missions, Special Challenges (SP Challenges) will appear. You may only choose one SP Challenge out of the several that appear on screen. Any unselected Challenges will be discarded after one is chosen, so please keep in mind the difficulty of the Challenge and its rewards before settling on one.<br>If you tap the \"Discard Challenges\" button without choosing a SP Challenge, all SP Challenges will be discarded, and you will have to complete the required amount of regular Challenges before you're able to choose a SP Challenge again.<br>If you tap the \"Back\" button while the SP Challenges are on screen, once you return to that same screen the SP Challenges will be displayed yet again. However, you will be unable to select anything from the list of regular Challenges until you have either completed or given up on the SP Challenge you have chosen.<br>If you give up on any SP Challenge you have chosen, a new list of SP Challenges will not be displayed. If you would like to try a different SP Challenge, you will have to give up on your current SP Challenge and complete the required amount of regular Challenges before you're able to choose a SP Challenge again.<br>SP Challenges are not included in the number of regular Challenges you can accept at a time, so it is possible to take on 5 regular Challenges and 1 SP Challenge at the same time.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "85"
+  },
+  {
+   "f1LKBoM9": "86",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can collect Merit Points you have earned through your Missions by accessing your Mission Record.<br>The entries in this section will be automatically marked as completed once their requirements have been fulfilled.<br>Special Challenges will award you more points than usual, but they must be manually selected from the Challenges menu.<br>Special Challenges are also often updated, so make sure to visit the Akras Summoners' Hall Administration Office often to check them out.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "86"
+  },
+  {
+   "f1LKBoM9": "87",
+   "b5VveUd8": "",
+   "qp37xTDh": "Chain Challenges are special challenges connected to each other that must be completed in sequential order.Each challenge has its own rewards upon completion, which become available once the requirements of each individual challenge have been completed.As you continue completing the challenges and collecting rewards, the next challenge in the chain will automatically be accepted.You can choose whether to continue the Chain Challenge, or cancel it midway.<br>If you choose to cancel the challenge, you can pick up where you left off as long as you are within the time limit allotted for the challenges' completion. You will start from the challenges that remain to be completed, and which still offer a redeemable reward.<br><br>You may spot that some challenge rewards appear as \"???\" on screen. The details behind these rewards will be revealed once you unlock the challenge before said mystery reward.<br><br>Completing a Chain Challenge will count as 1 cleared challenge  in regards to the count that unlocks any Special Challenges.",
+   "v9dyS8fi": "1000",
+   "meg8fhr1": "87"
+  },
+  {
+   "f1LKBoM9": "88",
+   "b5VveUd8": "",
+   "qp37xTDh": "Unlike normal battles, in Trials you can use up to three Squads in a single Quest. <br><br>If one Squad is defeated the next Squad is automatically summoned, and you must defeat the enemy before all your Squads have been defeated to clear the Quest.<br><br>For this Quest, Gems cannot be used to revive your Squad after they have been defeated.",
+   "v9dyS8fi": "1100",
+   "meg8fhr1": "88"
+  },
+  {
+   "f1LKBoM9": "89",
+   "b5VveUd8": "",
+   "qp37xTDh": "You have access to two times your normal Cost which you can divide between up to three Squads. <br><br>During battle, Squads will be summoned in the order in which they were selected.<br><br>A Leader must be assigned in each Squad, and Squads without a leader will not be summoned.",
+   "v9dyS8fi": "1100",
+   "meg8fhr1": "89"
+  },
+  {
+   "f1LKBoM9": "90",
+   "b5VveUd8": "",
+   "qp37xTDh": "One Helper Summoner can be selected for each Squad.<br><br>In Trials, only Friends can be selected as Summoner Helpers.<br><br>Your Friends' Leader Skills take effect on each party they are summoned with.",
+   "v9dyS8fi": "1100",
+   "meg8fhr1": "90"
+  },
+  {
+   "f1LKBoM9": "91",
+   "b5VveUd8": "",
+   "qp37xTDh": "Tap the Treasure Chest icon in the center-right section of the Home screen to go to the Gift reception screen.<br><br>If Gifts aren't received for more than 30 days, they will be deleted. Be sure to check for and receive Gifts regularly.",
+   "v9dyS8fi": "10000",
+   "meg8fhr1": "91"
+  },
+  {
+   "f1LKBoM9": "93",
+   "b5VveUd8": "",
+   "qp37xTDh": "In Raid Battles, a maximum of four players may battle together as a Team.<br>The conditions required to complete each Quest vary according to that particular mission, such as just defeating the boss, or having to defeat multiple enemies instead. <br>Raid Battles have a set time limit in which they must be completed. If you cannot complete the Quest in said time, it will be considered a failure, and you will be forced to abandon it.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "93"
+  },
+  {
+   "f1LKBoM9": "94",
+   "b5VveUd8": "",
+   "qp37xTDh": "In order to participate in Raid Battles, you must join a Room.<br>A minimum of one player is required per Room, and a maximum of four may join at any given time.<br><br>The player who wants to open a Room will be the Room Master.<br>The Room Master can select which Quest to take part in.<br>Also, if the Room displays the sign \"Expel On,\" this grants the Room Master the ability to expel any particular member of his or her choosing from the Team.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "94"
+  },
+  {
+   "f1LKBoM9": "95",
+   "b5VveUd8": "",
+   "qp37xTDh": "Quick Start mode allows you to mobilize right away after choosing a Quest and a Friend.<br>When choosing Quick Start, you will only be paired with other players who have chosen the same mode, and will be unable to join or search for regular rooms.<br>If there are Quick Start rooms with your selected Quest available, you will be entered into them automatically. If not, you will be entered into a new Quick Start room instead.<br>Once the Quest is finished, the room will automatically close, and you will be taken back to the main Raid Battle screen.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "95"
+  },
+  {
+   "f1LKBoM9": "96",
+   "b5VveUd8": "",
+   "qp37xTDh": "Raid Classes (RC) increase after completing certain Quests.<br>When you go up a class you will receive a special reward.<br>You will also be able to participate in more challenging Quests as your RC increases.<br><br>However, you will only be able to participate in missions that correspond to your current RC.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "96"
+  },
+  {
+   "f1LKBoM9": "97",
+   "b5VveUd8": "",
+   "qp37xTDh": "To participate in a Raid Battle you will need to use one \"Raid Orb.\" Raid Orbs regenerate after one hour has passed.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "97"
+  },
+  {
+   "f1LKBoM9": "98",
+   "b5VveUd8": "",
+   "qp37xTDh": "Every player will have three Lives at the start of each Quest. <br>If your whole Squad falls during a Raid Battle, you will lose one Life, be sent back to the Camp, and your Units will start recovering HP.<br><br>If you're left with 0 Lives, you may choose \"Recover Lives\" to recover a single Life by using a Gem, or \"Give Up\" to stop participating in the Quest, resulting in its failure. <br>In addition, when there are multiple players participating, if any of them lose all of their Lives or give up, they will leave the Quest, but the remaining players can continue with their mission.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "98"
+  },
+  {
+   "f1LKBoM9": "99",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can \"Rest\" at your Camp. <br>When you Rest, your Units will gradually recover their HP.<br>Units which were knocked out will also recover their HP.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "99"
+  },
+  {
+   "f1LKBoM9": "100",
+   "b5VveUd8": "",
+   "qp37xTDh": "In order to fight the Boss related to the mission, you must \"Move\" to its location on the map. <br>There are Quests which immediately show the location of the Boss, and some that do not.<br><br>However, even in the Quests where the Boss's location is not shown, you can use the exclusive Raid item \"Detector\" to find its hiding place.<br><br>Also, there are Bosses which will move around the map from time to time. In that case, you may fight the Boss in a particular location, but it may relocate to another afterwards.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "100"
+  },
+  {
+   "f1LKBoM9": "101",
+   "b5VveUd8": "",
+   "qp37xTDh": "Some of the Bosses have different parts that compose them.<br><br>Each part has its own attributes, and different types of attacks that it can perform. <br>Though the Boss may be defeated when its main body is destroyed, it cannot be defeated by destroying a single limb alone.<br>However, destroying the various parts that compose a Boss exponentially increases your chances of obtaining valuable Items.<br><br>",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "101"
+  },
+  {
+   "f1LKBoM9": "102",
+   "b5VveUd8": "",
+   "qp37xTDh": "In Raid Battles, there are certain locations on the map which allow you to \"Harvest\" materials.<br>Most of the items that you can Harvest here are exclusively for use during Raid Battles, but occasionally you can obtain valuable materials to create or exchange Spheres.<br>",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "102"
+  },
+  {
+   "f1LKBoM9": "103",
+   "b5VveUd8": "",
+   "qp37xTDh": "To judge how many Service Points you'll be awarded, an evaluation of your performance during each Quest will be displayed by a number of stars on the screen. Besides the amount of points you get for defeating a Target, the use of Raid Items will also affect your score.<br><br>- Defeating a Target (Example: defeat Edelma, defeat Van Lucy, etc.)<br><br>100 × (Amount of damage one dealt to boss ÷ damage dealt to boss as a group.)<br><br>- Item Usage<br><br>Number of Items used × 5<br><br>*Maximum amount of Item points that can be gained is 25pts (5 Items used total).<br>*Eligible Items are Beacon, God Crystal, Atk Crystal, and Def Crystal.<br><br>- According to the number of points you gain from the two terms evaluated above, your overall score will be calculated as follows:<br><br>★★★★★　400pts or more<br>★★★★　　 300 - 399pts<br>★★★　　　  200 - 299pts<br>★★　　　　   101 - 199pts<br>★　　　　　　   0 - 100pts",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "103"
+  },
+  {
+   "f1LKBoM9": "104",
+   "b5VveUd8": "",
+   "qp37xTDh": "Depending on how many stars you receive for your overall score, you will be entitled to different types of rewards.<br><br>- Zel, Karma, and Medal Bonus<br>★★★★★ ×　1.30<br>★★★★　　×  1.20<br>★★★　　   ×  1.10<br>★★　　　　  ×  1.05<br>★　　　　　   ×  1.00 (in general)<br><br>- Item Drop Bonus<br>★★★★★ ×　3.00<br>★★★★    ×　2.50<br>★★★　　   ×　2.00<br>★★　　　　  ×  1.50<br>★　　　　　   ×  1.00 (in general)",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "104"
+  },
+  {
+   "f1LKBoM9": "105",
+   "b5VveUd8": "",
+   "qp37xTDh": "A Contribution Bonus will also be awarded based on how many members participated in the Quest.<br>*The Contribution Bonus will be added on top of the Service Points you receive for your overall performance during a Quest.<br><br>- Zel, Karma, and Medal Bonus<br>4 people ×　1.15<br>3 people ×　1.10<br>2 people ×　1.05<br>1 person ×　1.00 (in general)<br><br>- Item Drop Bonus<br>4 people ×　1.50<br>3 people ×　1.25<br><br>2 people ×　1.10<br>1 person ×　1.00 (in general)",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "105"
+  },
+  {
+   "f1LKBoM9": "106",
+   "b5VveUd8": "",
+   "qp37xTDh": "In the event that you participate in a Raid mission with Friends, the number of Friends in the group will affect the Bonus Rewards.<br>*Contribution Bonuses and Service Points will also be affected.<br><br>- Zel, Karma, and Medal Bonus<br>3 people ×　1.15<br>2 people ×　1.10<br>1 person ×　1.05<br><br>- Item Drop Bonus<br>3 people ×　2.00<br>2 people ×　1.50<br>1 person ×　1.20",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "106"
+  },
+  {
+   "f1LKBoM9": "107",
+   "b5VveUd8": "",
+   "qp37xTDh": "When you blacklist other players, they will not be allowed to join your Rooms, and will not be paired up with you when you choose to Quick Start.<br>*In the event that they are already in your Room, the effects of blacklisting will not take place until said player has left the Room.<br><br>■ Blacklisting Players<br>From a Room, you can blacklist players through the Room Info or Team menus by tapping Blacklist Player.<br><br>■ Unblacklisting<br>From the World menu, tap Blacklist and select any players you would like to unblacklist.",
+   "v9dyS8fi": "1200",
+   "meg8fhr1": "107"
+  },
+  {
+   "f1LKBoM9": "108",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can create different Spheres than those available in the Town with materials obtained from Raid Battles.<br><br>In order to create a Sphere, you will need the materials required as well as sufficient Karma to complete the process.<br><br>To increase the variety of Spheres available, the key is to collect many different materials from Raid Battles.<br>Once you collect many different types of materials, more Spheres will be unlocked.",
+   "v9dyS8fi": "1300",
+   "meg8fhr1": "108"
+  },
+  {
+   "f1LKBoM9": "109",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can Synthesize exclusive Raid Items to be used during battle.<br><br>In order to create an Item, you will need the required materials first.",
+   "v9dyS8fi": "1400",
+   "meg8fhr1": "109"
+  },
+  {
+   "f1LKBoM9": "115",
+   "b5VveUd8": "",
+   "qp37xTDh": "Grand Quest is a huge group of Quests that multiple Squads go on.<br><br>The story separates into branches depending on your actions, so multiple endings are possible.<br><br>Also, some Quests have different conditions for clearing.<br><br>You can access Grand Quest via the Quest button on the Home screen.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "115"
+  },
+  {
+   "f1LKBoM9": "116",
+   "b5VveUd8": "",
+   "qp37xTDh": "Each Quest in Grand Quest has a required number of Squads.<br><br>If you can't create the required number, you can't go on that Quest.<br><br>Each quest also has a set limit for the total Cost of your Squads.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "116"
+  },
+  {
+   "f1LKBoM9": "117",
+   "b5VveUd8": "",
+   "qp37xTDh": "For each Squad, you can select one Friend's Leader Unit to be the your Helper Summoner.<br><br>Only Friends can be selected.<br><br>The Friend's Leader Skill will be active for that Squad only.<br><br>If \"Guest\" or \"Reserved\" appears in a Squad's Friend spot, you can't select a Friend for that Squad.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "117"
+  },
+  {
+   "f1LKBoM9": "118",
+   "b5VveUd8": "",
+   "qp37xTDh": "Clear a Quest while fulfilling certain requirements to raise your Percent Complete.<br><br>Once you raise it, it won't go down.<br><br>Tap Requirements to see which requirements you have met so far.<br><br>You'll get a special reward at 100%.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "118"
+  },
+  {
+   "f1LKBoM9": "119",
+   "b5VveUd8": "",
+   "qp37xTDh": "During a Quest, tap Pause and then Yes to save your progress and return to the Home screen.<br><br>To start your Quest from where you left off, select Quest on the Home screen and tap Grand Quest, followed by Yes when prompted.<br><br>Tap No when prompted if you want to delete your save data and go on a different Quest.<br><br>While Grand Quest is paused, you can access any other feature of the game, such as regular Quest, Raid Battle, Arena, Summon, etc.<br><br>*If you Fuse Units, etc. while a Quest is paused, it won't be reflected in that Quest.<br><br>*Only one Quest's save data can be saved at a time. If you pause a Quest, the saved data from the last time you paused will be overwritten, so please be careful.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "119"
+  },
+  {
+   "f1LKBoM9": "120",
+   "b5VveUd8": "",
+   "qp37xTDh": "Quest Clear rewards vary depending on your actions during that Quest.<br><br>Some Quest Clear rewards can only be claimed once whereas others have no limit.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "120"
+  },
+  {
+   "f1LKBoM9": "121",
+   "b5VveUd8": "",
+   "qp37xTDh": "On the Map there are icons for Bosses and powerful Enemies. Move to one to start a battle.<br><br>There are also icons that indicate an event will occur if you meet special conditions.<br><br>Some routes are locked, indicated by a door icon. You can open them by meeting certain conditions.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "121"
+  },
+  {
+   "f1LKBoM9": "122",
+   "b5VveUd8": "",
+   "qp37xTDh": "The currently selected Squad is indicated by a gold icon.<br><br>You can select a different Squad by tapping Squad on the lower right.<br><br>When you tap a point on the map, the Squad that can reach that location will move there.<br><br>If a point on the Map is grayed out, you can't move there.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "122"
+  },
+  {
+   "f1LKBoM9": "123",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can reread any Quest stories you have cleared in Grand Quest at the Imperial Library. You can access the Imperial Library from the Imperial Capital Randall icon available in the Home screen, and then tapping on the Imperial Library building.<br>You can only reread stories that you have already cleared in Grand Quest. If you pause your current GQ Quest,  fail it, or give up, you will not be able to see its story through the Imperial Library.",
+   "v9dyS8fi": "1700",
+   "meg8fhr1": "123"
+  },
+  {
+   "f1LKBoM9": "124",
+   "b5VveUd8": "",
+   "qp37xTDh": "Summoners will be divided into Level Tier, according to the following level range:<br>- Lv 15 to Lv 24<br>- Lv 25 to Lv 34<br>- Lv 35 to Lv 44<br>- Lv 45 to Lv 54<br>- Lv 55 to Lv 74<br>- Lv 75 and above<br><br>In each Level Tier, you will be allocated to a random group, to compete for rank within the group.<br><br>Become top ranker within the group and get great rewards!",
+   "v9dyS8fi": "800000",
+   "meg8fhr1": "124"
+  },
+  {
+   "f1LKBoM9": "125",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can get Victory Points by participating in Quest, Vortex events and Arena.<br><br>During the tournament, some dungeons in Quest and Vortex will give victory points upon completion. The points gained from Quest are scaled based on the difficulty of the area.<br><br>Arena Battle will give Victory Points upon winning or losing. Points acquired upon winning will be calculated based on Arena Battle Points gained.",
+   "v9dyS8fi": "800000",
+   "meg8fhr1": "125"
+  },
+  {
+   "f1LKBoM9": "126",
+   "b5VveUd8": "",
+   "qp37xTDh": "Summoners will be ranked within a group, based on the number of Victory Points acquired.<br><br>At the end of the tournament, summoner who reaches the top rank will be able to claim various rewards.<br><br>Current tournament rewards includes Exclusive Spheres, Burst Frogs, Metal Gods and many more!<br><br>Details of rewards for each tier can be seen from Victory Tournament Main Page.",
+   "v9dyS8fi": "800000",
+   "meg8fhr1": "126"
+  },
+  {
+   "f1LKBoM9": "127",
+   "b5VveUd8": "",
+   "qp37xTDh": "Earn Brave Points (BP) by completing Daily Tasks to redeem great prizes and earn loyalty milestone rewards!<br><br>- Everyday your Daily Tasks will be Refreshed with 3 new tasks<br>- Uncompleted tasks from the previous day will be forfieted<br>- Completing all 3 tasks of the day will earn you 10 bonus BP!",
+   "v9dyS8fi": "900000",
+   "meg8fhr1": "127"
+  },
+  {
+   "f1LKBoM9": "128",
+   "b5VveUd8": "",
+   "qp37xTDh": "Arena Victory - Achieve 3 Victories in the Arena<br>Quest Explorer - Complete 3 Missions within <indicated map><br>Vortex Venturer - Complete 1 Missions within the Vortex<br>Power Up - Fuse 5 units<br>Unit Upgrade - Evolve any units 1 times<br>Craftsman - Craft 5 Items/Spheres",
+   "v9dyS8fi": "900000",
+   "meg8fhr1": "128"
+  },
+  {
+   "f1LKBoM9": "129",
+   "b5VveUd8": "",
+   "qp37xTDh": "Prize Redemption -- Redeem items and prizes with your current amount of earned BPs<br><br>Milestone Rewards -- Automatically unlock loyalty milestone rewards with your total BPs collected. Claim your rewards by visiting the Milestone Rewards page.",
+   "v9dyS8fi": "900000",
+   "meg8fhr1": "129"
+  },
+  {
+   "f1LKBoM9": "130",
+   "b5VveUd8": "",
+   "qp37xTDh": "Flaunt your powers and embark on a journey to challenge other Summoners of the land! Destroy all that stand before you and bask in the glory of your victories!<br> <br>[CHALLENGE ARENA RULES]<br> <br>UNIT HP : Choose units for each battle wisely - Unit HP will carry over from one battle to the next. <br> <br>BONUS HP : Some Leader Skills and Arena Battle Conditions will imbue bonus HP to your Units. This will be reflected as an extension of the HP bar. <br> <br>BB GAUGE : The BB Gauge will be cleared each daily reset. For battles, BB remaining in gauges will carry over to the next. <br> <br>DEFEATED UNITS : Units that drop to 0 HP will remain so until the next reset. They will not be able to participate in any more battles for the day, unless revived with gems or potions. <br> <br>POINTS & REWARDS : You can get ranking rewards as long as you have participated in battles and obtained ranking points. <br> <br>SAME POINTS : In the case of two or more players having the same ranking point, the first player who achieved the point will be ranked on top of the others.<br> <br>ENTRY & END TIME : Summoners will be assigned to different groups where their allowed battle time will be throttled.<br> <br>--------<br><color=238:163:17>View \"CHALLENGE ARENA TIPS\" for helpful hints to dominate the Challenge Arena!</color>",
+   "v9dyS8fi": "888000",
+   "meg8fhr1": "130"
+  },
+  {
+   "f1LKBoM9": "131",
+   "b5VveUd8": "",
+   "qp37xTDh": "The Challenge Arena is divided into 3 Leagues: <br> <br>1. Rookie League <br>2. Summoner League <br>3. Legendary League <br> <br>Start off in the Rookie league and work your way up the top.<BR> <BR>Each week, the Top Summoners of the Rookie and Summoner Leagues will achieve promotion to the next higher League, where stronger opponents and greater rewards are waiting!<br> <br>Get to the <color=238:163:17>Legendary League</color> and reap the rewards that you truly deserve!<br> <br>[Ranking Points & Rewards] <br>You can get ranking rewards as long as you have participated in battles and obtained ranking points.",
+   "v9dyS8fi": "888000",
+   "meg8fhr1": "131"
+  },
+  {
+   "f1LKBoM9": "132",
+   "b5VveUd8": "",
+   "qp37xTDh": "You will face a series of progressively stronger opponents. Defeat them to gain ranking points and drops!<br> <br>Battles will be auto-battle style similar to the Arena. The team who defeats all opponent Units will be the victor. You will not be able to progress to the next opponent until the current opponent has been defeated.<br> <br>If the timer runs out before any squad has been defeated, the following conditions will determine the winner, in order of priority : <br>1. Number of Units <br>2. Total Damage <br>3. Total HP <br> <br>--------<br> <br>[BATTLE NOTES]<br>- Spheres are not allowed in the Challenge Arena. <br>- Attacking power of Brave Bursts and Super Brave Bursts have been reduced overall. <br>- Healing per HC has been reduced overall. <br>- Inflicted Statuses will all last for 1 turn. <br>- Status Infliction rates have been capped.",
+   "v9dyS8fi": "888000",
+   "meg8fhr1": "132"
+  },
+  {
+   "f1LKBoM9": "133",
+   "b5VveUd8": "",
+   "qp37xTDh": "When setting up your squad for battle, there is a \"Brave Bonus\" displayed. Use this as a guide for maximizing points gain!<br> <br>The stronger the opponent squad is relative to your current squad, the higher the bonus.<br> <br><color=238:163:17>View \"CHALLENGE ARENA TIPS\" for helpful hints to dominate the Challenge Arena!</color>",
+   "v9dyS8fi": "888000",
+   "meg8fhr1": "133"
+  },
+  {
+   "f1LKBoM9": "134",
+   "b5VveUd8": "",
+   "qp37xTDh": "Units are automatically available in the squad reserve. There are 2 sets of requirements for a unit to qualify for battle in the Challenge Arena. <br> <br> 1. Challenge Arena Unit Requirements <br>- No duplicate Units are allowed in your squad. If there are multiples of the same Unit, the Unit with the highest stats will be selected. This rule does not apply to opponent squads. <br>- Unit must be at the rarity and level equal to or higher than the League's requirement <br>- If duplicate Units of equal strength exist, one of them will be chosen at random. <br> <br>2. League Unit Requirements <br>You can check the exact requirements on the countdown panel during break period or tap the 'PLUS' button on squad reserve window.",
+   "v9dyS8fi": "888000",
+   "meg8fhr1": "134"
+  },
+  {
+   "f1LKBoM9": "135",
+   "b5VveUd8": "",
+   "qp37xTDh": "SQUAD SETUP TIP<br>The environment that each opponent is found in, hints about the difficulty of the battle.<br> <br>UNIT MANAGEMENT TIP <br>Summon more Units to increase the size of your squad reserve. The larger your reserve of eligible units, the greater the variety of squads you can customize to overcome the ever-changing battle conditions! <br> <br>BATTLE TIP<br>Bringing a unit with restorative BB effects can help your squad last longer! <br> <br>BATTLE TIP<br>Store up units with full BB/SBB gauges for tough opponents! <br> <br>BATTLE TIP<br>Study the opponent's squad setup (unit elements, skill effects, BB gauge levels etc.) and the presiding random rule to gain a greater \"Brave Bonus\" and victory chance!",
+   "v9dyS8fi": "888000",
+   "meg8fhr1": "135"
+  },
+  {
+   "f1LKBoM9": "136",
+   "b5VveUd8": "",
+   "qp37xTDh": "Collect gold and silver coins from ranking rewards to purchase potions, dungeon keys, fusion units and special items from the Challenge Arena Shop. Gather rainbow coins from defeated opponents to spend on Challenge Arena Summon! <br> <br>Open treasure chests along the battle route for additional gold and silver coins. <br> <br>Ranking rewards will be distributed every daily and weekly reset, but the actual rewarding will be staggered across several hours. Upon receiving the rewards, a notification will appear. <br> <br>You can check your current ranking reward tier from: <br><color=0:204:0>[Ranking -> View Rewards]</color>",
+   "v9dyS8fi": "888000",
+   "meg8fhr1": "136"
+  },
+  {
+   "f1LKBoM9": "238",
+   "b5VveUd8": "",
+   "qp37xTDh": "This is where players can view the Guild’s ranking based on the amount of Prestige Points earned from guild based events. There are 2 types of ranking: Event Ranking and Overall Ranking.  Event Ranking is a ranking based on the Prestige Points earned in guild based events. This ranking will reset every event.   Overall Ranking is a ranking based on accumulated Prestige Points earned starting from the creation of guild. This ranking will not reset.",
+   "v9dyS8fi": "80001",
+   "meg8fhr1": "238"
+  },
+  {
+   "f1LKBoM9": "239",
+   "b5VveUd8": "",
+   "qp37xTDh": "This bulletin board allows you to communicate with other guild members. This board will also have notifications and updates, such as a new member joining a Guild.",
+   "v9dyS8fi": "80001",
+   "meg8fhr1": "239"
+  },
+  {
+   "f1LKBoM9": "240",
+   "b5VveUd8": "",
+   "qp37xTDh": "This is where players can view Guild Members and Guild Descriptions. Guild Masters and Vice Guild Masters have the option of managing guild members inside the Guild Hall, as well as modifying Guild insignias and guild descriptions.",
+   "v9dyS8fi": "80001",
+   "meg8fhr1": "240"
+  },
+  {
+   "f1LKBoM9": "241",
+   "b5VveUd8": "",
+   "qp37xTDh": "These are Guild-based events that let you earn Prestige Points upon completion. Your Prestige Point total determines your guild ranking.",
+   "v9dyS8fi": "80001",
+   "meg8fhr1": "241"
+  },
+  {
+   "f1LKBoM9": "242",
+   "b5VveUd8": "",
+   "qp37xTDh": "This area offers exclusive and precious items, units, and spheres for sale. However, you will need the exclusive currency known as “Guild Tokens” to buy them. You can get “Guild Tokens” via Contributions in the Research Center and Guild Events.",
+   "v9dyS8fi": "80001",
+   "meg8fhr1": "242"
+  },
+  {
+   "f1LKBoM9": "243",
+   "b5VveUd8": "",
+   "qp37xTDh": "This is where you can upgrade your Guild membership special skills that are active during Guild-based events. You will need to donate Zel and Karma to upgrade and increase the effects of these special skills. <br>You will earn Guild Tokens when you donate a certain amount. Generosity has its own rewards!",
+   "v9dyS8fi": "80001",
+   "meg8fhr1": "243"
+  },
+  {
+   "f1LKBoM9": "300",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can unlock the Summoner Home screen by completing Chapter 2 (Ishgria) of the Brave Frontier saga.<br><br>Not only will a whole new menu become available, but a new storyline as well.<br><br>From this menu you'll be able to customize your Summoner, as well as enhance his or her parameters and weapons.<br><br>*Please refer to the Summoner Home Screen portion of the Help section for more details.",
+   "v9dyS8fi": "3000",
+   "meg8fhr1": "300"
+  },
+  {
+   "f1LKBoM9": "301",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can access the Summoning Arts Lab from the Summoner Home screen to clear special dungeons for loads of EXP.<br><br>To access the dungeons you will need Summoner Training Points.<br><br>*Some rare monsters that are worth a lot of EXP may appear in the dungeons.",
+   "v9dyS8fi": "3000",
+   "meg8fhr1": "301"
+  },
+  {
+   "f1LKBoM9": "302",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can manage your Summoner's details, element, weapons, and parameters from this menu.<br><br>*Please refer to each individual portion of the Help section concerning the Summoner Menu for further details on each.<br><br>All portions will become available as you advance through Chapter 3's storyline.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "302"
+  },
+  {
+   "f1LKBoM9": "303",
+   "b5VveUd8": "",
+   "qp37xTDh": "When you begin Chapter 3, you will not be able to remove your Summoner Avatar from your Squad. <br><br>As you advance through the story, you will gain the ability to gradually summon other Units. And once the story has been developed even further, you will gain access to other Units as well.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "303"
+  },
+  {
+   "f1LKBoM9": "304",
+   "b5VveUd8": "",
+   "qp37xTDh": "In Chapter 3 of Brave Frontier, the Summoner himself or herself will level up.<br><br>You can gain experience to level up as a reward for completing Quests.<br><br>When you level up your Summoner, his or her parameters will increase, and you will gain Summoner SP to use as well.<br><br>You will need SP to enhance your Summoner Avatar even further.<br><br>*Please see the Parameter Enhancements portion of the Help section for more details.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "304"
+  },
+  {
+   "f1LKBoM9": "305",
+   "b5VveUd8": "",
+   "qp37xTDh": "Each element can be leveled separately. As such, each of them unlocks different skills according to their current progress.<br><br>Any experience gathered will only affect the Summoner's current element. When wanting to level up other elements, you will have to switch to the desired element first before it can accumulate experience.<br><br>*The levels of your Summoning Arts have no effect on your Summoner, Guest Units, or Summoner Helpers. <br><br>・Status Enhancements: Affect your Summoner Avatar's max HP, Atk, Def, and Rec. They can also affect the quantitative boosts of any Spheres and Imps.<br><br>・BB Gauge Enhancements: Can affect you Summoner Avatar's BB gauge fill rate.<br><br>・BB Enhancements: Shows what Brave Burst level you can use.<br><br>・SBB (6-stars and up): Shows what Super Brave Burst level you can use.<br><br>・EX Skills (6-stars and below): Shows what effects, if any, EX Skills will have.<br><br>・UBB & EX Skills 2 (7-stars and up):: Shows if you can use UBB and any other Extra Skills, including those granted by Elgifs.<br><br>・SP Enhancements: Shows an Omni Unit's SP enhancements.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "305"
+  },
+  {
+   "f1LKBoM9": "306",
+   "b5VveUd8": "",
+   "qp37xTDh": "Not only does your Summoner Avatar's appearance change with each weapon he or she equips, but available skills and Brave Burst change as well.<br><br>You can level up your weapons by using Fusion. This will:<br>・Enhance their status<br>・Level up their Brave Burst, and unlock their Super Brave Burst<br>・Unlock Extra Skills<br>・Further enhance the weapon's skills<br><br>You can obtain experience for your weapons by either clearing Quests, or by using Fusion. Using techniques such as your Brave Burst to finish off enemies will get you more experience.<br><br>The skills your weapon can learn according to its level can be seen under the Weapon Details button.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "306"
+  },
+  {
+   "f1LKBoM9": "307",
+   "b5VveUd8": "",
+   "qp37xTDh": "Leader Skill (LS) Spheres can be used by Summoners. They function as Leader Skills for your avatar.<br><br>You can create LS Spheres in the newly created LS Sphere House located in the Village of the Venturer.<br><br>*The LS Sphere House will become available as you advance through the story.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "307"
+  },
+  {
+   "f1LKBoM9": "308",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can enhance different parameters by selecting the one desired, and then using SP to raise it.<br>*The effects of this are permanent.<br><br>Each parameter has its own levels, and as they rise so does said parameter, and the SP costs for subsequent levels with it. SP can be gained from time to time by defeating enemies in battle, or by having your Summoner undergo Fusion.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "308"
+  },
+  {
+   "f1LKBoM9": "309",
+   "b5VveUd8": "",
+   "qp37xTDh": "You will gain Extra Skills after your weapons have achieved a certain level.<br><br>The levels at which each EX Skill becomes available varies depending on the weapon. You can equip these useful abilities by tapping EX Skill under the Summoner Menu.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "309"
+  },
+  {
+   "f1LKBoM9": "310",
+   "b5VveUd8": "",
+   "qp37xTDh": "Fusion can be used in the following two ways:<br><br>Enhancing Weapons<br>You can level up your weapons by fusing Metal monsters to them.<br><br>*Caution: No experience bonuses will be given by fusing monsters that match the element you're currently enhancing.<br><br>Fusing for Summoner SP<br>・Burst Frog　　    1pt<br>・Burst Emperor    5pts<br>・Sphere Frog　　  10pts<br><br>Fusing any of the above will require Zel, and any fused Units will automatically disappear upon completion.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "310"
+  },
+  {
+   "f1LKBoM9": "311",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can change your Summoner Avatar's appearance any time you like from the Status screen.<br><br>You can change their hairstyle, element, and gender, though the gender change will require the use of 1 Gem.<br><br>Changing your Summoner's hairstyle will not affect their performance, so choose whichever style you like best.<br><br>However, changing your Summoner's element will have a great effect on your performance during battle.<br><br>If you find yourself having trouble clearing a certain Quest, try changing your Summoner's element to counter the element of your enemies.",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "311"
+  },
+  {
+   "f1LKBoM9": "312",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can gain Summoner Training (ST) Points by taking your Friends as Summoner Helpers in battle.<br><br>*In Brave Frontier's Chapter 3, you will not gain Honor Points.<br><br>You can use your ST Points by visiting the Summoning Arts Lab.<br>(Coming Soon)",
+   "v9dyS8fi": "3100",
+   "meg8fhr1": "312"
+  },
+  {
+   "f1LKBoM9": "313",
+   "b5VveUd8": "",
+   "qp37xTDh": "If you select Purchase Item from the Shop located under the Summoner Menu, you will see the Items available in the Shop.<br><br>You can use Gems to purchase these Items.",
+   "v9dyS8fi": "3200",
+   "meg8fhr1": "313"
+  },
+  {
+   "f1LKBoM9": "314",
+   "b5VveUd8": "",
+   "qp37xTDh": "Booster Items can be used during Quests, however, only those specifically designed for Chapter 3 of the Brave Frontier saga can be used.<br><br>When you use Booster Items before you head out on a Quest, their effects will serve to temporarily boost the experience your Summoner and your weapon will gain, as well as the SP you may obtain upon completion. <br><br>However, you can only use one Booster Item of the same type per Quest.",
+   "v9dyS8fi": "3200",
+   "meg8fhr1": "314"
+  },
+  {
+   "f1LKBoM9": "315",
+   "b5VveUd8": "",
+   "qp37xTDh": "Noel has come up with new and challenging Trials for the Summoners' Research Lab. <br><br>All the Trials in the game so far are part of the Trial Zone, while the latest ones are part of the newly established Strategy Zone of the Lab.<br><br>Unlike in the regular Trials, you can swap Units out during any battles in the Strategy Zone at any given time.<br><br>However, you may not use any Gems to continue, or revive any of your KO'd Units.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "315"
+  },
+  {
+   "f1LKBoM9": "316",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can swap out Units during your battles in the Strategy Zone. However, you have to wait a set amount of turns before you can substitute any Units you have already swapped out.<br><br>When all of your Units have been KO'd, including both those on the field and your substitutes, it will be deemed a Game Over.<br><br>If you swap out a KO'd Unit from the field for a substitute Unit, you will be unable to bring that KO'd Unit back to the field for the rest of the battle.<br><br>Your Leader Skill and Friend's Leader Skill will be set for the remainder of the battle according to the Leaders selected at the beginning.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "316"
+  },
+  {
+   "f1LKBoM9": "317",
+   "b5VveUd8": "",
+   "qp37xTDh": "Any Units selected as Battle Units at the beginning of battle will be the first to step on the field.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "317"
+  },
+  {
+   "f1LKBoM9": "318",
+   "b5VveUd8": "",
+   "qp37xTDh": "Substitutes are Units that you can swap out for Battle Units during battle. <br><br>Units swapped out into the Substitutes reserve will gradually recover some HP and BB gauge over time.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "318"
+  },
+  {
+   "f1LKBoM9": "319",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can swap out your Summoner Helper for a Helper Substitute during battle.<br><br>Keep in mind that you can only swap them out for other Summoner Helpers.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "319"
+  },
+  {
+   "f1LKBoM9": "320",
+   "b5VveUd8": "",
+   "qp37xTDh": "You can substitute any Units on the field for any in your Substitutes reserves by tapping \"Swap\" at the top left of the screen during battle.<br><br>Next, select the two Units you would like to alternate to carry out the substitution.<br><br>Be aware that you can only swap your Units for your own Units, and not for a Summoner Helper's Unit.<br><br>Any Units swapped into the Substitutes reserves will be cleared of any status ailments, debuffs, and buffs.<br><br>*The only effects that won't wear off while in the Substitutes reserves are any boosts to max HP relative to BB gauge, etc.<br><br>You will have to wait a set amount of turns before you can substitute any Units you have already swapped out. The specified number of turns left before said Unit(s) become available for another swap will be displayed in the Substitutes screen.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "320"
+  },
+  {
+   "f1LKBoM9": "321",
+   "b5VveUd8": "",
+   "qp37xTDh": "The provided Cost limit for your Battle Units will include the cost of all Units, including those of your Substitutes. Therefore, your normal Cost limit will be doubled to allocate for them.<br><br>Any Units selected as \"Battle Units\" will be the first to step on the field.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "321"
+  },
+  {
+   "f1LKBoM9": "322",
+   "b5VveUd8": "",
+   "qp37xTDh": "The number of Summoner Helpers that can accompany you to battle depends on each battle.<br><br>You cannot select any Summoner Helpers who are not on your Friends List.<br><br>Your Leader Skill and Friend's Leader Skill will be set for the remainder of the battle according to the Leaders selected at the beginning. So be very careful when selecting the Friend Skill, as you won't be able to change it.",
+   "v9dyS8fi": "1110",
+   "meg8fhr1": "322"
+  },
+  {
+   "f1LKBoM9": "8001",
+   "b5VveUd8": "",
+   "qp37xTDh": "In Guild Raid season, every Guild will be able to create a maximum of 3 teams of 15 Summoners. During the season, teams will be matched against an opposing Guild’s team to compete and obtain Battle Conquest Points (BCP) in a battle lasting 24 hours. Teams will fight against monsters, taking over Outposts and defeating the opposing teams' Guardian to earn BCP. The team with the highest BCP at the end of the match will be the winner.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8001"
+  },
+  {
+   "f1LKBoM9": "8002",
+   "b5VveUd8": "",
+   "qp37xTDh": "During the Preparation phase, each Guild will create teams, set up their defending Guardians and select their Squad for the battle. Once the battle begins, this setup cannot be changed.  Players will then fight against monsters and opposing Guardians to earn BCP. At the end of the battle phase, the Guild’s BCP will be tabulated and the winner determined.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8002"
+  },
+  {
+   "f1LKBoM9": "8003",
+   "b5VveUd8": "",
+   "qp37xTDh": "Guardians customized by Room master will be placed in conquered Outpost and Boss dungeons. New Guardians can be summoned from the Guild Research Centre and Guild members can be improved their Guild’s Guardian skills through resource contribution as well.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8003"
+  },
+  {
+   "f1LKBoM9": "8004",
+   "b5VveUd8": "",
+   "qp37xTDh": "Outpost dungeons (neutral ones) can be conquered by defeating the monsters within them. Once an Outpost is conquered, your team Guardian will defend it. Any opposing teams will have to defeat your Guardian in the Outpost to conquer it. It will release a mix of energies that can make your Boss Guardian or Units stronger and simultaneously weaken the opposing team’s Guardian or Units. Conquering a number of Outposts will also reveal the Boss’s dungeon location. However, the locations of Outposts change after a period of time and eventually become neutral again!  ",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8004"
+  },
+  {
+   "f1LKBoM9": "8005",
+   "b5VveUd8": "",
+   "qp37xTDh": "Boss locations are unknown at the start of the battle, so your team will need to locate it through exploration or by conquering Outposts to reveal its location. Boss Guardians will also move around the map from time to time. Therefore, once your team has located the Boss Guardian, you must aim to bring it down before it changes its location. Once defeated, Boss Guardians will only reappear in a new location after a period of time.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8005"
+  },
+  {
+   "f1LKBoM9": "8006",
+   "b5VveUd8": "",
+   "qp37xTDh": "Camp allows Units to Rest and recover HP. Units which were knocked out in battle will also revive at Camp after a period of healing.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8006"
+  },
+  {
+   "f1LKBoM9": "8007",
+   "b5VveUd8": "",
+   "qp37xTDh": "This allows you to teleport between portals, allowing you to move around the map instantly.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8007"
+  },
+  {
+   "f1LKBoM9": "8008",
+   "b5VveUd8": "",
+   "qp37xTDh": "Action points are used to Move, Battle, Rest, and Teleport around the battlefield. Each activity uses a different amount of action points and they will regenerate after a short period of time.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8008"
+  },
+  {
+   "f1LKBoM9": "8009",
+   "b5VveUd8": "",
+   "qp37xTDh": "Points are rewarded based on the total damage dealt, Heart Crystals, Battle Crystals, and Sparks generated. Bonuses based on total Guardian damage, Victory and Sparks will be awarded when any set requirements are met. Dungeon types will also affect the amount of BCP awarded. An additional BCP bonus will be given to the winning team of the battle, which contributes to weekly and season rankings!",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8009"
+  },
+  {
+   "f1LKBoM9": "8010",
+   "b5VveUd8": "",
+   "qp37xTDh": "After every match (24 hours), both teams will be rewarded based on the results of the match (victory/defeat). At the end of each week and season, you will receive Mystery Chests of various tiers based on the overall Guild BCP ranking. The amount of rewards in the chest is determined based on the Guild Ranking and individual BCP earned in the Guild.",
+   "v9dyS8fi": "80002",
+   "meg8fhr1": "8010"
+  },
+  {
+   "f1LKBoM9": "8011",
+   "b5VveUd8": "",
+   "qp37xTDh": "Members of the Officer rank and above can create a room with a maximum of 15 Summoners. The room master will select the defending Guardians and customize their skills. ",
+   "v9dyS8fi": "80003",
+   "meg8fhr1": "8011"
+  },
+  {
+   "f1LKBoM9": "8012",
+   "b5VveUd8": "",
+   "qp37xTDh": "The room master will select one Guardian to defend the Outposts, and one Guardian as the Boss Guardian. Any Guardians that are being used by other rooms will not be selectable. Guardians will be automatically selected if the room master fails to do so during the preparation phase.",
+   "v9dyS8fi": "80003",
+   "meg8fhr1": "8012"
+  },
+  {
+   "f1LKBoM9": "8013",
+   "b5VveUd8": "",
+   "qp37xTDh": "Each Guardian will have its own skill slots. The room master will customize each skill slot based on the slot type and available skills unlocked by the Guild. Skills can be shared among Guardians. Guardians’ skills will be automatically selected if the room master fails to do so during the preparation phase.",
+   "v9dyS8fi": "80003",
+   "meg8fhr1": "8013"
+  },
+  {
+   "f1LKBoM9": "88000",
+   "b5VveUd8": "",
+   "qp37xTDh": "The Event Bazaar can be found in the Town.<br><br>This is where you exchange special tokens that you obtain from events. <br><br>Items such as Spheres, Units, and many others will be avalaible in the Event Bazaar. <br><br>Some Event Bazaars are limited by time and can contain exclusive items available for exchange.",
+   "v9dyS8fi": "88000",
+   "meg8fhr1": "88000"
+  },
+  {
+   "f1LKBoM9": "88001",
+   "b5VveUd8": "",
+   "qp37xTDh": "Event Tokens are a special currency that are obtained exclusively from various events.<br><br>Events Tokens are limited to their own events, and as some Event Bazaars are time-limited, they should be used within the limited time period.",
+   "v9dyS8fi": "88000",
+   "meg8fhr1": "88001"
+  },
+  {
+   "f1LKBoM9": "88002",
+   "b5VveUd8": "",
+   "qp37xTDh": "In some events, units which have been specially featured will give various bonuses that help the Summoner obtain more Tokens as they complete the missions.<br><br>Each event will have a different format for said bonus units that will be announced in the news for the event itself.",
+   "v9dyS8fi": "88000",
+   "meg8fhr1": "88002"
+  },
+  {
+   "f1LKBoM9": "100001",
+   "b5VveUd8": "",
+   "qp37xTDh": "MST_HELP_DBB_100001_DESCRIPTION",
+   "v9dyS8fi": "100000",
+   "meg8fhr1": "100001"
+  },
+  {
+   "f1LKBoM9": "100002",
+   "b5VveUd8": "",
+   "qp37xTDh": "The only units in combat that can use Dual Brave Burst are those who have Bonded with their partner (displayed as a blue frame surrounding the unit bar). Fortunately, you only need one member of the Bonded Unit Pair in your squad in order to use Dual Brave Burst.<br>Synergy Gauge needs to be filled in combat in order to power Dual Brave Burst. One (1) Synergy Shard is gained every 5 turns when a DBB unlocked unit is in squad or when a DBB unlocked unit remains in Overdrive every turn (up to 4 Shards per Overdrive). Up to 10 Synergy Shards may be stored. Synergy Shards may carry forward to the next battle but not the next mission.<br>While the Bonded units are in Overdrive, they will be able to call upon their partner for help. During this time, the Bonded units will be able to freely execute their partner’s Brave Burst - but using their own element and parameters!<br>When sufficient Synergy Shards have been gathered to activate Dual Brave Burst, the Synergy Gauge becomes lit.<br>Once lit, tap on the Synergy Gauge to view the unit(s) available to activate Dual Brave Burst.<br>Hold tap on an available unit to view the details of its Dual Brave Burst.<br>Slide upwards to finally activate DUAL BRAVE BURST!",
+   "v9dyS8fi": "100000",
+   "meg8fhr1": "100002"
+  },
+  {
+   "f1LKBoM9": "100003",
+   "b5VveUd8": "",
+   "qp37xTDh": "The DBB Progression System allows Summoners to increase the effectiveness of their Bonded DBB Units’ skills. This includes improving Elemental Synergy effectiveness, DBB effect duration, Synergy Shard cost, and even the unlocking of new powers such as allowing the SBB of Bonded Partner Units to be used during Overdrive!<br>Bond levels can be boosted primarily through consuming Golems, Zel and Karma. Boosted Bond levels are tied to each pair of Units account-wide and will apply to all copies of the boosted Units. e.g. If Xenon is boosted from Bond level 1 to 2, this includes his Bond Partner Estia and all duplicate copies of Xenon and Estia.<br>Select a DBB Bonded Unit. In it’s Unit View screen, tap on the DBB slot to access the Bond DBB screen.<br>In the Bond DBB screen, tap on the Boost button at the bottom to access the Bond Level Boost screen. Please note that the Boost button is only accessible through the View Units and Home screens.<br>In the Bond Level Boost screen, the Golems, Zel and Karma requirement will be displayed. Upon meeting the cost requirement for the update, tap on the Boost button to get your Bond Level up!<br>Golems can now be evolved into Greater Golems by consuming 2 other Golems and 1 Distilled Ether. Greater Golems are used to boost Bond level from 3 to 4.<br>Distilled Ether is an existing material that can be obtained from Raid Battle Bazaar and Guild Exchange Hall (including a new Premium Prism Mystery Chest). There is also a chance to harvest it from Raid Class 7: Dichroma Chaos mission.",
+   "v9dyS8fi": "100000",
+   "meg8fhr1": "100003"
+  },
+  {
+   "f1LKBoM9": "800001",
+   "b5VveUd8": "",
+   "qp37xTDh": "An Omni Unit can be boosted into an Omni+ Unit. After boosting, the Unit's Skill Points (SP) and Raised parameters limits are increased. The boosted Unit also unlocks a new Squad passive effect mechanic called \"Elemental Paradigm.\"<br><color=255:165:0>There are two methods available for boosting an Omni Unit:</color><br>- Elemental<br>- Duplicate<br><color=255:255:0>* Duplicate Units refer to the duplicates of the Unit undergoing Boosting.</color><br><color=255:165:0>The following conditions must be met to boost a Unit:</color><br>- The Unit to be boosted must be at max level.<br>- You must have the Materials required.<br>- You must have the required amount of Zel.<br>- You must have the required amount of Karma.<br>* Please see the \"Elemental Paradigm\" portion of the Help section for more details on how Elemental Paradigms work.",
+   "v9dyS8fi": "90000",
+   "meg8fhr1": "800001"
+  },
+  {
+   "f1LKBoM9": "800002",
+   "b5VveUd8": "",
+   "qp37xTDh": "Adding 3 or more Omni+ Units of the same element to your Squad will activate an Elemental Paradigm corresponding to that element which provides additional passive parameters and damage boost effects of increasing effectiveness relative to the number of same element Omni+ Units.\r \r <br><color=255:165:0>The following conditions must be met for an Elemental Paradigm to activate:</color>\r <br>- At least 3 Omni+ Units of the same element\r <br>- Other Units in Squad need to be at least Omni rarity\r <br><color=255:255:0>* Helper Unit will not contribute to the activation.</color>\r \r <br><color=255:165:0>Elemental Paradigm level activated depends on the Omni+ Units used:</color>\r <br>Lv. 1 ⇒ 3 Omni+1 Units\r <br>Lv. 2 ⇒ 3 Omni+2 Units\r <br>Lv. 3 ⇒ 3 Omni+3 Units\r \r <br><color=255:255:0>* Elemental Paradigm will not be available in Strategy Zone nor the Summoner Arc.</color>\r \r <br><br>The following effects last for the entire battle when an Elemental Paradigm is activated:\r <br><color=255:165:0>■ Same Element Type Parameter Boost</color><br>Boost to max HP, Attack (Atk), Defense (Def), and Recovery (Rec) of all Unit(s) in Squad. \r <br><color=255:165:0>■ Same Element Type Spark Damage Boost</color><br>Boost to Spark damage of the all Unit(s) in Squad.\r <br><color=255:165:0>■ Same Element Type Critical Damage Boost</color><br>Boost to critical damage of the all Unit(s) in Squad.\r <br><color=255:165:0>■ Elemental Damage Boost</color><br>Boost to elemental damage of the all Unit(s) in Squad.  \r \r <br><color=255:255:0>* The best way to take advantage of this effect is to have as many Omni+ Units of the same element in your Squad.",
+   "v9dyS8fi": "90000",
+   "meg8fhr1": "800002"
+  }
+ ]
 }

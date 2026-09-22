@@ -46,6 +46,17 @@ HANDLEF(MissionContinue)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
+	// MARK THE RUN AS CONTINUED, for the "Cleared (No Continues)" achievements.
+	// Recorded against the MISSION, not a battle serial -- this request carries
+	// no serial, and MissionStart/MissionEnd bound the run either side, so the
+	// mission id is enough to scope it.  Written before the charge because the
+	// revival happens whether or not the payment does (see below): a continue
+	// the player did not pay for is still a continue.
+	co_await theDb()->execSqlCoro(
+		"INSERT INTO user_mission_continues (user_id, mission_id) VALUES ($1, $2)"
+		" ON CONFLICT(user_id, mission_id) DO NOTHING;",
+		identity.userId, std::to_string(req.mission_num.serial_id));
+
 	// CHARGE, BUT NEVER REFUSE.
 	//
 	// The gate is already on the client: initContinueConfirm shows the price

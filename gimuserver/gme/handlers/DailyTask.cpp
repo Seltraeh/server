@@ -2,6 +2,7 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/DailyTask.hpp>
 
 // DailyTaskUserInfo (m7g0Ekb5 / Hd8c3Y6) — the Brave Points & Rewards screen.
 //
@@ -33,30 +34,31 @@
 // ── Request shape (confirmed against a live capture) ─────────────────────
 // Bare identity request, matching DailyTaskUserInfoRequest::createBody:
 //     {"IKqx1Cn9":[{...}], "6FrKacq7":[{...}], "KeC10fuL":[...168 MST vers...]}
-// No feature-specific group at all, so there is nothing to parse.
+// No feature-specific group at all, so the only thing to read is the caller.
 //
-// ── Response: currently EMPTY, and the screen renders ────────────────────
-// Returning {} leaves the client showing the MST-driven catalog with zeroed
-// per-user state — BP Total 0 / Current 0, every task at [0/N], every prize
-// "Short of BP".  That is a truthful rendering of an account with no BP, not a
-// broken one, so an empty response is a legitimate resting point.
+// ── Per-user state rides ON the task rows ────────────────────────────────
+// An earlier note here said the BP totals lived in 6C0kzwM5
+// UserBraveMedalInfoResponse.  They do not — that block is the Brave MEDAL
+// item (medal_id / possession).  DailyTaskMst carries all three counters
+// itself: `brave_points` (22rqpZTo, spendable), `brave_points_total`
+// (bya9a67k, the lifetime figure the milestones are gated on) and
+// `times_completed` (9cKyb15U, this task's progress).  The two totals are
+// repeated on every task row; that is where the screen's headers read them.
 //
-// To make it live, the per-user state goes in these:
-//     6C0kzwM5  UserBraveMedalInfoResponse   3 params  (the BP totals)
-// and the catalog comes from three MSTs the binary already names:
-//     k23D7d43  DailyTaskMstResponse
-//     a739yK18  DailyTaskPrizeMstResponse
-//     p283g07d  DailyTaskBonusMstResponse
-// `packet-generator/assets/mst/daily_task.kdl` already exists and carries a
-// present_type field on the same 30Kw4WBa hash CampaignReceipt and the present
-// box dispatch on — so BP payouts can reuse that switch rather than inventing
-// a fourth reward vocabulary.  None of the three MST classes has readParam
-// setter names exported yet, so audit before populating (§3.4).
+// ⚠ NOTHING REPORTS PROGRESS.  The client ships exactly two daily-task
+// requests -- this one and DailyTaskClaimReward -- so the server counts the
+// six task codes itself from handlers that already know the event happened.
+// See gme::advanceDailyTask.
 HANDLEF(DailyTaskUserInfo)
 {
 	(void)session;
 
-	LOG_INFO << "DailyTaskUserInfo (m7g0Ekb5): " << json;
+	DailyTaskUserInfoReq req{};
+	{
+		glz::context ctx{};
+		if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
+			LOG_WARN << "DailyTaskUserInfo: parse error: " << glz::format_error(ec, json);
+	}
 
 	// Re-send the three daily-task tables.  Initialize already sends them at
 	// boot, but the screen empties the lists it is about to receive, so
@@ -69,6 +71,18 @@ HANDLEF(DailyTaskUserInfo)
 	resp.daily_task_bonuses   = init.daily_task_bonuses;
 	resp.daily_task_prizes    = init.daily_task_prizes;
 	resp.daily_tasks          = init.daily_tasks;
+
+	// Per-user state: today's rotation with its progress, the prize catalogue
+	// with this player's claim counts, and the two BP counters stamped onto
+	// every task row (which is where the screen's headers read them from).
+	// Falls back to the bare catalogue above if the caller cannot be resolved,
+	// so the screen still renders for the tutorial/new-user flow.
+	if (const auto identity = co_await gme::getUserIdentity(theDb(), req.login_info);
+		!identity.data.userId.empty())
+	{
+		co_await gme::fillDailyTaskTables(
+			theDb(), identity.data, resp.daily_tasks, resp.daily_task_prizes);
+	}
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)

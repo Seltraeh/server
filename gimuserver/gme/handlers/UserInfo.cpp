@@ -5,12 +5,17 @@
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/BraveSlots.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/LoginCampaign.hpp>
+#include <gimuserver/gme/common/SelectorRotation.hpp>
+#include <gimuserver/gme/common/Gifts.hpp>
 #include <gimuserver/gme/common/Dbb.hpp>
+#include <gimuserver/gme/common/FeatureGates.hpp>
 #include <gimuserver/gme/common/EventTokens.hpp>
 #include <gimuserver/gme/common/FriendPoints.hpp>
 #include <gimuserver/gme/common/MissionBreak.hpp>
 #include <gimuserver/gme/common/PermitPlace.hpp>
 #include <gimuserver/gme/common/SelectorBanners.hpp>
+#include <gimuserver/gme/common/SoundRoom.hpp>
 #include <gimuserver/gme/common/SummonTickets.hpp>
 
 #include <algorithm>
@@ -170,6 +175,11 @@ HANDLEF(UserInfo)
 	// report the identical set or a mid-session refresh would contradict the
 	// login snapshot.
 	resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
+
+	// The client's feature locks.  Must follow clear_mission_info: every
+	// condition the table carries is "mission <id> cleared", so the answer
+	// is computed from exactly the set that was just read.
+	resp.release_info = gme::evaluateFunctionReleases(resp.clear_mission_info);
 
 	// Lifetime battle statistics behind the Trophy / Arena Archive / Colosseum
 	// Archive screens.  Only the eight counters MissionEnd can feed are real;
@@ -358,6 +368,17 @@ HANDLEF(UserInfo)
     // charging for a pull, so without it a selector gate behaved like an
     // ordinary paid gate.  See the field docs in net/handlers.kdl.
     resp.unit_selector_gacha = theServer()->cache().unitSelectorGacha();
+    // THE WEEKLY STARTER-HERO ROTATION.  The catalogue above is the cache's
+    // copy; this rewrites the one rotating row in OUR copy, so what the picker
+    // draws changes every Friday without any MST file being edited and without
+    // a scrap of stored state.  gme::weeklyStarterHero is a pure function of
+    // the week number, so every player sees the same hero.
+    gme::applyWeeklySelector(resp.unit_selector_gacha);
+
+    // The one starter selector a fresh account is owed at Summoner Rank 50.
+    // Checked here rather than at the point of level-up so it cannot be missed
+    // by whichever path did the levelling.
+    co_await gme::grantStarterSelectorIfDue(db, identity);
     resp.selector_ticket_info = co_await gme::loadSelectorTickets(db, identity);
 
     // V2 summon tickets (a3d5d12i) — the per-type inventory.  Also load-bearing:
@@ -384,6 +405,39 @@ HANDLEF(UserInfo)
     // is forgotten as soon as the client closes.  A SINGLETON -- one full row,
     // state 0 when nothing is open.  See gme::loadMissionBreak.
     resp.mission_break = co_await gme::loadMissionBreak(db, identity);
+
+    // Music House tracks the player owns (d98mjNDc).  A FULL REPLACE, so this
+    // is the complete set -- and it has to be sent, because the purchase is
+    // client-local and this block is the only thing that carries it across a
+    // relaunch.  See gme::loadOwnedSounds.
+    resp.sound_info = co_await gme::loadOwnedSounds(db, identity);
+
+    // The padlocks (2375D38i).  One row per feature that is not finished --
+    // Arena, Raid and Guild -- at a level no player can reach.  Everything else
+    // is deliberately absent, because shouldGateLocked treats a missing row as
+    // unlocked: that is what keeps the rest of the game open from level 1.
+    // See gme::featureGates for which id is which and how they were read off.
+    resp.feature_gate_info = gme::featureGates();
+
+    // THE GIFT INBOX (30uygM9m).  Not optional: the gift screen renders
+    // straight from this list with no request of its own, and setGiftList
+    // @0x166D330 null-derefs on an EMPTY one -- a deterministic crash confirmed
+    // by two identical minidumps.  loadGiftInbox also mints today's gift from
+    // the simulated friend if it has not been sent yet.
+    resp.gift_info = co_await gme::loadGiftInbox(db, identity);
+
+    // THE LOGIN ADVENT CALENDAR (3da6bd0a).  This is the reply that seeds
+    // UserLoginCampaignInfo::shared() at login, and where a new day turns over
+    // for the ordinary case of launching the game.
+    //
+    // It belongs HERE and not on Initialize: 3da6bd0a is a UserInfoResp field.
+    // With it never sent the singleton kept its constructed defaults, the grid
+    // believed the player was on day 0, and only cell 1 was ever lit -- which
+    // paid nothing, because the client's claim @0x1CB14CC is animation and the
+    // server is what actually grants.  advanceLoginCampaign does the granting
+    // and is idempotent within a day, so the 12-hour re-check can call it too.
+    resp.campaign_info = gme::loginCampaignInfo(
+        co_await gme::advanceLoginCampaign(db, identity));
 
     // The Summoner itself (n5mdIUqj) — a SINGLETON, so exactly one row.  Built
     // by gme::loadSummonerInfo, shared with PresentReceipt (which pays SP);

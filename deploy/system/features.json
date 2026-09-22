@@ -21,7 +21,7 @@
     "battle_speed": 1,
     "battle_speed_arena_pvp": 1,
     "battle_speed_ca": 1,
-    "challenge_arena": 1,
+    "challenge_arena": 0,
     "character_voice": 1,
     "ischeat_enable": 1,
     "colosseum_enable": 1,

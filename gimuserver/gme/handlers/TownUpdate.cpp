@@ -2,6 +2,7 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/SoundRoom.hpp>
 #include <gimuserver/gme/common/Town.hpp>
 
 // TownUpdate (CuQ5oB8U) — the resource-tile tap report.
@@ -29,42 +30,27 @@ HANDLEF(TownUpdate)
 	if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
 	{
 		LOG_WARN << "TownUpdate: parse error: " << glz::format_error(ec, json);
-		co_return HandleResult::success("{}");
+		co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
 	}
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	co_await gme::Town::applyTaps(theDb(), identity, req.collect.collect_log);
-
-	// Trophy 100280 村採取タッチ数 -- the number of TAPS, counted off the same
-	// "<locationId>:<tapCnt>,..." log applyTaps just consumed, so the counter
-	// and the harvest cannot disagree about how many touches happened.
+	auto transaction = co_await theDb()->newTransactionCoro();
+	try
 	{
-		int64_t taps = 0;
-		const auto& log = req.collect.collect_log;
-		for (size_t at = 0; at < log.size();)
-		{
-			const auto comma = log.find(',', at);
-			const auto entry = log.substr(at, comma == std::string::npos ? std::string::npos : comma - at);
-			const auto colon = entry.find(':');
-			if (colon != std::string::npos)
-			{
-				try { taps += std::stoll(entry.substr(colon + 1)); }
-				catch (const std::exception&) { /* a malformed entry counts as zero */ }
-			}
-			if (comma == std::string::npos) break;
-			at = comma + 1;
-		}
-
-		co_await gme::bumpArchiveCounters(theDb(), identity, {
-			{ "town_harvest_cnt", taps },
-		});
+		const auto taps = co_await gme::Town::applyTaps(transaction, identity, req.collect.collect_log);
+		if (taps > 0)
+			co_await transaction->execSqlCoro(
+				"INSERT INTO user_team_archive (user_id, town_harvest_cnt) VALUES ($1, $2)"
+				" ON CONFLICT(user_id) DO UPDATE SET town_harvest_cnt = town_harvest_cnt + excluded.town_harvest_cnt;",
+				identity.userId, taps);
+		co_await gme::recordBoughtSounds(transaction, identity, req.collect.bought_sound_ids);
 	}
-
-	// LzKDI2i7 (the owned sound-room track list) rides along on the same
-	// request.  It is not persisted: nothing server-side reads it back, and the
-	// sound room is a client-local purchase list.  Logged above with the rest of
-	// the body so the first real purchase produces the capture.
+	catch (const std::exception& ex)
+	{
+		transaction->rollback();
+		co_return HandleResult::error("Town update failed", ex.what());
+	}
 
 	co_return HandleResult::success("{}");
 }

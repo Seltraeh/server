@@ -69,7 +69,7 @@ HANDLEF(DbbBond)
 				// to be one the catalogue names — the client only offers valid
 				// partners, so anything else is a replayed or forged body.
 				const auto owned = co_await transaction->execSqlCoro(
-					"SELECT user_unit_id, unit_id FROM user_units"
+					"SELECT user_unit_id, unit_id, dbb_unlocked FROM user_units"
 					" WHERE user_id = $1 AND user_unit_id IN ($2, $3);",
 					identity.userId, node.main_unit_id, node.sub_unit_id);
 				if (owned.size() != 2 || node.main_unit_id == node.sub_unit_id)
@@ -84,6 +84,38 @@ HANDLEF(DbbBond)
 						mainSpecies = row["unit_id"].as<std::string>();
 					else
 						subSpecies = row["unit_id"].as<std::string>();
+				}
+
+				// BOTH SLOTS HAVE TO BE OPEN.  Global wiki, Bonding: a unit is
+				// bondable only after being fused with an Elemental Golem of its
+				// own element, "allowing it to become Bonded with its partner
+				// (Unit Pair) THAT HAS COMPLETED THE SAME STEPS".
+				//
+				// Enforced here because the client cannot: isDbbEligible
+				// @0x12B5EA4 knows nothing about golems, so it offers the Bond
+				// button to any omni with SBB 10 and a catalogued partner.  The
+				// refusal names which side is missing rather than saying no.
+				std::vector<int32_t> locked;
+				for (const auto& row : owned)
+				{
+					if (row["dbb_unlocked"].as<int32_t>() == 0)
+						locked.push_back(row["user_unit_id"].as<int32_t>());
+				}
+				if (!locked.empty())
+				{
+					transaction->rollback();
+					std::string which;
+					for (const auto id : locked)
+					{
+						if (!which.empty()) which += ", ";
+						which += std::to_string(id);
+					}
+					LOG_INFO << "DbbBond: " << identity.userId
+						<< " tried to bond with an unopened DBB slot on unit(s) " << which;
+					co_return HandleResult::error(
+						"Invalid bond request",
+						"fuse an Elemental Golem of the unit's own element first (unit "
+							+ which + ")");
 				}
 
 				const auto dbbId = gme::dbbIdForPair(mainSpecies, subSpecies);

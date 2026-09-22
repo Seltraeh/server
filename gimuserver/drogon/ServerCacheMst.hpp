@@ -104,6 +104,9 @@ auto_cache("uxpnA5rF", FrontierGateSupportMst)
 // No wire key exists for this table (the client loads it from its own MST
 // store), so the wrapper just names it — see FrontierGateRewardMst.
 auto_cache("F_FROGATE_REWARD_MST", FrontierGateRewardMst)
+// Server-side only for the same reason, and the only lever the server has
+// over the client's feature locks -- see FunctionReleaseMst.
+auto_cache("F_FUNCTION_RELEASE_MST", FunctionReleaseMst)
 auto_cache("aYcBePEP", SummonerAbilityMst)
 auto_cache("6XHRamCn", SummonerAbilityLevelMst)
 auto_cache("xUo0D9Xb", SummonerAbilityUpMst)

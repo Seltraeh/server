@@ -107,9 +107,80 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("RUV94Dqz", UpdateInfo,            "hy0P9xjsGJ6MAgb2");
 	REGISTER("68pTQAJv", NoticeUpdate,          "WHfcd53M");
 	REGISTER("5fc8bf2c", UserLoginCampaignInfo, "4eb7ce1b");
+
+	// Guild.  Every pair below came out of tools/bin/so_groupids.py, which reads
+	// <Name>Request::getRequestID and ::getEncodeKey straight from libgame.so --
+	// verified against three known-good pairs before the sweep was trusted.
+	//
+	// GuildJoinedList asks the same question as GuildInfo ("what guild am I in?")
+	// with the same identity-only body, so it shares the handler.
+	REGISTER("138ba8d4", GuildInfo,             "23gD81ia");
+	REGISTER("3890ab5j", GuildInfo,             "820b38z5");
+	REGISTER("g298Da10", GuildCreate,           "G23Bd01d");
+	REGISTER("ja5Enusw", GuildRecomendedMember, "8upheqaC");
+	REGISTER("ad81b8at", GuildMemberUpdate,     "2b1bDo2m");
+	// The message box.  Not guild-named, so the Guild sweep missed it and
+	// "View messages" answered Unsupported request: rYSfaC4P.
+	REGISTER("rYSfaC4P", InboxMessageManage,    "0R9ZPaSf");
+
+	// The rest of the guild set, answered with a benign empty body.
+	//
+	// NOT laziness -- it is the difference between a blank panel and what looks
+	// like a crash.  An unregistered GroupId and a handler error produce the SAME
+	// GmeErrorCommand::Close, so any guild sub-screen this slice does not cover
+	// would drop the session with no http_log and no dump to explain it.  With a
+	// stub the screen simply has nothing in it, which is diagnosable.
+	//
+	// Every pair recovered by tools/bin/so_groupids.py.  Replace a line here with
+	// a real handler as each feature lands.
+	REGISTER("W1Dgsfnz", GuildUnimplemented, "eMfdsGVJ");
+	REGISTER("J93ki3Bw", GuildUnimplemented, "m83D19ib");
+	REGISTER("X89bDai1", GuildUnimplemented, "Bi9Ralbq");
+	REGISTER("38b67ie1", GuildUnimplemented, "hG738a5b");
+	REGISTER("bk30i39b", GuildUnimplemented, "3bkb98a1");
+	REGISTER("adk28bij", GuildUnimplemented, "fgd3uu2b");
+	REGISTER("yDDcC0vW", GuildUnimplemented, "NOeugPyv");
+	REGISTER("1D8bba8D", GuildUnimplemented, "bUd2bd0e");
+	REGISTER("bfa2D1bp", GuildUnimplemented, "9b3abdk1");
+	REGISTER("oRa3ztp8", GuildUnimplemented, "pVg9L9Uw");
+	REGISTER("dsRW32K", GuildUnimplemented, "Afs43Dc4");
+	REGISTER("9b98aKj1", GuildUnimplemented, "b8dAl1ic");
+	REGISTER("MTzXyuFL", GuildUnimplemented, "MkV5xHDL");
+	REGISTER("36jhZ9YZ", GuildUnimplemented, "Zd3d2zGx");
+	REGISTER("bka03Bi1", GuildUnimplemented, "F91Dalb8");
+	REGISTER("v87b3Diq", GuildUnimplemented, "Da0m39b1");
+	REGISTER("zGk5R8Dd", GuildUnimplemented, "DRJQatky");
+	REGISTER("Xdi3ebD9", GuildUnimplemented, "TrDi19Bd");
+	REGISTER("Ie01B83k", GuildUnimplemented, "P93Db8q1");
+	REGISTER("L3D9eK19", GuildUnimplemented, "9Ur3Dkb3");
+	REGISTER("Z3d9b0ew", GuildUnimplemented, "Bd83Dakb");
+	REGISTER("v83Diq7b", GuildUnimplemented, "m39bDa01");
+	REGISTER("d735ub8o", GuildUnimplemented, "bk7eob01");
+	REGISTER("fd54Sey", GuildUnimplemented, "F32dfFS");
+	REGISTER("W1Daxfnz", GuildUnimplemented, "eMMfFDVJ");
+	REGISTER("7di8aie9", GuildUnimplemented, "yh8ak18b");
+	REGISTER("U83BiqDw", GuildUnimplemented, "Cv3DaI3W");
+	REGISTER("83kBdiqD", GuildUnimplemented, "93Di3Ge8");
+	REGISTER("Q8Eib8Xv", GuildUnimplemented, "UI3Da1B7");
+	REGISTER("M2dD4b0A", GuildUnimplemented, "I2ixn4Ac");
+	REGISTER("26ZGiseY", GuildUnimplemented, "00dU9t9M");
+	REGISTER("ZZ9xaJoi", GuildUnimplemented, "sdtfUs9y");
+	REGISTER("2b9D01b4", GuildRanking,       "23Djab0e");
+	REGISTER("7ekSBz2y", GuildRankingDetail, "tWF58aK0");
+	REGISTER("0Dl4rdsn", GuildUnimplemented, "ndk4sS0s");
+	REGISTER("aXPZmq9h", GuildUnimplemented, "J90g7sZK");
+	REGISTER("Xfpo7jE2", GuildUnimplemented, "tVBMO5GW");
+	REGISTER("R38ba9M3", GuildUnimplemented, "0D18dQn4");
+	REGISTER("cXi7b58e", GuildUnimplemented, "jK18btd0");
+	REGISTER("38adiJeb", GuildUnimplemented, "ja3biAqb");
+	REGISTER("92bDoqBi", GuildUnimplemented, "w3Bne038");
+	REGISTER("a38B82bG", GuildUnimplemented, "7Ykwq038");
+	REGISTER("38bad198", GuildUnimplemented, "d38bHiqj");
 	REGISTER("cTZ3W2JG", UserInfo, "ScJx6ywWEb0A3njT");
 	REGISTER("2p9LHCNh", UnitFavorite,            "cb4ESLa1");
 	REGISTER("0gUSE84e", UnitEvo,                 "biHf01DxcrPou5Qt");
+	// Omni+ Boost.  A PROBE that logs and refuses — see UnitOmniEvo.cpp.
+	REGISTER("4Dk4spf9", UnitOmniEvo,             "4s3lsODp");
 	REGISTER("Mw08CIg2", UnitMix,                 "JnegC7RrN3FoW8dQ");
 	REGISTER("Ri3uTq9b", UnitSell,                "92VqcGFWuPkmT60U");
 	REGISTER("CuQ5oB8U", TownUpdate,              "w1eo2ZDJ");
@@ -157,6 +228,16 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("v0m1FU0g", FrontierGateRestart,  "whb7Y2wX");
 
 	REGISTER("gLRIn74v", FixGiftInfo,          "15gTE9ft");
+	// The other half of the gift feature.  Unregistered until 2026-09-15, and
+	// GiftRecieveConnectScene::initConnect fires it just to OPEN the screen --
+	// so the inbox closed the session the way the Shop tab used to.
+	REGISTER("ifYoPJ46", GetGiftInfo,          "6zHEYa9U");
+	REGISTER("oim9TU1D", ArenaInfo,            "oqQxdFfa");
+	REGISTER("SfMN9w4p", FriendDelete,         "yWXI80UKQNBZFozw");
+	REGISTER("WUNi08YL", FriendApply,          "gbpdAEZuv8IP40UF");
+	REGISTER("983D5Dii", UserEnteredFeature,   "Dr6pwV3i");
+	REGISTER("29slks49", UserGemShardInfo,     "930sDd3i");
+	REGISTER("29s22s49", VideoAdSlotsClaimBonus, "93055d2i");
 
 	// World-map / Grand Gaia entry sequence stubs.
 	REGISTER("BjAt1D6b", DungeonEventUpdate,     "k5EiNe9x");
@@ -180,10 +261,46 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("YPBU7MD8", GetAchievementInfo, "AKjzyZ81");
 	// The Merit Point loop: claim a finished achievement, spend the points,
 	// and the detail page's Start / Give Up button.  Deliver (vsaXI4M0) is the
-	// one left — see gme/handlers/AchievementAction.cpp.
+	// Trade Zel / Karma / Units / Spheres screens; its cond_type says which.
 	REGISTER("uq69mTtR", AchievementRewardReceive, "cbE74zBZ");
 	REGISTER("m9LiF6P2", AchievementTrade,         "0IWC9LVq");
 	REGISTER("dx5qvm7L", AchievementAccept,        "g9N1y7bc");
+	REGISTER("vsaXI4M0", AchievementDeliver,       "2Lj5hIEG");
+
+	// TODO(IAP) -- the Shop tab (scene 700, ShopTopScene) is REACHABLE and no
+	// longer crashes, but nothing behind it is built.
+	//
+	// The hard crash on tapping Shop was NOT an unregistered request: scene
+	// 700's `layout_shop_topV2.csv` was missing from the content drop while all
+	// thirteen of its images were present, and a missing layout is a null deref
+	// (LayoutCacheList::getObject returns nullptr, LayoutCache::getX is
+	// `ldr s0,[x0,#0x30]`).  It is authored now at
+	// content/bundleshop/layout_shop_topV2.csv.  ⚠ deploy/game_content is
+	// gitignored, so a fresh content drop LOSES it and the crash returns --
+	// tools/asset_preflight.py catches that in one run.
+	//
+	// The scene is inert on purpose.  ShopTopScene::updateEvent @0x1AD65D4 only
+	// asks for a catalogue refresh when a category's end date has passed, and
+	// its very first test is `if (getCount() < 1) skip` -- so with no
+	// BundlePacksCategoryInfo rows sent (we send none) the refresh never fires
+	// and none of these four can be reached:
+	//
+	//     swarOb4u / GeJa9uTe   BundleCategoryRefresh
+	//     D3gyT3b3 / a8pE3x39   BundlePurchase
+	//     kD298bt6 / u45Bi2p0   BundlePurchaseIap
+	//     u06y2UE4 / c2kjaKv8   SetPurchaseInfo
+	//
+	// WHEN IAP IS RESTORED, register those four and fill `7itHlDro`
+	// (BundlePacksCategoryInfo: T2bifltU id, In7lGGLn image, 2r4EoNt4 order,
+	// fru8e2rL bundle-id list, qA7M9EjP/SzV0Nps7 start/end as LONGS) plus
+	// `K72eC4nz` (BundlePacksInfo).  The plan is free "purchases" on a rotating
+	// cycle rather than real money, so BundlePurchase is the one that matters
+	// and BundlePurchaseIap can stay unregistered.
+	//
+	// ⚠ AN ERROR REPLY CLOSES THE SESSION.  The dispatcher turns both an
+	// unregistered id AND a handler error into GmeErrorCommand::Close, so a
+	// "politely refuse" handler has to return success with a benign body, not
+	// an error.  See the Close branch above.
 
 	// Dual Brave Burst.  The Bond button on a unit's detail page only exists
 	// once DbbMst is on the wire, which UserInfo now does — so this had to be
@@ -204,6 +321,9 @@ static GmeHandler getHandler(std::string_view cmd)
 	// is 8 or 16, and this one is correct: confirmed by a live decrypt.  It also
 	// lives outside the aligned handler table (see DailyTask.cpp).
 	REGISTER("m7g0Ekb5", DailyTaskUserInfo, "Hd8c3Y6");
+	// Claim on the Milestone Rewards / Redeem Prizes tabs.  Both were
+	// reachable with this unregistered, so the button closed the session.
+	REGISTER("oP3bn47e", DailyTaskClaimReward, "ut0j9h3K");
 	REGISTER("1MJT6L3W", UpdatePermitPlaceInfo,  "3zip5Htw");
 	REGISTER("rCB7ZI8x", UpdateEventInfo,        "L1o4eGbi");
 	REGISTER("5o8ZlDGX", Chronology,             "SNrhAG29");
@@ -230,6 +350,12 @@ static GmeHandler getHandler(std::string_view cmd)
 	// keys read from getRequestID / getEncodeKey the same way; all three are
 	// probes until a real client body has been seen.  SummonerJournal.cpp
 	// carries the six response classes and their dispatch keys.
+	// The Summoner Avatar arc.  All three were unregistered while the arc was
+	// reachable, and UserSummonerInfoEdit is the FIRST request it makes.
+	REGISTER("ZJYkXcHo", UserSummonerInfoEdit, "lyR0us9b");
+	REGISTER("nv4d3O7F", SummonerMix,          "vM65bAB4");
+	REGISTER("qWkYyw5i", SummonerSkillGet,     "mrXjLLJB");
+
 	REGISTER("32Gwida0", SummonerJournalInfo,             "66B2pDki");
 	REGISTER("2y48D13d", SummonerJournalTaskRewards,      "7nm3Dqe9");
 	REGISTER("3a83iY3r", SummonerJournalMilestoneRewards, "98Tw0ubW");

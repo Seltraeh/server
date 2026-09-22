@@ -90,43 +90,43 @@ inline bool borrowedHelper(const std::string& reinforceUserId)
 }
 
 /*!
-* The synthetic helper FriendGet offers, `DecompFriend`.
+* The original synthetic Summoner, `DecompFriend`, reserved user-unit id 999999.
 *
-* Its reserved user-unit id 999999 is documented in the handbook; this is the
-* account id that goes with it, and it is what MissionStart reports as the
-* borrowed helper.
+* NO LONGER A HELPER.  FriendGet offers the real roster now, so this id is never
+* borrowed and never reported by MissionStart.  It survives as the account the
+* daily gift is sent FROM (gme::kGiftSenderId), and the roster's DCF / DEV / NEW
+* id bands are all chosen to stay clear of it.
 */
 inline constexpr const char* kSyntheticHelperUserId = "n9ZMPC0t";
 
 /*!
-* Whether the server should pay the FRIEND rate for this helper.
-*
-* Must agree with what the card SHOWED, and the client decides that in
-* `FriendInfoList::existTypeOK` @0x12607CC: it walks FriendInfoList for a
-* matching user id and returns true only when that row's `friend_type` is
-* exactly 1.  FriendGet emits the one synthetic helper with friend_type 1, so
-* that helper is a friend on both sides.  Anything else is a stranger until
-* there is a real friend table to ask -- paying the friend rate for a helper
-* the client drew at the stranger rate would be a silent mismatch.
-*/
-inline bool helperIsFriend(const std::string& reinforceUserId)
-{
-	return reinforceUserId == kSyntheticHelperUserId;
-}
-
-/*!
 * Honor owed for one completed mission.
 *
+* ⚠ THE CALLER MUST ASK THE ROSTER.  This used to decide "is a friend" by
+* comparing the id to kSyntheticHelperUserId, back when FriendGet emitted
+* exactly one synthetic helper.  It now emits the player's whole roster plus
+* strangers, so that test answered NO for every real friend and quietly paid 10
+* Honor for a card the client had drawn "Honor +50" on.
+*
+* Which rate the card promised is decided client-side by
+* `FriendInfoList::existTypeOK` @0x12607CC -- it walks FriendInfoList for the
+* user id and returns true only when that row's `friend_type` is exactly 1.
+* FriendGet sends friend_type 1 for roster members and 0 for strangers, so
+* `gme::isFriend()` against user_friends is the server-side question that
+* matches it.  Anything looser is a silent mismatch in the player's favour or
+* against it.
+*
 * @param reinforceUserId The helper recorded at MissionStart, or "" / "0".
+* @param helperIsFriend  gme::isFriend() for that id, on this player's roster.
 * @return The Honor to credit, or 0 when no helper was borrowed.
 */
-inline int32_t honorForMission(const std::string& reinforceUserId)
+inline int32_t honorForMission(const std::string& reinforceUserId, bool helperIsFriend)
 {
 	if (!borrowedHelper(reinforceUserId))
 	{
 		return 0;
 	}
-	return helperIsFriend(reinforceUserId) ? kHonorPerFriendHelper : kHonorPerNormalHelper;
+	return helperIsFriend ? kHonorPerFriendHelper : kHonorPerNormalHelper;
 }
 
 } // namespace gme

@@ -6,6 +6,9 @@
 #include <gimuserver/archive/UnitArchiver.hpp>
 #include <gimuserver/gme/common/BraveSlots.hpp>
 #include <gimuserver/gme/common/SummonerJournal.hpp>
+#include <gimuserver/gme/common/Friends.hpp>
+#include <gimuserver/gme/common/LoginCampaign.hpp>
+#include <gimuserver/gme/common/SelectorRotation.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
 #include <gimuserver/gme/common/MysteryChest.hpp>
 
@@ -62,6 +65,12 @@ void GimuServer::initAndStart(const Json::Value& config)
 	gme::loadMysteryChestArchive(server["archive_root"].asString());
 	gme::loadBraveSlotArchive(server["archive_root"].asString());
 	gme::loadSummonerJournalArchive(server["archive_root"].asString());
+	// The friend roster needs the unit archive already set up: it sweeps the
+	// id space for evolution-chain bases, so UnitArchiver::setup must run first.
+	gme::loadFriendArchive(server["archive_root"].asString());
+	gme::loadLoginCampaignArchive(server["archive_root"].asString());
+	// Needs UnitArchiver::setup above: it sweeps the archive for 6-star units.
+	gme::loadSelectorRotation();
 }
 
 void GimuServer::shutdown() {}

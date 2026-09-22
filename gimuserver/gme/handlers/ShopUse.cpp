@@ -121,7 +121,7 @@ drogon::Task<void> expandBox(
         co_return;
 
     const auto gems = rows[0]["gems"].as<int64_t>();
-    const auto capacity = base + rows[0]["bought"].as<int32_t>();
+    const auto capacity = static_cast<int64_t>(base) + rows[0]["bought"].as<int32_t>();
     if (capacity + slots > cap)
     {
         LOG_WARN << "ShopUse: " << box << " box at " << capacity << " cannot take "
@@ -138,10 +138,12 @@ drogon::Task<void> expandBox(
     // One statement that re-checks the balance, so two quick taps cannot spend
     // the same gems twice.  $N in strict first-appearance order (the sqlite
     // named-param gotcha — see CampaignReceipt), hence price bound twice.
-    co_await theDb()->execSqlCoro(
+    const auto result = co_await theDb()->execSqlCoro(
         "UPDATE user_info SET gems = gems - $1, " + column + " = " + column + " + $2"
-        " WHERE id = $3 AND gems >= $4;",
-        price, slots, identity.userId, price);
+        " WHERE id = $3 AND gems >= $4 AND " + column + " <= $5;",
+        price, slots, identity.userId, price, static_cast<int64_t>(cap) - base - slots);
+
+    if (result.affectedRows() == 0) co_return;
 
     LOG_INFO << "ShopUse: " << box << " box " << capacity << " -> " << (capacity + slots)
              << " for " << price << " gem(s)";
@@ -266,7 +268,7 @@ drogon::Task<void> expandFriends(
 
     const auto gems = rows[0]["gems"].as<int64_t>();
     const auto bought = rows[0]["bought"].as<int32_t>();
-    if (bought + slots > mst->add_friend_count)
+    if (static_cast<int64_t>(bought) + slots > mst->add_friend_count)
     {
         LOG_WARN << "ShopUse: " << bought << " friend slot(s) bought; level "
                  << mst->level << " allows " << mst->add_friend_count << " in all";
@@ -307,42 +309,36 @@ drogon::Task<void> expandFriends(
 // ChallengeHeaderInfo::Aube, written only by the kN2i7qds response, and
 // ChallengeUserTeamResponse::readParam @0x13D3F94 names the exact field.  So
 // this now refills the real counter and leaves the Arena Orbs alone.
-drogon::Task<void> restoreHunterOrbs(const gme::UserIdentity identity, const int32_t cost)
+// Authored offline price, matching the captured type-5 prompt: one gem.
+// The client-provided cost is not an authority and cannot mint gems when negative.
+drogon::Task<HandleResult> restoreHunterOrbs(const gme::UserIdentity identity)
 {
-    const auto current = co_await db::DatabaseInterface::read(
-        theDb(),
-        "user_info",
-        {
-            db::Data("gems"),
-            db::Lookup("id", identity.userId),
-        });
-
-    const auto gems = current.front<int64_t>("gems");
-
-    if (gems < cost)
+    constexpr int64_t price = 1;
+    std::string body;
+    auto transaction = co_await theDb()->newTransactionCoro();
+    try
     {
-        LOG_WARN << "ShopUse: user " << identity.userId << " has " << gems
-                 << " gems, needs " << cost << " — refusing the restore";
-        co_return;
-    }
-
-    co_await db::DatabaseInterface::update(
-        theDb(),
-        "user_info",
+        const auto before = co_await gme::loadHunterOrbRefresh(transaction, identity);
+        if (before.aube < gme::hunterOrbCap())
         {
-            db::Data("gems", static_cast<int64_t>(gems - cost)),
-            db::Lookup("id", identity.userId),
-        });
-    co_await gme::restoreHunterOrbsToCap(theDb(), identity);
-
-    // The refreshed count reaches the client on the NEXT kN2i7qds — the Survey
-    // Office hub or the Frontier Hunter lobby — because no ShopUse response
-    // class exists and team_info has no field for this currency.  The prompt
-    // that sent the player here re-enters through one of those, so the orb is
-    // spendable immediately.
-    LOG_INFO << "ShopUse: restored Hunter Orbs to " << gme::hunterOrbCap()
-             << " for " << cost << " gem(s); " << (gems - cost) << " gem(s) remaining";
+            co_await transaction->execSqlCoro(
+                "UPDATE user_info SET gems = gems - $1, hunter_orbs = $2, hunter_orb_rest_ts = 0"
+                " WHERE id = $3 AND gems >= $4;", price, gme::hunterOrbCap(), identity.userId, price);
+        }
+        ::ShopUseResp resp{};
+        resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+        resp.user_team = co_await gme::loadHunterOrbRefresh(transaction, identity);
+        if (const auto error = glz::write_json(resp, body); error)
+            throw std::runtime_error(glz::format_error(error, body));
+    }
+    catch (const std::exception& ex)
+    {
+        transaction->rollback();
+        co_return HandleResult::error("Hunter Orb refill failed", ex.what());
+    }
+    co_return HandleResult::success(body);
 }
+
 }
 
 HANDLEF(ShopUse)
@@ -353,7 +349,7 @@ HANDLEF(ShopUse)
     {
         glz::context ctx{};
         if (const auto ec = glz::read<glz::opts{.error_on_unknown_keys = false}>(req, json, ctx); ec)
-            LOG_WARN << "ShopUse: parse error: " << glz::format_error(ec, json);
+            co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
     }
 
     const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
@@ -377,8 +373,7 @@ HANDLEF(ShopUse)
             co_await restoreArenaOrbs(identity, cost);
             break;
         case kShopUseRestoreHunterOrbs:
-            co_await restoreHunterOrbs(identity, cost);
-            break;
+            co_return co_await restoreHunterOrbs(identity);
         case kShopUseExpandFriends:
             co_await expandFriends(identity, req.shop_use.ext_cnt, cost);
             break;
@@ -403,5 +398,6 @@ HANDLEF(ShopUse)
     // the client's counters back on the server's numbers.
     ::ShopUseResp resp{};
     resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+
     co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }

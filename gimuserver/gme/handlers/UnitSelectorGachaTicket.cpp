@@ -3,6 +3,7 @@
 
 #include <gimuserver/archive/UnitArchiver.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/SelectorRotation.hpp>
 #include <gimuserver/utils/Random.hpp>
 
 #include <algorithm>
@@ -166,7 +167,16 @@ HANDLEF(UnitSelectorGachaTicket)
 	}
 
 	// Resolve the selector and validate the picked unit is in its pool.
-	const auto& selectors = theServer()->cache().unitSelectorGacha();
+	//
+	// ⚠ THE ROTATION HAS TO BE APPLIED HERE TOO.  The weekly selector's pool is
+	// NOT in the MST file -- the file carries a one-unit stub and
+	// applyWeeklySelector rewrites it per reply, which is what the emitters in
+	// Gacha.cpp and UserInfo.cpp do.  Validating against the RAW cache compared
+	// the pick against that stub, so every pick but unit 10016 was refused with
+	// "picked unit not in pool" no matter what the player was shown.  Take a
+	// copy and run the same transform the client was sent.
+	auto selectors = theServer()->cache().unitSelectorGacha();
+	gme::applyWeeklySelector(selectors);
 	const auto sel = std::find_if(selectors.begin(), selectors.end(),
 		[ticketId](const UnitSelectorGachaMst& s)
 		{ return static_cast<uint32_t>(s.selector_id) == ticketId; });

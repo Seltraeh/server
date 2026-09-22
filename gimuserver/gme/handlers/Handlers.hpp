@@ -105,9 +105,19 @@ namespace GmeHandlers
 	HANDLE(UpdateInfo);
 	HANDLE(NoticeUpdate);
 	HANDLE(UserLoginCampaignInfo);
+	// Guild -- the create-and-invite slice.  Wire shapes in net/guild.kdl.
+	HANDLE(GuildInfo);
+	HANDLE(GuildCreate);
+	HANDLE(GuildRecomendedMember);
+	HANDLE(GuildMemberUpdate);
+HANDLE(GuildRanking);
+HANDLE(GuildRankingDetail);
+	HANDLE(InboxMessageManage);
+	HANDLE(GuildUnimplemented);
 	HANDLE(UserInfo);
 	HANDLE(UnitFavorite);
 	HANDLE(UnitEvo);
+HANDLE(UnitOmniEvo);
 	HANDLE(UnitMix);
 	HANDLE(UnitSell);
 	HANDLE(TownUpdate);
@@ -156,6 +166,14 @@ namespace GmeHandlers
 	HANDLE(AchievementRewardReceive);
 	HANDLE(AchievementTrade);
 	HANDLE(AchievementAccept);
+	HANDLE(AchievementDeliver);
+	HANDLE(GetGiftInfo);
+	HANDLE(ArenaInfo);
+	HANDLE(FriendDelete);
+	HANDLE(FriendApply);
+	HANDLE(VideoAdSlotsClaimBonus);
+	HANDLE(UserGemShardInfo);
+	HANDLE(UserEnteredFeature);
 
 	// Dual Brave Burst — see gme/common/Dbb.hpp.
 	HANDLE(DbbBond);
@@ -166,6 +184,10 @@ namespace GmeHandlers
 
 	// Brave Points & Rewards (daily tasks / milestones / BP prize shop).
 	HANDLE(DailyTaskUserInfo);
+	HANDLE(DailyTaskClaimReward);
+	HANDLE(UserSummonerInfoEdit);
+	HANDLE(SummonerMix);
+	HANDLE(SummonerSkillGet);
 	HANDLE(UpdatePermitPlaceInfo);
 	HANDLE(UpdateEventInfo);
 	HANDLE(Chronology);

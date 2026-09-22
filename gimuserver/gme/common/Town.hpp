@@ -129,8 +129,9 @@ public:
 	* @param database Database client or transaction to use.
 	* @param identity Resolved user identity.
 	* @param collectLog TownUpdate's 0mRaAo39, "<locationId>:<tapCnt>,...".
+	* @return Taps actually consumed, for the trophy counter. Caller holds a transaction.
 	*/
-	static drogon::Task<void> applyTaps(
+	static drogon::Task<int64_t> applyTaps(
 		db::Database database,
 		UserIdentity identity,
 		std::string collectLog);

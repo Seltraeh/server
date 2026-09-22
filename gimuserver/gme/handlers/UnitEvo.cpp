@@ -1,10 +1,13 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <algorithm>
+
 #include <gimuserver/gme/common/SummonerJournal.hpp>
 
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/DailyTask.hpp>
 
 // UnitEvo — evolve a unit into its next form.
 //
@@ -121,7 +124,7 @@ HANDLEF(UnitEvo)
         "SELECT user_unit_id, unit_id, add_hp, add_atk, add_def, add_rec,"
         " ext_hp, ext_atk, ext_def, ext_rec,"
         " limit_over_hp, limit_over_atk, limit_over_def, limit_over_rec,"
-        " unit_type_id,"
+        " unit_type_id, skill_lv, extra_skill_lv,"
         " eqip_item_id, eqip_item_frame_id, eqip_item_id2, eqip_item_frame_id2"
         " FROM user_units WHERE user_id=$1 AND user_unit_id=$2 LIMIT 1;",
         std::string(kUserId), baseId
@@ -152,26 +155,53 @@ HANDLEF(UnitEvo)
 
     const std::string newElement = unitEvo_elementStr(targetMst->element);
 
+    // BURST LEVELS ARE HALVED BY EVOLVING, NOT RESET.
+    //
+    // Global wiki, Unit Skills: "Upon evolving, the unit's BB Level will be
+    // halved, rounded down."  This used to set skill_lv=1 and extra_skill_lv=0
+    // outright, which threw away every burst level the player had fused in.
+    //
+    // ⚠ The wiki CONTRADICTS ITSELF in the same sentence: its worked example
+    // reads "A unit with Level 10 SBB will be reduced to Level 1 SBB when
+    // evolving", which is not what halving 10 gives.  The stated RULE is
+    // implemented here and the example is not, because 10 -> 5 is what "halved,
+    // rounded down" means and the example cannot be reconciled with it.
+    //
+    // A unit that HAS a Brave Burst never drops below level 1.  A locked Super
+    // Brave Burst (0) stays locked; an unlocked one is halved but keeps at
+    // least level 1, because evolving does not take the unlock away.
+    const int32_t oldBbLvl  = br["skill_lv"].as<int32_t>();
+    const int32_t oldSbbLvl = br["extra_skill_lv"].as<int32_t>();
+    const int32_t newBbLvl  = targetMst->skill_id == 0
+        ? 0 : std::max(1, oldBbLvl / 2);
+    const int32_t newSbbLvl = (oldSbbLvl <= 0 || targetMst->extra_skill_id == 0)
+        ? 0 : std::max(1, oldSbbLvl / 2);
+
     // Step 2: UPDATE base unit row to the evolved form.
     //   - New unit_id, reset level/exp to 1/0, reset base stats from target MST.
     //   - Preserve: add_* (IMP), ext_*, limit_over_*, equipment, FE.
+    //   - Burst levels halved, per the rule above.
     co_await theDb()->execSqlCoro(
         "UPDATE user_units SET"
         " unit_id=$1,"
         " unit_lvl=1, exp=0, total_exp=0,"
-        " base_hp=$2,  base_atk=$3,  base_def=$4,  base_rec=$5, base_rec=$5,"
+        " base_hp=$2,  base_atk=$3,  base_def=$4,  base_rec=$5,"
         " add_hp=$6,   add_atk=$7,   add_def=$8,   add_rec=$9,"
         " skill_id=$10, extra_skill_id=$11,"
-        " skill_lv=1, extra_skill_lv=0,"
-        " element=$13"
-        " WHERE user_unit_id=$14 AND user_id=$15;",
+        " skill_lv=$12, extra_skill_lv=$13,"
+        " element=$14"
+        " WHERE user_unit_id=$15 AND user_id=$16;",
         unitEvo_addSuffix(targetMstId),
         targetMst->min_hp,  targetMst->min_atk,  targetMst->min_def,  targetMst->min_rec,
         keepAddHp,           keepAddAtk,           keepAddDef,          keepAddHeal,
         targetMst->skill_id, targetMst->extra_skill_id,
+        newBbLvl,            newSbbLvl,
         newElement,
         baseId, std::string(kUserId)
     );
+
+    LOG_INFO << "UnitEvo: burst levels halved on evolve — bb " << oldBbLvl
+        << "->" << newBbLvl << ", sbb " << oldSbbLvl << "->" << newSbbLvl;
 
     // Step 3: return spheres equipped on the evo materials, then DELETE them —
     // deleting without the return would destroy the equipped items.
@@ -246,6 +276,12 @@ HANDLEF(UnitEvo)
     LOG_INFO << "UnitEvo: full-replace unit cache — " << resp.unit_refresh->size()
              << " unit(s) under 4ceMWH6k";
 
+    // DAILY TASK `UU` ("Evolve any Units 3 Times").  The code is read in
+    // UnitDetailCommentScene, which reads like "look at a unit" until you check
+    // the client's own DAILYTASK_TYPE_UU_DESC — evolution is started from that
+    // screen.  One evolution, one tick.
+    co_await gme::advanceDailyTask(theDb(), identity, "UU");
+
     resp.team_info = std::move(
         (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
 
@@ -280,7 +316,10 @@ HANDLEF(UnitEvo)
         rd.extra_skill_id = std::to_string(targetMst->extra_skill_id);
         rd.extra_skill_lv = 0;
         rd.unit_type_id   = br["unit_type_id"].as<int32_t>();
-        rd.mission_id     = "";
+        // Ge8Yo32T is setEquipItemID, not a mission id -- and xZH6EIQ7 is a
+        // full REPLACE of the reinforcement record, so sending a blank here
+        // wiped the sphere off the evolved unit on the result screen.
+        rd.equipitem_id   = br["eqip_item_id"].as<int32_t>();
         resp.reinforce.emplace_back(std::move(rd));
     }
 

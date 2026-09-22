@@ -514,3 +514,7 @@ standalone_frontend/DebugCli.hpp
 # upstream builds just skip them. Keeping fork-only tables here stops them
 # colliding with every upstream edit to the shared cache files.
 gimuserver/drogon/ServerCacheLocal*.inl
+
+# Portable release tooling and maintainer instructions belong in the repository.
+!RELEASE.md
+!packaging/config.json

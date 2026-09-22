@@ -49,6 +49,21 @@ public:
 	std::optional<MissionRecord> lookup(MissionId mission_id) const;
 
 	/*!
+	* Whether an archive record exists for a mission, without building a copy
+	* of it and without logging a miss.
+	*
+	* PermitPlace needs this: `missionsByDungeon` is indexed from
+	* `mission_mst.json` (3433 rows) while the archive holds 942, so the quest
+	* map can otherwise advertise a tile whose battle does not exist.  Entering
+	* one fails lookup(), the handler throws, and the session closes — which
+	* reads to a player as a crash rather than as missing content.
+	*
+	* @param mission_id Mission id from mission_mst.
+	* @return True when the mission has an archive record.
+	*/
+	bool archived(MissionId mission_id) const;
+
+	/*!
 	* Populates all AI MST rows referenced by the mission record.
 	*
 	* @param record Archive record to read from.

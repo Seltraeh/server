@@ -69,6 +69,19 @@ public:
 		return RandomUInt(kMinUnitType, kMaxUnitType);
 	}
 
+	/*!
+	* Every archived unit, for callers that must walk the whole set.
+	*
+	* Added because sweeping the id space is not viable here: unit ids are
+	* sparse and run to 87,602,603, so a scan either misses units (a 90,000 cap
+	* dropped 550 of 2,053) or performs tens of millions of lookups at boot.
+	* The friend roster needs every evolution-chain base, which is a genuine
+	* enumeration and not a lookup.
+	*
+	* @return The id -> record map, empty before setup().
+	*/
+	const std::unordered_map<UnitId, UnitRecord>& all() const { return cache_; }
+
 	UnitArchiver(const UnitArchiver&) = delete;
 	UnitArchiver& operator=(const UnitArchiver&) = delete;
 

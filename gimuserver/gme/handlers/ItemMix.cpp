@@ -2,6 +2,7 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/DailyTask.hpp>
 #include <gimuserver/gme/common/Town.hpp>
 
 #include <algorithm>
@@ -319,6 +320,20 @@ HANDLEF(ItemMix)
 	for (const auto& [recipeId, count] : crafted)
 	{
 		LOG_INFO << "ItemMix: crafted recipe " << recipeId << " x" << count;
+	}
+
+	// DAILY TASK `CM` ("Craft N Items/Spheres").  Counted by ITEMS MADE, not by
+	// recipes used, because the task text counts items -- a continueMix run
+	// that applies one recipe five times has crafted five.  The client reads
+	// this code in StepScene but never reports it, so the tally is ours.
+	{
+		int32_t made = 0;
+		for (const auto& [recipeId, count] : crafted)
+		{
+			(void)recipeId;
+			made += count;
+		}
+		co_await gme::advanceDailyTask(theDb(), identity, "CM", made);
 	}
 
 	// Records counters: 100250 syntheses performed, 100260 materials consumed,

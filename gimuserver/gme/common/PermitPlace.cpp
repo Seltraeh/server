@@ -1,6 +1,7 @@
 #include "PermitPlace.hpp"
 #include "App.hpp"
 #include "Common.hpp"
+#include "archive/MissionArchiver.hpp"
 
 #include <algorithm>
 #include <ctime>
@@ -149,11 +150,69 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         for (const auto id : gq.dungeons) add("MHx05sXt", id);
         for (const auto id : gq.missions) add("j28VNcUW", id);
 
+        // Frontier Hunter.  The Survey Office's Enter goes to the ordinary
+        // quest-select screen, so the mode is reachable the moment its topology
+        // is permitted -- see ServerCache's collector.  Its area is AreaMst
+        // type 1, so these rows ride Y73tHKS8 and can actually be withdrawn
+        // when the event changes.
+        const auto& fh = theServer()->cache().challengePermits();
+        for (const auto id : fh.lands)    add("9C64Qwe0", id);
+        for (const auto id : fh.areas)    add("VjCY7rX4", id);
+        for (const auto id : fh.missions) add("j28VNcUW", id);
+        // Its DUNGEON row is built per request further down -- it needs a live
+        // countdown, which a static block computed once could not carry.
+
+        // Trial of the Gods.  Above kSpecialIdFloor, so the progression gate
+        // below never sees it; without this the six Trials have no tile.
+        const auto& tr = theServer()->cache().trialPermits();
+        for (const auto id : tr.lands)    add("9C64Qwe0", id);
+        for (const auto id : tr.areas)    add("VjCY7rX4", id);
+        for (const auto id : tr.dungeons) add("MHx05sXt", id);
+        for (const auto id : tr.missions)
+        {
+            // Same rule as the campaign below: never advertise a tile whose
+            // battle does not exist.  Checked HERE rather than in the cache's
+            // collector because MissionArchiver::setup runs after
+            // ServerCache::Setup, and this block is built on first request.
+            if (MissionArchiver::instance().archived(id))
+                add("j28VNcUW", id);
+        }
+
+        // THE VORTEX GETS THE SAME ARCHIVE GUARD AS THE CAMPAIGN AND THE TRIALS.
+        //
+        // ServerCache curates the Vortex list by hiding a tile that is empty,
+        // has an untranslated name, or duplicates another's banner art.  All
+        // three are PROXIES for "this tile is not ready", and the middle one
+        // stopped being true on 2026-09-19: repairing 88 dungeon names that a
+        // lossy transcode had reduced to "?????E??" made 18 areas readable, and
+        // with them 33 dungeons and 50 mission tiles that have no authored
+        // battle.  Every one of those would have served mission 10's waves
+        // relabelled, for free, under a Vortex name.
+        //
+        // So the condition is stated outright here instead of being inferred
+        // from the name: a mission tile is advertised only when its battle
+        // exists, and a dungeon only when at least one of its missions does --
+        // an empty Vortex dungeon was the original bug this whole file fixed.
+        // It cannot live in the cache's collector, which runs before
+        // MissionArchiver::setup (see the Trial block above).
         const auto& vx = theServer()->cache().vortexPermits();
-        for (const auto id : vx.lands)    add("9C64Qwe0", id);
-        for (const auto id : vx.areas)    add("VjCY7rX4", id);
-        for (const auto id : vx.dungeons) add("MHx05sXt", id);
-        for (const auto id : vx.missions) add("j28VNcUW", id);
+        const auto& byDungeon = theServer()->cache().missionsByDungeon();
+        const auto servable = [&byDungeon](const int32_t dungeonId) {
+            const auto it = byDungeon.find(dungeonId);
+            if (it == byDungeon.end())
+                return false;
+            return std::any_of(it->second.begin(), it->second.end(),
+                [](const int32_t id) { return MissionArchiver::instance().archived(id); });
+        };
+
+        for (const auto id : vx.lands) add("9C64Qwe0", id);
+        for (const auto id : vx.areas) add("VjCY7rX4", id);
+        for (const auto id : vx.dungeons)
+            if (servable(id))
+                add("MHx05sXt", id);
+        for (const auto id : vx.missions)
+            if (MissionArchiver::instance().archived(id))
+                add("j28VNcUW", id);
 
         return s;
     }();
@@ -200,6 +259,7 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         };
 
         size_t gatedAreas = 0, gatedDungeons = 0, gatedMissions = 0;
+        size_t unarchivedMissions = 0;
 
         std::set<int32_t> permittedLands;
 
@@ -238,6 +298,23 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
             {
                 if (missionId <= 0 || missionId >= kSpecialIdFloor)
                     continue;
+                // NEVER ADVERTISE A TILE WE CANNOT SERVE.  missionsByDungeon is
+                // indexed from mission_mst (3433 rows); the archive holds 942.
+                // 386 of the difference sit inside this id space, so without
+                // this the quest map offers them, MissionStart's lookup fails,
+                // the handler throws and the session closes — indistinguishable
+                // from a crash.  Mission 20100 (Vectus) reached a live save
+                // that way: its need_mission_id is 0, so no gate hid it.
+                //
+                // Deliberately ONLY here.  Frontier Gate, Grand Quest, Frontier
+                // Hunter and the Vortex build their permits from the same MST
+                // index but are working features with their own entry paths, so
+                // they keep whatever they advertise today.
+                if (!MissionArchiver::instance().archived(missionId))
+                {
+                    ++unarchivedMissions;
+                    continue;
+                }
                 if (missionId != entryMission)
                 {
                     const auto need = needs.find(missionId);
@@ -260,16 +337,34 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         LOG_INFO << "PermitPlace: progression gate — " << cleared.size()
                  << " mission(s) cleared, permitting " << gatedAreas << " area(s), "
                  << gatedDungeons << " dungeon(s), " << gatedMissions << " mission(s)"
-                 << ", land(s) [" << landList << "]";
+                 << ", land(s) [" << landList << "]"
+                 << "; withheld " << unarchivedMissions
+                 << " mission(s) with no archive record";
 
-        for (const auto id : today.dungeons) append(permitPlace, first, "MHx05sXt", id);
-        for (const auto id : today.missions) append(permitPlace, first, "j28VNcUW", id);
+        // The same archive guard the static Vortex block above applies, for the
+        // rotating half of the list: today's dungeons and the ladder tiers held
+        // back behind a need_mission_id.
+        const auto& byDungeon = cache.missionsByDungeon();
+        const auto servable = [&byDungeon](const int32_t dungeonId) {
+            const auto it = byDungeon.find(dungeonId);
+            if (it == byDungeon.end())
+                return false;
+            return std::any_of(it->second.begin(), it->second.end(),
+                [](const int32_t id) { return MissionArchiver::instance().archived(id); });
+        };
+
+        for (const auto id : today.dungeons)
+            if (servable(id))
+                append(permitPlace, first, "MHx05sXt", id);
+        for (const auto id : today.missions)
+            if (MissionArchiver::instance().archived(id))
+                append(permitPlace, first, "j28VNcUW", id);
 
         int32_t gatedVortex = 0;
         const auto permitGated = [&](const ServerCache::TopologyPermits& permits) {
             for (const auto& [missionId, need] : permits.gatedMissions)
             {
-                if (!satisfied(need))
+                if (!satisfied(need) || !MissionArchiver::instance().archived(missionId))
                     continue;
                 append(permitPlace, first, "j28VNcUW", missionId);
                 ++gatedVortex;
@@ -279,6 +374,35 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         permitGated(today);
 
         const auto nowEpoch = static_cast<int64_t>(now);
+
+        // THE CHALLENGE DUNGEON NEEDS A COUNTDOWN, and a bare id row is not
+        // enough.  MissionCheckScene::touchBegan @0x18851D0 looks the dungeon up
+        // with PermitPlaceInfoList::getObjectDungeon and refuses with
+        // CHALLENG_CHECK_TIME -- "No events currently being held." -- when
+        // getRemainingTime() is <= 0.  Emitting the id alone left it at 0, so
+        // the prep screen turned the player away at the Challenge button even
+        // though the lobby had let them in.
+        //
+        // This is the PARADE RULE INVERTED and worth keeping straight: for a
+        // parade, enterable-with-no-countdown IS the closed state and the key
+        // prompt is what should be reachable; for a challenge, no countdown
+        // means no event.
+        //
+        // The window is the one ServerCache already advertises for the active
+        // event -- open until 2038 -- so the countdown agrees with the dates the
+        // client was told rather than inventing a second answer.
+        {
+            constexpr int64_t kAdvertisedChallengeEnd = 2145916800;   // 2038-01-01
+            const auto left = kAdvertisedChallengeEnd - static_cast<int64_t>(now);
+            for (const auto id : theServer()->cache().challengePermits().dungeons)
+            {
+                std::string row = R"({"MHx05sXt":")" + std::to_string(id) + R"(","C1vG0iKh":"1")";
+                if (left > 0)
+                    row += R"(,"qY49LBjw":")" + std::to_string(left) + R"(")";
+                row += '}';
+                buckets.raw(channelForDungeon(id), row);
+            }
+        }
 
         // Rebuild every parade from persisted state, including expired windows.
         // Never merge old tier missions into this replacement snapshot.

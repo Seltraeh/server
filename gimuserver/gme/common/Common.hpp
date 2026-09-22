@@ -547,7 +547,7 @@ inline drogon::Task<WarehouseSnapshot> loadWarehouseSnapshot(
 		if (stack.item_num == 0)
 			continue;
 
-		if (stack.favorite_flg != 0)
+		if (stack.new_flg != 0)
 		{
 			// "::" — the packet struct, not GmeHandlers::ItemFavorite.
 			snapshot.favorites.push_back(::ItemFavorite{
@@ -555,6 +555,15 @@ inline drogon::Task<WarehouseSnapshot> loadWarehouseSnapshot(
 				.favorite = 1,
 			});
 		}
+
+		// THE MEMBER IS NOT WHAT THE COLUMN IS.  `new_flg` was read from
+		// user_items.favorite_flg purely to build the list above, but on the
+		// wire it is `dJNpLc81`, which readParam @0x14060E0 hands to
+		// setNewFlg -- the NEW badge.  Sending the lock through it would put a
+		// NEW badge on every stack the player has locked.  Locks travel in
+		// item_favorite (`5JbjC3Pp` -> setFavorit) and nowhere else; nothing
+		// here tracks item newness, so 0 is the honest value.
+		stack.new_flg = 0;
 
 		snapshot.warehouse.push_back(std::move(stack));
 	}
@@ -734,12 +743,18 @@ inline drogon::Task<std::vector<UnitSelectorGachaUserInfo>> loadSelectorTickets(
 * array never runs readParam and the client keeps its constructed defaults.
 * That is why summoner SP had nowhere to appear.
 *
-* Only `sp` is ours.  The other 31 fields are sent at exactly the values
-* init() @0x127E9E8 assigns — read out of .rodata, not guessed: strings empty
-* except the equipped arm "10" (the first of DefineMst.init_summoner_arm_id
-* "10,20"), sex/element 1, every exp/level pair (0,1), friend point 0,
-* summon_limit 1, deck 0.  So this block changes nothing the summoner
-* subsystem has not been built for.
+* ⚠ THIS USED TO SEND CONSTANTS.  Only `sp` came from the database and the
+* other 31 fields were init() @0x127E9E8's defaults, so the whole Summoner arc
+* was frozen and 94 Randall achievements read 0 forever.  The note that said
+* the subsystem "cannot draw and is not worth building" was wrong on both
+* counts: 33 layout_summoner_*.csv files ship in _dlcbundle, and this block was
+* already modelled and already on the wire.
+*
+* Every field is now persisted in user_summoner, in the shape the wiki's
+* Summoner Avatar article describes — gender, hairstyle, element, level, EXP,
+* SP, weapon, Leader Skill and the six per-element Summoning Arts levels.
+* The defaults in the schema are init()'s values, so a save that has never
+* touched the arc still sends exactly what it sent before.
 *
 * hp/atk/def/hel are the one deliberate departure: init() leaves 1/1/1/1,
 * which is a placeholder for the server to fill, so we send SummonerLevelMst's
@@ -754,17 +769,29 @@ inline drogon::Task<UserSummonerInfo> loadSummonerInfo(
 	const UserIdentity identity)
 {
 	const auto rows = co_await database->execSqlCoro(
-		"SELECT sp FROM user_summoner WHERE user_id = $1;", identity.userId);
-	const auto sp = rows.empty() ? 0 : rows[0]["sp"].as<int32_t>();
+		"SELECT sp, sex, element, hair_id, level, exp,"
+		" level1, exp1, level2, exp2, level3, exp3,"
+		" level4, exp4, level5, exp5, level6, exp6,"
+		" friend_point, summon_limit, ability_info, arm_id, eqp_item_id,"
+		" extra_passive_skill_id, extra_passive_skill_id2"
+		" FROM user_summoner WHERE user_id = $1;", identity.userId);
+	const auto has = !rows.empty();
+	const auto num = [&](const char* col, const int32_t fallback) {
+		return has && !rows[0][col].isNull() ? rows[0][col].as<int32_t>() : fallback;
+	};
+	const auto str = [&](const char* col, const char* fallback) {
+		return has && !rows[0][col].isNull() ? rows[0][col].as<std::string>() : std::string(fallback);
+	};
 
-	constexpr int32_t kSummonerLevel = 1;
+	const auto sp = num("sp", 0);
+	const auto kSummonerLevel = num("level", 1);
 
 	// Fall back to init()'s placeholder if the level has no MST row, so a
 	// truncated MST cannot make the summoner screen read as 0 ATK.
 	int32_t hp = 1, atk = 1, def = 1, hel = 1;
 	const auto& levels = theServer()->cache().summonerLevelMst();
 	const auto lv = std::find_if(levels.begin(), levels.end(),
-		[](const SummonerLevelMst& l) { return l.lv == kSummonerLevel; });
+		[kSummonerLevel](const SummonerLevelMst& l) { return l.lv == kSummonerLevel; });
 	if (lv != levels.end())
 	{
 		hp  = lv->base_hp;
@@ -775,31 +802,32 @@ inline drogon::Task<UserSummonerInfo> loadSummonerInfo(
 
 	UserSummonerInfo summoner{};
 	summoner.user_id = identity.userId;
-	summoner.sex = 1;
-	summoner.element = 1;
-	summoner.summoner_arm_id = "10";
-	summoner.summoner_hair_id = "";
-	summoner.exp = 0;
+	summoner.sex = num("sex", 1);
+	summoner.element = num("element", 1);
+	summoner.summoner_arm_id = str("arm_id", "10");
+	summoner.summoner_hair_id = str("hair_id", "");
+	summoner.exp = num("exp", 0);
 	summoner.level = kSummonerLevel;
-	summoner.exp1 = 0; summoner.level1 = 1;
-	summoner.exp2 = 0; summoner.level2 = 1;
-	summoner.exp3 = 0; summoner.level3 = 1;
-	summoner.exp4 = 0; summoner.level4 = 1;
-	summoner.exp5 = 0; summoner.level5 = 1;
-	summoner.exp6 = 0; summoner.level6 = 1;
+	// The six Summoning Arts levels, Fire through Dark.
+	summoner.exp1 = num("exp1", 0); summoner.level1 = num("level1", 1);
+	summoner.exp2 = num("exp2", 0); summoner.level2 = num("level2", 1);
+	summoner.exp3 = num("exp3", 0); summoner.level3 = num("level3", 1);
+	summoner.exp4 = num("exp4", 0); summoner.level4 = num("level4", 1);
+	summoner.exp5 = num("exp5", 0); summoner.level5 = num("level5", 1);
+	summoner.exp6 = num("exp6", 0); summoner.level6 = num("level6", 1);
 	summoner.sp = sp;
-	summoner.summoner_friend_point = 0;
+	summoner.summoner_friend_point = num("friend_point", 0);
 	summoner.hp = hp;
 	summoner.atk = atk;
 	summoner.def = def;
 	summoner.hel = hel;
-	summoner.summon_limit = 1;
+	summoner.summon_limit = num("summon_limit", 1);
 	summoner.ep3_current_deck_no = 0;
-	summoner.summoner_ability_info = "";
+	summoner.summoner_ability_info = str("ability_info", "");
 	summoner.eqp_item_frame_id = "";
-	summoner.eqp_item_id = "";
-	summoner.extra_passive_skill_id = "";
-	summoner.extra_passive_skill_id2 = "";
+	summoner.eqp_item_id = str("eqp_item_id", "");
+	summoner.extra_passive_skill_id = str("extra_passive_skill_id", "");
+	summoner.extra_passive_skill_id2 = str("extra_passive_skill_id2", "");
 
 	co_return summoner;
 }
@@ -910,6 +938,12 @@ inline drogon::Task<uint32_t> addUserUnit(
 		" base_rec, add_rec, ext_rec, limit_over_rec,"
 		" exp, total_exp,"
 		" skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
+		// ⚠ leader_skill_id WAS MISSING HERE, so every unit this path ever
+		// granted arrived with no Leader Skill -- 0 on all 176 units of the
+		// test account, including the 42 whose UnitMst row names one.  The
+		// client reads it off UserUnitInfo.oS3kTZ2W, so a squad leader
+		// contributed nothing.
+		" leader_skill_id,"
 		" element, unit_type_id, \"new\","
 		// -1, not the column default of 0: one sphere slot until a Sphere Frog
 		// says otherwise (kNoSecondSphereSlot).
@@ -919,11 +953,13 @@ inline drogon::Task<uint32_t> addUserUnit(
 		" $6,0,0,0,"
 		" 1,1,"
 		" $7,$8,$9,$10,"
-		" $11,$12,1,"
+		" $11,"
+		" $12,$13,1,"
 		" -1) RETURNING user_unit_id;",
 		identity.userId, std::to_string(unit.id),
 		unit.min_hp, unit.min_atk, unit.min_def, unit.min_rec,
 		unit.skill_id, skillLv, unit.extra_skill_id, extraSkillLv,
+		unit.leader_skill_id,
 		std::string(elementIdToString(unit.element)),
 		unitType);
 
@@ -1126,6 +1162,19 @@ inline drogon::Task<db::InterfaceResult<LoginInfoResp>> getLoginInfo(
 	// made the status pointer impossible to test independently; TutorialUpdate
 	// persists what the client reports instead (14082026_AddTutorialEndFlag).
 
+	// THE MASTER SWITCH FOR EVERY PADLOCK.  `a37D29iJ` is the ONLY caller of
+	// FeatureGatingHandler::setFeatureGate (UserInfoResponse::readParam
+	// @0x13FFA5C), and every gate site tests that flag FIRST:
+	// HomeScene2::initialize @0x16E99DC is `cbz w8 -> skip`, so with this at 0
+	// the client never even asks shouldGateLocked() whether a feature is
+	// locked.
+	//
+	// It defaulted to 0, which is why Arena stood wide open on the Home screen
+	// while the server was dutifully sending four perfectly good
+	// FeatureGatingInfo rows -- they arrived, were parsed, and were never
+	// consulted.  Nothing on the wire looked wrong.
+	packet.feature_gate = 1;
+
 	co_return db::InterfaceResult<LoginInfoResp>{
 		.data = std::move(packet),
 		.affected = result.affected,
@@ -1149,6 +1198,71 @@ inline constexpr int32_t kBaseUnitBoxSlots = 100;
 * @param identity Resolved user identity to read.
 * @return Team info packet populated from the database and derived cache data.
 */
+/*!
+* Force want_gift to name exactly three gifts that exist.
+*
+* The gift screen draws three slots unconditionally and indexes its want-gift
+* list at 0, 1 and 2 (GiftRecieveScene2::setWantGiftList @0x1671E20, `cmp x22,
+* #3`).  The Windows build does NOT bounds-check that index -- it takes a null
+* element and calls getGiftID on it -- so a want_gift with fewer than three
+* resolvable ids is a guaranteed client crash, and an empty one crashes on the
+* very first slot.
+*
+* Ids the catalogue does not contain are dropped rather than padded around,
+* because getObjectByKey would return null for them and the slot would be just
+* as empty.
+*
+* @param stored The player's own want_gift, possibly empty or short.
+* @return Exactly three comma-separated gift ids, or the input when no
+*         catalogue is loaded and nothing better can be said.
+*/
+inline std::string padWantGift(const std::string& stored)
+{
+	const auto& catalogue = theServer()->cache().userInfoResp().gift;
+	if (catalogue.empty())
+		return stored;
+
+	std::vector<std::string> wanted;
+	for (size_t at = 0; at <= stored.size(); )
+	{
+		const auto comma = stored.find(',', at);
+		auto piece = stored.substr(at, comma == std::string::npos ? std::string::npos : comma - at);
+		while (!piece.empty() && std::isspace(static_cast<unsigned char>(piece.front())))
+			piece.erase(piece.begin());
+		while (!piece.empty() && std::isspace(static_cast<unsigned char>(piece.back())))
+			piece.pop_back();
+
+		// Keep only ids the catalogue can actually resolve.
+		if (!piece.empty() && std::any_of(catalogue.begin(), catalogue.end(),
+			[&piece](const ::GiftItemMst& g) { return std::to_string(g.id) == piece; })
+			&& std::find(wanted.begin(), wanted.end(), piece) == wanted.end())
+		{
+			wanted.push_back(std::move(piece));
+		}
+		if (comma == std::string::npos)
+			break;
+		at = comma + 1;
+	}
+
+	for (const auto& row : catalogue)
+	{
+		if (wanted.size() >= 3)
+			break;
+		const auto id = std::to_string(row.id);
+		if (std::find(wanted.begin(), wanted.end(), id) == wanted.end())
+			wanted.push_back(id);
+	}
+
+	std::string out;
+	for (size_t i = 0; i < wanted.size() && i < 3; ++i)
+	{
+		if (!out.empty())
+			out += ',';
+		out += wanted[i];
+	}
+	return out;
+}
+
 inline drogon::Task<db::InterfaceResult<UserTeamInfo>> getTeamInfo(
 	const db::Database database,
 	const UserIdentity identity)
@@ -1163,6 +1277,26 @@ inline drogon::Task<db::InterfaceResult<UserTeamInfo>> getTeamInfo(
 	packet.reinforcement_deck.emplace_back(0);
 	packet.reinforcement_deck.emplace_back(0);
 	packet.add_unit_count = kBaseUnitBoxSlots;
+
+	// WANT_GIFT MUST NAME EXACTLY THREE GIFTS, OR THE GIFT SCREEN CRASHES.
+	//
+	// GiftRecieveScene2::setWantGiftList @0x1671E20 loops `cmp x22, #3` --
+	// the screen always draws THREE want-gift slots (giftItemMst0..2 /
+	// want_gift0..2) and indexes GiftRecieveScene2::getGiftMstList() at 0, 1
+	// and 2.  That list is built by splitting want_gift on ',' and resolving
+	// each id through GiftItemMstList::getObjectByKey, so it is only as long as
+	// want_gift is.
+	//
+	// The arm64 build bounds-checks that index (`b.hs` at 0x1671E3C).  THE
+	// WINDOWS BUILD DOES NOT: it yields a NULL element and dereferences it in
+	// getGiftID, which is the deterministic +0x84F533 / read 0x14 crash seen in
+	// four identical minidumps.  So an empty want_gift crashes, and so does one
+	// naming only one or two gifts.
+	//
+	// Padding here rather than in the DB keeps the player's own choices intact:
+	// whatever they picked stays first, and the remaining slots are filled with
+	// gifts they do not already have listed.
+	packet.want_gift = padWantGift(packet.want_gift);
 
 	const auto levelMst = getLevelMst(packet.level);
 	if (levelMst)
@@ -1350,7 +1484,7 @@ inline drogon::Task<void> accumulateBattleArchive(
 		"INSERT INTO user_team_archive ("
 		"user_id, b_crystal, h_crystal, battle_spark_cnt, battle_skill_cnt,"
 		" quest_mimic_cnt, battle_turn_max_damage, battle_turn_max_spark,"
-		" turn_max_unit_damage, b_crystal_max, h_crystal_max) VALUES ('"
+		" turn_max_unit_damage, b_crystal_max, h_crystal_max, spark_cnt_max) VALUES ('"
 		+ identity.userId + "',"
 		+ std::to_string(clamp(battle.battle_crystal_num)) + ","
 		+ std::to_string(clamp(battle.heart_crystal_num)) + ","
@@ -1363,7 +1497,10 @@ inline drogon::Task<void> accumulateBattleArchive(
 		// Trophies 100290 / 100300 are the BEST SINGLE BATTLE, not the total —
 		// the same two numbers as b_crystal/h_crystal, MAX-ed instead of summed.
 		+ std::to_string(clamp(battle.battle_crystal_num)) + ","
-		+ std::to_string(clamp(battle.heart_crystal_num)) + ")"
+		+ std::to_string(clamp(battle.heart_crystal_num)) + ","
+		// The best sparks in ONE quest -- a third number from the same field,
+		// distinct from the lifetime sum above and from the per-turn max.
+		+ std::to_string(clamp(battle.spark_cnt)) + ")"
 		" ON CONFLICT(user_id) DO UPDATE SET"
 		" b_crystal        = b_crystal        + excluded.b_crystal,"
 		" h_crystal        = h_crystal        + excluded.h_crystal,"
@@ -1374,7 +1511,8 @@ inline drogon::Task<void> accumulateBattleArchive(
 		" battle_turn_max_spark  = MAX(battle_turn_max_spark,  excluded.battle_turn_max_spark),"
 		" turn_max_unit_damage   = MAX(turn_max_unit_damage,   excluded.turn_max_unit_damage),"
 		" b_crystal_max          = MAX(b_crystal_max,          excluded.b_crystal_max),"
-		" h_crystal_max          = MAX(h_crystal_max,          excluded.h_crystal_max);";
+		" h_crystal_max          = MAX(h_crystal_max,          excluded.h_crystal_max),"
+		" spark_cnt_max          = MAX(spark_cnt_max,          excluded.spark_cnt_max);";
 
 	try
 	{
@@ -1707,6 +1845,71 @@ inline std::vector<::UserTeamArenaArchive> zeroedArenaArchive(const UserIdentity
 * @param identity Resolved user identity to read.
 * @return One entry per cleared mission, ready to serialise under UT1SVg59.
 */
+/*!
+* Evaluate the client's feature-release table for this player.
+*
+* ★ THIS IS WHAT OPENS THE SUMMONER AVATAR ARC, and it is why clearing the
+* Karna Masta fight appeared to do nothing.  `F_FUNCTION_RELEASE_MST` row 9
+* carries the condition `2:10864` -- "mission 10864 cleared" -- and 10864 is
+* "The Holy Emperor" in Menon, exactly the fight the wiki names as what opens
+* the arc.  The client asks the SERVER whether each function is released;
+* `UserReleaseInfo` (Dp0MjKAf) on UserInfoResp is the answer, and this fork had
+* never sent a single row, so every gated feature stayed shut no matter what
+* the player cleared.
+*
+* The conditions themselves live client-side and cannot be changed from here --
+* the server only reports whether they are met.
+*
+* @param cleared The player's cleared missions, as getClearedMissions returns.
+* @return One row per function the table knows about.
+*/
+inline std::vector<::UserReleaseInfo> evaluateFunctionReleases(
+	const std::vector<::UserClearMissionInfo>& cleared)
+{
+	std::set<int32_t> done;
+	for (const auto& row : cleared)
+		done.insert(row.mission_id);
+
+	std::vector<::UserReleaseInfo> out;
+	for (const auto& rule : theServer()->cache().functionReleaseMst())
+	{
+		::UserReleaseInfo info = {};
+		info.function_id = static_cast<uint32_t>(rule.function_id);
+
+		// "<type>:<param>".  ⚠ ONLY TYPE 2 IS DECODED.  Type 4 appears once,
+		// as "4:4" on function 8, and nothing here knows what it means -- so it
+		// reports NOT released.  Guessing the other way would hand the player a
+		// feature the real game gated.
+		bool released = false;
+		const auto colon = rule.condition.find(':');
+		if (colon != std::string::npos)
+		{
+			const auto type = rule.condition.substr(0, colon);
+			const auto param = rule.condition.substr(colon + 1);
+			if (type == "2")
+			{
+				try
+				{
+					released = done.contains(std::stoi(param));
+				}
+				catch (const std::exception&)
+				{
+					released = false;
+				}
+			}
+		}
+
+		info.released = released;
+		// The NEW badge. UserEnteredFeatureList (2386Diw1) is what clears it
+		// once the player opens the feature, and nothing here tracks that yet,
+		// so this stays 0 rather than pinning a badge on permanently.
+		info.new_flg = false;
+		out.push_back(std::move(info));
+	}
+	return out;
+}
+
+
 inline drogon::Task<std::vector<::UserClearMissionInfo>> getClearedMissions(
 	const db::Database database,
 	const UserIdentity identity)

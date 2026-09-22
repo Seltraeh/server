@@ -461,18 +461,18 @@ drogon::Task<void> Town::locationState(
 	co_return;
 }
 
-drogon::Task<void> Town::applyTaps(
+drogon::Task<int64_t> Town::applyTaps(
 	const db::Database database,
 	const UserIdentity identity,
 	const std::string collectLog)
 {
 	if (collectLog.empty())
 	{
-		co_return;
+		co_return 0;
 	}
 
 	// locationId -> taps claimed this flush.
-	std::map<int32_t, int32_t> claimed;
+	std::map<int32_t, int64_t> claimed;
 	for (const auto& entry : split(collectLog, ','))
 	{
 		const auto parts = split(entry, ':');
@@ -491,7 +491,7 @@ drogon::Task<void> Town::applyTaps(
 
 	if (claimed.empty())
 	{
-		co_return;
+		co_return 0;
 	}
 
 	const auto rows = co_await database->execSqlCoro(
@@ -499,6 +499,7 @@ drogon::Task<void> Town::applyTaps(
 		identity.userId);
 
 	std::map<int32_t, int32_t> itemGains;
+	int64_t acceptedTaps = 0;
 	int64_t zelGain = 0;
 	int64_t karmaGain = 0;
 	std::string tapSql;
@@ -514,11 +515,13 @@ drogon::Task<void> Town::applyTaps(
 
 		const auto remaining = row["tap_cnt"].as<int32_t>();
 		const auto drops = split(row["drop_info"].as<std::string>(), ',');
-		const auto taken = std::min(it->second, remaining);
+		const auto taken = static_cast<int32_t>(std::min(it->second, static_cast<int64_t>(remaining)));
 		if (taken <= 0)
 		{
 			continue;
 		}
+
+		acceptedTaps += taken;
 
 		// getCollectItemInfo reads element `count - tap_cnt`, so the taps just
 		// reported are the `taken` entries starting there.
@@ -591,7 +594,7 @@ drogon::Task<void> Town::applyTaps(
 			+ " ON CONFLICT(user_id, location_id) DO UPDATE SET tap_cnt=excluded.tap_cnt;");
 	}
 
-	co_return;
+	co_return acceptedTaps;
 }
 
 drogon::Task<std::vector<::PermitReceipe>> Town::permittedRecipes(

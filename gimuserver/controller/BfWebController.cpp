@@ -7,6 +7,77 @@
 using namespace drogon;
 namespace fs = std::filesystem;
 
+namespace
+{
+
+/*!
+* Locate an MST download part by NAME, wherever it happens to be staged.
+*
+* THE CLIENT FETCHES THESE FROM A FLAT `/mst/`, NOT `/content/<TABLE>/`.
+* That was the single unproven inference in the version/download channel: it
+* came from `requestMstFiles` passing the target name as a directory, and the
+* `/content` prefix was assumed from how `/sound/` behaves.  It was wrong, and
+* it failed in the worst available shape -- `requestMstFiles` runs during BOOT,
+* so the client sat on `DLC_PROBLEM_ENCOUNTERED` and the game was unplayable
+* rather than merely missing a table.  deploy/log/dlc_404.log had recorded the
+* real request all along: `/mst/Ver1_U1XChi09.dat`, five times over.
+*
+* So this deliberately does NOT care which directory a part is staged in.
+* Whatever layout gen_mst_download.py writes, a part reachable by name is
+* served -- which is what makes a wrong guess about the layout survivable
+* instead of fatal.  mstVersions() still refuses to ANNOUNCE a table whose
+* parts are missing, so the two halves stay honest independently.
+*
+* @param requestPath Request path, untrusted, e.g. "/mst/Ver1_U1XChi09.dat".
+* @return Path to the part, or empty when no such part is staged.
+*/
+fs::path findMstPart(const std::string& requestPath)
+{
+	const auto slash = requestPath.find_last_of('/');
+	const auto name = slash == std::string::npos
+		? requestPath : requestPath.substr(slash + 1);
+
+	// Validate against the FORMAT rather than blacklisting traversal: the only
+	// legal names are `Ver<n>_<key>.dat` and `Ver<n>_<key>_<part>.dat`, and
+	// nothing matching that can hold a separator or "..".
+	if (name.size() < 8 || name.compare(0, 3, "Ver") != 0
+		|| name.compare(name.size() - 4, 4, ".dat") != 0)
+		return {};
+	for (const char c : name.substr(0, name.size() - 4))
+	{
+		if (!std::isalnum(static_cast<unsigned char>(c)) && c != '_')
+			return {};
+	}
+
+	std::error_code ec;
+	const fs::path root = fs::path(app().getDocumentRoot()) / "content";
+	if (!fs::is_directory(root, ec))
+		return {};
+
+	// Flat under the content root first, then each table's own folder.
+	std::error_code flatEc;
+	if (fs::is_regular_file(root / name, flatEc) && !flatEc)
+		return root / name;
+
+	std::error_code iterEc;
+	auto it = fs::directory_iterator(root, iterEc);
+	if (iterEc)
+		return {};
+	for (const auto& entry : it)
+	{
+		std::error_code dirEc;
+		if (!entry.is_directory(dirEc) || dirEc)
+			continue;
+		std::error_code partEc;
+		const auto candidate = entry.path() / name;
+		if (fs::is_regular_file(candidate, partEc) && !partEc)
+			return candidate;
+	}
+	return {};
+}
+
+} // namespace
+
 // This code was intended for generating placeholders in assets
 //#define ENABLE_FILE_GENERATOR 1
 
@@ -112,6 +183,18 @@ void BfWebController::HandleWebPage(const HttpRequestPtr& rq, std::function<void
     // Serve existing file if it exists
 	if (!fs::exists(path) || fs::is_directory(path))
 	{
+		// Before giving up: an MST download part is staged under its TABLE's
+		// folder, but the client asks for it from a flat /mst/.  This is the
+		// only 404 on this server that wedges BOOT, so it gets a second look.
+		if (const auto part = findMstPart(rq->getPath()); !part.empty())
+		{
+			LOG_INFO << "MST download: " << rq->getPath() << " served from " << part.string();
+			auto resp = HttpResponse::newFileResponse(part.string());
+			resp->setContentTypeCode(CT_APPLICATION_OCTET_STREAM);
+			callback(resp);
+			return;
+		}
+
 		logDlc() << rq->getPath();
 		callback(HttpResponse::newNotFoundResponse());
 	}

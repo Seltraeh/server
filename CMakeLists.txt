@@ -35,6 +35,9 @@ if (MSVC AND TARGET glaze::glaze)
         "$<$<CONFIG:Release>:/INCREMENTAL:NO>;$<$<CONFIG:MinSizeRel>:/INCREMENTAL:NO>")
 endif()
 
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/packet-generator/assets/runtime/cpp/CMakeLists.txt")
+    message(FATAL_ERROR "packet-generator is missing. Run git submodule update --init --recursive before configuring.")
+endif()
 add_subdirectory(packet-generator/assets/runtime/cpp)
 
 # KDL -> C++ codegen. The packet-generator Rust CLI compiles assets/all.kdl
@@ -63,6 +66,13 @@ file(GLOB_RECURSE KDL_SCHEMAS CONFIGURE_DEPENDS
     "${PKGEN_SRC_DIR}/assets/*.kdl"
 )
 
+file(GLOB_RECURSE PKGEN_RUST_INPUTS CONFIGURE_DEPENDS
+    "${PKGEN_SRC_DIR}/src/*.rs"
+    "${PKGEN_SRC_DIR}/packet-generator-cli/src/*.rs"
+    "${PKGEN_SRC_DIR}/tools/*.rs"
+    "${PKGEN_SRC_DIR}/*/Cargo.toml"
+)
+list(APPEND PKGEN_RUST_INPUTS "${PKGEN_SRC_DIR}/Cargo.toml" "${PKGEN_SRC_DIR}/Cargo.lock")
 file(MAKE_DIRECTORY "${PKGEN_OUT_DIR}")
 
 # The archive schema (assets/archive.kdl) generates a second header consumed
@@ -74,16 +84,16 @@ set(PKGEN_ARCHIVE_OUT_HEADER "${PKGEN_ARCHIVE_OUT_DIR}/archive.hpp")
 
 add_custom_command(
     OUTPUT "${PKGEN_OUT_HEADER}" "${PKGEN_ARCHIVE_OUT_HEADER}"
-    COMMAND "${CARGO_EXECUTABLE}" run --release --
+    COMMAND "${CARGO_EXECUTABLE}" run --locked --release --
         generate --cxx --glaze
         -i "${PKGEN_ENTRY}"
         -o "${PKGEN_OUT_DIR}"
-    COMMAND "${CARGO_EXECUTABLE}" run --release --
+    COMMAND "${CARGO_EXECUTABLE}" run --locked --release --
         generate --cxx --glaze
         -i "${PKGEN_ARCHIVE_ENTRY}"
         -o "${PKGEN_ARCHIVE_OUT_DIR}"
     WORKING_DIRECTORY "${PKGEN_SRC_DIR}"
-    DEPENDS ${KDL_SCHEMAS}
+    DEPENDS ${KDL_SCHEMAS} ${PKGEN_RUST_INPUTS}
     COMMENT "Regenerating C++ packet headers from KDL schemas"
     VERBATIM
 )

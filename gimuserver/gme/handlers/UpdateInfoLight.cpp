@@ -3,6 +3,8 @@
 
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/HunterOrbs.hpp>
+#include <gimuserver/gme/common/LoginCampaign.hpp>
 
 // UpdateInfoLight (ynB7X5P9 / 7kH9NXwC) — the client's "anything new for me?"
 // poll.  Handbook §8.41.
@@ -12,34 +14,17 @@
 // and signalKey tags, so the request carries no fields at all.  This server and
 // the legacy fork both answered `{}` every time, i.e. "nothing has changed".
 //
-// That is the leading explanation for the standing complaint that mutations do
-// not appear until the client is relaunched: cleared missions still rendering
-// "NEW" with no successor, and unit evolutions and level-ups not showing.  The
-// data was verified to reach the client correctly in the login snapshot; what
-// was missing was any way for it to arrive again afterwards.
-//
-// Nothing constrains a GME response to a fixed class — GameResponseParser
-// dispatches each top-level key independently through getResponseObject (504
-// keys; tools/ida/audits/getResponseObject_FULL.txt), so a response is a bag of
-// keys and this poll can carry whatever actually changed.
-//
-// Scope is deliberately narrow: only per-user mutable state.  MST tables,
-// PermitPlace, the gacha catalog and friends are login-time data and stay in
-// UserInfo — resending them on a poll this frequent would be wasteful and would
-// re-run PermitPlace's progression build every few seconds.
-//
-// // UNVERIFIED: that this is what the real server answered with.  The legacy
-// stub is the only hint — it includes SignalKey.hpp and UserUnitInfo.hpp and
-// then uses neither.  Everything here is data the client already accepts from
-// UserInfo under the same keys, so the worst case is redundant work rather
-// than a malformed packet.
+// Team/clear state and a partial Hunter Orb snapshot are refreshed here.
+// Orb reader @0x13D3F94 has no singleton reset, so sending count/timer only
+// preserves rank and Frontier Gate score. The orb query is read-only; regeneration
+// is derived at request time. This poll never replaces the unit roster.
 HANDLEF(UpdateInfoLight)
 {
     ::UpdateInfoLightReq req{};
     {
         glz::context ctx{};
         if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
-            LOG_WARN << "UpdateInfoLight: parse error: " << glz::format_error(ec, json);
+            co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
     }
 
     const auto db = theDb();
@@ -54,11 +39,15 @@ HANDLEF(UpdateInfoLight)
     // into, and this poll fires ~143 times a session.  It also did not fix the
     // staleness it was added for.
     resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
+    resp.hunter_orbs = co_await gme::loadHunterOrbRefresh(db, identity);
 
     LOG_INFO << "UpdateInfoLight: refreshed team info + "
              << resp.clear_mission_info.size() << " cleared mission(s)";
 
-    co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+    std::string body;
+    if (const auto error = glz::write_json(resp, body); error)
+        co_return HandleResult::error("Serialization error", glz::format_error(error, body));
+    co_return HandleResult::success(body);
 }
 
 // UpdateInfo (RUV94Dqz) — Home's 30-minute refresh (see the KDL for the timer).
@@ -70,7 +59,7 @@ HANDLEF(UpdateInfo)
     {
         glz::context ctx{};
         if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
-            LOG_WARN << "UpdateInfo: parse error: " << glz::format_error(ec, json);
+            co_return HandleResult::error("Deserialization error", glz::format_error(ec, json));
     }
 
     const auto db = theDb();
@@ -79,13 +68,17 @@ HANDLEF(UpdateInfo)
     ::UpdateInfoResp resp{};
     resp.team_info = std::move((co_await gme::getTeamInfo(db, identity)).nonEmpty());
     resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
+    resp.hunter_orbs = co_await gme::loadHunterOrbRefresh(db, identity);
     resp.update_info.server_time = static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(
         std::chrono::system_clock::now().time_since_epoch()).count());
 
     LOG_INFO << "UpdateInfo: 30-minute refresh — team info + "
              << resp.clear_mission_info.size() << " cleared mission(s)";
 
-    co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+    std::string body;
+    if (const auto error = glz::write_json(resp, body); error)
+        co_return HandleResult::error("Serialization error", glz::format_error(error, body));
+    co_return HandleResult::success(body);
 }
 
 // NoticeUpdate (68pTQAJv) — the notice list.  There are no notices offline;
@@ -108,8 +101,11 @@ HANDLEF(NoticeUpdate)
     co_return HandleResult::success(glz::write_json(::NoticeUpdateResp{}).value_or("{}"));
 }
 
-// UserLoginCampaignInfo (5fc8bf2c) — Home's 12-hour login-campaign check.  No
-// login campaign runs offline, so there is nothing to report.
+// UserLoginCampaignInfo (5fc8bf2c) — Home's 12-hour login-campaign check, and
+// the thing that rolls the advent calendar over for a client left running past
+// midnight.  Initialize does the same work at launch; both go through
+// gme::advanceLoginCampaign, which is idempotent within a day, so whichever
+// arrives first pays and the other simply reports the same cell.
 HANDLEF(UserLoginCampaignInfo)
 {
     ::UserLoginCampaignInfoReq req{};
@@ -119,8 +115,22 @@ HANDLEF(UserLoginCampaignInfo)
             LOG_WARN << "UserLoginCampaignInfo: parse error: " << glz::format_error(ec, json);
     }
 
-    (void)(co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+    const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-    LOG_INFO << "UserLoginCampaignInfo: no login campaign";
-    co_return HandleResult::success("{}");
+    ::UserLoginCampaignInfoResp resp{};
+    try
+    {
+        const auto state = co_await gme::advanceLoginCampaign(theDb(), identity);
+        resp.campaign_info = gme::loginCampaignInfo(state);
+        LOG_INFO << "UserLoginCampaignInfo: day " << state.current_day << "/" << state.total_days
+                 << (state.first_for_the_day ? " (new day, granted)" : "");
+    }
+    catch (const drogon::orm::DrogonDbException& ex)
+    {
+        LOG_ERROR << "UserLoginCampaignInfo: DB error: " << ex.base().what();
+        // SUCCESS regardless: an error reply is GmeErrorCommand::Close.
+        co_return HandleResult::success("{}");
+    }
+
+    co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }

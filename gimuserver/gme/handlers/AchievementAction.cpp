@@ -6,6 +6,7 @@
 #include <gimuserver/gme/common/Common.hpp>
 
 #include <algorithm>
+#include <cctype>
 #include <string>
 
 // The Merit Point loop, and the two buttons on an achievement's detail page.
@@ -84,57 +85,126 @@ HANDLEF(AchievementRewardReceive)
 	const auto& node = req.nodes.front();
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	// The achievement has to exist, be finished, and not have paid already.
+	// RECEIVE ALL SENDS A LIST.  `M7SXoc31` is a COMMA-SEPARATED set of subject
+	// ids, not one id -- a live capture on 2026-09-14 carried
+	// "25000,25010,26000,27000,27010,27020".  Comparing that whole string
+	// against one row's id never matched, so the Receive All button answered
+	// "Invalid achievement request" on screen every time.  A single claim is
+	// just the one-element case of the same list.
+	std::vector<std::string> wanted;
+	{
+		size_t at = 0;
+		while (at <= node.subject_id.size())
+		{
+			const auto comma = node.subject_id.find(',', at);
+			auto piece = node.subject_id.substr(
+				at, comma == std::string::npos ? std::string::npos : comma - at);
+			// Trim, because a trailing comma is cheap for the client to emit.
+			while (!piece.empty() && std::isspace(static_cast<unsigned char>(piece.front())))
+				piece.erase(piece.begin());
+			while (!piece.empty() && std::isspace(static_cast<unsigned char>(piece.back())))
+				piece.pop_back();
+			if (!piece.empty())
+				wanted.push_back(std::move(piece));
+			if (comma == std::string::npos)
+				break;
+			at = comma + 1;
+		}
+	}
+	if (wanted.empty())
+		co_return HandleResult::error("Invalid achievement request", "no achievement named");
+
 	const auto& catalogue = theServer()->cache().achievementSubjectMst();
-	const auto subject = std::find_if(catalogue.begin(), catalogue.end(),
-		[&node](const ::AchievementSubjectMst& s)
-		{ return std::to_string(s.id) == node.subject_id; });
-	if (subject == catalogue.end())
-		co_return HandleResult::error("Invalid achievement request", "unknown achievement " + node.subject_id);
 
 	AchievementRewardReceiveResp resp{};
 	resp.signal_key.key = "5EdKHavF";
+	std::string body;
+	int32_t paidCount = 0;
+	int32_t queuedPresents = 0;
+	int64_t paidPoints = 0;
 	{
 		auto transaction = co_await theDb()->newTransactionCoro();
 		try
 		{
-			// Guarded on reward_received = 0, so a replayed body pays once.
-			const auto claimed = co_await transaction->execSqlCoro(
-				"INSERT INTO user_achievement_subjects (user_id, subject_id, reward_received)"
-				" VALUES ($1, $2, 1)"
-				" ON CONFLICT(user_id, subject_id) DO UPDATE SET reward_received = 1"
-				" WHERE user_achievement_subjects.reward_received = 0"
-				" RETURNING subject_id;",
-				identity.userId, node.subject_id);
-			if (claimed.empty())
+			// EACH ID IS CLAIMED INDEPENDENTLY AND A REFUSAL IS NOT FATAL.
+			// Receive All sweeps whatever the screen is showing, so it will
+			// routinely include rows that are already claimed or not finished;
+			// failing the batch on the first of those would make the button
+			// useless.  Skip them and pay the rest.
+			for (const auto& subjectId : wanted)
 			{
-				transaction->rollback();
-				LOG_WARN << "AchievementRewardReceive: " << node.subject_id
-					<< " was already claimed by " << identity.userId;
-				co_return HandleResult::error("Invalid achievement request", "already claimed");
-			}
+				const auto subject = std::find_if(catalogue.begin(), catalogue.end(),
+					[&subjectId](const ::AchievementSubjectMst& s)
+					{ return std::to_string(s.id) == subjectId; });
+				if (subject == catalogue.end())
+				{
+					LOG_WARN << "AchievementRewardReceive: unknown achievement " << subjectId;
+					continue;
+				}
 
-			// ...and it has to actually be finished.  Checked AFTER the latch so
-			// the two cannot race, and rolled back when it is not.
-			if (!co_await gme::achievementComplete(transaction, identity, *subject))
-			{
-				transaction->rollback();
-				LOG_WARN << "AchievementRewardReceive: " << node.subject_id
-					<< " is not complete for " << identity.userId;
-				co_return HandleResult::error("Invalid achievement request", "not complete");
-			}
+				// Guarded on reward_received = 0, so a replayed body pays once.
+				const auto claimed = co_await transaction->execSqlCoro(
+					"INSERT INTO user_achievement_subjects (user_id, subject_id, reward_received)"
+					" VALUES ($1, $2, 1)"
+					" ON CONFLICT(user_id, subject_id) DO UPDATE SET reward_received = 1"
+					" WHERE user_achievement_subjects.reward_received = 0"
+					" RETURNING subject_id;",
+					identity.userId, subjectId);
+				if (claimed.empty())
+					continue;          // already claimed
 
-			if (subject->point > 0)
-			{
-				co_await transaction->execSqlCoro(
-					"UPDATE user_info SET achieve_point = MIN(achieve_point + $1, 999999)"
-					" WHERE id = $2;",
-					subject->point, identity.userId);
+				// ...and it has to actually be finished.  Checked AFTER the
+				// latch so the two cannot race.
+				if (!co_await gme::achievementComplete(transaction, identity, *subject))
+				{
+					// Undo this one row's latch, but keep the rest of the batch.
+					co_await transaction->execSqlCoro(
+						"UPDATE user_achievement_subjects SET reward_received = 0"
+						" WHERE user_id = $1 AND subject_id = $2;",
+						identity.userId, subjectId);
+					continue;
+				}
+
+				if (subject->point > 0)
+				{
+					co_await transaction->execSqlCoro(
+						"UPDATE user_info SET achieve_point = MIN(achieve_point + $1, 999999)"
+						" WHERE id = $2;",
+						subject->point, identity.userId);
+					paidPoints += subject->point;
+				}
+
+				// THE PACKED REWARD, which is not the same thing as the points.
+				// Merit points are what the Randall records pay; the Level Up
+				// Campaign's 152 rows pay 0 of them and carry a unit, sphere,
+				// material or currency in reward_info instead.  Claiming those
+				// without this would latch reward_received and hand the player
+				// nothing, permanently -- worse than leaving them unclaimable.
+				if (co_await gme::grantAchievementReward(
+						transaction, identity, subject->reward_info))
+				{
+					++queuedPresents;
+				}
+				++paidCount;
 			}
 
 			resp.achievement_info = co_await gme::loadAchievementInfo(transaction, identity);
 			resp.subjects = co_await gme::loadAchievementSubjects(
 				transaction, identity, node.category, node.cond_type);
+
+			// The badges, recomputed from the state this transaction just
+			// wrote.  AchievementBadgeInfo's only writer is parseBadgeData, so
+			// a claim that does not re-send this leaves the badge lit on the
+			// Randall town tile and the record row until the next login.
+			resp.badge.badge_data =
+				co_await gme::achievementBadgeData(transaction, identity);
+
+			// SERIALIZE BEFORE THE TRANSACTION COMMITS.  The points are already
+			// credited above; if the reply could not be written after the block
+			// closed, the player would have paid-out state and an empty screen
+			// with no way to tell.  Failing here rolls the whole claim back.
+			if (const auto error = glz::write_json(resp, body); error)
+				throw std::runtime_error(glz::format_error(error, body));
 		}
 		catch (...)
 		{
@@ -143,11 +213,15 @@ HANDLEF(AchievementRewardReceive)
 		}
 	}
 
+	// An empty sweep is a SUCCESS, not an error.  Tapping Receive All with
+	// nothing outstanding is an ordinary thing to do, and answering with an
+	// error puts a failure dialog on screen for a no-op.
 	LOG_INFO << "AchievementRewardReceive: " << identity.userId << " claimed "
-		<< node.subject_id << " for " << subject->point << " merit point(s); balance "
-		<< resp.achievement_info.id;
+		<< paidCount << " of " << wanted.size() << " achievement(s) for "
+		<< paidPoints << " merit point(s) and " << queuedPresents
+		<< " present(s); balance " << resp.achievement_info.id;
 
-	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+	co_return HandleResult::success(body);
 }
 
 // ---------------------------------------------------------------------------

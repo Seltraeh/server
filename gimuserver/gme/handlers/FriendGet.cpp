@@ -3,6 +3,8 @@
 
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/FriendPoints.hpp>
+#include <gimuserver/gme/common/Friends.hpp>
+#include <gimuserver/gme/common/Gifts.hpp>   // giftToday(), the shared day key
 
 #include <ctime>
 
@@ -66,160 +68,175 @@ HANDLEF(FriendGet)
 
     FriendGetResp resp{};
 
+    // THE ROSTER, not a single mirror of the player's own leader.
+    //
+    // Every friend goes into BOTH lists: `xZH6EIQ7` (ReinforcementInfo) is the
+    // pre-battle helper picker and `tojMy68W` (FriendInfo) is the Social list.
+    // They are different client caches and populating one does not update the
+    // other -- the handbook calls this out by name.
+    //
+    // THE TWO LISTS DO NOT CARRY THE SAME SET, and that is the whole mechanic:
+    // a friend whose evolution chain can no longer reach the player's rarity is
+    // hidden from the PICKER (they cannot field a comparable helper) but stays
+    // on the SOCIAL list, because that is where the player sees who has fallen
+    // behind and unfriends them.  Filtering both would hide the very rows the
+    // player is supposed to act on.
     try
     {
-        // Active-deck leader first, fall back to highest-level unit so the
-        // friend slot always has data.  Matches MissionStart's query shape.
-        auto rows = co_await theDb()->execSqlCoro(
-            "SELECT uu.user_unit_id, uu.unit_id, uu.unit_lvl,"
-            " uu.base_hp,  uu.add_hp,  uu.ext_hp,"
-            " uu.base_atk, uu.add_atk, uu.ext_atk,"
-            " uu.base_def, uu.add_def, uu.ext_def,"
-            " uu.base_rec,uu.add_rec,uu.ext_rec,"
-            " uu.skill_id, uu.skill_lv, uu.extra_skill_id, uu.extra_skill_lv,"
-            " uu.unit_type_id, uu.element"
-            " FROM user_decks pd"
-            " JOIN user_units uu ON uu.user_unit_id = pd.user_unit_id"
-            " JOIN user_info ui ON ui.id = pd.user_id"
-            " WHERE pd.user_id=$1 AND pd.deck_num=ui.active_deck AND pd.member_type=0"
-            " LIMIT 1;",
-            std::string(kUserId));
+        const auto peak = co_await gme::playerPeak(theDb(), identity);
+        // The FULL roster; staleness is decided per friend below.
+        const auto roster = co_await gme::loadFriendRoster(theDb(), identity, false);
+        const auto loginTimestamp = static_cast<int32_t>(std::time(nullptr));
 
-        if (rows.empty())
+        for (const auto& mate : roster)
         {
-            rows = co_await theDb()->execSqlCoro(
-                "SELECT user_unit_id, unit_id, unit_lvl,"
-                " base_hp,  add_hp,  ext_hp,"
-                " base_atk, add_atk, ext_atk,"
-                " base_def, add_def, ext_def,"
-                " base_rec,add_rec,ext_rec,"
-                " skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
-                " unit_type_id, element"
-                " FROM user_units"
-                " WHERE user_id=$1"
-                " ORDER BY unit_lvl DESC, user_unit_id DESC LIMIT 1;",
-                std::string(kUserId));
-        }
+            const auto unit = gme::friendUnitFor(mate, peak);
+            if (unit.unit_id == 0)
+            {
+                LOG_WARN << "FriendGet: " << mate.handle_name << " has unknown chain base "
+                         << mate.base_unit_id << "; skipped rather than sent half-built";
+                continue;
+            }
 
-        if (!rows.empty())
-        {
-            const auto& r = rows[0];
+            // Can this friend still keep up?  If their chain tops out below
+            // the player, they are dropped from the picker only.
+            const bool stale = gme::chainTopRarity(mate.base_unit_id) < peak.rarity;
 
-            // user_units.unit_id may carry "_100" suffix on evolved forms;
-            // strip for the MST id on the wire.
-            const auto raw = r["unit_id"].as<std::string>();
-            const auto sep = raw.find('_');
-            int32_t mstId = 0;
-            try { mstId = std::stoi(sep != std::string::npos ? raw.substr(0, sep) : raw); }
-            catch (...) {}
-
-            const int32_t elemId         = friendGet_elementToInt(r["element"].as<std::string>());
-            const int32_t unitLv         = r["unit_lvl"].as<int32_t>();
-            const int32_t baseHp         = r["base_hp"].as<int32_t>();
-            const int32_t addHp          = r["add_hp"].as<int32_t>();
-            const int32_t extHp          = r["ext_hp"].as<int32_t>();
-            const int32_t baseAtk        = r["base_atk"].as<int32_t>();
-            const int32_t addAtk         = r["add_atk"].as<int32_t>();
-            const int32_t extAtk         = r["ext_atk"].as<int32_t>();
-            const int32_t baseDef        = r["base_def"].as<int32_t>();
-            const int32_t addDef         = r["add_def"].as<int32_t>();
-            const int32_t extDef         = r["ext_def"].as<int32_t>();
-            const int32_t baseHeal       = r["base_rec"].as<int32_t>();
-            const int32_t addHeal        = r["add_rec"].as<int32_t>();
-            const int32_t extHeal        = r["ext_rec"].as<int32_t>();
-            const int32_t skillId        = r["skill_id"].as<int32_t>();
-            const int32_t skillLv        = r["skill_lv"].as<int32_t>();
-            const int32_t extraSkillId   = r["extra_skill_id"].as<int32_t>();
-            const int32_t extraSkillLv   = r["extra_skill_lv"].as<int32_t>();
-            const int32_t unitTypeId     = r["unit_type_id"].as<int32_t>();
-            const int32_t loginTimestamp = static_cast<int32_t>(std::time(nullptr));
-
-            // === ReinforcementInfo entry (xZH6EIQ7) — the production-canonical
-            // shape for FriendGet responses.
+            // === ReinforcementInfo (xZH6EIQ7) -- the helper picker.
+            if (!stale)
+            {
             ReinforcementInfo ri{};
-            ri.user_id            = gme::kSyntheticHelperUserId;
-            ri.handle_name        = "DecompFriend";
-            ri.team_lv            = 999;
-            ri.target_lv          = unitLv;
-            ri.friend_type        = 1;                // 1 = friend (UNVERIFIED enum)
-            ri.last_login_date    = loginTimestamp;
-            ri.unit_id            = mstId;
-            ri.base_hp            = baseHp;
-            ri.add_hp             = addHp;
-            ri.ext_hp             = extHp;
-            ri.base_atk           = baseAtk;
-            ri.add_atk            = addAtk;
-            ri.ext_atk            = extAtk;
-            ri.base_def           = baseDef;
-            ri.add_def            = addDef;
-            ri.ext_def            = extDef;
-            ri.base_heal          = baseHeal;
-            ri.add_heal           = addHeal;
-            ri.ext_heal           = extHeal;
-            // THE HONOR GATE, not the amount.  ReinforcementInfo::
-            // getFriendPoint @0x126DDA8 returns 0 flat while this is < 1 and
-            // otherwise reads the 6e4b7sQt singleton below, so a zero here
-            // pinned every card to "Honor +0" no matter what else was sent.
-            // The values match what that singleton will hand back for this
-            // helper, which is a friend (friend_type 1 → existTypeOK).
-            ri.friend_point       = gme::kHonorPerFriendHelper;
+            ri.user_id             = mate.friend_id;
+            ri.handle_name         = mate.handle_name;
+            ri.team_lv             = 999;
+            ri.target_lv           = unit.level;
+            // MUST be 1: existTypeOK @0x12607CC accepts nothing else, and it is
+            // what pays the friend Honor rate instead of the stranger rate.
+            ri.friend_type         = 1;
+            ri.last_login_date     = loginTimestamp;
+            ri.unit_id             = unit.unit_id;
+            ri.base_hp             = unit.base_hp;
+            ri.base_atk            = unit.base_atk;
+            ri.base_def            = unit.base_def;
+            ri.base_heal           = unit.base_rec;
+            ri.friend_point        = gme::kHonorPerFriendHelper;
             ri.normal_friend_point = gme::kHonorPerNormalHelper;
-            ri.skill_id           = skillId;
-            ri.skill_lv           = skillLv;
-            ri.unit_type_id       = unitTypeId;
-            ri.extra_skill_id     = extraSkillId;
-            ri.extra_skill_lv     = extraSkillLv;
-            ri.user_unit_id       = 999999;           // fake friend-row id
-            ri.mission_id         = "";
+            ri.skill_id            = unit.bb_id;
+            ri.skill_lv            = unit.bb_lvl;
+            ri.extra_skill_id      = unit.sbb_id;
+            ri.extra_skill_lv      = unit.sbb_lvl;
+            ri.unit_type_id        = unit.unit_type_id;
+            ri.element             = std::to_string(unit.element);
+            ri.user_unit_id        = gme::kFriendUnitIdBase + static_cast<int32_t>(resp.reinforce_info.size());
+            // The helper's SPHERES.  Ge8Yo32T is setEquipItemID -- it was
+            // documented as setMissionID for a long time, which is why helpers
+            // used to show an empty sphere slot.
+            //
+            // STORED, not re-rolled.  A friend's kit was fixed when they were
+            // added and stays that way however far they evolve; only the second
+            // SLOT opens later, at 7-star.
+            ri.equipitem_id        = mate.sphere_1;
+            ri.equipitem_id2       = unit.rarity >= gme::kSecondSphereRarity
+                                     ? mate.sphere_2 : 0;
             resp.reinforce_info.emplace_back(std::move(ri));
+            }
 
-            // === FriendInfo entry (tojMy68W) — same data into FriendInfoList
-            // for any UI consumer that reads from there.
-            FriendInfo fi{};
-            fi.user_id            = gme::kSyntheticHelperUserId;
-            fi.handle_name        = "DecompFriend";
-            fi.team_lv            = 999;
-            fi.friend_type        = 1;
-            fi.last_login_date    = loginTimestamp;
-            fi.unit_id            = mstId;
-            fi.unit_lv            = unitLv;
-            fi.base_hp            = baseHp;
-            fi.add_hp             = addHp;
-            fi.ext_hp             = extHp;
-            fi.base_atk           = baseAtk;
-            fi.add_atk            = addAtk;
-            fi.ext_atk            = extAtk;
-            fi.base_def           = baseDef;
-            fi.add_def            = addDef;
-            fi.ext_def            = extDef;
-            fi.base_heal          = baseHeal;
-            fi.add_heal           = addHeal;
-            fi.ext_heal           = extHeal;
-            fi.skill_id           = std::to_string(skillId);
-            fi.skill_lv           = skillLv;
-            fi.extra_skill_id     = std::to_string(extraSkillId);
-            fi.extra_skill_lv     = extraSkillLv;
-            fi.unit_type_id       = unitTypeId;
-            fi.element            = elemId;
-            fi.friend_id          = "DECOMP01";
-            fi.friend_message     = "GG WP";
-            fi.favorite           = 1;
-            fi.priority           = 1;
-            fi.deck_no            = 0;
-            fi.guild_id           = 0;
-            resp.friend_info.emplace_back(std::move(fi));
-
-            LOG_INFO << "FriendGet: returning 1 friend (unit " << mstId
-                     << " lv " << unitLv << ") under both xZH6EIQ7 and tojMy68W";
         }
-        else
+
+        // The Social list, built by the one shared function FriendApply also
+        // uses -- tojMy68W is a full replace, so the two senders must agree.
+        resp.friend_info = gme::socialList(roster, peak);
+
+        // Emitting a stranger card.  Shared by the developer encounter and the
+        // ordinary suggestions: the only thing that differs is which reserved
+        // user_unit_id block they draw from.
+        //
+        // STRANGERS GO IN THE PICKER ONLY, and that is load-bearing.
+        // MissionResultFriendRequestScene::initialize @0x18C16BC offers to add
+        // the helper you just borrowed only when FriendInfoList::exist() says
+        // they are NOT already a friend -- so putting any of these in the Social
+        // list would answer that question "yes" and suppress the very prompt
+        // that recruits them.
+        //
+        // friend_type is NOT 1 here: they are strangers until recruited, which
+        // is honest and means borrowing one pays the stranger Honor rate.
+        // Befriending them is the upgrade.
+        const auto addStranger = [&](const gme::FriendRow& who, int32_t userUnitId) -> bool {
+            const auto unit = gme::friendUnitFor(who, peak);
+            if (unit.unit_id == 0)
+                return false;
+
+            ReinforcementInfo ri{};
+            ri.user_id             = who.friend_id;
+            ri.handle_name         = who.handle_name;
+            ri.team_lv             = 999;
+            ri.target_lv           = unit.level;
+            ri.friend_type         = 0;   // a stranger, for now
+            ri.last_login_date     = loginTimestamp;
+            ri.unit_id             = unit.unit_id;
+            ri.base_hp             = unit.base_hp;
+            ri.base_atk            = unit.base_atk;
+            ri.base_def            = unit.base_def;
+            ri.base_heal           = unit.base_rec;
+            // Both at the stranger rate: getFriendPoint gates on the row being
+            // >= 1 and then takes the amount from the 6e4b7sQt singleton
+            // according to existTypeOK, which says "not a friend" for these.
+            ri.friend_point        = gme::kHonorPerNormalHelper;
+            ri.normal_friend_point = gme::kHonorPerNormalHelper;
+            ri.skill_id            = unit.bb_id;
+            ri.skill_lv            = unit.bb_lvl;
+            ri.extra_skill_id      = unit.sbb_id;
+            ri.extra_skill_lv      = unit.sbb_lvl;
+            ri.unit_type_id        = unit.unit_type_id;
+            ri.element             = std::to_string(unit.element);
+            ri.user_unit_id        = userUnitId;
+            // A STRANGER'S kit is rolled on the spot, seeded on who they are
+            // and the day, so what the picker shows is stable while the player
+            // is looking at it and is exactly what gets locked in if they
+            // befriend them -- rollFriendSpheres is seeded on the friend id
+            // alone, and that is the same id recruitFriend stores under.
+            const auto spheres     = gme::rollFriendSpheres(
+                who.friend_id, gme::chainTopRarity(who.base_unit_id));
+            ri.equipitem_id        = spheres.first;
+            ri.equipitem_id2       = unit.rarity >= gme::kSecondSphereRarity
+                                     ? spheres.second : 0;
+            resp.reinforce_info.emplace_back(std::move(ri));
+            return true;
+        };
+
+        // TODAY'S DEVELOPER ENCOUNTER -- the easter egg, at the head of the
+        // strangers so it is findable rather than buried mid-list.
+        if (const auto met = gme::devEncounterFor(roster, identity.userId, gme::giftToday()))
         {
-            LOG_WARN << "FriendGet: no units in inventory — returning empty friend list";
+            const gme::FriendRow asRow{ gme::devFriendId(*met), met->name, met->base_unit_id, 1, 0 };
+            if (addStranger(asRow, gme::kEncounterUnitId))
+            {
+                LOG_INFO << "FriendGet: " << met->name << " is out there today, fielding "
+                         << met->unit;
+            }
         }
+
+        // THE OTHER SUMMONERS.  Without these the picker only ever shows people
+        // the player already knows, and the post-mission "add as a friend?"
+        // prompt -- which only fires for a helper FriendInfoList::exist() says
+        // is NOT a friend -- can never come up at all.
+        const auto strangers =
+            gme::strangerSuggestions(roster, identity.userId, gme::giftToday(), peak);
+        int32_t offered = 0;
+        for (const auto& who : strangers)
+        {
+            if (addStranger(who, gme::kStrangerUnitIdBase + offered))
+                ++offered;
+        }
+
+        LOG_INFO << "FriendGet: " << resp.reinforce_info.size() << " pickable ("
+                 << offered << " stranger(s)) of " << resp.friend_info.size()
+                 << " friend(s) for " << identity.userId
+                 << " at peak r" << peak.rarity << " lv " << peak.level;
     }
     catch (const drogon::orm::DrogonDbException& ex)
     {
-        LOG_WARN << "FriendGet: friend query failed: " << ex.base().what();
+        LOG_WARN << "FriendGet: roster query failed: " << ex.base().what();
     }
 
     // What each of those cards is worth (6e4b7sQt).  A SINGLETON the client

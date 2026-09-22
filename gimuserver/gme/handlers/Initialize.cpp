@@ -4,7 +4,9 @@
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/BraveSlots.hpp>
+#include <gimuserver/gme/common/MstVersions.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
+#include <gimuserver/gme/common/DailyTask.hpp>
 
 HANDLEF(Initialize)
 {
@@ -48,6 +50,41 @@ HANDLEF(Initialize)
 	//resp.user_info.gumi_live_userid = req.user_info.gumi_live_userid;
 
 	resp.signal_key.key = "C7vnXA5T";
+
+	// The MST version/download channel (KeC10fuL).
+	//
+	// ⚠ MERGE, NEVER REPLACE.  `resp` is a copy of the cached Initialize
+	// response, and that already carries the 169 rows of
+	// deploy/mst/version_info_mst.json -- the BASELINE versions the client's
+	// existing cache is matched against (M_LEVEL_MST v19, M_GACHA_MST v952,
+	// and so on).
+	//
+	// This line used to be a plain assignment, on the reasoning that "an empty
+	// list is the correct 'nothing to update' answer".  It is not.  Handing the
+	// client an empty version table for data it has already cached tells it
+	// every one of those tables is unknown, and it answers by refreshing the
+	// lot: "Refreshing the latest data files. Application will close now." --
+	// then does it again on the next boot, forever.  The client never even
+	// reached the home screen.
+	//
+	// It is the exact failure this session's audit keeps finding: a plausible
+	// value overwriting real state, healthy-looking on the wire.
+	//
+	// So: keep the baseline, and let a staged download table override its row.
+	{
+		auto staged = gme::mstVersions();
+		for (auto& row : staged)
+		{
+			const auto it = std::find_if(resp.mst.begin(), resp.mst.end(),
+				[&row](const ::VersionInfo& base) { return base.id == row.id; });
+			if (it != resp.mst.end())
+				*it = std::move(row);
+			else
+				resp.mst.push_back(std::move(row));
+		}
+		LOG_INFO << "Initialize: MST versions = " << resp.mst.size()
+			<< " row(s) (" << staged.size() << " from staged downloads)";
+	}
 
 	resp.challenge_arena_user_info.user_id = "n9ZMPC0t"; // rank name?
 	resp.challenge_arena_user_info.unkstr2 = "F"; // ranking?
@@ -102,7 +139,11 @@ HANDLEF(Initialize)
 	resp.daily_login_rewards.user_current_count = gme::kDailySpinLimit;
 	resp.daily_login_rewards.user_spin_limit_count = gme::kDailySpinLimit;
 	resp.daily_login_rewards.next_reward_id = gme::dailySpinAnchor(2);
-	resp.daily_login_rewards.message = " day(s) more to guaranteed Gem!";
+	{
+		auto label = gme::dailySpinGemLabel(1);
+		resp.daily_login_rewards.remaining_days_till_guaranteed_reward = std::move(label.counter);
+		resp.daily_login_rewards.message = std::move(label.message);
+	}
 
 	if (!identity.userId.empty())
 	{
@@ -111,20 +152,40 @@ HANDLEF(Initialize)
 		// both roll over on the same UTC clock.
 		co_await gme::grantDailyBraveMedals(theDb(), identity);
 
+		// DAILY TASKS.  ⚠ Initialize ships the RAW six-row table straight out
+		// of the cache and the client takes the first three, so the Home popup
+		// showed AV/QE/VV (file order) while the Rewards screen showed the real
+		// rotation — two different boards in one session.  Worse, the popup's
+		// first tile was Arena Victory, which this server cannot count at all.
+		// Both screens now come from the same builder.
+		co_await gme::fillDailyTaskTables(
+			theDb(), identity, resp.daily_tasks, resp.daily_task_prizes);
+
 		const auto spin = co_await gme::loadDailySpin(theDb(), identity);
 		// ⚠ These two are REWARD IDS, not day numbers.  The client groups the
 		// wheel by the row this id belongs to, so a day number here draws a
 		// different day's prizes than the spin scores against — sending 7 drew
 		// day 2's wheel (200,000 Karma and all) while the spin ran on day 7.
-		resp.daily_login_rewards.id = gme::dailySpinAnchor(spin.spinDay);
+		//
+		// ⚠ THE PAIR IS "last prize / wheel in front of you", NOT "today /
+		// tomorrow".  The client draws next_reward_id's group whenever it
+		// differs from id's (setupSpinWheelRewards @0xE52778), so this line
+		// sending today's anchor as BOTH pinned the wheel to `id` — which
+		// happened to be right only while the two were the same day.  See
+		// gme::dailySpinWheel, which also keeps `id` resolvable: the client
+		// calls getGroupType() on it with no null check.
+		const auto wheel = gme::dailySpinWheel(spin);
+		resp.daily_login_rewards.id = wheel.id;
+		resp.daily_login_rewards.next_reward_id = wheel.nextRewardId;
 		resp.daily_login_rewards.current_day = spin.spinDay;
 		resp.daily_login_rewards.user_current_count = spin.spinsUsed;
-		resp.daily_login_rewards.next_reward_id = gme::dailySpinAnchor(spin.spinDay + 1);
-		// Distance to the next guaranteed Gem — the live game gave one on the
-		// first spin of days 7 / 14 / 21 / 28.  Prepended to the message by the
-		// client, giving "N day(s) more to guaranteed Gem!".
-		resp.daily_login_rewards.remaining_days_till_guaranteed_reward =
-			(7 - (spin.spinDay % 7)) % 7;
+		// Distance to the next guaranteed Gem, BOTH HALVES EMPTY once none is
+		// left — see dailySpinGemLabel.  Shared with the DailyLogin handler
+		// deliberately; computing it in two places is how the reward id came to
+		// be right in one emitter and wrong in the other.
+		auto label = gme::dailySpinGemLabel(spin.spinDay);
+		resp.daily_login_rewards.remaining_days_till_guaranteed_reward = std::move(label.counter);
+		resp.daily_login_rewards.message = std::move(label.message);
 	}
 
 	std::string buffer{};
