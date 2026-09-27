@@ -1,5 +1,15 @@
 # Gameplay fixes and portable Debug builds — September 27, 2026
 
+## Guild follow-up
+
+Server `4e23268` and packet-generator `2efdaa5` are published to their respective
+mine/main branches. Invites are now player-confirmed working without a crash.
+The follow-up corrects rank IDs, quoted request numbers and the promotion reply:
+it no longer replaces the roster while the client still holds a member object.
+Promotion/demotion, dismissal, re-inviting and leaving passed isolated-save tests.
+Rank labels and promotion still await a client retest. The handbook includes a
+new-chat handoff and identifies GuildUpdate as the next unfinished guild handler.
+
 ## Confirmed in the Windows client
 
 - Burst Queen fusion raises BB and SBB to level 10 and unlocks UBB on an eligible unit.

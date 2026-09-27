@@ -9,6 +9,29 @@ Latest verified changes and build instructions are summarized in
 Tilith framing and exchange expiry fixes now have player confirmation. Research
 Lab encounter work remains server/model-tested pending client playthroughs.
 
+## New-chat handoff: guild fixes, September 27
+
+- Published gameplay fix: server `4e23268`, packet-generator `2efdaa5`, both
+  on the maintainer's `mine/main`. Verify current HEAD before making changes.
+- Inviting friends is player-confirmed working without a crash. Rank labels
+  and promotion are fixed and server-tested, but still need a client retest.
+  Ranks are Guild Master=1, Vice Guild Master=2, Officer=3, Member=4.
+- GuildMemberUpdate must acknowledge with `{}` rather than sending a replacement
+  roster: the active client screen edits its existing member object itself.
+  Requests encode guild ids and member ranks as strings. Preserve both contracts.
+- The guild regression suite was rerun successfully on a fresh copy of the live
+  save, covering invites, promotions, demotion, refusal, dismissal, re-invite and
+  leaving. The live save and running server were not changed by that verification.
+- Next bounded guild task: investigate GuildUpdate (Disband and guild metadata
+  edits), which remains a stub. Recover its request and response consumers before
+  implementing it. See [guild evidence and remaining gaps](features/GUILD_INVITE_2026-09-26.md).
+  For a separate gameplay task, continue the Research Lab queue after reading
+  its completed encounter reports; do not recreate Trials 001–003.
+
+Client retest: reconnect using the current server, verify rank labels, promote
+a Member to Officer and then Vice Guild Master, demote once, and dismiss a
+member. Record actual observations separately from wire-test results.
+
 ## Current direction
 
 Players are now chiefly finding gameplay problems. Prioritize correct encounters,
