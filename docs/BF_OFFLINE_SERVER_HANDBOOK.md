@@ -43,6 +43,115 @@ them. Publish schema commits in packet-generator before updating the parent
 pointer. Do not include live saves, extracted clients, multi-gigabyte assets, or
 reverse-engineering dumps in a source commit.
 
+## Working in Claude Code
+
+Procedure for an AI coding session on the maintainer's Windows machine. The
+maintainer plays the Windows client against the live server and reports what
+they see; the session builds, tests on copies, deploys and documents.
+
+**Start of a session.** Read this handbook, the work queue and the feature note
+for the area you touch. Then check for parallel work before building:
+`git status` in both repositories, other running sessions (Claude Code's agent
+list), and whether `CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG` is set in
+`out/build/debug-win64/CMakeCache.txt` (another session may be testing). The
+server state is `tools/bin/bf_ctl.ps1 -Target server -Action status`.
+
+**Local-only tools.** Everything under `tools/` is git-ignored and exists only on
+the maintainer's machine; a fresh checkout has none of it. `pwsh` is not
+installed: run scripts as `powershell -NoProfile -ExecutionPolicy Bypass -File …`.
+
+| Need | Tool (tools/…) |
+|---|---|
+| Start/stop/status of the live server (handles its forked child and the port check) | `bin/bf_ctl.ps1` |
+| arm64 client: symbols, disassembly, callers through the PLT, string-literal users | `bin/so_symbols.py`, `bin/so_disasm.py`, `bin/so_xref.py`, `bin/so_strref.py` |
+| Request GroupId + AES key for every Request class | `bin/so_groupids.py` |
+| Every key a `…Response::readParam` accepts, with its setter | `readparam_map.py <Response> <vtable symbol>` |
+| Windows crash dumps (`%LOCALAPPDATA%\CrashDumps`): genuine return addresses; x86 code and strings near an RVA | `bin/dmp_stack.py`, `bin/pe_disasm.py <rva> [n] --strings` |
+| Screenshot the client window | `bin/client_shot.ps1` |
+
+The client binaries sit beside this checkout on the maintainer's machine:
+`..\BraveFrontier-APK\lib\arm64-v8a\libgame.so` (symbols; the reference for
+semantics) and `..\BraveFrontierAppxClient\BraveFrontier.Windows.exe` (what
+actually runs; stripped). Map a Windows crash to arm64 through the string
+literals both builds share. Offsets differ between them.
+
+**Build while the live server runs.** From bash, export `LIB`/`INCLUDE` for the
+installed MSVC and Windows SDK (or use `rebuild.bat`, which imports them).
+The running server locks its EXE, so build into a scratch directory with
+`cmake -S . -B out/build/debug-win64 -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=<dir>`.
+That variable sits in the shared cache: every session's build goes there
+until it is removed with `-UCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG`. **Any** KDL edit,
+documentation included, regenerates `all.hpp` and rebuilds all 205 steps
+(about 20 minutes at two or three jobs), so batch schema edits.
+
+**Test on copies, never the live save.** Copy `deploy/gme.sqlite` with SQLite's
+backup API into a folder under `out/`, next to a config listening on 19960 or
+19962 with `"filename": "./gme.sqlite"`. **Pass that config's absolute path as
+the EXE's first argument.** Debug builds otherwise load `deploy/config.json`,
+which binds the live port 9960 and opens the live save; on Windows the
+second bind succeeds silently. Confirm `starts listening on 127.0.0.1:19960` in
+the test server's log before sending anything, and stop test servers by EXE
+path or process tree, never by name. Encrypted request helpers are in every
+`scripts/test_*_wire.py`. Run the existing suites that touch your area too:
+
+| Suite | Port | Covers |
+|---|---|---|
+| `test_research_lab_wire.py` | 19960 | Trials 001–003, The Creation God: payloads, unlocks, pay rules |
+| `test_research_lab_ai.py` (no server) | — | Every authored boss AI against `ai_model.py` |
+| `test_guild_invite_wire.py` | 19960 | Invite candidates, GuildJoin, member ranks |
+| `test_exchange_ui_wire.py`, `test_fusion_merit.py` | 19960 | Exchanges, fusion, Bazaar |
+| `test_feature_visits_wire.py`, `test_synthesis_wire.py` | 19962 | Feature visits, synthesis transactions |
+| `validate_missions.py`, `audit_handlers.py` (no server) | — | Mission archive checks, handler registrations |
+
+**Deploy after every tested change.** The maintainer tests in the client and
+does not run the build. Back up the live save (backup API; the server may stay
+up), stop the server with `bf_ctl.ps1 -Action stop`, remove the runtime
+directory override, build in-tree (a relink if nothing else changed), start with
+`-Action start`, confirm it is listening, and report the EXE's timestamp.
+Stopping the server drops the client's connection; the maintainer reconnects.
+
+**Client contracts that cost a test round each:**
+
+- Every handler error and every unregistered GroupId **closes the client's
+  session**. Answer a refusal with a normal reply and log it.
+- The client sends **every number in a request as a string**:
+  `JsonNode::addParam(const char*, int)` @0xFDB82C is `IntToString` plus the
+  string overload. Model request numbers as `i32::str`. An `i32::int` request
+  field stops glaze at that field; the handler runs on a half-read request and
+  the only trace is a `parse error` warning in `deploy/log/server_stdout.log`.
+  Wire tests must send strings too, or they pass while the client fails (this
+  hid a guild promote bug and the guild shop and Bazaar purchase counts).
+- Many lists are **full replaces** (cleared on row 0). Send them complete. A
+  zero-row array never reaches `readParam`, so a list cannot be emptied.
+- A reply can **free objects a screen still holds**. After an edit the client
+  often updates its own cache (the member screen sets the new rank itself); a
+  roster in that reply cleared the list first and the promote crashed.
+- Find the request a button **actually sends** (`so_xref` on its Request's
+  `setRequestValues`) before building a handler. Inviting is `GuildJoin`, not
+  `GuildMemberUpdate`; that assumption survived a "wire-verified" slice.
+- A screen reached from a list may need a **second list keyed by the same id**
+  (the invite profile's `8lAroepR` beside the cards' `fRaBu6et`).
+- Unit art: image variant 2 and up appends `_N` to the file name; most units
+  ship no such file, and a missing texture crashes. Guild cards send 1.
+- Archive JSON loaders are strict: one unknown key (even a `_doc` note) leaves
+  that archive empty while handlers still reply successfully.
+- Transforming and multi-boss fights are driven by the client's own
+  `F_MISSION_SCRIPT_MST`; decrypt that row first. Boss AI grammar and the test
+  model are in `packet-generator/assets/archive/ai.kdl` and `scripts/ai_model.py`.
+
+**Publishing.** Commit only when the maintainer asks. Both repositories work on
+`audit-campaign`; `mine` is the maintainer's fork (Seltraeh/server,
+Seltraeh/packet-generator) and `origin` is upstream decompfrontier (do not push
+there). Commit and push packet-generator first (`git push mine
+audit-campaign:main`), then the parent with the updated submodule pointer. Stage
+source, authored data and docs by name; never live saves, `*.bak*` backups,
+`out/`, `deploy/log/`, `deploy/mst_download_staging/` or client assets.
+
+**Session notes.** Claude Code's per-project memory (outside the repository)
+holds the maintainer's standing preferences and longer histories; this handbook
+and the feature notes are the shared record. When they disagree, re-check the
+source and fix whichever is stale.
+
 ## What was established on September 25
 
 | Area | Evidence and remaining limits |

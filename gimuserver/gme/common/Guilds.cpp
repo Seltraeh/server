@@ -144,9 +144,9 @@ drogon::Task<std::optional<GuildRow>> createGuild(
 
 	// The founder is a MEMBER, not just an owner -- see the header.
 	co_await database->execSqlCoro(
-		"INSERT OR IGNORE INTO user_guild_members (guild_id, member_id, joined_day)"
-		" VALUES ($1, $2, $3);",
-		guildId, identity.userId, today);
+		"INSERT OR IGNORE INTO user_guild_members (guild_id, member_id, joined_day, member_type)"
+		" VALUES ($1, $2, $3, $4);",
+		guildId, identity.userId, today, kGuildRankMaster);
 
 	LOG_INFO << "Guilds: " << identity.userId << " founded \"" << name << "\" (guild " << guildId << ")";
 	co_return co_await guildById(database, guildId);
@@ -192,9 +192,9 @@ drogon::Task<int32_t> inviteFriends(
 		}
 
 		const auto result = co_await database->execSqlCoro(
-			"INSERT OR IGNORE INTO user_guild_members (guild_id, member_id, joined_day)"
-			" VALUES ($1, $2, $3);",
-			guild->guild_id, id, today);
+			"INSERT OR IGNORE INTO user_guild_members (guild_id, member_id, joined_day, member_type)"
+			" VALUES ($1, $2, $3, $4);",
+			guild->guild_id, id, today, kGuildRankMember);
 		if (result.affectedRows() > 0)
 		{
 			++joined;
@@ -255,7 +255,8 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 	const auto now = static_cast<int64_t>(std::time(nullptr));
 
 	for (const auto& row : co_await database->execSqlCoro(
-		"SELECT member_id FROM user_guild_members WHERE guild_id = $1 ORDER BY joined_day, member_id;",
+		"SELECT member_id, member_type FROM user_guild_members WHERE guild_id = $1"
+		" ORDER BY joined_day, member_id;",
 		guild->guild_id))
 	{
 		const auto memberId = row["member_id"].as<std::string>();
@@ -263,6 +264,11 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 		::GuildMemberInfo info{};
 		info.guild_id = guild->guild_id;
 		info.user_id = memberId;
+		// Anything outside the named ranks would draw an unnamed rank, which is
+		// exactly what the old hard-coded 0 did.
+		const auto stored = row["member_type"].as<int32_t>();
+		info.member_type = (stored >= kGuildRankVice && stored <= kGuildRankMember)
+			? stored : kGuildRankMember;
 		info.last_online = now;
 		info.active_guild_deck = 1;
 		const auto wallet = co_await database->execSqlCoro("SELECT guild_tokens FROM user_info WHERE id=$1;", memberId);
@@ -310,10 +316,8 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 				// nonexistent assets. Guild cards use the base artwork.
 				info.unit_img_type = 1;
 			}
-			// Guild master.  // UNVERIFIED: the member_type vocabulary is not
-			// recovered; 1 is used for the founder and 0 for everyone else so the
-			// two are at least distinguishable on screen.
-			info.member_type = 1;
+			// The owner is always the Guild Master, whatever the row says.
+			info.member_type = kGuildRankMaster;
 			out.push_back(std::move(info));
 			continue;
 		}
@@ -355,6 +359,71 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 	}
 
 	co_return out;
+}
+
+drogon::Task<GuildMemberChange> updateGuildMember(
+	const db::Database database,
+	const UserIdentity identity,
+	const std::string memberId,
+	const int32_t memberType)
+{
+	const auto guild = co_await loadGuild(database, identity);
+	if (!guild || guild->owner_user_id != identity.userId)
+	{
+		LOG_WARN << "Guilds: " << identity.userId << " does not lead a guild; member update ignored";
+		co_return GuildMemberChange::Refused;
+	}
+
+	if (memberId == identity.userId)
+	{
+		if (memberType != kGuildRankRemoved)
+		{
+			LOG_WARN << "Guilds: " << identity.userId << " asked to change their own rank to "
+				<< memberType << "; the owner stays Guild Master";
+			co_return GuildMemberChange::Refused;
+		}
+		// Leaving your own guild ends it: there is nobody to hand it to.
+		co_await database->execSqlCoro(
+			"DELETE FROM user_guild_members WHERE guild_id = $1;", guild->guild_id);
+		co_await database->execSqlCoro(
+			"DELETE FROM user_guilds WHERE guild_id = $1;", guild->guild_id);
+		LOG_INFO << "Guilds: " << identity.userId << " left guild " << guild->guild_id
+			<< " (\"" << guild->name << "\"), which is dissolved";
+		co_return GuildMemberChange::Dissolved;
+	}
+
+	if (memberType == kGuildRankRemoved)
+	{
+		const auto removed = co_await database->execSqlCoro(
+			"DELETE FROM user_guild_members WHERE guild_id = $1 AND member_id = $2;",
+			guild->guild_id, memberId);
+		if (removed.affectedRows() == 0)
+		{
+			LOG_WARN << "Guilds: " << memberId << " is not in guild " << guild->guild_id << "; dismissal ignored";
+			co_return GuildMemberChange::Refused;
+		}
+		LOG_INFO << "Guilds: " << identity.userId << " dismissed " << memberId
+			<< " from guild " << guild->guild_id;
+		co_return GuildMemberChange::Dismissed;
+	}
+
+	if (memberType < kGuildRankVice || memberType > kGuildRankMember)
+	{
+		LOG_WARN << "Guilds: rank " << memberType << " for " << memberId
+			<< " refused (only 2-4 can be given; 1 would hand the guild over)";
+		co_return GuildMemberChange::Refused;
+	}
+
+	const auto updated = co_await database->execSqlCoro(
+		"UPDATE user_guild_members SET member_type = $1 WHERE guild_id = $2 AND member_id = $3;",
+		memberType, guild->guild_id, memberId);
+	if (updated.affectedRows() == 0)
+	{
+		LOG_WARN << "Guilds: " << memberId << " is not in guild " << guild->guild_id << "; rank change ignored";
+		co_return GuildMemberChange::Refused;
+	}
+	LOG_INFO << "Guilds: " << memberId << " is now rank " << memberType << " in guild " << guild->guild_id;
+	co_return GuildMemberChange::RankSet;
 }
 
 namespace

@@ -171,21 +171,20 @@ HANDLEF(GuildRecomendedMember)
 	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
 
-// GuildMemberUpdate (ad81b8at).
+// GuildMemberUpdate (ad81b8at) -- rank changes, dismissals and leaving.
 //
-// ⚠ NOT THE INVITE, although it was built as one.  The client sends it only from
-// the Hall, the member screen and GuildTeamScene2 -- with the player's OWN id
-// beside GUILD_DISBAND_CONFIRMATION_OK -- so it is leaving, disbanding and rank
-// changes.  Inviting is GuildJoin, below.  Treated as an invite, those actions
-// are currently no-ops (the ids are already members, or not on the roster).
+// NOT the invite (that is GuildJoin, below).  The member screen
+// (GuildMemberInfoScene::updateEvent @0x1DD36B8) sends the member's id with
+// their current type - 1 to promote, + 1 to demote, or 0 to dismiss; the Hall
+// and GuildTeamScene2 send the player's OWN id with 0 to leave.  Ranks: see
+// kGuildRank* in Guilds.hpp.
 //
-// AUTHORED: they always accept.  A real invite was a request the other player
-// answered; the Summoners here are simulated, so there is nobody to ask, and a
-// chance of refusal would be a dice roll wearing a social system's clothes.
-//
-// The reply is the refreshed guild, because the member count on the screen the
-// player is looking at has just changed and GuildInfoResponse is the only thing
-// that updates it.
+// ⚠ THE REPLY MUST NOT CARRY THE ROSTER.  After the reply the client updates
+// its own copy: noticeOK @0x1DD3DD4 looks the member up again by id and sets
+// type - 1 / + 1 on it, and a dismissal removes the object and lowers the
+// member count itself.  A roster in the reply (csIuech30) replaces the member
+// list first, so the lookup came back null and the promote crashed with
+// `write 0x284` (2026-09-27 dump; 0x284 is GuildMemberInfo's member type).
 HANDLEF(GuildMemberUpdate)
 {
 	(void)session;
@@ -197,32 +196,23 @@ HANDLEF(GuildMemberUpdate)
 	}
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	std::vector<std::string> ids;
 	for (const auto& node : req.members)
 	{
-		if (!node.user_id.empty())
-			ids.push_back(node.user_id);
+		if (node.user_id.empty())
+			continue;
+		int32_t memberType = -1;
+		try { memberType = std::stoi(node.value); }
+		catch (const std::exception&)
+		{
+			LOG_WARN << "GuildMemberUpdate: unparseable member type \"" << node.value
+				<< "\" for " << node.user_id;
+			continue;
+		}
+		co_await gme::updateGuildMember(theDb(), identity, node.user_id, memberType);
 	}
 
-	const auto joined = co_await gme::inviteFriends(theDb(), identity, ids);
-	LOG_INFO << "GuildMemberUpdate: " << joined << " of " << ids.size()
-		<< " invite(s) accepted for " << identity.userId;
-
-	const auto guild = co_await gme::loadGuild(theDb(), identity);
-	if (!guild)
-		co_return HandleResult::success("{}");
-
-	const auto handle = (co_await db::DatabaseInterface::read(
-		theDb(), "user_info",
-		{ db::Data("username"), db::Lookup("id", identity.userId) }))
-		.front<std::string>("username");
-
-	::GuildInfoResp resp{};
-	resp.guild.push_back(gme::guildInfoBlock(*guild, handle));
-	resp.members = co_await gme::guildRoster(theDb(), identity);
-	resp.exchange_mst = theServer()->cache().guildPointExchangeMst();
-	resp.exchange_stock = co_await gme::loadGuildExchangeStock(theDb(), identity);
-	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+	// Refusals answer the same way: every handler error closes the session.
+	co_return HandleResult::success("{}");
 }
 
 // GuildJoin (bfa2D1bp) -- the Invite to Guild button.

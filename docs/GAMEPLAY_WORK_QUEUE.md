@@ -167,7 +167,7 @@ These are audit candidates, not confirmed defects:
 |---|---|
 | Quest/Vortex/Grand Quest | Entry gates, waves, stories, branching objectives, map state, drops and completion; implement one complete route. |
 | Arena/Colosseum | Opponent generation, squad restrictions, scoring, rank rewards, orbs and failure; verify one match lifecycle. |
-| Raid/Guild | Room/party model suitable for offline play, raid maps, boss phases, crafting drops and token earnings; label simulated multiplayer policy. |
+| Raid/Guild | Room/party model suitable for offline play, raid maps, boss phases, crafting drops and token earnings; label simulated multiplayer policy. Invites, ranks and member management are built ([features/GUILD_INVITE_2026-09-26.md](features/GUILD_INVITE_2026-09-26.md)); GuildUpdate (Disband, name/description/insignia edits) is still a stub. |
 | Frontier Hunter/Gate/Rift/Spire | Scoring, stage restrictions, checkpoints, defeat/retry and reward tiers; separate each mode. |
 | Summoner mode | Weapon/element leveling, avatar skills, SP, journal and mission eligibility; verify one progression chain. |
 | Town/crafting | Facility upgrades, harvest timers, recipe unlocks, crafting quantities and rare ingredients; distinguish missing textures from missing rules. |

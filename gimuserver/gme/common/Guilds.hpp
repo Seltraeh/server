@@ -45,6 +45,29 @@ struct GuildRow
 };
 
 /*!
+* A member's rank, GuildMemberInfo.member_type (gr48vsdJ).  BINARY-CONFIRMED:
+* GameUtils::getNameOfGuildRank @0x1EC4178 builds the text key
+* GUILD_RANK_NAME_<n>, and the client's string table names 1..4 only.  LOWER
+* IS HIGHER: GuildMemberInfoScene::updateEvent @0x1DD36B8 sends type - 1 to
+* promote and type + 1 to demote, and 0 to dismiss (or, with the player's own
+* id, to leave).
+*/
+inline constexpr int32_t kGuildRankMaster = 1;   // "Guild Master"
+inline constexpr int32_t kGuildRankVice = 2;     // "Vice Guild Master"
+inline constexpr int32_t kGuildRankOfficer = 3;  // "Officer"
+inline constexpr int32_t kGuildRankMember = 4;   // "Member"
+inline constexpr int32_t kGuildRankRemoved = 0;  // GuildMemberUpdate: dismiss / leave
+
+/*! What a GuildMemberUpdate node did. */
+enum class GuildMemberChange
+{
+	RankSet,     // a member's rank changed
+	Dismissed,   // a member was removed by the player
+	Dissolved,   // the player left the guild they own, which ends it
+	Refused,     // nothing changed (see the log line)
+};
+
+/*!
 * What founding a guild costs.  AUTHORED.
 *
 * GuildCreateCostResponse recovers the SHAPE of the fee -- a currency type and
@@ -175,6 +198,27 @@ drogon::Task<int32_t> inviteFriends(
 drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 	const db::Database database,
 	const UserIdentity identity);
+
+/*!
+* Apply one GuildMemberUpdate node: set a member's rank, dismiss them, or --
+* with the caller's own id and 0 -- leave.
+*
+* The caller always owns their guild here (nobody else runs one), so they are
+* its Guild Master and may manage everyone else.  AUTHORED: ranks 2-4 can be
+* given; making someone Guild Master (a hand-over) is refused, because the
+* other side is a simulated friend who cannot run a guild.  For the same
+* reason leaving your own guild dissolves it rather than handing it on.
+*
+* @param database  Database client or transaction.
+* @param identity  Resolved user.
+* @param memberId  Whose membership (h7eY3sAK).
+* @param memberType The requested rank (gr48vsdJ), 0 to remove.
+*/
+drogon::Task<GuildMemberChange> updateGuildMember(
+	const db::Database database,
+	const UserIdentity identity,
+	const std::string memberId,
+	int32_t memberType);
 
 /*!
 * The friends the caller could still invite -- the whole GuildRecomendedMember

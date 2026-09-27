@@ -143,7 +143,7 @@ for token in (8, 13, 61):
 def event_buy(nodes, error=False):
     return call('SLf48fs0', 'Odiel30s', {'c2Sls4DD': nodes}, error)
 def event_node(offer_id, count, token=13):
-    return {'Kd3DL39d': offer_id, 'H6k1LIxC': count, 'Slkc395l': str(token)}
+    return {'Kd3DL39d': offer_id, 'H6k1LIxC': str(count), 'Slkc395l': str(token)}
 def wallet(token=13):
     return db.execute('SELECT count FROM user_event_tokens WHERE user_id=? AND token_id=?', (user, str(token))).fetchone()[0]
 before = wallet()
@@ -173,7 +173,7 @@ assert len(result['nMe3ai17']) == 121
 guild_offer = next(r for r in result['baD81eqw'] if r['qBAb07rh'].startswith('6:') and int(r['S8rdp9zk']) > 1)
 gid, price, limit = int(guild_offer['Yxo3bEic']), int(guild_offer['3EWLm0sA']), int(guild_offer['S8rdp9zk'])
 def guild_buy(count, error=False):
-    return call('38adiJeb', 'ja3biAqb', {'ah82D1iq': [{'Yxo3bEic': gid, 'H6k1LIxC': count}]}, error)
+    return call('38adiJeb', 'ja3biAqb', {'ah82D1iq': [{'Yxo3bEic': str(gid), 'H6k1LIxC': str(count)}]}, error)
 guild_buy(limit+1, error=True)
 result = guild_buy(1)
 assert len(result['qC2tJs4E']) == 1

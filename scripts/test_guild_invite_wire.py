@@ -3,14 +3,21 @@
     python scripts/test_guild_invite_wire.py out/guild-invite-tests-2026-09-26/gme.sqlite
 
 The save must be a FRESH COPY under out/ (sqlite3's backup API) whose player
-already leads a guild and has at least two invitable friends; the test
-invites one of them.
+already leads a guild and has at least two friends; the test empties that
+guild down to its founder first, then invites one of them.
 
 The 2026-09-26 crash: tapping a candidate in the Guild Hall makes
 GuildHallScene::touchEnded look the candidate up in the list 8lAroepR fills
 and clone() the result with no null check.  The server sent only the cards
 (fRaBu6et), so the lookup returned null.  The invite button then sends
 GuildJoin (bfa2D1bp) with request type 2, which was a `{}` stub.
+
+The 2026-09-27 crash: promoting a member sends GuildMemberUpdate (ad81b8at)
+with the member's type - 1; the reply carried the roster, which clears the
+client's member list, and the member screen then updated a freed member.
+Ranks are GUILD_RANK_NAME_1..4 (Guild Master, Vice, Officer, Member); the
+server used to send 0 for every friend.  The last section dissolves the
+copied save's guild, so it runs last.
 """
 import base64
 import gzip
@@ -88,6 +95,12 @@ def members():
         ' WHERE g.owner_user_id = ?', (user,))}
 
 
+# Fixture (the copy only): leave the founder alone in their guild, so every
+# friend is invitable whatever the live save looked like when it was copied.
+db.execute('DELETE FROM user_guild_members WHERE member_id != ? AND guild_id IN'
+           ' (SELECT guild_id FROM user_guilds WHERE owner_user_id = ?)', (user, user))
+db.commit()
+
 # --- the candidate list and the profiles it opens -------------------------------
 g = guild()
 check('the copied save leads a guild', 'error' not in g and len(g.get('IkdSufj5', [])) == 1, str(g)[:300])
@@ -138,6 +151,62 @@ for label, args in (('an application (type 1)', (gid, other, '1')),
     check(f'refused, no error: {label}', 'error' not in r and members() == before, str(r.get('error')))
 check('the member count did not move on refusals',
       int(guild()['IkdSufj5'][0]['SivJ9sL9']) == count0 + 1)
+
+# --- ranks and member management (GuildMemberUpdate) ---------------------------------
+def roster():
+    return {m['h7eY3sAK']: m for m in guild().get('csIuech30', [])}
+
+
+def update(member_id, member_type):
+    return call('ad81b8at', '2b1bDo2m', {'IkdSufj5': [{'sD73jd20': str(gid)}],
+                                          'csIuech30': [{'h7eY3sAK': member_id, 'gr48vsdJ': str(member_type)}]})
+
+
+def rank_of(member_id):
+    return roster().get(member_id, {}).get('gr48vsdJ')
+
+
+ros = roster()
+check('ranks: the owner is Guild Master (1) and every friend a Member (4) -- 0 has no name',
+      ros[user]['gr48vsdJ'] == '1' and all(m['gr48vsdJ'] == '4' for k, m in ros.items() if k != user),
+      str({k: m['gr48vsdJ'] for k, m in ros.items()}))
+
+r = update(target, 3)
+check('promote (4 -> 3) answers {} -- no roster, the client updates its own list', r == {}, str(r)[:200])
+check('... and the new rank is stored and served', rank_of(target) == '3', rank_of(target))
+update(target, 2)
+check('promote again (3 -> 2): Vice Guild Master', rank_of(target) == '2', rank_of(target))
+r = update(target, 1)
+check('promote to Guild Master (a hand-over) is refused without an error', r == {} and rank_of(target) == '2',
+      f'{r} {rank_of(target)}')
+update(target, 3)
+check('demote (2 -> 3): Officer', rank_of(target) == '3', rank_of(target))
+for bad in (5, -1, 'abc'):
+    r = update(target, bad)
+    check(f'rank {bad!r} is refused without an error', r == {} and rank_of(target) == '3', f'{r} {rank_of(target)}')
+r = update(user, 2)
+check('the owner cannot demote themselves', r == {} and rank_of(user) == '1', f'{r} {rank_of(user)}')
+r = update('NOT_A_MEMBER', 3)
+check('a rank for a non-member is refused without an error', r == {})
+
+count_before = int(guild()['IkdSufj5'][0]['SivJ9sL9'])
+r = update(target, 0)
+check('dismiss (0) answers {}', r == {}, str(r)[:200])
+check('... removes the membership (database and roster)', target not in members() and target not in roster())
+check('... lowers the member count', int(guild()['IkdSufj5'][0]['SivJ9sL9']) == count_before - 1)
+check('... and makes the friend invitable again',
+      target in {c['h7eY3sAK'] for c in candidates().get('fRaBu6et', [])})
+r = invite(gid, target)
+check('re-invited after a dismissal, back as a Member', 'error' not in r and rank_of(target) == '4',
+      str(rank_of(target)))
+
+r = update(user, 0)
+check('leaving your own guild answers {}', r == {}, str(r)[:200])
+g = guild()
+check('... dissolves it: no guild block, the founding fee instead',
+      not g.get('IkdSufj5') and g.get('jKeiqDbl'), str(g)[:300])
+check('... and no membership or guild row is left',
+      not members() and not db.execute('SELECT 1 FROM user_guilds WHERE owner_user_id = ?', (user,)).fetchone())
 
 print(f'\n{failures} failure(s)')
 sys.exit(1 if failures else 0)

@@ -1516,6 +1516,15 @@ static void RegisterMigrations(MigrationMap& map)
             "CHECK(feature_id > 0 OR dungeon_id > 0));");
     });
 
+	// A guild member's rank, GuildMemberInfo.member_type (gr48vsdJ): 1 Guild
+	// Master, 2 Vice Guild Master, 3 Officer, 4 Member (GUILD_RANK_NAME_<n>).
+	// Existing rows are all ordinary members; the founder is always reported as
+	// Guild Master from user_guilds.owner_user_id, so no backfill is needed.
+	migrate("27092026_AddUserGuildMembersMemberType", {
+		p->execSqlSync(
+			"ALTER TABLE user_guild_members ADD COLUMN member_type INTEGER NOT NULL DEFAULT 4;");
+	});
+
 }
 
 /*!
