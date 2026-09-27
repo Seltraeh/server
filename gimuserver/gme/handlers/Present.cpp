@@ -8,6 +8,7 @@
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/EventTokens.hpp>
+#include <gimuserver/gme/common/Guilds.hpp>
 #include <gimuserver/gme/common/SummonTickets.hpp>
 
 #include <algorithm>
@@ -235,6 +236,7 @@ HANDLEF(PresentReceipt)
 			bool selectorsChanged = false;
 			bool summonTicketsChanged = false;
 			bool eventTokensChanged = false;
+            bool guildTokensChanged = false;
 
 			for (const auto presentId : toClaim)
 			{
@@ -512,6 +514,12 @@ HANDLEF(PresentReceipt)
 					granted = true;
 					break;
 				}
+                case 8002: // Guild Tokens; player wallet, distinct from Guild Relics.
+                    co_await transaction->execSqlCoro(
+                        "UPDATE user_info SET guild_tokens=guild_tokens+$1 WHERE id=$2;",
+                        targetCnt, identity.userId);
+                    guildTokensChanged = granted = true;
+                    break;
 				case 8004:  // event token (the Frontier Gate's "Rift Token" is id 8)
 				{
 					// createPresentName @0x11C3AF8 formats target_id into
@@ -605,6 +613,8 @@ HANDLEF(PresentReceipt)
 				resp.selector_ticket_info = co_await gme::loadSelectorTickets(transaction, identity);
 			if (summonTicketsChanged)
 				resp.summon_ticket_v2_user = co_await gme::loadSummonTicketsV2(transaction, identity);
+            if (guildTokensChanged)
+                resp.guild_members = co_await gme::guildRoster(transaction, identity);
 			if (eventTokensChanged)
 				resp.event_token_info = co_await gme::loadEventTokens(transaction, identity);
 

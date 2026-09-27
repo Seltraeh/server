@@ -19,5 +19,2458 @@
                 }
             }
         ]
+    },
+    {
+        "id": 20000001,
+        "name": "Trial No. 001 - Brave Knight Karl",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 75
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 35.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 75
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 35.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 75
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000002,
+        "name": "Trial No. 001 - Ice Warrior Karl",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 15
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 50
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 50
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 75
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 6,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 7,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000011,
+        "name": "Trial No. 002 - Grahdens",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 17
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 1
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 1
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "wait",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "act",
+                        "parameter": 1
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "hp_pr_over",
+                        "parameter": 70
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        2,
+                        1
+                    ],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 10
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 80
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 6,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 70
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 7,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 14
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 40
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 8,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 15
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 30
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 9,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 8
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 20
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 10,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 16
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 20
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 11,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 7
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 15
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 12,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 8
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 13,
+                "percent": 20.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 11
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 40
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 14,
+                "percent": 20.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 12
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 40
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 15,
+                "percent": 15.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 13
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 40
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 16,
+                "percent": 20.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 9
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 17,
+                "percent": 15.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 7
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 18,
+                "percent": 10.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 8
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 19,
+                "percent": 25.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 20,
+                "percent": 25.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 21,
+                "percent": 25.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 22,
+                "percent": 25.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 23,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000021,
+        "name": "Trial No. 003 - Juggernaut",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000022,
+        "name": "Trial No. 003 - Demon Abaddon",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 30
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 4
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        1,
+                        1
+                    ],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 50
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 2
+                    },
+                    {
+                        "type": "flg_off",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 6,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 7,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000023,
+        "name": "Trial No. 003 - Creator Maxwell",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 30
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "hp_pr_over",
+                        "parameter": 30
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 7
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 20
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 6,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "turn_end",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 7,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "actbetween",
+                        "parameter": 5
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "turn_end",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 8,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 30
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 9,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 50
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 10,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 70
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 11,
+                "percent": 40.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 12,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000031,
+        "name": "The Creation God - Juggernaut",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 25.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000032,
+        "name": "The Creation God - Demon Abaddon",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 7
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 30
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 4
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        1,
+                        1
+                    ],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 7
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 66
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "flg_off",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 3
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 20.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 20.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 6,
+                "percent": 20.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 7,
+                "percent": 20.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 8,
+                "percent": 25.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 9,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000033,
+        "name": "The Creation God - Creator Maxwell",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 10
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "turn_end",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 6,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "actbetween",
+                        "parameter": 5
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "turn_end",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 7,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 7
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 70
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 8,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 75
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 9,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 10,
+                "percent": 50.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 11,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
+    },
+    {
+        "id": 20000034,
+        "name": "The Creation God - Inception God Maxwell",
+        "actions": [
+            {
+                "priority": 1,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 8
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 1
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        1,
+                        0
+                    ],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 2,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 7
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 15
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        1,
+                        1
+                    ],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 3,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 9
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [
+                    {
+                        "target_id": 5,
+                        "target_parameter": "non",
+                        "type": "ubb_use",
+                        "parameters": "non"
+                    }
+                ],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        2,
+                        1
+                    ],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 4,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 10
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 2
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [
+                    {
+                        "target_id": 5,
+                        "target_parameter": "non",
+                        "type": "ubb_use",
+                        "parameters": "non"
+                    }
+                ],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        2,
+                        0,
+                        11,
+                        1
+                    ],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 5,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 11
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 2
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 11
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [
+                    {
+                        "target_id": 5,
+                        "target_parameter": "non",
+                        "type": "ubb_use",
+                        "parameters": "non"
+                    }
+                ],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        2,
+                        0,
+                        12,
+                        1
+                    ],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 6,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 12
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 2
+                    },
+                    {
+                        "type": "flg_on",
+                        "parameter": 12
+                    },
+                    {
+                        "type": "limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [
+                    {
+                        "target_id": 5,
+                        "target_parameter": "non",
+                        "type": "ubb_use",
+                        "parameters": "non"
+                    }
+                ],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [
+                        2,
+                        0
+                    ],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 7,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "hp_max",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 8,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "hp_min",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 6
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 10
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 9,
+                "percent": 100.0,
+                "act_target": 1,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 10,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 5
+                    },
+                    {
+                        "type": "actbetween",
+                        "parameter": 4
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 11,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 1
+                    },
+                    {
+                        "type": "turn_limited_act",
+                        "parameter": 1
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": false,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 12,
+                "percent": 50.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 3
+                    },
+                    {
+                        "type": "hp_pr_under",
+                        "parameter": 50
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 13,
+                "percent": 30.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [
+                    {
+                        "type": "skill",
+                        "parameter": 2
+                    }
+                ],
+                "party_conditions": [],
+                "action": {
+                    "type": "skill",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            },
+            {
+                "priority": 14,
+                "percent": 100.0,
+                "act_target": 2,
+                "search_term": "random",
+                "self_conditions": [],
+                "party_conditions": [],
+                "action": {
+                    "type": "attack",
+                    "flag_changes": [],
+                    "unknown_bool": true,
+                    "unknown_int_1": 0,
+                    "unknown_int_2": 0
+                }
+            }
+        ]
     }
 ]

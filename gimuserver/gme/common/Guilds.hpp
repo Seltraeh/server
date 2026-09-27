@@ -177,15 +177,23 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 	const UserIdentity identity);
 
 /*!
-* The friends the caller could still invite.
+* The friends the caller could still invite -- the whole GuildRecomendedMember
+* reply.
 *
-* Everyone on the roster who is not already in the guild.  The reply this feeds
-* is a FULL REPLACE, so this must be the complete set.
+* Everyone on the roster who is not already in the guild.  Both lists in the
+* reply are FULL REPLACES, so this must be the complete set.
+*
+* TWO LISTS, ONE LOOP.  `members` (fRaBu6et) is the card the Hall draws;
+* `friends` (8lAroepR) is the profile it opens when a card is tapped, looked up
+* by the card's user id and cloned with no null check.  A card without a
+* profile is a crash on the tap, so both come out of the same iteration and
+* cannot disagree.  The profile is the Social list's own card (socialList), so
+* a friend reads the same in both places.
 *
 * @param database Database client or transaction.
 * @param identity Resolved user.
 */
-drogon::Task<std::vector<::GuildRecomendedMemberInfo>> invitableFriends(
+drogon::Task<::GuildRecomendedMemberResp> invitableFriends(
 	const db::Database database,
 	const UserIdentity identity);
 

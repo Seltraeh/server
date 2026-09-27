@@ -1,0 +1,27 @@
+{
+  "listeners": [{"address": "127.0.0.1", "port": 9960, "https": false}],
+  "app": {
+    "number_of_threads": 2,
+    "log": {"log_level": "INFO"},
+    "enable_session": true,
+    "session_timeout": 1200,
+    "document_root": "./game_content"
+  },
+  "db_clients": [{
+    "name": "default", "rdbms": "sqlite3", "is_fast": false,
+    "connection_number": 1, "filename": "./gme.sqlite"
+  }],
+  "plugins": [{
+    "name": "GimuServer", "dependencies": [],
+    "config": {
+      "extra_log": {"enable": false},
+      "server": {
+        "wallpaper_banner": "/wallpaper/title_logo20151028.jpg",
+        "game_version": 21900,
+        "notice_url": "http://ios21900.bfww.gumi.sg/pages/versioninfo",
+        "mst_root": "./mst", "system_root": "./system", "archive_root": "./archive",
+        "fps_cap": 60, "vortex_weekend_opens_all": false
+      }
+    }
+  }]
+}

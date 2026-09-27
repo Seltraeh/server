@@ -139,10 +139,6 @@ auto_cache("GHUsyi76", MedalMst)
 auto_cache("a3IgzZ0q", HelpDetailMst)
 auto_cache("KFJBwYbR", PvpFixedSettingMst)
 
-// Local-only cache declarations, if this checkout has any.  Keeps dev-fork
-// tables out of this file so they don't collide with upstream edits.
-// After ADDING the file, touch this header: when it was absent nothing
-// recorded a dependency on it, so the build won't otherwise notice.
-#if __has_include("ServerCacheLocalMst.inl")
-	#include "ServerCacheLocalMst.inl"
-#endif
+auto_cache("JukkSeNA", UnitSelectorGachaMst)
+// Names from sgtext_Exchange_Token; balances live in user_event_tokens.
+auto_cache("l234vdKs", EventTokenInfo)

@@ -40,6 +40,41 @@ std::vector<std::span<const BattleMonster>> missionMonsterGroups(const MissionRe
 	return groups;
 }
 
+// Every monster the MissionStart response must describe: the wave and chest
+// groups above, plus the ones the client's mission script swaps in mid-battle.
+// Scripted monsters get MonsterMst, AI and art rows but never a group, since a
+// group is what places a monster on the opening field.
+std::vector<std::span<const BattleMonster>> describedMonsters(const MissionRecord& record)
+{
+	auto monsters = missionMonsterGroups(record);
+	if (record.script_monsters && !record.script_monsters->empty())
+		monsters.emplace_back(*record.script_monsters);
+	return monsters;
+}
+
+// MonsterParty::changeMonster @0x10C3160 looks the new monster up by id alone,
+// so a scripted id must name exactly one monster in the response.
+bool validScriptMonsters(const MissionRecord& record)
+{
+	if (!record.script_monsters)
+		return true;
+	std::set<uint32_t> waveIds;
+	for (const auto& monsters : missionMonsterGroups(record))
+		for (const auto& monster : monsters)
+			waveIds.insert(monster.id);
+	std::set<uint32_t> seen;
+	for (const auto& monster : *record.script_monsters)
+	{
+		if (monster.id == 0 || monster.hp == 0 || waveIds.contains(monster.id)
+			|| !seen.insert(monster.id).second)
+		{
+			LOG_ERROR << "Invalid scripted monster " << monster.id << " in mission " << record.id;
+			return false;
+		}
+	}
+	return true;
+}
+
 bool validMimicMonster(const BattleMonster& monster)
 {
 	// Captures use the same species as the side-group monster, whose assets
@@ -144,9 +179,9 @@ std::string MissionArchiver::encodeAIAction(const Action& action)
 	}
 	stream << std::format(
 		"@{}@{}@{}",
-		action.unknown_bool ? 1 : 0,
-		action.unknown_int_1,
-		action.unknown_int_2);
+		action.counts_as_action ? 1 : 0,
+		action.move_wait_frames,
+		action.end_wait_frames);
 	return stream.str();
 }
 
@@ -547,7 +582,7 @@ bool MissionArchiver::populatePacket(const MissionRecord& record, std::vector<Ai
 {
 	// Gather unique AI ids referenced by the mission record.
 	std::set<AiId> ids;
-	for (const auto& monsters : missionMonsterGroups(record))
+	for (const auto& monsters : describedMonsters(record))
 	{
 		for (const auto& monster : monsters)
 		{
@@ -651,9 +686,12 @@ std::string monsterAilmentResists(const BattleMonster& monster)
 
 bool MissionArchiver::populatePacket(const MissionRecord& record, std::vector<MonsterMst>& msts)
 {
+	if (!validScriptMonsters(record))
+		return false;
+
 	msts.clear();
 	msts.reserve(record.stages.size() * kMaxMonstersPerStage);
-	const auto groups = missionMonsterGroups(record);
+	const auto groups = describedMonsters(record);
 	for (size_t stageIdx = 0; stageIdx < groups.size(); ++stageIdx)
 	{
 		const auto& monsters = groups[stageIdx];
@@ -731,12 +769,12 @@ bool MissionArchiver::populatePacket(const MissionRecord& record, std::vector<Mo
 				.after_image = visuals ? visuals->after_image : unit->after_image,
 				.max_act_count = monster.act_max,
 				.min_act_count = monster.act_min,
-				// The four constants below are what every captured live row carried.
-				// They are seeded rather than defaulted because the KDL fields are new
-				// (the wire surface is 38 keys, we modelled 24) and a zero-initialised
-				// act_rate would ship "0" where the live server always sent "100".
-				// They become per-monster archive data once bosses are authorable.
-				.act_rate = 100.0f,
+				// act_rate and the three constants below are what every captured
+				// live row carried.  They are seeded rather than defaulted because
+				// the KDL fields are new (the wire surface is 38 keys, we modelled
+				// 24) and a zero-initialised act_rate would ship "0" where the live
+				// server always sent "100".  A boss may author its own act_rate.
+				.act_rate = monster.act_rate.value_or(100.0f),
 				.monster_skill_id = monsterSkillList(monster),
 				.skill_move_type = visuals ? visuals->skill_move_type : unit->skill_move_type,
 				.bad_state_resists = monsterAilmentResists(monster),
@@ -778,7 +816,7 @@ bool MissionArchiver::populatePacket(
 	};
 
 	std::vector<MonsterCgsMst> rows;
-	for (const auto& monsters : missionMonsterGroups(record))
+	for (const auto& monsters : describedMonsters(record))
 	{
 		for (const auto& monster : monsters)
 		{

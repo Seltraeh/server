@@ -4,9 +4,8 @@
 #include <gimuserver/db/MigrationManager.hpp>
 #include <gimuserver/drogon/GimuServer.hpp>
 
-// The debug CLI is a local-only dev tool (git-ignored). When DebugCli.cpp is
-// present, standalone_frontend/CMakeLists.txt defines BF_DEBUG_CLI; upstream
-// builds without the file simply omit it.
+// The optional developer console is enabled by GIMU_ENABLE_DEBUG_CLI.
+// Portable release presets disable it.
 #ifdef BF_DEBUG_CLI
 #include "DebugCli.hpp"
 #endif

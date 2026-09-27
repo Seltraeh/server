@@ -1501,6 +1501,21 @@ static void RegisterMigrations(MigrationMap& map)
 			" ON user_gifts (user_id, received);");
 	});
 
+    migrate("25092026_CreateExchangePurchases", {
+        p->execSqlSync("ALTER TABLE user_info ADD COLUMN guild_tokens INTEGER NOT NULL DEFAULT 0");
+        p->execSqlSync("CREATE TABLE IF NOT EXISTS user_exchange_purchases ("
+            "user_id TEXT NOT NULL, shop TEXT NOT NULL, offer_id TEXT NOT NULL,"
+            "count INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(user_id,shop,offer_id));");
+    });
+
+    migrate("25092026_CreateUserEnteredFeatures", {
+        p->execSqlSync("CREATE TABLE IF NOT EXISTS user_entered_features ("
+            "user_id TEXT NOT NULL, feature_id INTEGER NOT NULL CHECK(feature_id >= 0),"
+            "dungeon_id INTEGER NOT NULL CHECK(dungeon_id >= 0),"
+            "PRIMARY KEY(user_id, feature_id, dungeon_id),"
+            "CHECK(feature_id > 0 OR dungeon_id > 0));");
+    });
+
 }
 
 /*!

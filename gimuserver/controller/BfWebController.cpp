@@ -3,6 +3,9 @@
 #include "WebTerms.hpp"
 
 #include <filesystem>
+#include <chrono>
+#include <mutex>
+#include <unordered_map>
 
 using namespace drogon;
 namespace fs = std::filesystem;
@@ -74,6 +77,103 @@ fs::path findMstPart(const std::string& requestPath)
 			return candidate;
 	}
 	return {};
+}
+
+/*!
+* Find any content file by NAME, wherever the package happens to put it.
+*
+* ⚠ WHERE A FILE IS PACKAGED AND WHERE THE CLIENT ASKS FOR IT ARE TWO DIFFERENT
+* FACTS, and only one of them is ours.  The Town map ships as
+* `content/sam/MapVillage/MapVillage_640x384.png`; the client asks for it under
+* `_dlcbundle/MapVillage/`.  A miss there is not a blank tile -- a scene that
+* cannot load its art null-derefs, which is why Town, the shop, the merit
+* exchange and sending a friend a gift were all crashing on the release build.
+*
+* The obvious fix is to move the files, but that means re-cutting the download
+* mirror every time the client surprises us with another path, and it only ever
+* fixes the paths we already know about.  Resolving by name fixes the whole
+* class at once and keeps the package layout free to change: the server looks
+* for the basename anywhere under the content root and serves whatever it
+* finds.  Same reasoning as findMstPart above, which exists because guessing
+* the MST layout was wrong once and stalled boot.
+*
+* The lookup is served from an index rather than a walk -- the tree is 76,000
+* files, so scanning per request would turn a cold cache into a stall -- but a
+* MISS rescans (at most once every 10s) so files dropped in after boot are
+* found without a restart.  See the note at the miss below.
+*
+* @param requestPath Request path, untrusted, e.g. "/content/_dlcbundle/MapVillage/x.png".
+* @return Path to a file with that name, or empty when nothing matches.
+*/
+fs::path findContentByName(const std::string& requestPath)
+{
+	const auto slash = requestPath.find_last_of('/');
+	const auto name = slash == std::string::npos
+		? requestPath : requestPath.substr(slash + 1);
+
+	// Only ever resolve a plain filename.  Anything carrying a separator or
+	// ".." is a traversal attempt, not a packaging mismatch.
+	if (name.empty() || name == "." || name.find("..") != std::string::npos)
+		return {};
+
+	static std::mutex guard;
+	static std::unordered_map<std::string, fs::path> index;
+	static std::chrono::steady_clock::time_point builtAt{};
+
+	const auto rebuild = [] {
+		const fs::path root = fs::path(app().getDocumentRoot()) / "content";
+		std::error_code ec;
+		index.clear();
+		if (!fs::is_directory(root, ec))
+			return;
+		fs::recursive_directory_iterator it(
+			root, fs::directory_options::skip_permission_denied, ec);
+		if (ec)
+			return;
+		size_t files = 0;
+		for (const auto& entry : it)
+		{
+			std::error_code fileEc;
+			if (!entry.is_regular_file(fileEc) || fileEc)
+				continue;
+			++files;
+			// FIRST WINS, and the walk is depth-first from the root, so a file
+			// sitting at a shallower path beats a copy buried deeper.  When the
+			// same name exists twice the shallower one is the canonical drop,
+			// and either copy renders the same art anyway.
+			index.emplace(entry.path().filename().string(), entry.path());
+		}
+		builtAt = std::chrono::steady_clock::now();
+		LOG_INFO << "content index: " << index.size() << " distinct filename(s) from "
+		         << files << " file(s) -- used to answer requests whose path does "
+		            "not match how the package is laid out";
+	};
+
+	std::lock_guard<std::mutex> lock(guard);
+	if (builtAt == std::chrono::steady_clock::time_point{})
+		rebuild();
+
+	auto hit = index.find(name);
+	if (hit == index.end())
+	{
+		// ⚠ A MISS MUST BE ABLE TO SEE FILES ADDED SINCE BOOT.  An index built
+		// once per process means anything dropped into the content tree after
+		// startup stays invisible until a restart -- and dropping files in is
+		// exactly how this gap gets closed (tools/seed_client_assets.py, or a
+		// hand-copied folder).  The client asking to download is the moment to
+		// look again, so a miss rescans.
+		//
+		// Rate-limited because a genuinely absent file is requested repeatedly:
+		// the client retries, and rescanning 76,000 files per retry would turn
+		// one missing asset into a stall.
+		const auto now = std::chrono::steady_clock::now();
+		if (now - builtAt > std::chrono::seconds(10))
+		{
+			rebuild();
+			hit = index.find(name);
+		}
+	}
+	return hit == index.end() ? fs::path{} : hit->second;
 }
 
 } // namespace
@@ -195,7 +295,26 @@ void BfWebController::HandleWebPage(const HttpRequestPtr& rq, std::function<void
 			return;
 		}
 
-		logDlc() << rq->getPath();
+		// Still nothing at the path the client asked for.  Before 404ing --
+		// which for an asset is a crash, not a gap -- look the file up by name
+		// anywhere under the content root.  See findContentByName.
+		if (const auto asset = findContentByName(rq->getPath()); !asset.empty())
+		{
+			LOG_INFO << "content: " << rq->getPath() << " served from "
+			         << asset.string() << " (packaged elsewhere)";
+			// Logged as well as served: the line is the evidence for where the
+			// package SHOULD put it, and without it a silently-healed mismatch
+			// is invisible until someone re-cuts the mirror and it breaks again.
+			// ⚠ "\n" not '\n' -- DumpLog has no char overload and writes a lone
+			// char as its integer value, which puts a stray "10" in the log.
+			logDlc() << rq->getPath() << "  -> resolved by name: " << asset.string() << "\n";
+			callback(HttpResponse::newFileResponse(asset.string()));
+			return;
+		}
+
+		// DumpLog does not terminate a statement, so every miss used to run into
+		// the next one and the log could not be read back as a list of paths.
+		logDlc() << rq->getPath() << "\n";
 		callback(HttpResponse::newNotFoundResponse());
 	}
 	else

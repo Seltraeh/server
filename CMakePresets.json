@@ -8,6 +8,7 @@
     "configurePresets": [
         {
             "name": "default-base",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
             "displayName": "Default basic config",
             "description": "General basic configuration to inherit",
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",

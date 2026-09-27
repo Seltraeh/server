@@ -11,6 +11,7 @@
 #include <gimuserver/gme/common/SelectorRotation.hpp>
 #include <gimuserver/gme/common/DailySpin.hpp>
 #include <gimuserver/gme/common/MysteryChest.hpp>
+#include <gimuserver/gme/common/Exchange.hpp>
 
 GimuServer::GimuServer() : m_dlc_error_log(), m_have_log(false), m_cache() {}
 
@@ -71,6 +72,7 @@ void GimuServer::initAndStart(const Json::Value& config)
 	gme::loadLoginCampaignArchive(server["archive_root"].asString());
 	// Needs UnitArchiver::setup above: it sweeps the archive for 6-star units.
 	gme::loadSelectorRotation();
+	gme::loadExchangeArchive(server["archive_root"].asString());
 }
 
 void GimuServer::shutdown() {}

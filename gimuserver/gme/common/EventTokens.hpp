@@ -2,6 +2,7 @@
 
 #include <gimuserver/gme/common/Common.hpp>
 
+#include <gimuserver/gme/common/Exchange.hpp>
 #include <map>
 #include <set>
 #include <string>
@@ -108,25 +109,35 @@ inline drogon::Task<std::vector<::EventTokenInfo>> loadEventTokens(
 	for (const auto& token : theServer()->cache().eventTokenMst())
 		names[std::to_string(token.token_id)] = token.name;
 
-	std::vector<::EventTokenInfo> tokens;
-	for (const auto& row : rows)
-	{
-		const auto tokenId = row["token_id"].as<std::string>();
+	std::map<std::string, int32_t> balances;
+    for (const auto& row : rows)
+        balances[row["token_id"].as<std::string>()] = row["count"].as<int32_t>();
+    for (const auto& offer : eventExchangeCatalog())
+        balances.try_emplace(std::to_string(offer.token_id), 0);
+    std::vector<::EventTokenInfo> tokens;
+    for (const auto& [tokenId, balance] : balances)
+    {
 		const auto named = names.find(tokenId);
 		::EventTokenInfo info{};
 		try { info.token_id = std::stoi(tokenId); }
 		catch (const std::exception&) { continue; }
 		info.name = named == names.end() ? std::string{} : named->second;
-		info.amount = std::max(row["count"].as<int32_t>(), 0);
-		// No expiry: nothing in this fork drives a token's clock, and sending a
-		// stale timeleft would count down to an expiry that never happens.
-		info.timeleft = 0;
+		info.amount = std::max(balance, 0);
+		// EventTokenInfo::getTimeleft preserves -1. Zero is expired and
+		// EventTokenTopScene::setLayout skips that token entirely.
+		info.timeleft = -1;
 		// The dungeons that pay it -- see detail::tokenDungeons, and note this
 		// is what decides whether the token is ever drawn.  unit_ids stays empty
 		// until there is an exchange to offer units from.
 		if (const auto it = detail::tokenDungeons().find(info.token_id);
 			it != detail::tokenDungeons().end())
 			info.dungeon_ids = it->second;
+        for (const auto& offer : eventExchangeCatalog())
+            if (offer.token_id == info.token_id && offer.reward_type == 6)
+            {
+                if (!info.unit_ids.empty()) info.unit_ids += ',';
+                info.unit_ids += std::to_string(offer.target_id);
+            }
 		tokens.push_back(std::move(info));
 	}
 	co_return tokens;

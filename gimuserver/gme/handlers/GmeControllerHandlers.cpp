@@ -141,7 +141,7 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("adk28bij", GuildUnimplemented, "fgd3uu2b");
 	REGISTER("yDDcC0vW", GuildUnimplemented, "NOeugPyv");
 	REGISTER("1D8bba8D", GuildUnimplemented, "bUd2bd0e");
-	REGISTER("bfa2D1bp", GuildUnimplemented, "9b3abdk1");
+	REGISTER("bfa2D1bp", GuildJoin,          "9b3abdk1");
 	REGISTER("oRa3ztp8", GuildUnimplemented, "pVg9L9Uw");
 	REGISTER("dsRW32K", GuildUnimplemented, "Afs43Dc4");
 	REGISTER("9b98aKj1", GuildUnimplemented, "b8dAl1ic");
@@ -172,7 +172,7 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("Xfpo7jE2", GuildUnimplemented, "tVBMO5GW");
 	REGISTER("R38ba9M3", GuildUnimplemented, "0D18dQn4");
 	REGISTER("cXi7b58e", GuildUnimplemented, "jK18btd0");
-	REGISTER("38adiJeb", GuildUnimplemented, "ja3biAqb");
+	REGISTER("38adiJeb", GuildTrade, "ja3biAqb");
 	REGISTER("92bDoqBi", GuildUnimplemented, "w3Bne038");
 	REGISTER("a38B82bG", GuildUnimplemented, "7Ykwq038");
 	REGISTER("38bad198", GuildUnimplemented, "d38bHiqj");
@@ -186,6 +186,8 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("CuQ5oB8U", TownUpdate,              "w1eo2ZDJ");
 	REGISTER("8v43tz7g", TownFacilityUpdate,       "rq7Yd1nG");
 	REGISTER("f49als4D", EventTokenInfo,           "94lDsgh4");
+	REGISTER("49zxdfl3", EventExchangeInfo, "v2DfDSFl");
+	REGISTER("SLf48fs0", EventExchangePurchase, "Odiel30s");
 
 	// Quest / world-map entry point.
 	REGISTER("Zds63G5y", AreaInfo,             "YfAh7gqojdXEtFR1");

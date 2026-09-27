@@ -7,6 +7,9 @@
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/DailyTask.hpp>
 #include <gimuserver/gme/common/Dbb.hpp>
+#include <algorithm>
+#include <array>
+#include <random>
 #include <cmath>
 #include <deque>
 
@@ -190,6 +193,11 @@ HANDLEF(UnitMix)
         co_return HandleResult::error("UnitMix: no base unit");
     }
 
+    std::sort(matIds.begin(), matIds.end());
+    if (matIds.empty() || std::adjacent_find(matIds.begin(), matIds.end()) != matIds.end()
+        || std::binary_search(matIds.begin(), matIds.end(), baseId))
+        co_return HandleResult::error("Invalid fusion materials");
+
     const int32_t zelCost = req.zel_cost_list.empty() ? 0 : req.zel_cost_list[0].cost;
 
     // Build material IN-clause.
@@ -200,712 +208,766 @@ HANDLEF(UnitMix)
         matList += std::to_string(matIds[i]);
     }
 
-    // Step 1: SELECT base unit full stats.
-    const auto baseRows = co_await theDb()->execSqlCoro(
-        "SELECT user_unit_id, unit_id, total_exp, bb_id, bb_lvl, sbb_id, sbb_lvl,"
-        " base_hp, base_atk, base_def, base_rec,"
-        " add_hp, add_atk, add_def, add_rec,"
-        " ext_hp, ext_atk, ext_def, ext_rec,"
-        " limit_over_hp, limit_over_atk, limit_over_def, limit_over_rec,"
-        " skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
-        " element, unit_type_id,"
-        " eqip_item_id, eqip_item_frame_id, eqip_item_id2, eqip_item_frame_id2,"
-        " sphere_ext, dbb_unlocked"
-        " FROM user_units WHERE user_id=$1 AND user_unit_id=$2 LIMIT 1;",
-        std::string(kUserId), baseId
-    );
-
-    if (baseRows.empty())
+    // Keep material consumption, the type reset and compensation in one
+    // transaction, including the reads that prevent duplicate consumption.
+    auto transaction = co_await theDb()->newTransactionCoro();
+    try
     {
-        LOG_WARN << "UnitMix: base unit " << baseId << " not found";
-        co_return HandleResult::error("UnitMix: base unit not found");
-    }
-    const auto& br = baseRows[0];
-
-    const std::string rawBaseUnitId = br["unit_id"].as<std::string>();
-    const std::string baseMstId     = unitMix_stripSuffix(rawBaseUnitId);
-    const int32_t     baseMstIdInt  = std::stoi(baseMstId);
-    const int         baseTotalExp  = br["total_exp"].as<int32_t>();
-
-    // Lookup base unit MST data.
-    const auto& unitMst = theServer()->cache().unitMst();
-    const UnitMst* baseMstData = nullptr;
-    for (const auto& u : unitMst) { if (u.id == baseMstIdInt) { baseMstData = &u; break; } }
-
-    const int baseElement   = baseMstData ? baseMstData->element       : 0;
-    const int baseRare      = baseMstData ? baseMstData->rarity        : 0;
-    const int expPatternId  = baseMstData ? baseMstData->exp_pattern_id: 10;
-    const int maxLevel      = baseMstData ? baseMstData->max_lv        : 100;
-
-    // Step 2: SELECT material stats to compute exp gain -- and the two special
-    // effects that are not exp at all (see unitMix_impBonus above).
-    float    gainedExpF     = 0.0f;
-    int      burstLevelGain = 0;
-    int      golemMats = 0;
-    int      matchingGolems = 0;
-    int      mismatchedGolemElement = 0;
-    int      sphereFrogs    = 0;
-    // Counted for the great/super success roll below: matching elements are the
-    // one condition the game has always said improves a fusion.
-    int      matCount       = 0;
-    int      sameElementMats = 0;
-    ImpBonus impGain{ 0, 0, 0, 0 };
-    if (!matIds.empty())
-    {
-        static const int kRarityBonus[] = { 0, 100, 200, 500, 1000, 1500, 3000, 5000, 10000 };
-
-        const auto matRows = co_await theDb()->execSqlCoro(
-            "SELECT unit_id, total_exp FROM user_units"
-            " WHERE user_id=$1 AND user_unit_id IN (" + matList + ");",
-            std::string(kUserId)
+        // Step 1: SELECT base unit full stats.
+        const auto baseRows = co_await transaction->execSqlCoro(
+            "SELECT user_unit_id, unit_id, total_exp, bb_id, bb_lvl, sbb_id, sbb_lvl,"
+            " base_hp, base_atk, base_def, base_rec,"
+            " add_hp, add_atk, add_def, add_rec,"
+            " ext_hp, ext_atk, ext_def, ext_rec,"
+            " limit_over_hp, limit_over_atk, limit_over_def, limit_over_rec,"
+            " skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
+            " element, unit_type_id,"
+            " eqip_item_id, eqip_item_frame_id, eqip_item_id2, eqip_item_frame_id2,"
+            " sphere_ext, dbb_unlocked"
+            " FROM user_units WHERE user_id=$1 AND user_unit_id=$2 LIMIT 1;",
+            std::string(kUserId), baseId
         );
 
-        for (const auto& row : matRows)
+        if (baseRows.empty())
         {
-            const std::string matMstId    = unitMix_stripSuffix(row["unit_id"].as<std::string>());
-            const int32_t     matMstIdInt = std::stoi(matMstId);
-            const int         matTotalExp = row["total_exp"].as<int32_t>();
+            LOG_WARN << "UnitMix: base unit " << baseId << " not found";
+            co_return HandleResult::error("UnitMix: base unit not found");
+        }
+        const auto& br = baseRows[0];
 
-            const UnitMst* matData = nullptr;
-            for (const auto& u : unitMst) { if (u.id == matMstIdInt) { matData = &u; break; } }
+        const std::string rawBaseUnitId = br["unit_id"].as<std::string>();
+        const std::string baseMstId     = unitMix_stripSuffix(rawBaseUnitId);
+        const int32_t     baseMstIdInt  = std::stoi(baseMstId);
+        const int         baseTotalExp  = br["total_exp"].as<int32_t>();
 
-            const int matAdjust = matData ? matData->adjust_exp : 0;
-            const int matCost   = matData ? matData->cost       : 1;
-            const int matRare   = matData ? matData->rarity     : 1;
-            const int matElem   = matData ? matData->element    : 0;
+        // Lookup base unit MST data.
+        const auto& unitMst = theServer()->cache().unitMst();
+        const UnitMst* baseMstData = nullptr;
+        for (const auto& u : unitMst) { if (u.id == baseMstIdInt) { baseMstData = &u; break; } }
 
-            float matExp = (float)matTotalExp / 2.5f;
-            matExp += (float)(matCost * 2);
-            matExp += (float)matAdjust;
-            if (matRare >= 1 && matRare <= 8)
-                matExp += (float)kRarityBonus[matRare];
-            ++matCount;
-            if (baseElement != 0 && matElem == baseElement)
+        const int baseElement   = baseMstData ? baseMstData->element       : 0;
+        const int baseRare      = baseMstData ? baseMstData->rarity        : 0;
+        const int expPatternId  = baseMstData ? baseMstData->exp_pattern_id: 10;
+        const int maxLevel      = baseMstData ? baseMstData->max_lv        : 100;
+
+        // Step 2: SELECT material stats to compute exp gain -- and the two special
+        // effects that are not exp at all (see unitMix_impBonus above).
+        float    gainedExpF     = 0.0f;
+        int      burstLevelGain = 0;
+        int      golemMats = 0;
+        int      matchingGolems = 0;
+        int      mismatchedGolemElement = 0;
+        int      sphereFrogs    = 0;
+        int      mysteryKind = 0;
+        int      newUnitType = br["unit_type_id"].as<int32_t>();
+        // Counted for the great/super success roll below: matching elements are the
+        // one condition the game has always said improves a fusion.
+        int      matCount       = 0;
+        int      sameElementMats = 0;
+        ImpBonus impGain{ 0, 0, 0, 0 };
+        if (!matIds.empty())
+        {
+            static const int kRarityBonus[] = { 0, 100, 200, 500, 1000, 1500, 3000, 5000, 10000 };
+
+            const auto matRows = co_await transaction->execSqlCoro(
+                "SELECT unit_id, total_exp FROM user_units"
+                " WHERE user_id=$1 AND user_unit_id IN (" + matList + ");",
+                std::string(kUserId)
+            );
+
+            if (matRows.size() != matIds.size())
+                co_return HandleResult::error("Fusion material not owned");
+            for (const auto& row : matRows)
             {
-                matExp *= 1.5f;
-                ++sameElementMats;
+                const std::string matMstId    = unitMix_stripSuffix(row["unit_id"].as<std::string>());
+                const int32_t     matMstIdInt = std::stoi(matMstId);
+                const int         matTotalExp = row["total_exp"].as<int32_t>();
+
+                const UnitMst* matData = nullptr;
+                for (const auto& u : unitMst) { if (u.id == matMstIdInt) { matData = &u; break; } }
+
+                const int matAdjust = matData ? matData->adjust_exp : 0;
+                const int matCost   = matData ? matData->cost       : 1;
+                const int matRare   = matData ? matData->rarity     : 1;
+                const int matElem   = matData ? matData->element    : 0;
+
+                float matExp = (float)matTotalExp / 2.5f;
+                matExp += (float)(matCost * 2);
+                matExp += (float)matAdjust;
+                if (matRare >= 1 && matRare <= 8)
+                    matExp += (float)kRarityBonus[matRare];
+                ++matCount;
+                if (baseElement != 0 && matElem == baseElement)
+                {
+                    matExp *= 1.5f;
+                    ++sameElementMats;
+                }
+
+                if (matData && matData->kind >= 10010 && matData->kind <= 10016)
+                {
+                    // The client restricts type changing to a single material.
+                    if (matIds.size() != 1 || !baseMstData || baseMstData->max_lv <= 1)
+                        co_return HandleResult::error("Use one Mystery Frog on a levelable unit");
+                    mysteryKind = matData->kind;
+                }
+                gainedExpF += matExp;
+
+                // A frog and an imp still hand over their exp; what they ALSO do
+                // is the part that was missing.
+                if (matData && matData->burst_level_boost > 0)
+                    burstLevelGain += matData->burst_level_boost;
+                if (matMstIdInt == kSphereFrogUnitId)
+                    ++sphereFrogs;
+                // ELEMENTAL GOLEM -> the DBB slot.  Same element only; the wiki is
+                // explicit ("e.g. a Fire Golem can only be fused to a Fire Element
+                // unit") and a mismatch is spent as ordinary fodder, which is what
+                // the real game's own screen would have prevented.
+                if (const auto golem = gme::dbbGolemElement(matMstId); golem != 0)
+                {
+                    ++golemMats;
+                    if (golem == baseElement)
+                        ++matchingGolems;
+                    else
+                        mismatchedGolemElement = golem;
+                }
+                if (const ImpBonus* imp = unitMix_impBonus(matMstIdInt))
+                {
+                    impGain.hp  += imp->hp;
+                    impGain.atk += imp->atk;
+                    impGain.def += imp->def;
+                    impGain.rec += imp->rec;
+                }
             }
+        }
 
-            gainedExpF += matExp;
-
-            // A frog and an imp still hand over their exp; what they ALSO do
-            // is the part that was missing.
-            if (matData && matData->burst_level_boost > 0)
-                burstLevelGain += matData->burst_level_boost;
-            if (matMstIdInt == kSphereFrogUnitId)
-                ++sphereFrogs;
-            // ELEMENTAL GOLEM -> the DBB slot.  Same element only; the wiki is
-            // explicit ("e.g. a Fire Golem can only be fused to a Fire Element
-            // unit") and a mismatch is spent as ordinary fodder, which is what
-            // the real game's own screen would have prevented.
-            if (const auto golem = gme::dbbGolemElement(matMstId); golem != 0)
+        if (mysteryKind)
+        {
+            if (mysteryKind == 10010)
             {
-                ++golemMats;
-                if (golem == baseElement)
-                    ++matchingGolems;
-                else
-                    mismatchedGolemElement = golem;
+                // Offline distribution: equal ordinary types, rarer Rex. The live
+                // server's exact random-frog probabilities are not documented.
+                std::array<double, 6> weights{1, 1, 1, 1, 1, 0.25};
+                if (newUnitType >= 1 && newUnitType <= 6) weights[newUnitType - 1] = 0;
+                newUnitType = 1 + std::discrete_distribution<int>(weights.begin(), weights.end())(RandomEngine());
             }
-            if (const ImpBonus* imp = unitMix_impBonus(matMstIdInt))
+            else newUnitType = mysteryKind - 10010;
+            gainedExpF = 0;
+        }
+
+        // GREAT / SUPER SUCCESS.  CONFIRMED from the client:
+        // UnitMixPlayScene::ConvSuccessSet @0x1C200A4 branches on the value straight
+        // out of UnitOpeResult::getSuccessType —
+        //     2 -> ConvSuccessSuper.sam   (Super Success)
+        //     1 -> ConvSuccessBig.sam     (Great Success)
+        //     0 -> ConvSuccess.sam        (normal)
+        // and all three animations ship in game_content.  This settles the KDL's
+        // "UNVERIFIED: the value set" note on 6hMI5xeF; the field had been pinned to
+        // 0, so the tier could never fire however good the displayed rate looked.
+        //
+        // The MULTIPLIERS are MST data, not invented: DefineMst.unit_mix_great_exp_rate
+        // (2inP0tCg) = 1.5 and unit_mix_super_exp_rate (zn65EXYF) = 2.0.
+        //
+        // The CHANCE is not in any MST — defines_mst carries the two rates and no
+        // probability — so the original server owned it and these numbers are ours.
+        // Same-element fusion improving the odds is the rule the game has always
+        // stated; baseExp already applies its own 1.5x for matching elements, and
+        // this is the second half of that bonus.
+        // // TUNABLE: 10% great / 2% super, doubled when every material matched the
+        // base unit's element.  No capture backs these figures.
+        int successType = 0;
+        {
+            const bool allSameElement = matCount > 0 && sameElementMats == matCount;
+            const int greatChance = allSameElement ? 20 : 10;
+            const int superChance = allSameElement ? 4 : 2;
+            const auto roll = RandomUInt(1, 100);
+            if (roll <= static_cast<uint32_t>(superChance))
+                successType = 2;
+            else if (roll <= static_cast<uint32_t>(superChance + greatChance))
+                successType = 1;
+        }
+
+        const auto& defines = theServer()->cache().initializeResp().defines;
+        const float successRate =
+            successType == 2 ? static_cast<float>(defines.unit_mix_super_exp_rate)
+          : successType == 1 ? static_cast<float>(defines.unit_mix_great_exp_rate)
+          : 1.0f;
+        if (successType != 0)
+        {
+            gainedExpF *= successRate;
+            LOG_INFO << "UnitMix: " << (successType == 2 ? "SUPER" : "GREAT")
+                     << " SUCCESS — exp x" << successRate;
+        }
+
+        if (mysteryKind) successType = 0;
+        const int gainedExp = (int)llroundf(gainedExpF);
+
+        // Compute new level / exp.
+        const auto& expPat      = theServer()->cache().initializeResp().exp_pattern;
+        const int   maxTotalExp = unitMix_expForLevel(expPat, expPatternId, maxLevel);
+        int         newTotalExp = mysteryKind ? 0 : baseTotalExp + gainedExp;
+        if (maxTotalExp > 0 && newTotalExp > maxTotalExp) newTotalExp = maxTotalExp;
+
+        const int newLevel    = unitMix_levelFromExp(expPat, expPatternId, maxLevel, newTotalExp);
+        const int levelExpFlr = unitMix_expForLevel(expPat, expPatternId, newLevel);
+        const int newExp      = newTotalExp - levelExpFlr;
+
+        // The BEFORE side of the result screen.  Derived the same way as the after
+        // side so the two are guaranteed consistent: the row stores total_exp, not
+        // a level, so the pre-fusion level is whatever that total maps to.
+        const int oldLevel    = unitMix_levelFromExp(expPat, expPatternId, maxLevel, baseTotalExp);
+        const int oldExp      = baseTotalExp - unitMix_expForLevel(expPat, expPatternId, oldLevel);
+
+        LOG_INFO << "UnitMix: unit=" << baseId << " mst=" << baseMstId
+                 << " totalExp " << baseTotalExp << "+" << gainedExp << "=" << newTotalExp
+                 << " lv->" << newLevel << "/" << maxLevel;
+
+        // Imps raise the stat up to a cap that belongs to the RECIPIENT, so clamp
+        // against what this unit is allowed rather than a global constant.  Fodder
+        // carries 0:0:0:0 and therefore cannot be imped at all — which is correct,
+        // and also why the clamp has to happen after the base MST lookup.
+        // ⚠ IMPS LIVE IN ext_*, NOT add_*.  CONFIRMED IN-CLIENT 2026-09-05 by
+        // probing both buckets with distinct values on one unit: the card drew
+        //     HP 5365  [111]   from base 5243 + add 11 + ext 111
+        // i.e. the big stat is base+add+ext, and the SMALL ORANGE NUMBER beside it
+        // -- the imp total the player actually looks at -- is ext_* alone.
+        //
+        // Writing imps to add_* (what this did before) still moved the big number,
+        // which is why it looked like it worked, but the orange imp figure stayed
+        // absent and the cap it represents was invisible.  net/user.kdl called
+        // TokWs1B3 the "Imp/stat-up HP bucket" all along.
+        //
+        // add_* is a separate bonus that folds silently into the total; nothing in
+        // this handler writes it, and nothing should until we know what it is.
+        const ImpBonus impCaps = baseMstData ? unitMix_impCaps(baseMstData->param_max)
+                                             : ImpBonus{ 0, 0, 0, 0 };
+        const int oldImpHp  = br["ext_hp"].as<int32_t>();
+        const int oldImpAtk = br["ext_atk"].as<int32_t>();
+        const int oldImpDef = br["ext_def"].as<int32_t>();
+        const int oldImpRec = br["ext_rec"].as<int32_t>();
+        const auto clampAdd = [](int have, int gain, int cap) {
+            return cap <= 0 ? have : std::min(have + gain, cap);
+        };
+        const int newImpHp  = clampAdd(oldImpHp,  impGain.hp,  impCaps.hp);
+        const int newImpAtk = clampAdd(oldImpAtk, impGain.atk, impCaps.atk);
+        const int newImpDef = clampAdd(oldImpDef, impGain.def, impCaps.def);
+        const int newImpRec = clampAdd(oldImpRec, impGain.rec, impCaps.rec);
+
+        // BB and SBB level share the frog: one Burst Frog raises whichever the
+        // unit has.  10 is the ceiling the UI shows.
+        //
+        // ⚠ GATE ON THE SKILL ID, NOT THE LEVEL.  A unit with no Brave Burst at all
+        // must not gain a BB level -- 134 of unit_mst's 2291 rows carry skill_id 0
+        // (every frog, emperor, queen, ghost and metal, plus a few oddities like
+        // Thunder Mecha God 40334), and the archive correctly leaves their bb_id
+        // empty.  The previous test was `oldBbLvl > 0 || burstLevelGain > 0` with a
+        // `max(oldBbLvl, 1)` floor, which fed a frog into a BB-less unit and moved
+        // it from 0 straight to 2 -- inventing a Brave Burst the unit does not have
+        // and cannot use, and skipping level 1 on the way.
+        //
+        // A BB-less unit still eats the frog for exp, which is what the real game
+        // does; it simply gains no burst level.
+        static constexpr int kMaxBurstLevel = 10;
+        const bool hasBb    = !br["bb_id"].isNull()  && !br["bb_id"].as<std::string>().empty()
+                              && br["bb_id"].as<std::string>() != "0";
+        const bool hasSbb   = !br["sbb_id"].isNull() && !br["sbb_id"].as<std::string>().empty()
+                              && br["sbb_id"].as<std::string>() != "0";
+        const int oldBbLvl  = br["bb_lvl"].as<int32_t>();
+        const int oldSbbLvl = br["sbb_lvl"].as<int32_t>();
+        // Spend a single level budget in order: BB, then SBB. Unlocking SBB at
+        // level 1 is free, and the remainder of this fusion can immediately raise it.
+        int remainingBurstLevels = burstLevelGain;
+        int newBbLvl = oldBbLvl;
+        if (hasBb)
+        {
+            newBbLvl = std::clamp(oldBbLvl, 1, kMaxBurstLevel);
+            const int gain = std::min(remainingBurstLevels, kMaxBurstLevel - newBbLvl);
+            newBbLvl += gain;
+            remainingBurstLevels -= gain;
+        }
+        int newSbbLvl = oldSbbLvl;
+        if (hasBb && hasSbb && newBbLvl == kMaxBurstLevel)
+            newSbbLvl = std::min(std::max(oldSbbLvl, 1) + remainingBurstLevels,
+                                kMaxBurstLevel);
+
+        // THE DBB SLOT.  Global wiki, Bonding: fusing an Elemental Golem of the
+        // unit's OWN element "will now permanently unlock the unit's DBB Slot",
+        // after which it can be bonded to its partner.
+        //
+        // ⚠ THE CLIENT CANNOT ENFORCE THIS.  UserUnitInfo::isDbbEligible @0x12B5EA4
+        // tests only "has a DbbMst partner AND rarity >= 8 AND SBB level 10" -- it
+        // has no notion of a golem ever having been fused -- so the slot appears on
+        // the detail screen regardless and the gate has to live here and in
+        // DbbBond.  gme::dbbEligible mirrors that same test so the two agree about
+        // WHO may do it; the golem is the extra step only this server knows about.
+        const int32_t oldDbbUnlocked = br["dbb_unlocked"].as<int32_t>();
+        int32_t newDbbUnlocked = oldDbbUnlocked;
+        if (matchingGolems > 0)
+        {
+            if (oldDbbUnlocked != 0)
             {
-                impGain.hp  += imp->hp;
-                impGain.atk += imp->atk;
-                impGain.def += imp->def;
-                impGain.rec += imp->rec;
+                LOG_INFO << "UnitMix: unit " << baseId << " already has its DBB slot — "
+                         << matchingGolems << " golem(s) spent as exp fodder only";
+            }
+            else if (!gme::dbbEligible(baseMstId, baseRare, newSbbLvl, newLevel, maxLevel))
+            {
+                LOG_INFO << "UnitMix: unit " << baseId << " (" << baseMstId
+                         << ") is not DBB-eligible yet — needs a catalogued partner, "
+                         << "rarity 8, Super Brave Burst 10 and level " << maxLevel
+                         << " (it is " << newLevel << "); golem spent as exp fodder";
+            }
+            else
+            {
+                newDbbUnlocked = 1;
+                LOG_INFO << "UnitMix: unit " << baseId << " (" << baseMstId
+                         << ") DBB SLOT UNLOCKED by an element-" << baseElement << " golem";
             }
         }
-    }
-
-    // GREAT / SUPER SUCCESS.  CONFIRMED from the client:
-    // UnitMixPlayScene::ConvSuccessSet @0x1C200A4 branches on the value straight
-    // out of UnitOpeResult::getSuccessType —
-    //     2 -> ConvSuccessSuper.sam   (Super Success)
-    //     1 -> ConvSuccessBig.sam     (Great Success)
-    //     0 -> ConvSuccess.sam        (normal)
-    // and all three animations ship in game_content.  This settles the KDL's
-    // "UNVERIFIED: the value set" note on 6hMI5xeF; the field had been pinned to
-    // 0, so the tier could never fire however good the displayed rate looked.
-    //
-    // The MULTIPLIERS are MST data, not invented: DefineMst.unit_mix_great_exp_rate
-    // (2inP0tCg) = 1.5 and unit_mix_super_exp_rate (zn65EXYF) = 2.0.
-    //
-    // The CHANCE is not in any MST — defines_mst carries the two rates and no
-    // probability — so the original server owned it and these numbers are ours.
-    // Same-element fusion improving the odds is the rule the game has always
-    // stated; baseExp already applies its own 1.5x for matching elements, and
-    // this is the second half of that bonus.
-    // // TUNABLE: 10% great / 2% super, doubled when every material matched the
-    // base unit's element.  No capture backs these figures.
-    int successType = 0;
-    {
-        const bool allSameElement = matCount > 0 && sameElementMats == matCount;
-        const int greatChance = allSameElement ? 20 : 10;
-        const int superChance = allSameElement ? 4 : 2;
-        const auto roll = RandomUInt(1, 100);
-        if (roll <= static_cast<uint32_t>(superChance))
-            successType = 2;
-        else if (roll <= static_cast<uint32_t>(superChance + greatChance))
-            successType = 1;
-    }
-
-    const auto& defines = theServer()->cache().initializeResp().defines;
-    const float successRate =
-        successType == 2 ? static_cast<float>(defines.unit_mix_super_exp_rate)
-      : successType == 1 ? static_cast<float>(defines.unit_mix_great_exp_rate)
-      : 1.0f;
-    if (successType != 0)
-    {
-        gainedExpF *= successRate;
-        LOG_INFO << "UnitMix: " << (successType == 2 ? "SUPER" : "GREAT")
-                 << " SUCCESS — exp x" << successRate;
-    }
-
-    const int gainedExp = (int)llroundf(gainedExpF);
-
-    // Compute new level / exp.
-    const auto& expPat      = theServer()->cache().initializeResp().exp_pattern;
-    const int   maxTotalExp = unitMix_expForLevel(expPat, expPatternId, maxLevel);
-    int         newTotalExp = baseTotalExp + gainedExp;
-    if (maxTotalExp > 0 && newTotalExp > maxTotalExp) newTotalExp = maxTotalExp;
-
-    const int newLevel    = unitMix_levelFromExp(expPat, expPatternId, maxLevel, newTotalExp);
-    const int levelExpFlr = unitMix_expForLevel(expPat, expPatternId, newLevel);
-    const int newExp      = newTotalExp - levelExpFlr;
-
-    // The BEFORE side of the result screen.  Derived the same way as the after
-    // side so the two are guaranteed consistent: the row stores total_exp, not
-    // a level, so the pre-fusion level is whatever that total maps to.
-    const int oldLevel    = unitMix_levelFromExp(expPat, expPatternId, maxLevel, baseTotalExp);
-    const int oldExp      = baseTotalExp - unitMix_expForLevel(expPat, expPatternId, oldLevel);
-
-    LOG_INFO << "UnitMix: unit=" << baseId << " mst=" << baseMstId
-             << " totalExp " << baseTotalExp << "+" << gainedExp << "=" << newTotalExp
-             << " lv->" << newLevel << "/" << maxLevel;
-
-    // Imps raise the stat up to a cap that belongs to the RECIPIENT, so clamp
-    // against what this unit is allowed rather than a global constant.  Fodder
-    // carries 0:0:0:0 and therefore cannot be imped at all — which is correct,
-    // and also why the clamp has to happen after the base MST lookup.
-    // ⚠ IMPS LIVE IN ext_*, NOT add_*.  CONFIRMED IN-CLIENT 2026-09-05 by
-    // probing both buckets with distinct values on one unit: the card drew
-    //     HP 5365  [111]   from base 5243 + add 11 + ext 111
-    // i.e. the big stat is base+add+ext, and the SMALL ORANGE NUMBER beside it
-    // -- the imp total the player actually looks at -- is ext_* alone.
-    //
-    // Writing imps to add_* (what this did before) still moved the big number,
-    // which is why it looked like it worked, but the orange imp figure stayed
-    // absent and the cap it represents was invisible.  net/user.kdl called
-    // TokWs1B3 the "Imp/stat-up HP bucket" all along.
-    //
-    // add_* is a separate bonus that folds silently into the total; nothing in
-    // this handler writes it, and nothing should until we know what it is.
-    const ImpBonus impCaps = baseMstData ? unitMix_impCaps(baseMstData->param_max)
-                                         : ImpBonus{ 0, 0, 0, 0 };
-    const int oldImpHp  = br["ext_hp"].as<int32_t>();
-    const int oldImpAtk = br["ext_atk"].as<int32_t>();
-    const int oldImpDef = br["ext_def"].as<int32_t>();
-    const int oldImpRec = br["ext_rec"].as<int32_t>();
-    const auto clampAdd = [](int have, int gain, int cap) {
-        return cap <= 0 ? have : std::min(have + gain, cap);
-    };
-    const int newImpHp  = clampAdd(oldImpHp,  impGain.hp,  impCaps.hp);
-    const int newImpAtk = clampAdd(oldImpAtk, impGain.atk, impCaps.atk);
-    const int newImpDef = clampAdd(oldImpDef, impGain.def, impCaps.def);
-    const int newImpRec = clampAdd(oldImpRec, impGain.rec, impCaps.rec);
-
-    // BB and SBB level share the frog: one Burst Frog raises whichever the
-    // unit has.  10 is the ceiling the UI shows.
-    //
-    // ⚠ GATE ON THE SKILL ID, NOT THE LEVEL.  A unit with no Brave Burst at all
-    // must not gain a BB level -- 134 of unit_mst's 2291 rows carry skill_id 0
-    // (every frog, emperor, queen, ghost and metal, plus a few oddities like
-    // Thunder Mecha God 40334), and the archive correctly leaves their bb_id
-    // empty.  The previous test was `oldBbLvl > 0 || burstLevelGain > 0` with a
-    // `max(oldBbLvl, 1)` floor, which fed a frog into a BB-less unit and moved
-    // it from 0 straight to 2 -- inventing a Brave Burst the unit does not have
-    // and cannot use, and skipping level 1 on the way.
-    //
-    // A BB-less unit still eats the frog for exp, which is what the real game
-    // does; it simply gains no burst level.
-    static constexpr int kMaxBurstLevel = 10;
-    const bool hasBb    = !br["bb_id"].isNull()  && !br["bb_id"].as<std::string>().empty()
-                          && br["bb_id"].as<std::string>() != "0";
-    const bool hasSbb   = !br["sbb_id"].isNull() && !br["sbb_id"].as<std::string>().empty()
-                          && br["sbb_id"].as<std::string>() != "0";
-    const int oldBbLvl  = br["bb_lvl"].as<int32_t>();
-    const int oldSbbLvl = br["sbb_lvl"].as<int32_t>();
-    const int newBbLvl  = hasBb
-        ? std::min(std::max(oldBbLvl, 1) + burstLevelGain, kMaxBurstLevel) : oldBbLvl;
-
-    // SUPER BRAVE BURST UNLOCKS WHEN THE NORMAL ONE MAXES, AT LEVEL 1.
-    // Global wiki, Unit Skills: "Only 6-star units and up and Nice Burny are
-    // capable of acquiring a Super Brave Burst.  The normal Brave Burst must
-    // first be levelled to 10 (MAX), after which the Super Brave Burst will
-    // become available, at Level 1."
-    //
-    // So a locked SBB (level 0) does NOT take levels from the feeding that
-    // maxed BB -- it appears at exactly 1, and the NEXT feeding starts raising
-    // it.  The previous code started from max(oldSbbLvl, 1), which handed a
-    // level-1 SBB to any unit with an id the first time it ate a frog, whatever
-    // its BB level was.
-    int newSbbLvl = oldSbbLvl;
-    if (hasSbb)
-    {
-        if (oldSbbLvl <= 0)
-            newSbbLvl = (newBbLvl >= kMaxBurstLevel) ? 1 : 0;
-        else
-            newSbbLvl = std::min(oldSbbLvl + burstLevelGain, kMaxBurstLevel);
-    }
-    if (hasSbb && oldSbbLvl <= 0 && newSbbLvl == 1)
-    {
-        LOG_INFO << "UnitMix: unit " << baseId
-                 << " maxed its Brave Burst — Super Brave Burst unlocked at level 1";
-    }
-
-    // THE DBB SLOT.  Global wiki, Bonding: fusing an Elemental Golem of the
-    // unit's OWN element "will now permanently unlock the unit's DBB Slot",
-    // after which it can be bonded to its partner.
-    //
-    // ⚠ THE CLIENT CANNOT ENFORCE THIS.  UserUnitInfo::isDbbEligible @0x12B5EA4
-    // tests only "has a DbbMst partner AND rarity >= 8 AND SBB level 10" -- it
-    // has no notion of a golem ever having been fused -- so the slot appears on
-    // the detail screen regardless and the gate has to live here and in
-    // DbbBond.  gme::dbbEligible mirrors that same test so the two agree about
-    // WHO may do it; the golem is the extra step only this server knows about.
-    const int32_t oldDbbUnlocked = br["dbb_unlocked"].as<int32_t>();
-    int32_t newDbbUnlocked = oldDbbUnlocked;
-    if (matchingGolems > 0)
-    {
-        if (oldDbbUnlocked != 0)
+        else if (golemMats > 0)
         {
-            LOG_INFO << "UnitMix: unit " << baseId << " already has its DBB slot — "
-                     << matchingGolems << " golem(s) spent as exp fodder only";
+            LOG_WARN << "UnitMix: unit " << baseId << " is element " << baseElement
+                     << " but was fed an element-" << mismatchedGolemElement
+                     << " golem — no DBB slot, spent as exp fodder";
         }
-        else if (!gme::dbbEligible(baseMstId, baseRare, newSbbLvl, newLevel, maxLevel))
+
+        if (burstLevelGain > 0 && !hasBb)
         {
-            LOG_INFO << "UnitMix: unit " << baseId << " (" << baseMstId
-                     << ") is not DBB-eligible yet — needs a catalogued partner, "
-                     << "rarity 8, Super Brave Burst 10 and level " << maxLevel
-                     << " (it is " << newLevel << "); golem spent as exp fodder";
+            LOG_INFO << "UnitMix: unit " << baseId << " has no Brave Burst (bb_id empty) — "
+                     << "burst material spent as exp only";
         }
-        else
+
+        // One slot, ever.  A second frog on a unit that already has the slot is not
+        // an error -- it is the case the help text says the client should have
+        // stopped -- so it is logged and the frog is spent as plain fodder.
+        const int oldSphereExt = br["sphere_ext"].as<int32_t>();
+        const int newSphereExt = (sphereFrogs > 0) ? 1 : oldSphereExt;
+
+        // THE SLOT ITSELF lives in eqip_item_frame_id2, not in sphere_ext: -1 hides
+        // it, 0 shows it empty, 1..14 shows it holding that sphere type.  See
+        // gme::kNoSecondSphereSlot.  max(0, old) is what opens the slot -- it lifts
+        // -1 to "empty" while leaving an already-equipped frame untouched, so a
+        // second frog on a unit that has the slot cannot wipe its sphere.
+        const int oldEqpFrame2 = br["eqip_item_frame_id2"].as<int32_t>();
+        const int newEqpFrame2 = newSphereExt ? std::max(0, oldEqpFrame2)
+                                              : gme::kNoSecondSphereSlot;
+
+        if (sphereFrogs > 0)
         {
-            newDbbUnlocked = 1;
-            LOG_INFO << "UnitMix: unit " << baseId << " (" << baseMstId
-                     << ") DBB SLOT UNLOCKED by an element-" << baseElement << " golem";
+            if (oldSphereExt)
+                LOG_WARN << "UnitMix: unit " << baseId << " already has the extra sphere slot — "
+                         << sphereFrogs << " Sphere Frog(s) spent as exp fodder only";
+            else
+                LOG_INFO << "UnitMix: unit " << baseId << " gains the second sphere slot"
+                         << (sphereFrogs > 1 ? " (only one of the frogs could grant it)" : "");
         }
-    }
-    else if (golemMats > 0)
-    {
-        LOG_WARN << "UnitMix: unit " << baseId << " is element " << baseElement
-                 << " but was fed an element-" << mismatchedGolemElement
-                 << " golem — no DBB slot, spent as exp fodder";
-    }
 
-    if (burstLevelGain > 0 && !hasBb)
-    {
-        LOG_INFO << "UnitMix: unit " << baseId << " has no Brave Burst (bb_id empty) — "
-                 << "burst material spent as exp only";
-    }
+        if (burstLevelGain || impGain.hp || impGain.atk || impGain.def || impGain.rec)
+        {
+            LOG_INFO << "UnitMix: special materials — burst +" << burstLevelGain
+                     << " (bb " << oldBbLvl << "->" << newBbLvl
+                     << ", sbb " << oldSbbLvl << "->" << newSbbLvl << ")"
+                     << ", imps +" << impGain.hp << "/" << impGain.atk << "/"
+                     << impGain.def << "/" << impGain.rec
+                     << " capped to " << newImpHp << "/" << newImpAtk << "/"
+                     << newImpDef << "/" << newImpRec
+                     << " (caps " << impCaps.hp << ":" << impCaps.atk << ":"
+                     << impCaps.def << ":" << impCaps.rec << ")";
+        }
 
-    // One slot, ever.  A second frog on a unit that already has the slot is not
-    // an error -- it is the case the help text says the client should have
-    // stopped -- so it is logged and the frog is spent as plain fodder.
-    const int oldSphereExt = br["sphere_ext"].as<int32_t>();
-    const int newSphereExt = (sphereFrogs > 0) ? 1 : oldSphereExt;
+        // ⚠ BASE STATS ARE LEVEL-SCALED AND MUST BE REWRITTEN HERE.
+        //
+        // user_units.base_* holds the stats AT THE UNIT'S CURRENT LEVEL -- the
+        // client displays them verbatim and does no scaling of its own (the unit
+        // card showed 3039 HP on a Lv80/80 Nemia whose max_hp is 4854, which is
+        // exactly the stored level-1 value).  Levelling a unit without rewriting
+        // them left every levelled unit fighting with its level-1 statline.
+        //
+        // Scale from the MST's min/max, NOT from the stored base_*: the stored
+        // value is already scaled to the OLD level, so feeding it back as the
+        // minimum compounds the error on every fusion.
+        const auto scaleStat = [&](int minV, int maxV) {
+            return unitMix_statAtLevel(minV, maxV, newLevel, maxLevel);
+        };
+        // Carry the previously rolled type growth and roll each newly gained
+        // level from UnitTypeMst. A Mystery Frog starts that growth over at level 1.
+        std::array<std::vector<int>, 4> typeGrowth;
+        const UnitTypeMst* typeData = nullptr;
+        for (const auto& t : theServer()->cache().unitTypeMst())
+            if (t.unit_type_id == newUnitType) typeData = &t;
+        const int mins[] = {baseMstData ? baseMstData->min_hp : 0,
+                            baseMstData ? baseMstData->min_atk : 0,
+                            baseMstData ? baseMstData->min_def : 0,
+                            baseMstData ? baseMstData->min_rec : 0};
+        const int maxs[] = {baseMstData ? baseMstData->max_hp : 0,
+                            baseMstData ? baseMstData->max_atk : 0,
+                            baseMstData ? baseMstData->max_def : 0,
+                            baseMstData ? baseMstData->max_rec : 0};
+        const char* columns[] = {"base_hp", "base_atk", "base_def", "base_rec"};
+        for (int stat = 0; stat < 4; ++stat)
+        {
+            const int previous = mysteryKind || !baseMstData ? 0 :
+                br[columns[stat]].as<int32_t>() - unitMix_statAtLevel(mins[stat], maxs[stat], oldLevel, maxLevel);
+            typeGrowth[stat].resize(newLevel + 1, previous);
+            if (!typeData || mysteryKind) continue;
+            const auto& range = stat == 0 ? typeData->unk1 : stat == 1 ? typeData->unk2 :
+                                stat == 2 ? typeData->unk3 : typeData->unk4;
+            for (int lv = oldLevel + 1; lv <= newLevel; ++lv)
+                typeGrowth[stat][lv] = typeGrowth[stat][lv - 1] +
+                    (range.size() == 2 ? std::uniform_int_distribution<int>(range[0], range[1])(RandomEngine()) : 0);
+        }
+        const int newBaseHp = baseMstData ? scaleStat(baseMstData->min_hp, baseMstData->max_hp) + typeGrowth[0][newLevel] : br["base_hp"].as<int32_t>();
+        const int newBaseAtk = baseMstData ? scaleStat(baseMstData->min_atk, baseMstData->max_atk) + typeGrowth[1][newLevel] : br["base_atk"].as<int32_t>();
+        const int newBaseDef = baseMstData ? scaleStat(baseMstData->min_def, baseMstData->max_def) + typeGrowth[2][newLevel] : br["base_def"].as<int32_t>();
+        const int newBaseRec = baseMstData ? scaleStat(baseMstData->min_rec, baseMstData->max_rec) + typeGrowth[3][newLevel] : br["base_rec"].as<int32_t>();
 
-    // THE SLOT ITSELF lives in eqip_item_frame_id2, not in sphere_ext: -1 hides
-    // it, 0 shows it empty, 1..14 shows it holding that sphere type.  See
-    // gme::kNoSecondSphereSlot.  max(0, old) is what opens the slot -- it lifts
-    // -1 to "empty" while leaving an already-equipped frame untouched, so a
-    // second frog on a unit that has the slot cannot wipe its sphere.
-    const int oldEqpFrame2 = br["eqip_item_frame_id2"].as<int32_t>();
-    const int newEqpFrame2 = newSphereExt ? std::max(0, oldEqpFrame2)
-                                          : gme::kNoSecondSphereSlot;
+        if (newLevel != oldLevel)
+        {
+            LOG_INFO << "UnitMix: base stats rescaled for lv " << oldLevel << "->" << newLevel
+                     << " — hp " << br["base_hp"].as<int32_t>() << "->" << newBaseHp
+                     << ", atk " << br["base_atk"].as<int32_t>() << "->" << newBaseAtk
+                     << ", def " << br["base_def"].as<int32_t>() << "->" << newBaseDef
+                     << ", rec " << br["base_rec"].as<int32_t>() << "->" << newBaseRec;
+        }
 
-    if (sphereFrogs > 0)
-    {
-        if (oldSphereExt)
-            LOG_WARN << "UnitMix: unit " << baseId << " already has the extra sphere slot — "
-                     << sphereFrogs << " Sphere Frog(s) spent as exp fodder only";
-        else
-            LOG_INFO << "UnitMix: unit " << baseId << " gains the second sphere slot"
-                     << (sphereFrogs > 1 ? " (only one of the frogs could grant it)" : "");
-    }
-
-    if (burstLevelGain || impGain.hp || impGain.atk || impGain.def || impGain.rec)
-    {
-        LOG_INFO << "UnitMix: special materials — burst +" << burstLevelGain
-                 << " (bb " << oldBbLvl << "->" << newBbLvl
-                 << ", sbb " << oldSbbLvl << "->" << newSbbLvl << ")"
-                 << ", imps +" << impGain.hp << "/" << impGain.atk << "/"
-                 << impGain.def << "/" << impGain.rec
-                 << " capped to " << newImpHp << "/" << newImpAtk << "/"
-                 << newImpDef << "/" << newImpRec
-                 << " (caps " << impCaps.hp << ":" << impCaps.atk << ":"
-                 << impCaps.def << ":" << impCaps.rec << ")";
-    }
-
-    // ⚠ BASE STATS ARE LEVEL-SCALED AND MUST BE REWRITTEN HERE.
-    //
-    // user_units.base_* holds the stats AT THE UNIT'S CURRENT LEVEL -- the
-    // client displays them verbatim and does no scaling of its own (the unit
-    // card showed 3039 HP on a Lv80/80 Nemia whose max_hp is 4854, which is
-    // exactly the stored level-1 value).  Levelling a unit without rewriting
-    // them left every levelled unit fighting with its level-1 statline.
-    //
-    // Scale from the MST's min/max, NOT from the stored base_*: the stored
-    // value is already scaled to the OLD level, so feeding it back as the
-    // minimum compounds the error on every fusion.
-    const auto scaleStat = [&](int minV, int maxV) {
-        return unitMix_statAtLevel(minV, maxV, newLevel, maxLevel);
-    };
-    const int newBaseHp  = baseMstData ? scaleStat(baseMstData->min_hp,  baseMstData->max_hp)
-                                       : br["base_hp"].as<int32_t>();
-    const int newBaseAtk = baseMstData ? scaleStat(baseMstData->min_atk, baseMstData->max_atk)
-                                       : br["base_atk"].as<int32_t>();
-    const int newBaseDef = baseMstData ? scaleStat(baseMstData->min_def, baseMstData->max_def)
-                                       : br["base_def"].as<int32_t>();
-    const int newBaseRec = baseMstData ? scaleStat(baseMstData->min_rec, baseMstData->max_rec)
-                                       : br["base_rec"].as<int32_t>();
-
-    if (newLevel != oldLevel)
-    {
-        LOG_INFO << "UnitMix: base stats rescaled for lv " << oldLevel << "->" << newLevel
-                 << " — hp " << br["base_hp"].as<int32_t>() << "->" << newBaseHp
-                 << ", atk " << br["base_atk"].as<int32_t>() << "->" << newBaseAtk
-                 << ", def " << br["base_def"].as<int32_t>() << "->" << newBaseDef
-                 << ", rec " << br["base_rec"].as<int32_t>() << "->" << newBaseRec;
-    }
-
-    // Step 3: UPDATE base unit level/exp, the rescaled base stats, plus the imp
-    // and burst-level columns the special materials just changed.
-    co_await theDb()->execSqlCoro(
-        "UPDATE user_units SET unit_lvl=$1, exp=$2, total_exp=$3,"
-        " ext_hp=$4, ext_atk=$5, ext_def=$6, ext_rec=$7, bb_lvl=$8, sbb_lvl=$9,"
-        " sphere_ext=$10, eqip_item_frame_id2=$11,"
-        " base_hp=$12, base_atk=$13, base_def=$14, base_rec=$15,"
-        " dbb_unlocked=$16"
-        " WHERE user_unit_id=$17 AND user_id=$18;",
-        newLevel, newExp, newTotalExp,
-        newImpHp, newImpAtk, newImpDef, newImpRec, newBbLvl, newSbbLvl,
-        newSphereExt, newEqpFrame2,
-        newBaseHp, newBaseAtk, newBaseDef, newBaseRec,
-        newDbbUnlocked,
-        baseId, std::string(kUserId)
-    );
-
-    // Step 4: return spheres equipped on the fodder, then DELETE the material
-    // units — deleting without the return would destroy the equipped items.
-    uint32_t spheresReturned = 0;
-    if (!matIds.empty())
-    {
-        spheresReturned = co_await gme::returnEquippedSpheres(theDb(), identity, matList);
-        co_await theDb()->execSqlCoro(
-            "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + matList + ");",
-            std::string(kUserId)
+        // Step 3: UPDATE base unit level/exp, the rescaled base stats, plus the imp
+        // and burst-level columns the special materials just changed.
+        co_await transaction->execSqlCoro(
+            "UPDATE user_units SET unit_lvl=$1, exp=$2, total_exp=$3,"
+            " ext_hp=$4, ext_atk=$5, ext_def=$6, ext_rec=$7, bb_lvl=$8, sbb_lvl=$9,"
+            " sphere_ext=$10, eqip_item_frame_id2=$11,"
+            " base_hp=$12, base_atk=$13, base_def=$14, base_rec=$15,"
+            " dbb_unlocked=$16, unit_type_id=$17"
+            " WHERE user_unit_id=$18 AND user_id=$19;",
+            newLevel, newExp, newTotalExp,
+            newImpHp, newImpAtk, newImpDef, newImpRec, newBbLvl, newSbbLvl,
+            newSphereExt, newEqpFrame2,
+            newBaseHp, newBaseAtk, newBaseDef, newBaseRec,
+            newDbbUnlocked,
+            newUnitType, baseId, std::string(kUserId)
         );
-    }
 
-    // Step 5: deduct zel.
-    if (zelCost > 0)
-    {
-        co_await theDb()->execSqlCoro(
-            "UPDATE user_info SET zel = MAX(0, zel - $1) WHERE id=$2;",
-            zelCost, std::string(kUserId)
-        );
-    }
-
-
-    // Build response.
-    UnitMixResp resp = {};
-
-    // Reinforcement animation entry.
-    {
-        UnitReinforceEntry rd = {};
-        rd.handle_name    = "DecompDev";
-        rd.target_lv      = newLevel;
-        rd.unit_mst_id    = baseMstId;
-        rd.base_hp        = newBaseHp;
-        rd.base_atk       = newBaseAtk;
-        rd.base_def       = newBaseDef;
-        rd.base_heal      = newBaseRec;
-        // add_* passes through untouched -- fusion does not write it.  ext_* is
-        // the IMP bucket and carries the POST-fusion clamped values, because an
-        // imp that just landed has to show on the result screen.
-        rd.add_hp         = br["add_hp"].as<int32_t>();
-        rd.add_atk        = br["add_atk"].as<int32_t>();
-        rd.add_def        = br["add_def"].as<int32_t>();
-        rd.add_heal       = br["add_rec"].as<int32_t>();
-        rd.ext_hp         = newImpHp;
-        rd.ext_atk        = newImpAtk;
-        rd.ext_def        = newImpDef;
-        // ⚠ THESE ARE THE BRAVE BURST FIELDS, DESPITE THE NAMES.
-        // UnitReinforceEntry.skill_id carries hash nj9Lw7mV and skill_lv
-        // carries 3NbeC8AB -- the same two hashes UserUnitInfo uses for bb_id
-        // and bb_lvl.  They were being fed from user_units.skill_id/skill_lv,
-        // a different (and entirely unused, 0 on all 77 rows) pair of columns,
-        // which is why the fusion RESULT screen read "BB Lv. 0/10" while the
-        // unit card -- which reads UserUnitInfo -- correctly showed Lv.10.
-        // Post-fusion values, like add_* above, so the screen shows the gain.
-        rd.skill_id       = br["bb_id"].as<std::string>();
-        rd.skill_lv       = newBbLvl;
-        rd.extra_skill_id = br["sbb_id"].as<std::string>();
-        rd.extra_skill_lv = newSbbLvl;
-        rd.unit_type_id   = br["unit_type_id"].as<int32_t>();
-        // Ge8Yo32T is setEquipItemID, not a mission id -- and xZH6EIQ7 is a
-        // full REPLACE of the reinforcement record, so sending a blank here
-        // wiped the sphere off the fused unit on the result screen.
-        rd.equipitem_id   = br["eqip_item_id"].as<int32_t>();
-        resp.reinforce.emplace_back(std::move(rd));
-    }
-
-    // Incremental unit cache update.
-    //
-    // Read back through PacketInterfaceFor<UserUnitInfo> rather than
-    // hand-assembling the entry.  This is the SAME read UserInfo uses at login,
-    // and login is the one path the client provably accepts — so building the
-    // entry any other way is guessing at a shape we already have.
-    //
-    // Hand-assembly is how the level stopped showing after a fusion: the entry
-    // was 47 fields and complete-looking, but `received_order` (Bvkx8s6M) was
-    // never assigned and so went out as 0, where login sends 1000.  It is not
-    // a column — the schema maps it onto `user_unit_id` — so there was nothing
-    // in the SELECT to notice was missing.  Any field added to UserUnitInfo in
-    // future would have silently defaulted the same way.
-    //
-    // The DB writes above have already landed, so this read reflects the new
-    // level, exp and total_exp.
-    //
-    // FULL-REPLACE THE UNIT CACHE (4ceMWH6k).  Confirmed working in-client
-    // 2026-08-10: the fusion menu shows the new level and the fodder are gone,
-    // with no trip to Home.
-    //
-    // We deliberately do NOT echo the base unit under qC2tJs4E.  That key is
-    // INSERT-IF-ABSENT: readParam's tail asks UserUnitInfoList::exist() and
-    // returns without committing when the client already owns the unit, so for
-    // a fusion base it is a guaranteed no-op.
-    //
-    // 4ceMWH6k is the only key that can change an owned unit, because its
-    // readParam calls removeAllObjects() first — which is also why it must
-    // carry the WHOLE roster, not just the fused unit.
-    //
-    // It is needed because the client has no local apply path of its own: it
-    // never writes the fused unit (no UserUnitInfo mutator is reachable from a
-    // fusion scene) and never drops the fodder (removeObject is called by the
-    // sale scenes and the FrontierGate/FGPlus friend lists, never by a fusion
-    // scene; removeObjectWithUserUnitID has none), and it issues no request
-    // after the fusion.
-    //
-    // The historical objection was that removeAllObjects release()s every
-    // CCObject in the list, dangling any raw UserUnitInfo* a live scene holds —
-    // it soft-locked the result screen once.  That build also sent
-    // lvup_status "1", which crashes parseMixResult by itself; with the ritual
-    // payload correct, this key is fine here.  If a future scene does start
-    // soft-locking on it, that is the mechanism to suspect.
-    resp.unit_refresh = std::move((co_await db::PacketInterfaceFor<::UserUnitInfo>::read(
-        theDb(),
-        "user_units",
-        { db::Lookup("user_id", std::string(kUserId)) })).data);
-
-    LOG_INFO << "UnitMix: full-replace unit cache — " << resp.unit_refresh->size()
-             << " unit(s) under 4ceMWH6k";
-
-    // THE RESULT SCREEN (1ZbHB6Im).  This is what actually drives the xp-bar
-    // sweep and the level-up flourish, and the server had never sent it — the
-    // screen rendered the unit and then sat there with nothing to animate.
-    // Every field here is a before/after pair for exactly that reason.
-    {
-        UnitOpeResult r = {};
-        r.unit_id       = baseMstId;
-        r.user_unit_id  = std::to_string(baseId);
-        r.zel           = zelCost;
-        r.exp           = gainedExp;
-        r.success_type  = successType;          // 0 normal / 1 great / 2 super
-        r.before_lv     = oldLevel;
-        r.after_lv      = newLevel;
-        r.before_exp    = oldExp;
-        r.after_exp     = newExp;
-
-        // ⚠ before/after_skill_lv IS THE BRAVE BURST LEVEL, and fusion DOES
-        // change it.  This block (UnitOpeResult, 1ZbHB6Im) is what the fusion
-        // RESULT screen draws its "BB Lv. x/10" from -- not the reinforce entry
-        // and not the unit cache, both of which carry the right value and are
-        // ignored for this field.  Confirmed 2026-09-05 against a live capture:
-        // Eliza fused 1->2, the response carried bb_lvl 2 in BOTH xZH6EIQ7 and
-        // 4ceMWH6k, and the screen still read 0/10 because these two were 0.
-        //
-        // They were being read from user_units.skill_lv / extra_skill_lv, an
-        // unused pair of columns that is 0 on every row -- the same wrong-column
-        // mistake as the reinforce entry, in a second place.
-        //
-        // Slot 1's frame genuinely is unchanged by fusion, so it keeps the
-        // before == after treatment (a 0/0 pair would read as "dropped to
-        // nothing" on any stat the UI chooses to flourish).
-        //
-        // SLOT 2's FRAME IS NOT INERT: a Sphere Frog moves it from -1 to 0,
-        // which is the whole visible effect of that fusion.  Sending the old
-        // value on both sides is what made the frog look like it did nothing
-        // on the result screen.
-        const auto eqpFrame     = br["eqip_item_frame_id"].as<int32_t>();
-
-        r.before_skill_lv         = oldBbLvl;
-        r.after_skill_lv          = newBbLvl;
-        r.before_extra_skill_lv   = oldSbbLvl;
-        r.after_extra_skill_lv    = newSbbLvl;
-        r.before_eqp_frame_id     = eqpFrame;
-        r.after_eqp_frame_id      = eqpFrame;
-        r.before_eqp_frame_id2    = oldEqpFrame2;
-        r.after_eqp_frame_id2     = newEqpFrame2;
-
-        // FE and DBB are not implemented; equal zeroes are the honest "no
-        // change" for a feature that does not exist yet.
-        r.before_fe_bp = r.after_fe_bp = 0;
-        r.before_max_fe_bp = r.after_max_fe_bp = 0;
-        r.before_dbb_skill_level = r.after_dbb_skill_level = 0;
-
-        // THE STAT TABLE.  lvup_status and param_up_state are a matched pair
-        // and must be built together — decoded from parseMixResult:
-        //
-        //   lvup_status    strtok(s, ",")  -> one MixResultStatus per chunk,
-        //                  each chunk "lv:hp:atk:def:heal"
-        //   param_up_state parseList(':')  -> a single "lv:hp:atk:def:heal";
-        //                  its lv is looked up AGAINST that table
-        //
-        // Sent empty, the client falls back to building ONE row from the unit
-        // it is displaying — at the OLD level — which is why the bar moved but
-        // no stats or level-up ever appeared.  And param_up_state alone would
-        // look up a level absent from that one-row table, leaving `v119 = 0`
-        // and dereferencing it (`MixResultStatus::getHp(v119)`) — the crash.
-        //
-        // So: emit a row for every level from before to after, then point
-        // param_up_state at the final one.
+        // Step 4: return spheres equipped on the fodder, then DELETE the material
+        // units — deleting without the return would destroy the equipped items.
+        uint32_t spheresReturned = 0;
+        if (!matIds.empty())
         {
-            // Scaled from the MST's MIN, not from the stored base_*: the
-            // stored value is already scaled to the unit's level, so using it
-            // as the floor made every row of the animation drift upward.
-            // ⚠ THE TWO STRINGS MUST DIFFER OR NOTHING IS SHOWN.
+            spheresReturned = co_await gme::returnEquippedSpheres(transaction, identity, matList);
+            co_await transaction->execSqlCoro(
+                "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + matList + ");",
+                std::string(kUserId)
+            );
+        }
+
+        if (mysteryKind)
+            co_await gme::addUserPresent(transaction, identity, 6, "750006", 3, 0,
+                                        "Mystery Frog fusion: Rainbow Crystals");
+
+        // Step 5: deduct zel.
+        if (zelCost > 0)
+        {
+            co_await transaction->execSqlCoro(
+                "UPDATE user_info SET zel = MAX(0, zel - $1) WHERE id=$2;",
+                zelCost, std::string(kUserId)
+            );
+        }
+
+
+        // Build response.
+        UnitMixResp resp = {};
+
+        // Reinforcement animation entry.
+        {
+            UnitReinforceEntry rd = {};
+            rd.handle_name    = "DecompDev";
+            rd.target_lv      = newLevel;
+            rd.unit_mst_id    = baseMstId;
+            rd.base_hp        = newBaseHp;
+            rd.base_atk       = newBaseAtk;
+            rd.base_def       = newBaseDef;
+            rd.base_heal      = newBaseRec;
+            // add_* passes through untouched -- fusion does not write it.  ext_* is
+            // the IMP bucket and carries the POST-fusion clamped values, because an
+            // imp that just landed has to show on the result screen.
+            rd.add_hp         = br["add_hp"].as<int32_t>();
+            rd.add_atk        = br["add_atk"].as<int32_t>();
+            rd.add_def        = br["add_def"].as<int32_t>();
+            rd.add_heal       = br["add_rec"].as<int32_t>();
+            rd.ext_hp         = newImpHp;
+            rd.ext_atk        = newImpAtk;
+            rd.ext_def        = newImpDef;
+            // ⚠ THESE ARE THE BRAVE BURST FIELDS, DESPITE THE NAMES.
+            // UnitReinforceEntry.skill_id carries hash nj9Lw7mV and skill_lv
+            // carries 3NbeC8AB -- the same two hashes UserUnitInfo uses for bb_id
+            // and bb_lvl.  They were being fed from user_units.skill_id/skill_lv,
+            // a different (and entirely unused, 0 on all 77 rows) pair of columns,
+            // which is why the fusion RESULT screen read "BB Lv. 0/10" while the
+            // unit card -- which reads UserUnitInfo -- correctly showed Lv.10.
+            // Post-fusion values, like add_* above, so the screen shows the gain.
+            rd.skill_id       = br["bb_id"].as<std::string>();
+            rd.skill_lv       = newBbLvl;
+            rd.extra_skill_id = br["sbb_id"].as<std::string>();
+            rd.extra_skill_lv = newSbbLvl;
+            rd.unit_type_id   = newUnitType;
+            // Ge8Yo32T is setEquipItemID, not a mission id -- and xZH6EIQ7 is a
+            // full REPLACE of the reinforcement record, so sending a blank here
+            // wiped the sphere off the fused unit on the result screen.
+            rd.equipitem_id   = br["eqip_item_id"].as<int32_t>();
+            resp.reinforce.emplace_back(std::move(rd));
+        }
+
+        // Incremental unit cache update.
+        //
+        // Read back through PacketInterfaceFor<UserUnitInfo> rather than
+        // hand-assembling the entry.  This is the SAME read UserInfo uses at login,
+        // and login is the one path the client provably accepts — so building the
+        // entry any other way is guessing at a shape we already have.
+        //
+        // Hand-assembly is how the level stopped showing after a fusion: the entry
+        // was 47 fields and complete-looking, but `received_order` (Bvkx8s6M) was
+        // never assigned and so went out as 0, where login sends 1000.  It is not
+        // a column — the schema maps it onto `user_unit_id` — so there was nothing
+        // in the SELECT to notice was missing.  Any field added to UserUnitInfo in
+        // future would have silently defaulted the same way.
+        //
+        // The DB writes above have already landed, so this read reflects the new
+        // level, exp and total_exp.
+        //
+        // FULL-REPLACE THE UNIT CACHE (4ceMWH6k).  Confirmed working in-client
+        // 2026-08-10: the fusion menu shows the new level and the fodder are gone,
+        // with no trip to Home.
+        //
+        // We deliberately do NOT echo the base unit under qC2tJs4E.  That key is
+        // INSERT-IF-ABSENT: readParam's tail asks UserUnitInfoList::exist() and
+        // returns without committing when the client already owns the unit, so for
+        // a fusion base it is a guaranteed no-op.
+        //
+        // 4ceMWH6k is the only key that can change an owned unit, because its
+        // readParam calls removeAllObjects() first — which is also why it must
+        // carry the WHOLE roster, not just the fused unit.
+        //
+        // It is needed because the client has no local apply path of its own: it
+        // never writes the fused unit (no UserUnitInfo mutator is reachable from a
+        // fusion scene) and never drops the fodder (removeObject is called by the
+        // sale scenes and the FrontierGate/FGPlus friend lists, never by a fusion
+        // scene; removeObjectWithUserUnitID has none), and it issues no request
+        // after the fusion.
+        //
+        // The historical objection was that removeAllObjects release()s every
+        // CCObject in the list, dangling any raw UserUnitInfo* a live scene holds —
+        // it soft-locked the result screen once.  That build also sent
+        // lvup_status "1", which crashes parseMixResult by itself; with the ritual
+        // payload correct, this key is fine here.  If a future scene does start
+        // soft-locking on it, that is the mechanism to suspect.
+        resp.unit_refresh = std::move((co_await db::PacketInterfaceFor<::UserUnitInfo>::read(
+            transaction,
+            "user_units",
+            { db::Lookup("user_id", std::string(kUserId)) })).data);
+
+        LOG_INFO << "UnitMix: full-replace unit cache — " << resp.unit_refresh->size()
+                 << " unit(s) under 4ceMWH6k";
+
+        // THE RESULT SCREEN (1ZbHB6Im).  This is what actually drives the xp-bar
+        // sweep and the level-up flourish, and the server had never sent it — the
+        // screen rendered the unit and then sat there with nothing to animate.
+        // Every field here is a before/after pair for exactly that reason.
+        {
+            UnitOpeResult r = {};
+            r.unit_id       = baseMstId;
+            r.user_unit_id  = std::to_string(baseId);
+            r.zel           = zelCost;
+            r.exp           = gainedExp;
+            r.success_type  = successType;          // 0 normal / 1 great / 2 super
+            r.before_lv     = oldLevel;
+            r.after_lv      = newLevel;
+            r.before_exp    = oldExp;
+            r.after_exp     = newExp;
+
+            // ⚠ before/after_skill_lv IS THE BRAVE BURST LEVEL, and fusion DOES
+            // change it.  This block (UnitOpeResult, 1ZbHB6Im) is what the fusion
+            // RESULT screen draws its "BB Lv. x/10" from -- not the reinforce entry
+            // and not the unit cache, both of which carry the right value and are
+            // ignored for this field.  Confirmed 2026-09-05 against a live capture:
+            // Eliza fused 1->2, the response carried bb_lvl 2 in BOTH xZH6EIQ7 and
+            // 4ceMWH6k, and the screen still read 0/10 because these two were 0.
             //
-            // parseMixResult builds a MixResultStatus table from lvup_status
-            // (one "lv:hp:atk:def:heal" chunk per level) and then looks
-            // param_up_state's level up IN that table -- the stat-gain flourish
-            // is the DIFFERENCE between the two.  Building both from the same
-            // post-fusion numbers makes that difference zero, which is why an
-            // imp fusion moved the totals and animated nothing.
+            // They were being read from user_units.skill_lv / extra_skill_lv, an
+            // unused pair of columns that is 0 on every row -- the same wrong-column
+            // mistake as the reinforce entry, in a second place.
             //
-            // So: the table carries the statline WITHOUT this fusion's imps
-            // (levelling alone), and param_up_state carries it WITH them.  For a
-            // pure level-up the imp terms are equal and the flourish is the
-            // level gain, exactly as before.
-            const auto statRow = [&](int lv, int impHp, int impAtk, int impDef, int impRec) {
-                const int hp = unitMix_statAtLevel(
-                                     baseMstData ? baseMstData->min_hp : br["base_hp"].as<int32_t>(),
-                                     baseMstData ? baseMstData->max_hp : br["base_hp"].as<int32_t>(),
-                                     lv, maxLevel)
-                                 + br["add_hp"].as<int32_t>() + impHp
-                                 + br["limit_over_hp"].as<int32_t>();
-                const int atk = unitMix_statAtLevel(
-                                     baseMstData ? baseMstData->min_atk : br["base_atk"].as<int32_t>(),
-                                     baseMstData ? baseMstData->max_atk : br["base_atk"].as<int32_t>(),
-                                     lv, maxLevel)
-                                 + br["add_atk"].as<int32_t>() + impAtk
-                                 + br["limit_over_atk"].as<int32_t>();
-                const int def = unitMix_statAtLevel(
-                                     baseMstData ? baseMstData->min_def : br["base_def"].as<int32_t>(),
-                                     baseMstData ? baseMstData->max_def : br["base_def"].as<int32_t>(),
-                                     lv, maxLevel)
-                                 + br["add_def"].as<int32_t>() + impDef
-                                 + br["limit_over_def"].as<int32_t>();
-                const int rec = unitMix_statAtLevel(
-                                     baseMstData ? baseMstData->min_rec : br["base_rec"].as<int32_t>(),
-                                     baseMstData ? baseMstData->max_rec : br["base_rec"].as<int32_t>(),
-                                     lv, maxLevel)
-                                 + br["add_rec"].as<int32_t>() + impRec
-                                 + br["limit_over_rec"].as<int32_t>();
-                return std::to_string(lv) + ':' + std::to_string(hp) + ':'
-                     + std::to_string(atk) + ':' + std::to_string(def) + ':'
-                     + std::to_string(rec);
-            };
+            // Slot 1's frame genuinely is unchanged by fusion, so it keeps the
+            // before == after treatment (a 0/0 pair would read as "dropped to
+            // nothing" on any stat the UI chooses to flourish).
+            //
+            // SLOT 2's FRAME IS NOT INERT: a Sphere Frog moves it from -1 to 0,
+            // which is the whole visible effect of that fusion.  Sending the old
+            // value on both sides is what made the frog look like it did nothing
+            // on the result screen.
+            const auto eqpFrame     = br["eqip_item_frame_id"].as<int32_t>();
 
-            std::string table;
-            for (int lv = oldLevel; lv <= newLevel; ++lv)
+            r.before_skill_lv         = oldBbLvl;
+            r.after_skill_lv          = newBbLvl;
+            r.before_extra_skill_lv   = oldSbbLvl;
+            r.after_extra_skill_lv    = newSbbLvl;
+            r.before_eqp_frame_id     = eqpFrame;
+            r.after_eqp_frame_id      = eqpFrame;
+            r.before_eqp_frame_id2    = oldEqpFrame2;
+            r.after_eqp_frame_id2     = newEqpFrame2;
+
+            // FE and DBB are not implemented; equal zeroes are the honest "no
+            // change" for a feature that does not exist yet.
+            r.before_fe_bp = r.after_fe_bp = 0;
+            r.before_max_fe_bp = r.after_max_fe_bp = 0;
+            r.before_dbb_skill_level = r.after_dbb_skill_level = 0;
+
+            // THE STAT TABLE.  lvup_status and param_up_state are a matched pair
+            // and must be built together — decoded from parseMixResult:
+            //
+            //   lvup_status    strtok(s, ",")  -> one MixResultStatus per chunk,
+            //                  each chunk "lv:hp:atk:def:heal"
+            //   param_up_state parseList(':')  -> a single "lv:hp:atk:def:heal";
+            //                  its lv is looked up AGAINST that table
+            //
+            // Sent empty, the client falls back to building ONE row from the unit
+            // it is displaying — at the OLD level — which is why the bar moved but
+            // no stats or level-up ever appeared.  And param_up_state alone would
+            // look up a level absent from that one-row table, leaving `v119 = 0`
+            // and dereferencing it (`MixResultStatus::getHp(v119)`) — the crash.
+            //
+            // So: emit a row for every level from before to after, then point
+            // param_up_state at the final one.
             {
-                if (!table.empty()) table += ',';
-                table += statRow(lv, oldImpHp, oldImpAtk, oldImpDef, oldImpRec);
+                // Scaled from the MST's MIN, not from the stored base_*: the
+                // stored value is already scaled to the unit's level, so using it
+                // as the floor made every row of the animation drift upward.
+                // ⚠ THE TWO STRINGS MUST DIFFER OR NOTHING IS SHOWN.
+                //
+                // parseMixResult builds a MixResultStatus table from lvup_status
+                // (one "lv:hp:atk:def:heal" chunk per level) and then looks
+                // param_up_state's level up IN that table -- the stat-gain flourish
+                // is the DIFFERENCE between the two.  Building both from the same
+                // post-fusion numbers makes that difference zero, which is why an
+                // imp fusion moved the totals and animated nothing.
+                //
+                // So: the table carries the statline WITHOUT this fusion's imps
+                // (levelling alone), and param_up_state carries it WITH them.  For a
+                // pure level-up the imp terms are equal and the flourish is the
+                // level gain, exactly as before.
+                const auto statRow = [&](int lv, int impHp, int impAtk, int impDef, int impRec) {
+                    const int hp = unitMix_statAtLevel(
+                                         baseMstData ? baseMstData->min_hp : br["base_hp"].as<int32_t>(),
+                                         baseMstData ? baseMstData->max_hp : br["base_hp"].as<int32_t>(),
+                                         lv, maxLevel)
+                                     + typeGrowth[0][lv] + br["add_hp"].as<int32_t>() + impHp
+                                     + br["limit_over_hp"].as<int32_t>();
+                    const int atk = unitMix_statAtLevel(
+                                         baseMstData ? baseMstData->min_atk : br["base_atk"].as<int32_t>(),
+                                         baseMstData ? baseMstData->max_atk : br["base_atk"].as<int32_t>(),
+                                         lv, maxLevel)
+                                     + typeGrowth[1][lv] + br["add_atk"].as<int32_t>() + impAtk
+                                     + br["limit_over_atk"].as<int32_t>();
+                    const int def = unitMix_statAtLevel(
+                                         baseMstData ? baseMstData->min_def : br["base_def"].as<int32_t>(),
+                                         baseMstData ? baseMstData->max_def : br["base_def"].as<int32_t>(),
+                                         lv, maxLevel)
+                                     + typeGrowth[2][lv] + br["add_def"].as<int32_t>() + impDef
+                                     + br["limit_over_def"].as<int32_t>();
+                    const int rec = unitMix_statAtLevel(
+                                         baseMstData ? baseMstData->min_rec : br["base_rec"].as<int32_t>(),
+                                         baseMstData ? baseMstData->max_rec : br["base_rec"].as<int32_t>(),
+                                         lv, maxLevel)
+                                     + typeGrowth[3][lv] + br["add_rec"].as<int32_t>() + impRec
+                                     + br["limit_over_rec"].as<int32_t>();
+                    return std::to_string(lv) + ':' + std::to_string(hp) + ':'
+                         + std::to_string(atk) + ':' + std::to_string(def) + ':'
+                         + std::to_string(rec);
+                };
+
+                std::string table;
+                for (int lv = std::min(oldLevel, newLevel); lv <= newLevel; ++lv)
+                {
+                    if (!table.empty()) table += ',';
+                    table += statRow(lv, oldImpHp, oldImpAtk, oldImpDef, oldImpRec);
+                }
+                r.lvup_status    = table;
+                // Same level as the table's last row, so the lookup resolves -- a
+                // level absent from the table null-derefs in parseMixResult.
+                r.param_up_state = statRow(newLevel, newImpHp, newImpAtk, newImpDef, newImpRec);
             }
-            r.lvup_status    = table;
-            // Same level as the table's last row, so the lookup resolves -- a
-            // level absent from the table null-derefs in parseMixResult.
-            r.param_up_state = statRow(newLevel, newImpHp, newImpAtk, newImpDef, newImpRec);
+
+            // FE is not implemented; empty is the honest "no allocation".  These
+            // are plain string setters with no list parsing behind them.
+            r.before_fe_info = "";
+            r.after_fe_info  = "";
+
+            resp.ope_result.push_back(std::move(r));
+
+            LOG_INFO << "UnitMix: result lv " << oldLevel << "->" << newLevel
+                     << " exp " << oldExp << "->" << newExp
+                     << " (+" << gainedExp << "), lvup=" << r.lvup_status;
         }
 
-        // FE is not implemented; empty is the honest "no allocation".  These
-        // are plain string setters with no list parsing behind them.
-        r.before_fe_info = "";
-        r.after_fe_info  = "";
+        // DAILY TASK `PU`.  ⚠ IT COUNTS UNITS FUSED, NOT FUSIONS PERFORMED — the
+        // wiki and the client agree the task is "Fuse 5 units", and feeding five
+        // fodder in one go is five.  Counting the operation instead made a full
+        // five-material fusion read [1/5], which is what Evan hit on 2026-09-20.
+        co_await gme::advanceDailyTask(transaction, identity, "PU",
+            static_cast<int32_t>(matIds.size()));
 
-        resp.ope_result.push_back(std::move(r));
+        resp.team_info = std::move(
+            (co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
 
-        LOG_INFO << "UnitMix: result lv " << oldLevel << "->" << newLevel
-                 << " exp " << oldExp << "->" << newExp
-                 << " (+" << gainedExp << "), lvup=" << r.lvup_status;
+        // Spheres handed back from the fodder: no fusion scene touches the client
+        // warehouse, so they need the full snapshot (UnitMixResp in handlers.kdl).
+        if (spheresReturned > 0)
+        {
+            auto warehouse = co_await gme::loadWarehouseSnapshot(transaction, identity);
+            resp.warehouse_info = std::move(warehouse.warehouse);
+            resp.item_dictionary_info = std::move(warehouse.dictionary);
+        }
+
+        // THE DBB LIST, whenever this fusion could have changed it.
+        //
+        // A golem fusion opens the unit's DBB slot, and the ONLY way the client
+        // learns a slot is open is by finding the unit in this list
+        // (GameUtils::setDbbFusedIcon @0x1EC4CF8 -> objectForKey).  Nothing in the
+        // fusion scene refreshes it, so without this the column was set correctly
+        // in the database and the screen showed no slot, no icon and no animation
+        // -- handbook §6: a successful SQL update is not a UI refresh.
+        //
+        // Sent when the unlock changed, and also when the unit already had a slot,
+        // because the fusion reply is the only refresh this scene gets.
+        if (newDbbUnlocked != 0)
+            co_await gme::fillDbb(transaction, identity, resp);
+
+        std::string buffer{};
+        if (const auto& ec2 = glz::write_json(resp, buffer); ec2)
+        {
+            LOG_ERROR << "UnitMix: serialization error: " << glz::format_error(ec2, buffer);
+            transaction->rollback();
+            co_return HandleResult::error("Serialization error");
+        }
+
+        // Journal: "10 Fusions performed".  Counts the units consumed, which is
+        // what a player means by a fusion - feeding five fodder in one action is
+        // five fusions, not one.
+        co_await gme::addJournalProgress(
+            transaction, identity, gme::kJournalTaskUnitFusion,
+            static_cast<int32_t>(std::max<size_t>(matIds.size(), 1)));
+
+        // Trophies 100220 合成回数 / 100230 合成ユニット素材使用数 / 100040 総合ゼル使用額.
+        // matIds is the material set the handler actually consumed, and zelCost is
+        // what it charged -- both taken after validation, not from the raw request.
+        co_await gme::bumpArchiveCounters(transaction, identity, {
+            { "unit_mix_cnt",      1 },
+            { "unit_mix_elem_cnt", static_cast<int64_t>(matIds.size()) },
+            { "zel_use",           static_cast<int64_t>(zelCost) },
+        });
+
+        co_return HandleResult::success(buffer);
     }
-
-    // DAILY TASK `PU`.  ⚠ IT COUNTS UNITS FUSED, NOT FUSIONS PERFORMED — the
-    // wiki and the client agree the task is "Fuse 5 units", and feeding five
-    // fodder in one go is five.  Counting the operation instead made a full
-    // five-material fusion read [1/5], which is what Evan hit on 2026-09-20.
-    co_await gme::advanceDailyTask(theDb(), identity, "PU",
-        static_cast<int32_t>(matIds.size()));
-
-    resp.team_info = std::move(
-        (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
-
-    // Spheres handed back from the fodder: no fusion scene touches the client
-    // warehouse, so they need the full snapshot (UnitMixResp in handlers.kdl).
-    if (spheresReturned > 0)
+    catch (...)
     {
-        auto warehouse = co_await gme::loadWarehouseSnapshot(theDb(), identity);
-        resp.warehouse_info = std::move(warehouse.warehouse);
-        resp.item_dictionary_info = std::move(warehouse.dictionary);
+        transaction->rollback();
+        throw;
     }
 
-    // THE DBB LIST, whenever this fusion could have changed it.
-    //
-    // A golem fusion opens the unit's DBB slot, and the ONLY way the client
-    // learns a slot is open is by finding the unit in this list
-    // (GameUtils::setDbbFusedIcon @0x1EC4CF8 -> objectForKey).  Nothing in the
-    // fusion scene refreshes it, so without this the column was set correctly
-    // in the database and the screen showed no slot, no icon and no animation
-    // -- handbook §6: a successful SQL update is not a UI refresh.
-    //
-    // Sent when the unlock changed, and also when the unit already had a slot,
-    // because the fusion reply is the only refresh this scene gets.
-    if (newDbbUnlocked != 0)
-        co_await gme::fillDbb(theDb(), identity, resp);
-
-    std::string buffer{};
-    if (const auto& ec2 = glz::write_json(resp, buffer); ec2)
-    {
-        LOG_ERROR << "UnitMix: serialization error: " << glz::format_error(ec2, buffer);
-        co_return HandleResult::error("Serialization error");
-    }
-
-    // Journal: "10 Fusions performed".  Counts the units consumed, which is
-    // what a player means by a fusion - feeding five fodder in one action is
-    // five fusions, not one.
-    co_await gme::addJournalProgress(
-        theDb(), identity, gme::kJournalTaskUnitFusion,
-        static_cast<int32_t>(std::max<size_t>(matIds.size(), 1)));
-
-    // Trophies 100220 合成回数 / 100230 合成ユニット素材使用数 / 100040 総合ゼル使用額.
-    // matIds is the material set the handler actually consumed, and zelCost is
-    // what it charged -- both taken after validation, not from the raw request.
-    co_await gme::bumpArchiveCounters(theDb(), identity, {
-        { "unit_mix_cnt",      1 },
-        { "unit_mix_elem_cnt", static_cast<int64_t>(matIds.size()) },
-        { "zel_use",           static_cast<int64_t>(zelCost) },
-    });
-
-    co_return HandleResult::success(buffer);
 }

@@ -1,38 +1,40 @@
 #include "App.hpp"
 #include "Handlers.hpp"
+#include <gimuserver/gme/common/FeatureVisits.hpp>
 
-// UserEnteredFeature (983D5Dii) — "the player just opened this feature".
-//
-// ⚠ THIS REQUEST ONLY EXISTS BECAUSE FEATURE GATING IS ON.  Turning the master
-// switch `a37D29iJ` from 0 to 1 is what padlocked Raid and Guild, and it also
-// activated the gating code path in every scene that consults it —
-// RandallTownScene among them.  Those paths report each feature the player
-// enters, so a switch that had been off since the server was written suddenly
-// put a brand-new GroupId on the wire.  Unregistered, that is
-// GmeErrorCommand::Close, which is why Randall started refusing to open the
-// moment the padlocks started working.
-//
-// The lesson is the switch, not the request: enabling a client-side system
-// wholesale makes every request that system owns reachable at once.  The full
-// list of what is still unregistered is 47 non-deferred classes; this is simply
-// the first one a player walks into.
-//
-// WHAT IT IS FOR: UserEnteredFeatureList (2386Diw1) is what clears the NEW
-// badge on a freshly unlocked feature — see FeatureGatingInfo.new_flg in
-// net/user.kdl, which notes the badge is sticky server-side once set.
-// Answering `{}` keeps Randall open and leaves the badge showing, which is why
-// Vortex and the Imperial Capital still say NEW.
-//
-// TO FINISH IT: persist the reported feature id per user and return the list
-// under `2386Diw1` (UserEnteredFeatureListResponse takes e63D1BV0 feature_id,
-// MHx05sXt dungeon_id, Diwl3b56 — all inlined stores at +0x18/+0x1c/+0x20).
-// Then the NEW badges clear on first visit, as they did in the live game.
+// Android createBody @0x1C706F0 sends one visit under 2386Diw1.
+// This is visit history only: it never releases a feature or grants rewards.
 HANDLEF(UserEnteredFeature)
 {
-	(void)session;
-	LOG_INFO << "UserEnteredFeature: " << json;
+    (void)session;
+    ::UserEnteredFeatureReq req{};
+    if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
+        co_return HandleResult::error("Invalid feature visit");
+    if (req.entered_features.size() != 1)
+        co_return HandleResult::error("Expected one feature visit");
+    const auto& visit = req.entered_features.front();
+    if (visit.feature_id < 0 || visit.dungeon_id < 0 ||
+        (visit.feature_id == 0 && visit.dungeon_id == 0) || visit.new_flg != 0)
+        co_return HandleResult::error("Invalid feature visit values");
 
-	// Deliberately empty rather than absent: the client asked, and an answer it
-	// can parse is what keeps Randall reachable instead of killing the session.
-	co_return HandleResult::success("{}");
+    const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+    auto transaction = co_await theDb()->newTransactionCoro();
+    try
+    {
+        co_await transaction->execSqlCoro(
+            "INSERT INTO user_entered_features(user_id,feature_id,dungeon_id) "
+            "VALUES ($1,$2,$3) ON CONFLICT(user_id,feature_id,dungeon_id) DO NOTHING;",
+            identity.userId, visit.feature_id, visit.dungeon_id);
+        ::UserEnteredFeatureResp resp{};
+        resp.entered_features = co_await gme::loadFeatureVisits(transaction, identity);
+        std::string body;
+        if (const auto ec = glz::write_json(resp, body); ec)
+            throw std::runtime_error("Cannot serialize feature visits");
+        co_return HandleResult::success(body);
+    }
+    catch (...)
+    {
+        transaction->rollback();
+        throw;
+    }
 }

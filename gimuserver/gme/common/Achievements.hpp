@@ -1198,6 +1198,8 @@ inline drogon::Task<std::vector<::UserAchievementTradeInfo>> loadAchievementTrad
 		row.trade_id = std::to_string(offer.id);
 		const auto it = bought.find(row.trade_id);
 		row.count = it == bought.end() ? 0 : it->second;
+		// VDKB0Y5h is seconds remaining: zero prints Time Expired, -1 hides it.
+		row.state = -1;
 		trades.push_back(std::move(row));
 	}
 	co_return trades;

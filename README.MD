@@ -19,7 +19,12 @@ See [RELEASE.md](RELEASE.md) to build the standalone server ZIP and separate gam
 - vcpkg
 
 ## Building
-See the [Tutorial](https://decompfrontier.github.io/pages/Tutorial/index.html) pages section "Development setup" for more information.
+Use the [fresh-checkout development guide](docs/DEVELOPMENT.md). On Windows,
+`rebuild.bat` configures CMake before building Debug; generated Ninja files do
+not need to be copied from another PC.
+
+For gameplay work, start with the [current handbook](docs/BF_OFFLINE_SERVER_HANDBOOK.md)
+and [gameplay work queue](docs/GAMEPLAY_WORK_QUEUE.md).
 
 ## Legal
 The code of this project is released under the Affero GNU Public License v3.0+.

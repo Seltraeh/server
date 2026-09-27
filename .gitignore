@@ -505,16 +505,19 @@ out/
 tools/
 *.md
 
-# Local-only debug CLI (dev tool, kept out of upstream)
-standalone_frontend/DebugCli.cpp
-standalone_frontend/DebugCli.hpp
+# The optional developer console is shared source; release packages disable it.
 
-# Local-only ServerCache fragments (dev-fork MST caches, kept out of upstream).
-# ServerCache{,Mst}.hpp/.cpp pull these in with __has_include when present, so
-# upstream builds just skip them. Keeping fork-only tables here stops them
-# colliding with every upstream edit to the shared cache files.
+# Historical local fragments are no longer included. Their required gameplay
+# caches now live in tracked ServerCache sources; keep old copies ignored.
 gimuserver/drogon/ServerCacheLocal*.inl
 
 # Portable release tooling and maintainer instructions belong in the repository.
 !RELEASE.md
 !packaging/config.json
+
+# Shared contributor documentation and build inputs.
+!docs/
+!docs/**/*.md
+!scripts/*.md
+CMakeUserPresets.json
+.tools/

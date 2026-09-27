@@ -13,10 +13,8 @@
 // "Rift Token" is the Frontier Gate's currency; the box pays it as present type
 // 8004 (gme::grantEventToken) and this is where the balance comes back.
 //
-// Still unbuilt above this: the exchange itself.  The client has
-// EventTokenExchangeInfoRequest and the shop's item names live in its own
-// sgtext (MST_ET_EXCHANGE_*, 61 rows), but no F_EVENT_TOKEN_EXCHANGE MST was
-// dumped, so there is nothing to spend tokens ON yet.
+// Exchange.cpp serves the curated offline catalogue and purchases. Supported
+// currencies appear here even at zero balance, so their shops can be browsed.
 HANDLEF(EventTokenInfo)
 {
 	(void)session;

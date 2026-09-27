@@ -644,12 +644,14 @@ private:
 	std::vector<HelpDetailMst> m_helpDetailMst;
 	std::vector<PvpFixedSettingMst> m_pvpFixedSettingMst;
 
-// Local-only members and getters, if this checkout has any.  Must be last in
-// the class: the include manages its own access specifiers and leaves the
-// class in whatever mode it ends on.
-// After ADDING the file, touch this header: when it was absent nothing
-// recorded a dependency on it, so the build won't otherwise notice.
-#if __has_include("ServerCacheLocalMembers.inl")
-	#include "ServerCacheLocalMembers.inl"
-#endif
+public:
+	// Required by gameplay handlers, including selector summons and the Bazaar.
+	inline const auto& unitSelectorGacha() const { return m_unitSelectorGacha; }
+	inline const auto& missionMst() const { return m_missionMst; }
+	inline const auto& eventTokenMst() const { return m_eventTokenMst; }
+
+private:
+	std::vector<UnitSelectorGachaMst> m_unitSelectorGacha;
+	std::vector<MissionMst> m_missionMst;
+	std::vector<EventTokenInfo> m_eventTokenMst;
 };

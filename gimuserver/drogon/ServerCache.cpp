@@ -595,12 +595,13 @@ void ServerCache::Setup(const Json::Value& serverObj)
 			// the map had no tile, because these all sit above kSpecialIdFloor
 			// where the progression gate never looks.
 			//
-			// ⚠ THE PREREQUISITE CHAIN IS NOT APPLIED HERE and must not be.
-			// PermitPlace adds these WITHOUT the need_mission_id check every
-			// campaign tile gets, which is deliberate: a Strategy Zone trial
-			// needs the two before it, those are unbuilt, and an unbuilt mission
-			// can never be cleared -- so honouring the chain would lock the
-			// whole series behind content that does not exist.
+			// ⚠ THE PREREQUISITE CHAIN IS NOT APPLIED HERE: this set is the same
+			// for every player.  PermitPlace applies it per request to the
+			// Research Lab's missions (gme::researchLabUnlocked), skipping any
+			// prerequisite with no archive record -- a Strategy Zone trial needs
+			// two before it, those are unbuilt, and an unbuilt mission can never
+			// be cleared, so honouring them would lock the series behind content
+			// that does not exist.  Trial of the Gods keeps no chain.
 			//
 			// The archive check that keeps an unbuildable tile off the map lives
 			// in PermitPlace, NOT here: GimuServer::Setup runs m_cache.Setup
@@ -986,13 +987,9 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		// shape (12 fields) and GachaArchiver serves it at request time; the
 		// MST file has 23 columns, so a strict load into that struct throws.
 
-		// Local-only MST loads, if this checkout has any.  Runs last so it can
-		// rely on everything above; see ServerCacheLocalMembers.inl for storage.
-		// After ADDING the file, touch this file: when it was absent nothing
-		// recorded a dependency on it, so the build won't otherwise notice.
-#if __has_include("ServerCacheLocalLoad.inl")
-	#include "ServerCacheLocalLoad.inl"
-#endif
+		m_unitSelectorGacha = LoadJson<UnitSelectorGachaMstCache>(mstRoot, "unit_selector_gacha_ticket_mst.json").data;
+		m_missionMst = LoadJson<MissionMstCache>(mstRoot, "mission_mst.json").data;
+		m_eventTokenMst = LoadJson<EventTokenInfoCache>(mstRoot, "event_token_mst.json").data;
 
 		// cache: GachaList response (gacha_info comes from GachaArchiver at
 		// request time; only the category banners are cached here)
@@ -1005,4 +1002,3 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		// ---
 	}
 }
-

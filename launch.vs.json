@@ -5,7 +5,7 @@
       "type": "native",
       "name": "gimuserverw Debug",
       "project": "CMakeLists.txt",
-      "projectTarget": "gimuserverw.exe (standalone_frontend\\gimuserverw.exe)",
+      "projectTarget": "gimuserverw.exe (standalone_frontend\\Debug\\gimuserverw.exe)",
       "args": [ "${workspaceRoot}\\deploy\\config.json" ],
       "env": {}
     },
@@ -13,7 +13,7 @@
       "type": "native",
       "name": "gimuserverw Release",
       "project": "CMakeLists.txt",
-      "projectTarget": "gimuserverw.exe (standalone_frontend\\gimuserverw.exe)",
+      "projectTarget": "gimuserverw.exe (standalone_frontend\\Release\\gimuserverw.exe)",
       "args": [ "${workspaceRoot}\\deploy\\config.json" ],
       "env": {}
     }

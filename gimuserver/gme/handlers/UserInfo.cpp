@@ -1,5 +1,6 @@
 #include "App.hpp"
 #include "Handlers.hpp"
+#include <gimuserver/gme/common/FeatureVisits.hpp>
 
 #include <gimuserver/archive/GachaArchiver.hpp>
 #include <gimuserver/db/PacketInterface.hpp>
@@ -60,6 +61,7 @@ HANDLEF(UserInfo)
 	const auto identity = (co_await gme::getUserIdentity(db, req.login_info, true)).nonEmpty();
 
 	// We must have a valid user entry in the database at this point.
+	resp.entered_features = co_await gme::loadFeatureVisits(db, identity);
 	resp.login_info = std::move((co_await gme::getLoginInfo(db, identity)).nonEmpty());
 	resp.team_info = std::move((co_await gme::getTeamInfo(db, identity)).nonEmpty());
 

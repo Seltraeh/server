@@ -110,6 +110,7 @@ namespace GmeHandlers
 	HANDLE(GuildCreate);
 	HANDLE(GuildRecomendedMember);
 	HANDLE(GuildMemberUpdate);
+	HANDLE(GuildJoin);
 HANDLE(GuildRanking);
 HANDLE(GuildRankingDetail);
 	HANDLE(InboxMessageManage);
@@ -123,6 +124,9 @@ HANDLE(UnitOmniEvo);
 	HANDLE(TownUpdate);
 	HANDLE(TownFacilityUpdate);
 	HANDLE(EventTokenInfo);
+	HANDLE(EventExchangeInfo);
+	HANDLE(EventExchangePurchase);
+	HANDLE(GuildTrade);
 	HANDLE(AreaInfo);
 	HANDLE(CampaignStart);
 	HANDLE(CampaignMissionGet);

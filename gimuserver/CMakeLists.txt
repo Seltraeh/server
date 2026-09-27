@@ -1,4 +1,4 @@
-file(GLOB_RECURSE SRC "*.cpp" "*.hpp")
+file(GLOB_RECURSE SRC CONFIGURE_DEPENDS "*.cpp" "*.hpp")
 source_group(TREE "${CMAKE_CURRENT_LIST_DIR}" FILES ${SRC})
 add_library(gimuserver STATIC ${SRC})
 
@@ -25,6 +25,13 @@ target_include_directories(gimuserver
 )
 
 target_precompile_headers(gimuserver PRIVATE App.hpp)
+
+# The MSVC/Ninja PCH dependency scan can retain the old packet layout after
+# pkgen_generate runs. Keep explicit file dependencies in addition to the
+# target ordering above, including translation units that skip the PCH.
+set_property(SOURCE ${SRC}
+    "${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/gimuserver.dir/cmake_pch.cxx"
+    APPEND PROPERTY OBJECT_DEPENDS "${PKGEN_OUT_HEADER};${PKGEN_ARCHIVE_OUT_HEADER}")
 
 if (MSVC)
     target_compile_options(gimuserver PUBLIC "/constexpr:steps8388608")

@@ -3,6 +3,7 @@
 
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/Guilds.hpp>
+#include <gimuserver/gme/common/Exchange.hpp>
 
 // The guild create-and-invite slice.
 //
@@ -62,6 +63,8 @@ HANDLEF(GuildInfo)
 	// tapping a member is a null dereference -- an access violation with no
 	// dialog, which no empty-body stub can prevent.
 	resp.members = co_await gme::guildRoster(theDb(), identity);
+	resp.exchange_mst = theServer()->cache().guildPointExchangeMst();
+	resp.exchange_stock = co_await gme::loadGuildExchangeStock(theDb(), identity);
 
 	LOG_INFO << "GuildInfo: " << identity.userId << " is in \"" << guild->name
 		<< "\" (" << guild->members_count << " member(s))";
@@ -135,6 +138,8 @@ HANDLEF(GuildCreate)
 	::GuildInfoResp resp{};
 	resp.guild.push_back(gme::guildInfoBlock(*guild, handle));
 	resp.members = co_await gme::guildRoster(theDb(), identity);
+	resp.exchange_mst = theServer()->cache().guildPointExchangeMst();
+	resp.exchange_stock = co_await gme::loadGuildExchangeStock(theDb(), identity);
 	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
 
@@ -157,15 +162,22 @@ HANDLEF(GuildRecomendedMember)
 	}
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	::GuildRecomendedMemberResp resp{};
-	resp.members = co_await gme::invitableFriends(theDb(), identity);
+	// Both lists: the cards (fRaBu6et) and the profiles a tapped card opens
+	// (8lAroepR).  Sending only the cards crashed the Hall on the first tap.
+	const auto resp = co_await gme::invitableFriends(theDb(), identity);
 
 	LOG_INFO << "GuildRecomendedMember: " << resp.members.size()
 		<< " invitable friend(s) for " << identity.userId;
 	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
 
-// GuildMemberUpdate (ad81b8at) -- bring friends in.
+// GuildMemberUpdate (ad81b8at).
+//
+// ⚠ NOT THE INVITE, although it was built as one.  The client sends it only from
+// the Hall, the member screen and GuildTeamScene2 -- with the player's OWN id
+// beside GUILD_DISBAND_CONFIRMATION_OK -- so it is leaving, disbanding and rank
+// changes.  Inviting is GuildJoin, below.  Treated as an invite, those actions
+// are currently no-ops (the ids are already members, or not on the roster).
 //
 // AUTHORED: they always accept.  A real invite was a request the other player
 // answered; the Summoners here are simulated, so there is nobody to ask, and a
@@ -208,6 +220,82 @@ HANDLEF(GuildMemberUpdate)
 	::GuildInfoResp resp{};
 	resp.guild.push_back(gme::guildInfoBlock(*guild, handle));
 	resp.members = co_await gme::guildRoster(theDb(), identity);
+	resp.exchange_mst = theServer()->cache().guildPointExchangeMst();
+	resp.exchange_stock = co_await gme::loadGuildExchangeStock(theDb(), identity);
+	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+}
+
+// GuildJoin (bfa2D1bp) -- the Invite to Guild button.
+//
+// Every friend profile's invite button sends this with request type 2, the
+// player's own guild id and the FRIEND'S id: the Hall's candidate profile, the
+// Social list, friend search and the post-battle helper screens all do.  Type 1
+// is GuildDetailScene's application to someone else's guild, which cannot
+// happen here -- each Summoner's guild is their own and there are no others.
+//
+// AUTHORED: the friend accepts at once, the rule Guilds.hpp sets out.  A refusal
+// (not on the roster, guild full) answers with the unchanged guild rather than
+// an error: every handler error closes the session, and the live game's
+// refusal message is not recovered.
+//
+// The reply is the refreshed guild.  The profile's back button rebuilds the
+// Hall, whose initConnect re-requests ONLY GuildRecomendedMember, so without
+// this the new member and count would not show until the next GuildInfo.
+HANDLEF(GuildJoin)
+{
+	(void)session;
+	::GuildJoinReq req{};
+	{
+		glz::context ctx{};
+		if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
+			LOG_WARN << "GuildJoin: parse error: " << glz::format_error(ec, json);
+	}
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	const auto guild = co_await gme::loadGuild(theDb(), identity);
+	if (!guild)
+	{
+		LOG_WARN << "GuildJoin: " << identity.userId << " is not in a guild; nothing to invite into";
+		co_return HandleResult::success("{}");
+	}
+
+	// setRequestValues' third argument; see GuildJoinNode.request_type.
+	constexpr int32_t kGuildJoinInvite = 2;
+	for (const auto& node : req.nodes)
+	{
+		if (node.request_type != kGuildJoinInvite)
+		{
+			LOG_WARN << "GuildJoin: " << identity.userId << " sent request type "
+				<< node.request_type << " for guild " << node.guild_id
+				<< "; only invites (2) exist here";
+			continue;
+		}
+		if (node.guild_id != guild->guild_id)
+		{
+			LOG_WARN << "GuildJoin: " << identity.userId << " invited into guild "
+				<< node.guild_id << " but leads guild " << guild->guild_id << "; ignored";
+			continue;
+		}
+
+		const auto joined = co_await gme::inviteFriends(theDb(), identity, { node.user_id });
+		LOG_INFO << "GuildJoin: " << identity.userId << " invited " << node.user_id
+			<< (joined > 0 ? " -- joined" : " -- did not join");
+	}
+
+	const auto refreshed = co_await gme::loadGuild(theDb(), identity);
+	if (!refreshed)
+		co_return HandleResult::success("{}");
+
+	const auto handle = (co_await db::DatabaseInterface::read(
+		theDb(), "user_info",
+		{ db::Data("username"), db::Lookup("id", identity.userId) }))
+		.front<std::string>("username");
+
+	::GuildInfoResp resp{};
+	resp.guild.push_back(gme::guildInfoBlock(*refreshed, handle));
+	resp.members = co_await gme::guildRoster(theDb(), identity);
+	resp.exchange_mst = theServer()->cache().guildPointExchangeMst();
+	resp.exchange_stock = co_await gme::loadGuildExchangeStock(theDb(), identity);
 	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
 }
 

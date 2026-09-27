@@ -9,6 +9,7 @@
 #include <gimuserver/gme/common/MissionBreak.hpp>
 #include <gimuserver/gme/common/FrontierGate.hpp>
 #include <gimuserver/gme/common/PermitPlace.hpp>
+#include <gimuserver/gme/common/ResearchLab.hpp>
 
 #include <algorithm>
 #include <chrono>
@@ -33,10 +34,25 @@ constexpr uint32_t kSecondTutorialMission = 2;
 //     chapter 11    -> tuto16.txt   (Tilith's farewell)
 //     chapter 12    -> tuto17.txt   (does not exist -> nothing plays = done)
 //
-// So chapter 10 below is deliberate and load-bearing: clearing mission 2 is what
-// arms the summon tutorial.  Do not "tidy" these into a contiguous sequence.
+// ⚠ THE SECOND CHECKPOINT USED TO BE 10, AND THAT SKIPPED FIVE SCRIPTS.
+// Chapter 10 is tuto15, so clearing mission 2 jumped the player straight from
+// tuto2 to the free-summon tutorial and the whole 50..54 band -- tuto10 through
+// tuto14 -- never ran.  The cost was not cosmetic: **tuto14 is the one that
+// issues `battle_ui_on`**, so the BB/SBB/UBB/DBB commands were never enabled
+// and manual play was left with Guard.  It also fires the summon tutorial ahead
+// of the ones meant to precede it, which is why fresh saves see tutorials out
+// of order.
+//
+// These checkpoints are RESUME points, not the driver: the client walks the
+// sequence itself and reports each step through TutorialUpdate, which stores
+// what it is told.  A resume point ahead of the player therefore does not
+// "skip ahead harmlessly" -- it tells the client it is further along than it
+// is, and everything in between is lost.
+//
+// 50 is the chapter that follows tuto9, so the client resumes at tuto10 and
+// walks 50->54 then 10, 11, 12 (tuto17 does not exist = done) in order.
 constexpr uint8_t kFirstTutorialCheckpoint = 2;
-constexpr uint8_t kSecondTutorialCheckpoint = 10;
+constexpr uint8_t kSecondTutorialCheckpoint = 50;
 
 // What Karl hands over in tuto15.txt ("You received 5 Gems"), which is exactly
 // the cost of summon gate 2000 — the gate the client itself labels
@@ -462,10 +478,24 @@ HANDLEF(MissionEnd)
 			const auto honorEarned =
 				missionLost ? 0 : gme::honorForMission(helperUserId, helperWasFriend);
 
+			// THE RESEARCH LAB PAYS ONCE: "Subsequent victories won't award
+			// anything" (gme/common/ResearchLab.hpp).  A repeat clear of a lab
+			// mission pays no archive Zel, Karma or EXP; its first-clear
+			// rewards are already once-only below.  Read before the clear is
+			// recorded.
+			const auto labReplay = !missionLost
+				&& gme::isResearchLabMission(static_cast<int32_t>(req.mission_num.serial_id))
+				&& !(co_await transaction->execSqlCoro(
+					"SELECT 1 FROM user_campaign_missions"
+					" WHERE user_id = $1 AND mission_id = $2 AND state = 2;",
+					identity.userId,
+					std::to_string(req.mission_num.serial_id))).empty();
+
 			// A reported loss earns none of the archive clear rewards.
-			const auto rewardZel = req.battle_result.zel + (missionLost ? 0 : missionRecord->zel);
-			const auto rewardKarma = req.battle_result.karma + (missionLost ? 0 : missionRecord->karma);
-			const auto rewardExp = missionLost ? 0 : missionRecord->exp;
+			const auto payClear = !missionLost && !labReplay;
+			const auto rewardZel = req.battle_result.zel + (payClear ? missionRecord->zel : 0);
+			const auto rewardKarma = req.battle_result.karma + (payClear ? missionRecord->karma : 0);
+			const auto rewardExp = payClear ? missionRecord->exp : 0;
 	
 			// See if we leveled up.
 			auto newLevel = currentLevel;
@@ -511,13 +541,22 @@ HANDLEF(MissionEnd)
 				// draws that message — the balance has to come from here, or the
 				// player reaches the summon gate unable to pay for it.
 				//
-				// Guarded on `tutorial_status < 10` so the two writes happen
-				// exactly once: MissionEnd runs again on every replay of mission
-				// 2, and an unguarded `gems + 5` would pay out each time.
+				// ⚠ THE GUARD CANNOT BE `tutorial_status < <checkpoint>`.  The
+				// chapter ids are not monotonic -- the order is 1..9, 50..54,
+				// 10, 11, 12 -- so against a checkpoint of 50 a FINISHED player
+				// (chapter 12) still compares "less than", and replaying
+				// mission 2 would reset them into the tutorial and pay the gems
+				// again.  The old `< 10` hid this only because 10 happened to
+				// be low.
+				//
+				// Advance only a player still inside the opening band, which is
+				// the one case this checkpoint is for.  MissionEnd runs again on
+				// every replay of mission 2, and everyone else is left alone.
 				co_await transaction->execSqlCoro(
 					"UPDATE user_info"
 					" SET tutorial_status = $1, gems = gems + $2"
-					" WHERE gumi_user_id = $3 AND id = $4 AND tutorial_status < $1;",
+					" WHERE gumi_user_id = $3 AND id = $4"
+					"   AND tutorial_status BETWEEN 1 AND 9;",
 					kSecondTutorialCheckpoint,
 					kTutorialSummonGems,
 					identity.gumiUserId,

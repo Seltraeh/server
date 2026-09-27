@@ -249,6 +249,9 @@ HANDLEF(AchievementTrade)
 	if (offer == shop.end())
 		co_return HandleResult::error("Invalid trade request", "unknown offer " + node.trade_id);
 
+	if (node.count <= 0 || count > offer->limit_count || offer->price <= 0)
+		co_return HandleResult::error("Invalid trade request", "invalid quantity or price");
+
 	const auto reward = parseReward(offer->reward_info);
 	const auto cost = static_cast<int64_t>(offer->price) * count;
 

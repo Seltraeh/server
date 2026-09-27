@@ -265,6 +265,8 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 		info.user_id = memberId;
 		info.last_online = now;
 		info.active_guild_deck = 1;
+		const auto wallet = co_await database->execSqlCoro("SELECT guild_tokens FROM user_info WHERE id=$1;", memberId);
+		if (!wallet.empty()) info.tokens = wallet[0]["guild_tokens"].as<int32_t>();
 
 		if (memberId == identity.userId)
 		{
@@ -303,7 +305,10 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 				info.skill_lv = lead[0]["skill_lv"].as<int32_t>();
 				info.extra_skill_id = lead[0]["extra_skill_id"].as<int32_t>();
 				info.extra_skill_lv = lead[0]["extra_skill_lv"].as<int32_t>();
-				info.unit_img_type = lead[0]["unit_type_id"].as<int32_t>();
+				// Growth type (Anima/Breaker/etc.) is NOT an artwork variant.
+				// Values >=2 append _N to the thumbnail filename and can name
+				// nonexistent assets. Guild cards use the base artwork.
+				info.unit_img_type = 1;
 			}
 			// Guild master.  // UNVERIFIED: the member_type vocabulary is not
 			// recovered; 1 is used for the founder and 0 for everyone else so the
@@ -334,7 +339,7 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 		info.friend_message = mate->is_dev != 0 ? "decompfrontier" : "GG WP";
 		info.unit_id = unit.unit_id;
 		info.unit_lv = unit.level;
-		info.unit_img_type = unit.unit_type_id;
+		info.unit_img_type = 1; // Base artwork, independent of growth type.
 		info.base_hp = unit.base_hp;
 		info.base_atk = unit.base_atk;
 		info.base_def = unit.base_def;
@@ -352,11 +357,71 @@ drogon::Task<std::vector<::GuildMemberInfo>> guildRoster(
 	co_return out;
 }
 
-drogon::Task<std::vector<::GuildRecomendedMemberInfo>> invitableFriends(
+namespace
+{
+
+// The Social list's card, re-keyed for the Hall's profile.  The two classes
+// share 43 keys; the guild id is the one that moves (sD73jd20 here, mgNdrCEe on
+// FriendInfo), and FriendInfo has no enhancement or Omni fields.
+::GuildRecommendFriendInfo profileFromSocialCard(const ::FriendInfo& card)
+{
+	::GuildRecommendFriendInfo out{};
+	out.user_id = card.user_id;
+	out.handle_name = card.handle_name;
+	out.team_lv = card.team_lv;
+	out.friend_type = card.friend_type;
+	out.last_login_date = card.last_login_date;
+	out.unit_id = card.unit_id;
+	out.unit_lv = card.unit_lv;
+	out.base_hp = card.base_hp;
+	out.base_atk = card.base_atk;
+	out.base_def = card.base_def;
+	out.base_heal = card.base_heal;
+	out.add_hp = card.add_hp;
+	out.ext_hp = card.ext_hp;
+	out.add_atk = card.add_atk;
+	out.ext_atk = card.ext_atk;
+	out.add_def = card.add_def;
+	out.ext_def = card.ext_def;
+	out.add_heal = card.add_heal;
+	out.ext_heal = card.ext_heal;
+	out.today_yale = card.today_yale;
+	out.want_gift = card.want_gift;
+	out.favorite = card.favorite;
+	out.equipitem_id = card.equipitem_id;
+	out.equipitem_id2 = card.equipitem_id2;
+	out.friend_id = card.friend_id;
+	out.friend_message = card.friend_message;
+	out.friend_message_change_time = card.friend_message_change_time;
+	out.arena_rank_id = card.arena_rank_id;
+	out.ranking_point = card.ranking_point;
+	out.unit_type_id = card.unit_type_id;
+	out.skill_id = card.skill_id;
+	out.skill_lv = card.skill_lv;
+	out.extra_skill_id = card.extra_skill_id;
+	out.extra_skill_lv = card.extra_skill_lv;
+	out.req_time = card.req_time;
+	out.elapsed_agree_time = card.elapsed_agree_time;
+	out.friend_rc = card.unk_7_x3_p_pb2_c;
+	out.friend_hr = card.unk_sv80_k_l5_r;
+	out.extra_passive_skill_id = card.extra_passive_skill_id;
+	out.extra_passive_skill_id2 = card.extra_passive_skill_id2;
+	// Base artwork, as on every other guild card: 2 and up name a _N file that
+	// most units do not ship.
+	out.unit_img_type = 1;
+	out.guild_id = 0; // Simulated friends belong to no guild until invited.
+	out.deck_no = card.deck_no;
+	out.priority = card.priority;
+	return out;
+}
+
+} // namespace
+
+drogon::Task<::GuildRecomendedMemberResp> invitableFriends(
 	const db::Database database,
 	const UserIdentity identity)
 {
-	std::vector<::GuildRecomendedMemberInfo> out;
+	::GuildRecomendedMemberResp out{};
 
 	const auto guild = co_await loadGuild(database, identity);
 	std::vector<std::string> already;
@@ -373,26 +438,25 @@ drogon::Task<std::vector<::GuildRecomendedMemberInfo>> invitableFriends(
 	const auto roster = co_await loadFriendRoster(database, identity, false);
 	const auto now = static_cast<int64_t>(std::time(nullptr));
 
-	for (const auto& mate : roster)
+	// socialList already leaves out anyone whose unit cannot be derived, so a
+	// candidate without a drawable card is never offered in the first place.
+	for (const auto& card : socialList(roster, peak))
 	{
-		if (std::find(already.begin(), already.end(), mate.friend_id) != already.end())
-			continue;
-
-		const auto unit = friendUnitFor(mate, peak);
-		if (unit.unit_id == 0)
+		if (std::find(already.begin(), already.end(), card.user_id) != already.end())
 			continue;
 
 		::GuildRecomendedMemberInfo info{};
-		info.user_id = mate.friend_id;
-		info.user_name = mate.handle_name;
+		info.user_id = card.user_id;
+		info.user_name = card.handle_name;
 		// The same 999 the helper picker shows for a simulated Summoner; their
 		// team level is not modelled, and inventing a spread would be noise.
-		info.user_level = 999;
-		info.friend_unit_id = unit.unit_id;
-		info.friend_unit_level = unit.level;
-		info.friend_image_type = unit.unit_type_id;
+		info.user_level = card.team_lv;
+		info.friend_unit_id = card.unit_id;
+		info.friend_unit_level = card.unit_lv;
+		info.friend_image_type = 1; // Base artwork, independent of growth type.
 		info.last_online_time = now;
-		out.push_back(std::move(info));
+		out.members.push_back(std::move(info));
+		out.friends.push_back(profileFromSocialCard(card));
 	}
 
 	co_return out;

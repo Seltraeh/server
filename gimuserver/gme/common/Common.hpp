@@ -544,8 +544,19 @@ inline drogon::Task<WarehouseSnapshot> loadWarehouseSnapshot(
 	{
 		snapshot.dictionary.push_back(UserItemDictionaryInfo{ .item_id = stack.item_id });
 
-		if (stack.item_num == 0)
-			continue;
+		// ⚠ DO NOT SKIP A STACK AT ZERO.  Equipping a sphere consumes one from
+		// its stack (ItemSphereEqp) and deliberately KEEPS the row -- "row kept
+		// so the instance id survives" -- so a player whose only Holy Cane is
+		// on Tridon holds a stack of 0.  Dropping it here defeated the other
+		// half of that design: the sphere vanished from the item list entirely,
+		// which also reads as "the sphere I claimed never arrived" because the
+		// present granted it and equipping it made it disappear.  Every one of
+		// this account's four zero stacks was an equipped sphere.
+		//
+		// The row still belongs in the list: the client knows WHICH unit holds
+		// it from UserUnitInfo.equipitem_id, so it can render it as equipped.
+		// The dictionary below already listed these, which is why the two lists
+		// disagreed by exactly the four equipped spheres.
 
 		if (stack.new_flg != 0)
 		{
@@ -1742,7 +1753,8 @@ inline drogon::Task<std::vector<::UserTeamArchive>> loadTeamArchive(
 inline drogon::Task<void> bumpArchiveCounters(
 	const db::Database database,
 	const UserIdentity identity,
-	const std::vector<std::pair<std::string, int64_t>> deltas)
+	const std::vector<std::pair<std::string, int64_t>> deltas,
+	const bool propagateFailure = false)
 {
 	std::string cols, vals, sets;
 	for (const auto& [col, raw] : deltas)
@@ -1771,8 +1783,10 @@ inline drogon::Task<void> bumpArchiveCounters(
 	}
 	catch (const drogon::orm::DrogonDbException& ex)
 	{
-		// A statistics row must never fail the action that produced it.
+		// Transactional callers must not acknowledge a craft whose transaction
+		// failed. Other callers retain the historical best-effort statistics policy.
 		LOG_WARN << "bumpArchiveCounters: " << ex.base().what();
+		if (propagateFailure) throw;
 	}
 	co_return;
 }

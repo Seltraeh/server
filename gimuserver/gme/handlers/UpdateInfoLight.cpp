@@ -1,5 +1,6 @@
 #include "App.hpp"
 #include "Handlers.hpp"
+#include <gimuserver/gme/common/FeatureVisits.hpp>
 
 #include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
@@ -39,6 +40,7 @@ HANDLEF(UpdateInfoLight)
     // into, and this poll fires ~143 times a session.  It also did not fix the
     // staleness it was added for.
     resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
+    resp.entered_features = co_await gme::loadFeatureVisits(db, identity);
     resp.hunter_orbs = co_await gme::loadHunterOrbRefresh(db, identity);
 
     LOG_INFO << "UpdateInfoLight: refreshed team info + "
@@ -68,6 +70,7 @@ HANDLEF(UpdateInfo)
     ::UpdateInfoResp resp{};
     resp.team_info = std::move((co_await gme::getTeamInfo(db, identity)).nonEmpty());
     resp.clear_mission_info = co_await gme::getClearedMissions(db, identity);
+    resp.entered_features = co_await gme::loadFeatureVisits(db, identity);
     resp.hunter_orbs = co_await gme::loadHunterOrbRefresh(db, identity);
     resp.update_info.server_time = static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(
         std::chrono::system_clock::now().time_since_epoch()).count());

@@ -1,6 +1,7 @@
 #include "PermitPlace.hpp"
 #include "App.hpp"
 #include "Common.hpp"
+#include "ResearchLab.hpp"
 #include "archive/MissionArchiver.hpp"
 
 #include <algorithm>
@@ -174,7 +175,10 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
             // battle does not exist.  Checked HERE rather than in the cache's
             // collector because MissionArchiver::setup runs after
             // ServerCache::Setup, and this block is built on first request.
-            if (MissionArchiver::instance().archived(id))
+            //
+            // The Research Lab's missions unlock in order, which depends on
+            // the player, so they are added per request below.
+            if (MissionArchiver::instance().archived(id) && !isResearchLabMission(id))
                 add("j28VNcUW", id);
         }
 
@@ -333,6 +337,20 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
                 landList += ',';
             landList += std::to_string(landId);
         }
+
+        // THE RESEARCH LAB UNLOCKS IN ORDER.  Its dungeon, area and land stay
+        // in the static block -- the lab itself has no requirement -- but
+        // each trial waits for its prerequisites; see researchLabUnlocked.
+        size_t labMissions = 0;
+        for (const auto missionId : researchLabMissions())
+        {
+            if (!MissionArchiver::instance().archived(missionId)
+                || !researchLabUnlocked(missionId, cleared))
+                continue;
+            append(permitPlace, first, "j28VNcUW", missionId);
+            ++labMissions;
+        }
+        LOG_INFO << "PermitPlace: Research Lab — permitting " << labMissions << " trial(s)";
 
         LOG_INFO << "PermitPlace: progression gate — " << cleared.size()
                  << " mission(s) cleared, permitting " << gatedAreas << " area(s), "

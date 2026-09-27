@@ -74,12 +74,14 @@ public:
 	static bool populatePacket(const MissionRecord& record, std::vector<AiMst>& msts);
 
 	/*!
-	* Populates all monster MST rows referenced by the mission record.
+	* Populates all monster MST rows referenced by the mission record,
+	* including the script_monsters its client-side mission script swaps in.
 	*
 	* @param record Archive record to read from.
 	* @param msts Packet rows to populate.
 	* @return True if the packet rows were populated, false if referenced unit
-	* archive data is missing or the mission has no monsters.
+	* archive data is missing, a scripted monster id is invalid or ambiguous,
+	* or the mission has no monsters.
 	*/
 	static bool populatePacket(const MissionRecord& record, std::vector<MonsterMst>& msts);
 
