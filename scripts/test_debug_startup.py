@@ -9,7 +9,7 @@ import socket
 import sqlite3
 import subprocess
 import sys
-import tempfile
+import shutil
 import time
 import urllib.request
 
@@ -17,8 +17,13 @@ ROOT = Path(__file__).resolve().parents[1]
 exe = Path(sys.argv[1]).resolve()
 assert exe.is_file(), exe
 assert exe.with_suffix('.pdb').is_file(), 'Debug symbols are missing'
-(ROOT / 'out').mkdir(exist_ok=True)
-work = Path(tempfile.mkdtemp(prefix='debug-startup-', dir=ROOT / 'out'))
+# One reused fixture directory (out/qa/current/debug_startup), recreated per run.
+# Removing it fails if an earlier run's server still holds the save -- the guard
+# against reusing a suite directory before its process has stopped.
+work = ROOT / 'out' / 'qa' / 'current' / 'debug_startup'
+if work.exists():
+    shutil.rmtree(work)
+work.mkdir(parents=True)
 with socket.socket() as s:
     s.bind(('127.0.0.1', 0))
     port = s.getsockname()[1]

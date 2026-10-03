@@ -184,9 +184,10 @@ FriendUnit friendUnitFor(const FriendRow& row, const PlayerPeak& peak);
 * generated the way the game's own rules would allow:
 *
 *   - TWO SPHERES OF THE SAME CATEGORY CANNOT BE WORN AT ONCE.  `ItemMst
-*     .sphere_type` (1..14) is that category -- it is what ItemSphereEqp writes
-*     into eqip_item_frame_id and what the client draws the slot frame from --
-*     so the second roll is drawn from a DIFFERENT sphere_type than the first.
+*     .sphere_type` (1..14) is that category, so the second roll is drawn from
+*     a DIFFERENT sphere_type than the first.  (It is not what a player unit's
+*     eqip_item_frame_id holds -- that is the worn copy's warehouse row, see
+*     kNoSecondSphereSlot -- and the client draws slot icons from item ids.)
 *   - The second slot only exists from kSecondSphereRarity up.
 *   - A sphere is only offered if its own rarity is within the unit's, so a
 *     low-tier helper is not walking around in endgame gear.
@@ -375,6 +376,24 @@ drogon::Task<bool> isFriend(
 	const db::Database database,
 	const UserIdentity identity,
 	const std::string& friendId);
+
+/*!
+* The unit a borrowed helper led with -- the same one the picker offered.
+*
+* Every picker entry is friendUnitFor(row, playerPeak): a roster friend's own
+* chain, a developer's, or the chain a stranger's id carries ("NEW" + base).
+* Resolved again from the same inputs, so MissionEnd can read the helper's
+* leader skill (Player EXP Boost counts BOTH leaders -- see Mission.cpp).
+*
+* @param database Database client or transaction.
+* @param identity Resolved user.
+* @param helperId The helper recorded at MissionStart.
+* @return The unit id, or 0 for no helper / an id that names nobody.
+*/
+drogon::Task<int32_t> helperLeaderUnit(
+	const db::Database database,
+	const UserIdentity identity,
+	const std::string& helperId);
 
 /*!
 * Remove one friend from the roster.

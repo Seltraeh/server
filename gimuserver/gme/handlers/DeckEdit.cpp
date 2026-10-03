@@ -34,6 +34,13 @@ HANDLEF(DeckEdit)
 					identity,
 					req.party_deck_info)).nonEmpty();
 			}
+
+			// DeckEditRequest::createBody @0x13A2D8C builds its login block with
+			// createDungeonEventUserInfoTag, so it carries the client's current
+			// cutscene progress; keep it (see storeClientScenarioMarkers).
+			co_await gme::storeClientScenarioMarkers(transaction, identity,
+				req.login_info.special_scenario_info,
+				req.login_info.scenario_info.value_or(std::string{}));
 		}
 		catch (...)
 		{

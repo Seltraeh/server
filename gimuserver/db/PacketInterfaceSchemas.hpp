@@ -40,21 +40,11 @@ PacketInterfaceFor<::LoginInfoResp>::fields()
 			.update = true,
 			.insert = true,
 		}),
-		// Echoes back the one-off scene intros the client told us it has played
-		// (9yVsu21R).  DungeonEventUpdate stores what the client reports; this
-		// sends it back in the login envelope so the intros stay marked seen.
-		// Read-only here: the write goes through DungeonEventUpdate, which is
-		// the only request observed to carry the list.
-		field<&::LoginInfoResp::user_special_scenario_info>("special_scenario_info", {
-			.read = true,
-		}),
-		// N4XVE1uA — the composite scenario marker, the sibling of
-		// special_scenario_info above.  Read-only here for the same reason:
-		// DungeonEventUpdate owns the write, this just echoes it back so the
-		// client sees its own state again next login.
-		field<&::LoginInfoResp::user_scenario_info>("scenario_info", {
-			.read = true,
-		}),
+		// The two scenario markers (9yVsu21R special_scenario_info, N4XVE1uA
+		// scenario_info) are OPTIONAL members now and are filled by
+		// gme::getLoginInfo itself: only the login replies may carry them (see
+		// gme::omitClientScenarioMarkers), and this mapping has no optional
+		// support.
 	};
 }
 
@@ -312,6 +302,18 @@ PacketInterfaceFor<::UserUnitInfo>::fields()
 			.update = true,
 			.insert = true,
 		}),
+		// Omni enhancement SP.  Unmapped, all three went out as 0, and the
+		// fusion screen then had no room for SP on any unit -- which greys out
+		// every SP-only material (#25; see net/user.kdl).  Read-only: UnitMix
+		// is the one writer, and a newly granted unit must keep the column
+		// defaults (10 / 0 / 100) rather than the struct's zeroes.
+		field<&::UserUnitInfo::fe_bp>("fe_sp", { .read = true }),
+		field<&::UserUnitInfo::fe_used_bp>("fe_used_sp", { .read = true }),
+		field<&::UserUnitInfo::fe_max_usable_bp>("fe_max_sp", { .read = true }),
+		// The acquired enhancements themselves.  Read-only for the same reason:
+		// FeSkillGet and the ShopUse reset are the only writers, and a granted
+		// unit starts with the column default '' (none).
+		field<&::UserUnitInfo::fe_skill_info>("fe_skill_info", { .read = true }),
 	};
 }
 

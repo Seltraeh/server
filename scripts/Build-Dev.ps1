@@ -49,6 +49,31 @@ try {
     foreach ($inputFile in @('packet-generator\Cargo.lock','packet-generator\assets\runtime\cpp\CMakeLists.txt','packaging\Install.cmake','packaging\config.json')) {
         if (!(Test-Path -LiteralPath (Join-Path $root $inputFile))) { throw "Required source file missing: $inputFile. Pull the complete source and initialize submodules." }
     }
+    if (!$BuildDirectory) { $BuildDirectory = Join-Path $root 'out\build\debug-win64' }
+    $BuildDirectory = [IO.Path]::GetFullPath($BuildDirectory)
+    # An existing tree keeps the vcpkg it was configured with.  The preset's
+    # toolchain is $env{VCPKG_ROOT}: a missing one fails the configure and can
+    # leave a half-written cache, and a different one makes CMake discard the
+    # whole cache.  A machine-wide VCPKG_ROOT that has gone stale must not do
+    # either to a working tree.
+    $treeVcpkg = $null
+    $cacheFile = Join-Path $BuildDirectory 'CMakeCache.txt'
+    if (!$Fresh -and (Test-Path -LiteralPath $cacheFile)) {
+        $toolchain = Select-String -LiteralPath $cacheFile -Pattern '^CMAKE_TOOLCHAIN_FILE:[A-Z]+=(.+)/scripts/buildsystems/vcpkg\.cmake$' | Select-Object -First 1
+        if ($toolchain) { $treeVcpkg = [IO.Path]::GetFullPath($toolchain.Matches[0].Groups[1].Value) }
+    }
+    if ($treeVcpkg) {
+        if ($PSBoundParameters.ContainsKey('VcpkgRoot') -and $VcpkgRoot -and ([IO.Path]::GetFullPath($VcpkgRoot) -ne $treeVcpkg)) {
+            throw "$BuildDirectory was configured with vcpkg at $treeVcpkg. Pass that -VcpkgRoot, or add -Fresh to reconfigure from scratch with $VcpkgRoot."
+        }
+        if (!(Test-Path -LiteralPath (Join-Path $treeVcpkg 'scripts\buildsystems\vcpkg.cmake'))) {
+            throw "The vcpkg this tree was configured with is missing: $treeVcpkg. Restore it, or use -Fresh -VcpkgRoot <path>."
+        }
+        if ($env:VCPKG_ROOT -and ([IO.Path]::GetFullPath($env:VCPKG_ROOT) -ne $treeVcpkg)) {
+            Write-Warning "VCPKG_ROOT is $env:VCPKG_ROOT, but $BuildDirectory uses $treeVcpkg; building with the tree's. Visual Studio's Open Folder configure reads VCPKG_ROOT, so it must name $treeVcpkg as well (docs/DEVELOPMENT.md)."
+        }
+        $VcpkgRoot = $treeVcpkg
+    }
     if (!$VcpkgRoot) { $VcpkgRoot = Join-Path $root '.tools\vcpkg' }
     if (!(Test-Path -LiteralPath (Join-Path $VcpkgRoot 'scripts\buildsystems\vcpkg.cmake'))) {
         if (!$BootstrapVcpkg) { throw 'Set VCPKG_ROOT, pass -VcpkgRoot, or use -BootstrapVcpkg -VcpkgRoot .tools\vcpkg to install a local copy.' }
@@ -64,8 +89,6 @@ try {
     $env:VCPKG_ROOT = $VcpkgRoot
     $env:VCPKG_MAX_CONCURRENCY = "$Jobs"
     $env:CARGO_BUILD_JOBS = "$Jobs"
-    if (!$BuildDirectory) { $BuildDirectory = Join-Path $root 'out\build\debug-win64' }
-    $BuildDirectory = [IO.Path]::GetFullPath($BuildDirectory)
     # Building needs no artwork. Do not overwrite an existing config or save.
     $config = Join-Path $root 'deploy\config.json'
     if (!(Test-Path -LiteralPath $config)) {

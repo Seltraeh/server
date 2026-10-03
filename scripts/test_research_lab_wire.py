@@ -65,17 +65,27 @@ def top_up():
     db.commit()
 
 
+# The battle serial each start issued, echoed by end() as the client does
+# (MissionEndRequest reads MissionInfo::getMissionSerialID, which the start's
+# Kz7qfSs5.k9cxD7Ba set).  Sending the mission id instead only settled a
+# serial-issued run through the legacy loophole closed after the 2026-09-30 QC.
+issued = {}
+
+
 def start(mission):
     top_up()
-    return call('jE6Sp0q4', 'csiVLDKkxEwBfR70', {
+    resp = call('jE6Sp0q4', 'csiVLDKkxEwBfR70', {
         '9Q1Lq5FS': [{'h7eY3sAK': '0', 'J3stQ7jd': '0', 'j28VNcUW': str(mission), 'jkldTrhL': '0',
                       'Z0Y4RoD7': '0', 'nA95Bdj6': '0', '5Z1LNoyH': '0', 'u1iPEVUq': '-1'}],
         'JzS3uxsZ': [{'0b4efi1W': '1'}]})
+    if resp.get('Kz7qfSs5'):
+        issued[mission] = resp['Kz7qfSs5'][0]['k9cxD7Ba']
+    return resp
 
 
 def end(mission, status):
     return call('9TvyNR5H', 'oINq0rfUFPx5MgmT', {
-        'Kz7qfSs5': [{'k9cxD7Ba': str(mission), 'j3g5P4cq': str(status)}],
+        'Kz7qfSs5': [{'k9cxD7Ba': str(issued.get(mission, mission)), 'j3g5P4cq': str(status)}],
         'rXvA1E5y': [{'Najhr8m6': '0', 'HTVh8a65': '0', '3MAT6quo': '', '4T0Q2Bh5': ''}]})
 
 

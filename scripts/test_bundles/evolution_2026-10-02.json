@@ -1,0 +1,29 @@
+{
+ "tag": "Client QA evolution bundle 2026-10-02",
+ "user_id": "CLz1ad9x",
+ "unit_box": {"base_slots": 100},
+ "notes": [
+  "Revised in Session 6 against the save as of 2026-10-02 14:00 (93 units in a 110-slot box, 17 free); the earlier draft was never granted.",
+  "Recipes from deploy/mst/unit_evo_mst.json, skills from unit_mst/skill_mst/leader_skill_mst; every unit resolves in deploy/archive/unit.json and ships its art.",
+  "UnitEvo.cpp: the base must be at its max level; BB -> max(1, BB/2); an unlocked SBB -> max(1, SBB/2); a locked SBB (or a form that gains one) stays locked until BB 10.",
+  "Chain (one disposable Inferno Berdette, so the player's own uu 1014 is never needed):",
+  "  1. Berdette 5* 10824 (max 80): fuse a Rainbow Crystal (2,005,024 EXP >= 1,137,652) -> lv 80; fuse a Burst Queen -> BB 10. BB 10824 Ruse Filo, no SBB, LS 7401.",
+  "  2. Evolve with Miracle Totem + 2 Fire Totems + Dragon Mimic + Metal Mimic, 500,000 Zel -> Hades Flame Berdette 6* 10825: lv 1/100, BB 10825 Ruse Capture lv 5, SBB 110825 Era Cremation LOCKED (0), LS 7418.",
+  "  3. Fuse the second Rainbow Crystal (>= 1,999,997) -> lv 100; fuse the second Burst Queen -> BB 10 and SBB unlocked to 10.",
+  "  4. Evolve with Fire Mecha God + Miracle Totem + Fire Totem + 2 Metal Mimics, 1,500,000 Zel -> Tartarus Blaze Berdette 7* 10826: lv 1/120, BB 10826 Ruse Eclipse lv 5, SBB 110826 Terrible Cremation lv 5, UBB 210826 Promethea, LS 7419.",
+  "Optional, the player's choice: Selena 20011 (uu 1000, 12/12, BB 10) -> Ice Selena 20012 with the Water Nymph + 2,500 Zel: BB 20011 -> 20012 lv 5, LS 110 unchanged. Goblin 10050 (uu 1228) -> Redcap 10051 needs nothing new (owned Mimic + a Metal King).",
+  "The Zel covers both Berdette evolutions so the player's balance is untouched; fusion fees at these levels are a few thousand Zel."
+ ],
+ "presents": [
+  {"type": 6, "target": "10824", "count": 1, "why": "Inferno Berdette 5* - disposable base for the evolution chain"},
+  {"type": 6, "target": "750006", "count": 2, "why": "Rainbow Crystals - Berdette to lv 80 (5*) and to lv 100 (6*)"},
+  {"type": 6, "target": "750004", "count": 2, "why": "Burst Queens - BB 10 before evolution 1, BB+SBB 10 before evolution 2"},
+  {"type": 6, "target": "50354", "count": 2, "why": "Miracle Totems - one for each Berdette evolution"},
+  {"type": 6, "target": "10133", "count": 3, "why": "Fire Totems - two for 5* to 6*, one for 6* to 7*"},
+  {"type": 6, "target": "60144", "count": 1, "why": "Dragon Mimic - Berdette 5* to 6*"},
+  {"type": 6, "target": "60224", "count": 3, "why": "Metal Mimics - one for 5* to 6*, two for 6* to 7*"},
+  {"type": 6, "target": "10354", "count": 1, "why": "Fire Mecha God - Berdette 6* to 7*"},
+  {"type": 6, "target": "20130", "count": 1, "why": "Water Nymph - optional Selena to Ice Selena (your choice)"},
+  {"type": 3, "target": "", "count": 2000000, "why": "Zel - 500,000 + 1,500,000 for the two Berdette evolutions"}
+ ]
+}

@@ -521,3 +521,7 @@ gimuserver/drogon/ServerCacheLocal*.inl
 !scripts/*.md
 CMakeUserPresets.json
 .tools/
+
+# Local recovery copies and generated download staging are never source changes.
+deploy/**/*.bak*
+deploy/mst_download_staging/

@@ -2,8 +2,11 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/db/DatabaseInterface.h>
+#include <gimuserver/db/PacketInterface.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/FeSkills.hpp>
 #include <gimuserver/gme/common/HunterOrbs.hpp>
+#include <gimuserver/gme/common/Transactions.hpp>
 
 // ShopUse (xe8tiSf4 / qthMXTQSkz3KfH9R) — the client's generic "spend a
 // currency on a shop action" endpoint.  Frontier Gate reaches it through the
@@ -27,10 +30,11 @@
 //   4   restore Arena Orbs (ShopHelFightScene, ArenaTopScene)
 //   5   restore Hunter Orbs (Frontier Gate / Frontier Hunter prompts)
 //   7   expand friend capacity (ShopFriendExtScene)
+//   9   reset a unit's SP enhancements (UnitDetailVirtuallyInfoScene)
 //   10  Quest Repeat's Auto Energy Recovery
-//   6 ShopBuyStampScene, 8 ColosseumTopScene, 9 UnitDetailVirtuallyInfoScene,
-//   11 ShopSummonerItemBuyDetailScene, 12 SummonerUnitMakeScene and
-//   103 VortexArenaTopScene are not handled — see the default branch.
+//   6 ShopBuyStampScene, 8 ColosseumTopScene, 11 ShopSummonerItemBuyDetailScene,
+//   12 SummonerUnitMakeScene and 103 VortexArenaTopScene are not handled —
+//   see the default branch.
 
 namespace
 {
@@ -78,6 +82,9 @@ constexpr int32_t kShopUseRestoreHunterOrbs = 5;
 // user_info.max_friend_count holds how many were (see gme::getTeamInfo).
 constexpr int32_t kShopUseExpandFriends = 7;
 constexpr int32_t kFriendSlotsPerStep = 5;
+
+// ShopUseType 9 — reset a unit's SP enhancements (see resetFeSkills).
+constexpr int32_t kShopUseResetFeSkills = 9;
 
 // Buys `slots` more unit or item capacity.  The client's price is a claim
 // (handbook §5), so the server charges its own, refuses anything that is not a
@@ -339,6 +346,154 @@ drogon::Task<HandleResult> restoreHunterOrbs(const gme::UserIdentity identity)
     co_return HandleResult::success(body);
 }
 
+// ShopUseType 9 — Reset on a unit's Enhancements screen.
+//
+// UnitDetailVirtuallyInfoScene::resetConnect @0x1BDEBDC sends type 9, the
+// price DefineMst::getResetFeSkillDiaCnt (reset_fe_skill_dia_count, 5csFoG1G:
+// 1 in this data) and the unit in edy7fq3L.  The client gates both ends:
+// resetBtnSet @0x1BE2C88 disables the button while getFeUsedBP() is 0, and
+// resetDialog @0x1BDF278 offers the reset only when UserTeamInfo's gems cover
+// that price (the shop shortage dialog otherwise).  It changes nothing itself:
+// after the reply, updateEvent's state 2 calls GameScene::updateHeader (gems
+// from team_info) and drawUP, which re-resolves the unit by id and redraws
+// getFeBP / getFeUsedBP / the acquired skills from the roster.  So the reply is
+// team_info plus the COMPLETE roster (4ceMWH6k, full replace), FeSkillGet's
+// shape.
+//
+// The reset: every spent SP back to available, no acquired skills, used 0,
+// the cap untouched — available + used is preserved, nothing is granted —
+// and the price charged once, all in one transaction that must commit before
+// the reply goes out.
+//
+// A reset that has nothing to undo (used 0 and no skills: the client's own
+// "disabled" state) charges nothing and just resynchronises, and so does one
+// the balance cannot cover (the client's next tap then sees the shortage).
+// That is what makes a retry safe: the body names the unit and the price and
+// nothing else — no nonce, nothing about the unit's state — so a copy of a
+// reset that went through finds the unit empty.  What the protocol cannot tell
+// apart is a copy of reset #1 delayed until after the player bought skills
+// again from a genuine reset #2: that copy resets again and charges again
+// (the SP is refunded, never lost).  docs/CLAUDE_SESSION_6_HANDOFF.md.
+drogon::Task<HandleResult> resetFeSkills(const gme::UserIdentity identity, const ::ShopUseEntry& use)
+{
+    const auto ownedId = gme::FeSkillSet::id(use.user_unit_id);
+    if (!ownedId || *ownedId <= 0)
+        co_return HandleResult::refuseToHome("Invalid enhancement reset.",
+                                             "user unit id \"" + use.user_unit_id + "\"");
+
+    const int32_t price = theServer()->cache().initializeResp().defines.reset_fe_skill_dia_count;
+    if (price <= 0)
+        co_return HandleResult::refuseToHome("Enhancement reset is unavailable.",
+                                             "reset_fe_skill_dia_count " + std::to_string(price));
+    if (price != use.cost)
+    {
+        LOG_WARN << "ShopUse: client priced the enhancement reset at " << use.cost
+                 << " gem(s); charging the server's " << price;
+    }
+
+    std::string body;
+    std::string cleared;
+    int64_t refunded = 0;
+    bool reset = false;
+    auto tx = co_await theDb()->newTransactionCoro();
+    try
+    {
+        const auto rows = co_await tx->execSqlCoro(
+            "SELECT unit_id, fe_sp, fe_used_sp, fe_max_sp, fe_skill_info FROM user_units"
+            " WHERE user_id = $1 AND user_unit_id = $2;", identity.userId, *ownedId);
+        if (rows.empty())
+        {
+            tx->rollback();
+            co_return HandleResult::refuseToHome("The selected unit is no longer available.",
+                                                 "user unit " + std::to_string(*ownedId) + " not owned");
+        }
+        const auto& row = rows[0];
+
+        // Only an Omni unit has an Enhancements screen (FeSkillGet's rule).
+        const auto species = gme::FeSkillSet::id(row["unit_id"].as<std::string>());
+        const UnitMst* unit = nullptr;
+        for (const auto& candidate : theServer()->cache().unitMst())
+            if (species && candidate.id == *species) { unit = &candidate; break; }
+        if (!unit || unit->rarity < 8)
+        {
+            tx->rollback();
+            co_return HandleResult::refuseToHome("This unit has no enhancements to reset.",
+                                                 "species " + row["unit_id"].as<std::string>());
+        }
+
+        const auto available = row["fe_sp"].as<int64_t>();
+        const auto spent = row["fe_used_sp"].as<int64_t>();
+        const auto limit = row["fe_max_sp"].as<int64_t>();
+        if (available < 0 || spent < 0 || limit < 0)
+        {
+            tx->rollback();
+            co_return HandleResult::refuseToHome("This unit's enhancement data is invalid.",
+                                                 "fe_sp/fe_used_sp/fe_max_sp " + std::to_string(available) + "/"
+                                                 + std::to_string(spent) + "/" + std::to_string(limit));
+        }
+        cleared = row["fe_skill_info"].as<std::string>();
+        const bool empty = spent == 0 && gme::FeSkillSet::parse(cleared).size() == 0;
+
+        const auto balance = co_await tx->execSqlCoro(
+            "SELECT gems FROM user_info WHERE id = $1;", identity.userId);
+        const auto gems = balance.empty() ? int64_t{ 0 } : balance[0]["gems"].as<int64_t>();
+
+        if (empty)
+        {
+            LOG_INFO << "ShopUse: user unit " << *ownedId << " has no enhancements to reset; nothing charged";
+        }
+        else if (gems < price)
+        {
+            LOG_WARN << "ShopUse: " << gems << " gem(s) cannot pay the " << price
+                     << "-gem enhancement reset of user unit " << *ownedId << "; nothing changed";
+        }
+        else
+        {
+            // Guarded on the values just read, so a second copy racing this
+            // one cannot refund or charge twice.  $N in first-appearance order.
+            const auto paid = co_await tx->execSqlCoro(
+                "UPDATE user_info SET gems = gems - $1 WHERE id = $2 AND gems >= $3;",
+                static_cast<int64_t>(price), identity.userId, static_cast<int64_t>(price));
+            const auto refundedRow = co_await tx->execSqlCoro(
+                "UPDATE user_units SET fe_sp = $1, fe_used_sp = 0, fe_skill_info = ''"
+                " WHERE user_id = $2 AND user_unit_id = $3 AND fe_sp = $4 AND fe_used_sp = $5;",
+                available + spent, identity.userId, *ownedId, available, spent);
+            if (paid.affectedRows() != 1 || refundedRow.affectedRows() != 1)
+                throw std::runtime_error("ShopUse: unit or balance changed under the enhancement reset");
+            refunded = spent;
+            reset = true;
+        }
+
+        ::ShopUseResp resp{};
+        resp.team_info = std::move((co_await gme::getTeamInfo(tx, identity)).nonEmpty());
+        resp.unit_refresh = std::move((co_await db::PacketInterfaceFor<::UserUnitInfo>::read(
+            tx, "user_units", { db::Lookup("user_id", identity.userId) })).data);
+        if (const auto error = glz::write_json(resp, body); error)
+            throw std::runtime_error(glz::format_error(error, body));
+    }
+    catch (const std::exception& ex)
+    {
+        tx->rollback();
+        co_return HandleResult::refuseToHome("Enhancement reset failed. Please try again.", ex.what());
+    }
+    catch (...)
+    {
+        tx->rollback();
+        co_return HandleResult::refuseToHome("Enhancement reset failed. Please try again.", "unknown exception");
+    }
+
+    if (!(co_await gme::CommitTransaction(std::move(tx))))
+        co_return HandleResult::refuseToHome("Enhancement reset could not be saved. Please reconnect.",
+                                             "commit failed");
+
+    if (reset)
+    {
+        LOG_INFO << "ShopUse: reset user unit " << *ownedId << " (\"" << cleared << "\"), " << refunded
+                 << " SP back to available, for " << price << " gem(s)";
+    }
+    co_return HandleResult::success(body);
+}
+
 }
 
 HANDLEF(ShopUse)
@@ -377,6 +532,8 @@ HANDLEF(ShopUse)
         case kShopUseExpandFriends:
             co_await expandFriends(identity, req.shop_use.ext_cnt, cost);
             break;
+        case kShopUseResetFeSkills:
+            co_return co_await resetFeSkills(identity, req.shop_use);
         default:
             // Unknown action: acknowledge without touching state.  Guessing
             // which currency to deduct for an undecoded type is the §3.4

@@ -103,7 +103,9 @@ installed MSVC and Windows SDK (or use `rebuild.bat`, which imports them).
 The running server locks its EXE, so build into a scratch directory with
 `cmake -S . -B out/build/debug-win64 -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=<dir>`.
 That variable sits in the shared cache: every session's build goes there
-until it is removed with `-UCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG`. **Any** KDL edit,
+until it is removed with `-UCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG` (`rebuild.bat`
+keeps it, and still prints the in-tree path as "Built:"; the link line shows
+where the EXE really went). **Any** KDL edit,
 documentation included, regenerates `all.hpp` and rebuilds all 205 steps
 (about 20 minutes at two or three jobs), so batch schema edits.
 
@@ -113,8 +115,12 @@ backup API into a folder under `out/`, next to a config listening on 19960 or
 the EXE's first argument.** Debug builds otherwise load `deploy/config.json`,
 which binds the live port 9960 and opens the live save; on Windows the
 second bind succeeds silently. Confirm `starts listening on 127.0.0.1:19960` in
-the test server's log before sending anything, and stop test servers by EXE
-path or process tree, never by name. Encrypted request helpers are in every
+the test server's log before sending anything, and stop test servers by their
+own PID plus the children they created (`scripts/bf_testkit.py`), never by name
+and never by `taskkill /T` alone: `/T` follows recycled parent PIDs, so a live
+server whose launcher has exited can be taken down with a test server.
+`bf_ctl.ps1 -Action stop` stops EVERY `gimuserverw`, test servers included.
+Encrypted request helpers are in every
 `scripts/test_*_wire.py`. Run the existing suites that touch your area too:
 
 | Suite | Port | Covers |
@@ -126,6 +132,21 @@ path or process tree, never by name. Encrypted request helpers are in every
 | `test_feature_visits_wire.py`, `test_synthesis_wire.py` | 19962 | Feature visits, synthesis transactions |
 | `validate_missions.py`, `audit_handlers.py` (no server) | — | Mission archive checks, handler registrations |
 
+`scripts/run_bugfix_regressions.py EXE` runs all of them (each on its own
+copied save) and writes `out/qa/current/SUMMARY.md`.  A suite passes only with
+positive proof it finished (its summary line agreeing with its PASS/FAIL lines,
+no traceback); a failure is accepted only when `EXPECTED_FAILURES` lists those
+exact cases; `validate_missions.py` must match the recorded data baseline in
+`scripts/qa_baselines/validate_missions.json` (3,117 findings: open work, not a
+clean result).  `scripts/test_qa_runner.py` tests those rules.
+
+The copies are of the LIVE save, so the player's progress reaches the fixtures.
+When a suite that passed before fails, run it on the unchanged deployed EXE
+against the same copy first: identical failures mean fixture drift, not a
+regression (keep both logs).  The fix belongs in the fixture, on the copy:
+reset the state the checks compare (town tiles, Continue marks, an
+already-delivered bundle, a full unit box), never relax the check.
+
 **Deploy after every tested change.** The maintainer tests in the client and
 does not run the build. Back up the live save (backup API; the server may stay
 up), stop the server with `bf_ctl.ps1 -Action stop`, remove the runtime
@@ -136,7 +157,14 @@ Stopping the server drops the client's connection; the maintainer reconnects.
 **Client contracts that cost a test round each:**
 
 - Every handler error and every unregistered GroupId **closes the client's
-  session**. Answer a refusal with a normal reply and log it.
+  session**. Answer a refusal with a normal reply and log it -- unless the
+  screen has a decoded refusal path: `HandleResult::refuseToHome` (cmd 6,
+  message then Home) or `refuseToRetry` (cmd 2, message then the scene's own
+  noticeOK; for MissionContinue that is the Continue prompt again).
+- **An ordinary reply can BE the action.** MissionGameOverScene revives on any
+  non-error MissionContinue reply, so a revival the server did not accept must
+  be refused with cmd 2, never acknowledged.  A retry re-sends the same
+  request object byte for byte (no nonce); see net/mission.kdl.
 - The client sends **every number in a request as a string**:
   `JsonNode::addParam(const char*, int)` @0xFDB82C is `IntToString` plus the
   string overload. Model request numbers as `i32::str`. An `i32::int` request

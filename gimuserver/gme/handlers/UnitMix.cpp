@@ -22,17 +22,14 @@
 //                {"edy7fq3L":"<id>","mnZ5K4Ii":"2"}, // material   (role 2) x N]
 //
 // Response:
-//   "xZH6EIQ7": [UnitReinforceEntry] — drives the level-up animation
-//   "qC2tJs4E": [UserUnitInfo]       — incremental unit cache update
+//   "1ZbHB6Im": [UnitOpeResult]      — the result screen (xp sweep, BB level)
+//   "4ceMWH6k": [UserUnitInfo]       — full-replace unit cache
 //   "fEi17cnx": [UserTeamInfo]       — updated zel
+//   never "xZH6EIQ7" — that is the helper picker list (see "Build response")
 
-// The request struct (UnitMixReq + UnitMixUnitEntry/UnitMixZelEntry) is
-// generated from packet-generator/assets/net/{handlers,unit}.kdl.
-
-// The response struct (UnitMixResp + the shared UnitReinforceEntry under
-// xZH6EIQ7) is generated from packet-generator/assets/net/{handlers,unit}.kdl.
-// unit_update rides UserUnitInfo under qC2tJs4E; team_info rides UserTeamInfo
-// under fEi17cnx.
+// The request struct (UnitMixReq + UnitMixUnitEntry/UnitMixZelEntry) and the
+// response struct (UnitMixResp) are generated from
+// packet-generator/assets/net/{handlers,unit}.kdl.
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -77,6 +74,71 @@ static std::string unitMix_stripSuffix(const std::string& raw)
 // row in place), and granted by nothing else.  Extra frogs are still consumed
 // as ordinary exp fodder -- the cap is on the slot, not on the fusion.
 static constexpr int32_t kSphereFrogUnitId = 20302;
+
+// ---------------------------------------------------------------------------
+// Omni enhancement SP (#25)
+//
+// A max-level Omni unit whose SBB is at 10 collects SP from fusion.  Which
+// materials give how much is the CLIENT's own table --
+// UserState::getUserUnitListEfPoint @0x1247888, the number the fusion screen
+// uses to decide whether an SP-only material (a Burst or Omni Frog fed to a
+// maxed unit) is selectable at all -- and it matches the Global wiki's list
+// figure for figure (Unit Skills rev 656738, "Enhancements"):
+//
+//   burst_level_boost 1..4   Burst Frog 1, Lawson Frog 2 (the value itself
+//                            when it is 2, else 1)
+//   burst_level_boost > 4    Burst Emperor 5; 20 on Burst Queen (750004) only
+//   Sphere Frog              10, but only once the base ALREADY has its second
+//                            sphere slot (UnitExtMst.double_sphere_trigger)
+//   same category_no         5 -- a duplicate, in any evolutionary form
+//   Omni Frog (750003)       30
+//   Omni Emperor (750005)    5, and +5 to the limit, only at Omni+3 --
+//                            UnitMixElemSelectScene::checkElemUnit @0x1C09B98
+//                            refuses it below that.  This server has no Omni+
+//                            levels yet (UnitOmniEvo is a probe), so an Omni
+//                            Emperor is exp fodder here.
+//
+// NOT PORTED: the wiki's "chance to raise by 1" for ordinary units.  Neither
+// the client nor any MST carries the probability, and the preview leaves it
+// out, so inventing one would pay what no evidence supports.
+//
+// Eligibility is the client's GameUtils::feUnitCheck @0x11A8504 on the unit
+// as the material screen saw it: rarity >= 8, SBB level exactly 10, level ==
+// UnitMst max_lv.  The limit is fe_sp + fe_used_sp <= fe_max_sp
+// (GameUtils::mixFeBpCheck @0x1EC4C80).
+// ---------------------------------------------------------------------------
+static constexpr int32_t kOmniFrogUnitId    = 750003;
+static constexpr int32_t kBurstQueenUnitId  = 750004;
+static constexpr int32_t kOmniEmperorUnitId = 750005;
+
+static bool unitMix_isDoubleSphereTrigger(int32_t unitId)
+{
+    for (const auto& ext : theServer()->cache().unitExtMst())
+        if (ext.unit_id == unitId) return ext.double_sphere_trigger != 0;
+    return false;
+}
+
+static int unitMix_materialSp(const UnitMst& base, const UnitMst& mat, bool baseHasSecondSlot)
+{
+    int sp = 0;
+    const int adjust = mat.burst_level_boost;
+    if (adjust >= 1)
+    {
+        if (adjust <= 4)
+            sp += adjust == 2 ? 2 : 1;
+        else if (adjust == 20 && mat.id == kBurstQueenUnitId)
+            sp += 20;
+        else
+            sp += 5;
+    }
+    if (baseHasSecondSlot && unitMix_isDoubleSphereTrigger(mat.id))
+        sp += 10;
+    if (base.category == mat.category)
+        sp += 5;
+    if (mat.id == kOmniFrogUnitId)
+        sp += 30;
+    return sp;
+}
 
 struct ImpBonus { int hp, atk, def, rec; };
 
@@ -223,7 +285,7 @@ HANDLEF(UnitMix)
             " skill_id, skill_lv, extra_skill_id, extra_skill_lv,"
             " element, unit_type_id,"
             " eqip_item_id, eqip_item_frame_id, eqip_item_id2, eqip_item_frame_id2,"
-            " sphere_ext, dbb_unlocked"
+            " sphere_ext, dbb_unlocked, fe_sp, fe_used_sp, fe_max_sp"
             " FROM user_units WHERE user_id=$1 AND user_unit_id=$2 LIMIT 1;",
             std::string(kUserId), baseId
         );
@@ -258,6 +320,8 @@ HANDLEF(UnitMix)
         int      matchingGolems = 0;
         int      mismatchedGolemElement = 0;
         int      sphereFrogs    = 0;
+        int      materialSp     = 0;   // enhancement SP, if the base is eligible
+        int      omniEmperors   = 0;
         int      mysteryKind = 0;
         int      newUnitType = br["unit_type_id"].as<int32_t>();
         // Counted for the great/super success roll below: matching elements are the
@@ -318,6 +382,11 @@ HANDLEF(UnitMix)
                     burstLevelGain += matData->burst_level_boost;
                 if (matMstIdInt == kSphereFrogUnitId)
                     ++sphereFrogs;
+                if (matMstIdInt == kOmniEmperorUnitId)
+                    ++omniEmperors;
+                else if (matData && baseMstData)
+                    materialSp += unitMix_materialSp(*baseMstData, *matData,
+                        br["eqip_item_frame_id2"].as<int32_t>() != gme::kNoSecondSphereSlot);
                 // ELEMENTAL GOLEM -> the DBB slot.  Same element only; the wiki is
                 // explicit ("e.g. a Fire Golem can only be fused to a Fire Element
                 // unit") and a mismatch is spent as ordinary fodder, which is what
@@ -560,6 +629,25 @@ HANDLEF(UnitMix)
                          << (sphereFrogs > 1 ? " (only one of the frogs could grant it)" : "");
         }
 
+        // ENHANCEMENT SP (see unitMix_materialSp).  Judged on the unit as the
+        // material screen saw it, before this fusion: that is the state
+        // checkElemUnit validated when it let an SP-only material be picked.
+        const int oldFeSp   = br["fe_sp"].as<int32_t>();
+        const int feUsedSp  = br["fe_used_sp"].as<int32_t>();
+        const int feMaxSp   = br["fe_max_sp"].as<int32_t>();
+        const bool feEligible = baseMstData && baseRare >= 8 && oldSbbLvl == kMaxBurstLevel
+                             && oldLevel == maxLevel;
+        int newFeSp = oldFeSp;
+        if (feEligible && materialSp > 0)
+            newFeSp = oldFeSp + std::clamp(feMaxSp - feUsedSp - oldFeSp, 0, materialSp);
+        if (materialSp > 0 || omniEmperors > 0)
+        {
+            LOG_INFO << "UnitMix: enhancement SP " << (feEligible ? "" : "(base not eligible) ")
+                     << oldFeSp << "+" << materialSp << " -> " << newFeSp
+                     << " (spent " << feUsedSp << ", limit " << feMaxSp << ")"
+                     << (omniEmperors ? "; Omni Emperor needs Omni+3, spent as exp" : "");
+        }
+
         if (burstLevelGain || impGain.hp || impGain.atk || impGain.def || impGain.rec)
         {
             LOG_INFO << "UnitMix: special materials — burst +" << burstLevelGain
@@ -635,14 +723,14 @@ HANDLEF(UnitMix)
             " ext_hp=$4, ext_atk=$5, ext_def=$6, ext_rec=$7, bb_lvl=$8, sbb_lvl=$9,"
             " sphere_ext=$10, eqip_item_frame_id2=$11,"
             " base_hp=$12, base_atk=$13, base_def=$14, base_rec=$15,"
-            " dbb_unlocked=$16, unit_type_id=$17"
-            " WHERE user_unit_id=$18 AND user_id=$19;",
+            " dbb_unlocked=$16, unit_type_id=$17, fe_sp=$18"
+            " WHERE user_unit_id=$19 AND user_id=$20;",
             newLevel, newExp, newTotalExp,
             newImpHp, newImpAtk, newImpDef, newImpRec, newBbLvl, newSbbLvl,
             newSphereExt, newEqpFrame2,
             newBaseHp, newBaseAtk, newBaseDef, newBaseRec,
             newDbbUnlocked,
-            newUnitType, baseId, std::string(kUserId)
+            newUnitType, newFeSp, baseId, std::string(kUserId)
         );
 
         // Step 4: return spheres equipped on the fodder, then DELETE the material
@@ -672,47 +760,17 @@ HANDLEF(UnitMix)
 
 
         // Build response.
+        //
+        // NOTHING GOES UNDER xZH6EIQ7.  That key is the helper picker list
+        // (ReinforcementInfoResponse): row 0 clears ReinforcementInfoList, and a
+        // row with no user id is then thrown away instead of added.  This reply
+        // used to carry one id-less "DecompDev" row there, so every fusion
+        // emptied the friend picker and the next quest said "Reinforcements could
+        // not be found" until a FriendGet refilled it.  The result screen reads
+        // 1ZbHB6Im below and the unit cards read the 4ceMWH6k roster -- the row
+        // never reached any list, so it never drove the animation it was named
+        // for.  The field is optional and stays unset.
         UnitMixResp resp = {};
-
-        // Reinforcement animation entry.
-        {
-            UnitReinforceEntry rd = {};
-            rd.handle_name    = "DecompDev";
-            rd.target_lv      = newLevel;
-            rd.unit_mst_id    = baseMstId;
-            rd.base_hp        = newBaseHp;
-            rd.base_atk       = newBaseAtk;
-            rd.base_def       = newBaseDef;
-            rd.base_heal      = newBaseRec;
-            // add_* passes through untouched -- fusion does not write it.  ext_* is
-            // the IMP bucket and carries the POST-fusion clamped values, because an
-            // imp that just landed has to show on the result screen.
-            rd.add_hp         = br["add_hp"].as<int32_t>();
-            rd.add_atk        = br["add_atk"].as<int32_t>();
-            rd.add_def        = br["add_def"].as<int32_t>();
-            rd.add_heal       = br["add_rec"].as<int32_t>();
-            rd.ext_hp         = newImpHp;
-            rd.ext_atk        = newImpAtk;
-            rd.ext_def        = newImpDef;
-            // ⚠ THESE ARE THE BRAVE BURST FIELDS, DESPITE THE NAMES.
-            // UnitReinforceEntry.skill_id carries hash nj9Lw7mV and skill_lv
-            // carries 3NbeC8AB -- the same two hashes UserUnitInfo uses for bb_id
-            // and bb_lvl.  They were being fed from user_units.skill_id/skill_lv,
-            // a different (and entirely unused, 0 on all 77 rows) pair of columns,
-            // which is why the fusion RESULT screen read "BB Lv. 0/10" while the
-            // unit card -- which reads UserUnitInfo -- correctly showed Lv.10.
-            // Post-fusion values, like add_* above, so the screen shows the gain.
-            rd.skill_id       = br["bb_id"].as<std::string>();
-            rd.skill_lv       = newBbLvl;
-            rd.extra_skill_id = br["sbb_id"].as<std::string>();
-            rd.extra_skill_lv = newSbbLvl;
-            rd.unit_type_id   = newUnitType;
-            // Ge8Yo32T is setEquipItemID, not a mission id -- and xZH6EIQ7 is a
-            // full REPLACE of the reinforcement record, so sending a blank here
-            // wiped the sphere off the fused unit on the result screen.
-            rd.equipitem_id   = br["eqip_item_id"].as<int32_t>();
-            resp.reinforce.emplace_back(std::move(rd));
-        }
 
         // Incremental unit cache update.
         //
@@ -812,10 +870,14 @@ HANDLEF(UnitMix)
             r.before_eqp_frame_id2    = oldEqpFrame2;
             r.after_eqp_frame_id2     = newEqpFrame2;
 
-            // FE and DBB are not implemented; equal zeroes are the honest "no
-            // change" for a feature that does not exist yet.
-            r.before_fe_bp = r.after_fe_bp = 0;
-            r.before_max_fe_bp = r.after_max_fe_bp = 0;
+            // Unspent SP before/after -- parseMixResult @0x1C18D6C adds the
+            // unit's fe_used_bp to both for display -- and the limit, which
+            // fusion does not move (only an Omni+3 Omni Emperor would).
+            r.before_fe_bp = oldFeSp;
+            r.after_fe_bp = newFeSp;
+            r.before_max_fe_bp = r.after_max_fe_bp = feMaxSp;
+            // DBB is not implemented; equal zeroes are the honest "no change"
+            // for a feature that does not exist yet.
             r.before_dbb_skill_level = r.after_dbb_skill_level = 0;
 
             // THE STAT TABLE.  lvup_status and param_up_state are a matched pair
@@ -921,6 +983,7 @@ HANDLEF(UnitMix)
         {
             auto warehouse = co_await gme::loadWarehouseSnapshot(transaction, identity);
             resp.warehouse_info = std::move(warehouse.warehouse);
+            resp.item_favorite = std::move(warehouse.favorites);
             resp.item_dictionary_info = std::move(warehouse.dictionary);
         }
 

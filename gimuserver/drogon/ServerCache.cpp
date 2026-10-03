@@ -686,6 +686,10 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_unitCommentMst = LoadJson<UnitCommentMstCache>(mstRoot, "unit_comment_mst.json").data;
 		m_unitFeSkillMst = LoadJson<UnitFeSkillMstCache>(mstRoot, "unit_fe_skill_mst.json").data;
 		m_unitFeCategoryMst = LoadJson<UnitFeCategoryMstCache>(mstRoot, "unit_fe_category_mst.json").data;
+		// F_FE_SKILL_MST, the client's own copy (scripts/gen_fe_skill_mst.py):
+		// what each SP enhancement costs, so FeSkillGet prices it as the
+		// Enhancements screen did.
+		m_feSkillMst = LoadJson<FeSkillMstCache>(mstRoot, "fe_skill_mst.json").data;
 		m_missionEp3Mst = LoadJson<MissionEp3MstCache>(mstRoot, "mission_ep3_mst.json").data;
 
 		// World geography — see mst/area.kdl.

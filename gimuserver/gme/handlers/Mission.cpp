@@ -2,11 +2,13 @@
 #include "Handlers.hpp"
 
 #include <gimuserver/archive/MissionArchiver.hpp>
+#include <gimuserver/gme/common/BattleItems.hpp>
 #include <gimuserver/gme/common/Common.hpp>
 #include <gimuserver/gme/common/DailyTask.hpp>
 #include <gimuserver/gme/common/FriendPoints.hpp>
 #include <gimuserver/gme/common/Friends.hpp>
 #include <gimuserver/gme/common/MissionBreak.hpp>
+#include <gimuserver/gme/common/MissionRuns.hpp>
 #include <gimuserver/gme/common/FrontierGate.hpp>
 #include <gimuserver/gme/common/PermitPlace.hpp>
 #include <gimuserver/gme/common/ResearchLab.hpp>
@@ -160,7 +162,10 @@ static std::string encodeClearBonus(const std::vector<ClearReward>& rewards)
 	return out;
 }
 
-drogon::Task<void> grantDungeonClearGem(
+// Called on a FIRST clear only.  Returns the quest dungeon this clear completed
+// (every one of its missions now cleared), or 0 -- which is also exactly the
+// dungeon MissionEnd reports as newly cleared (4sQ8vBXm).
+drogon::Task<int32_t> grantDungeonClearGem(
 	const db::Database database,
 	const gme::UserIdentity identity,
 	const uint32_t missionId)
@@ -168,11 +173,11 @@ drogon::Task<void> grantDungeonClearGem(
 	const auto& cache = theServer()->cache();
 	const auto dungeonIt = cache.missionQuestDungeon().find(static_cast<int32_t>(missionId));
 	if (dungeonIt == cache.missionQuestDungeon().end())
-		co_return; // Vortex, Frontier Gate, event content — no clear Gem.
+		co_return 0; // Vortex, Frontier Gate, event content — no clear Gem.
 
 	const auto missionsIt = cache.missionsByDungeon().find(dungeonIt->second);
 	if (missionsIt == cache.missionsByDungeon().end())
-		co_return;
+		co_return 0;
 
 	const auto& dungeonMissions = missionsIt->second;
 
@@ -201,11 +206,11 @@ drogon::Task<void> grantDungeonClearGem(
 		" WHERE user_id = $1 AND state = 2 AND mission_id IN (" + idList + ");",
 		identity.userId);
 	if (rows.empty())
-		co_return;
+		co_return 0;
 
 	const auto cleared = rows[0]["cleared"].as<int64_t>();
 	if (cleared < static_cast<int64_t>(dungeonMissions.size()))
-		co_return;
+		co_return 0;
 
 	co_await database->execSqlCoro(
 		"UPDATE user_info SET gems = MIN(gems + $1, $2)"
@@ -218,6 +223,7 @@ drogon::Task<void> grantDungeonClearGem(
 	LOG_INFO << "MissionEnd: quest dungeon " << dungeonIt->second << " fully cleared by "
 	         << identity.userId << " (" << dungeonMissions.size()
 	         << " missions) — awarded " << kDungeonClearGems << " gem";
+	co_return dungeonIt->second;
 }
 
 // Fully consume decimal fields; std::stoul accepted suffixes and signed input.
@@ -344,36 +350,109 @@ std::string encodeUnitDrops(
 }
 
 /*!
+* The player level cap: DefineMst max_team_lv (Kt8H4LN7, 999 in this data).
+*
+* ⚠ NOT "the last UserLevelMst row".  The level table carries a row for the
+* level AFTER the cap: MissionResultScene::updateEvent seeds its EXP counter
+* with GameUtils::getNeedUserExp(beforeLv + 1, true) @0x11762A0, which skips
+* the max-level check and returns -1 when the row is missing.  At level 999
+* that -1 becomes a NEGATIVE per-frame step, and MissionResultBaseScene::countUp
+* @0x18B8784 compares `counted + step < total`, which then never becomes false
+* -- the result screen froze for every level-999 player.  The row for 1000 is
+* the upstream capture's own (see deploy/mst/user_level_mst.json), so the cap
+* has to come from the define the client itself compares against.
+*/
+uint32_t maxPlayerLevel()
+{
+	const auto cap = theServer()->cache().initializeResp().defines.max_team_lv;
+	return cap > 0 ? static_cast<uint32_t>(cap) : 999u;
+}
+
+/*!
+* Player EXP Boost (#26): the percent a unit's LEADER SKILL adds to quest EXP.
+*
+* Passive/process 97 is "Player EXP Boost" (Global wiki, Player EXP Boost rev
+* 653737: buff 79, passive 97), and its first parameter is the percent --
+* Perpetual Flaw Roglizer's Historical Epilogue (LS 10168) carries "97" with
+* "20", which its wiki page notes as "20% EXP" (rev 642770); Holy End
+* Roglizer's End of the World (LS 10167) carries 15.  The client has no
+* consumer for it: the result screen shows reward_info.inc_exp as the server
+* sent it, so the server owns this bonus.
+*
+* The leader is read from UnitMst by species, as the battle does
+* (BattleParty::setPartyPassiveList @0x10B3E10 -> UnitMst::getLeaderSkillID),
+* not from user_units.leader_skill_id, which is 0 on units granted before that
+* column was written.
+*
+* LeaderSkillMst.process_param is modelled as a comma list, but its per-process
+* separator is '@' ("80,80,80,0,80@15@110,0,0,0,0,0@15" for LS 10167), so the
+* list is re-joined and split on '@' to line up with process_id.
+*/
+int32_t leaderExpBoostPercent(const int32_t unitId)
+{
+	constexpr int32_t kPlayerExpBoost = 97;
+	const auto& cache = theServer()->cache();
+	const auto unit = std::find_if(cache.unitMst().begin(), cache.unitMst().end(),
+		[unitId](const auto& u) { return u.id == unitId; });
+	if (unit == cache.unitMst().end() || unit->leader_skill_id <= 0)
+		return 0;
+	const auto ls = std::find_if(cache.leaderSkillMst().begin(), cache.leaderSkillMst().end(),
+		[&](const auto& l) { return l.leader_skill_id == unit->leader_skill_id; });
+	if (ls == cache.leaderSkillMst().end())
+		return 0;
+
+	std::string joined;
+	for (size_t i = 0; i < ls->process_param.size(); ++i)
+		joined += (i ? "," : "") + ls->process_param[i];
+	std::vector<std::string> params;
+	std::stringstream split(joined);
+	for (std::string part; std::getline(split, part, '@');)
+		params.push_back(part);
+
+	int32_t percent = 0;
+	for (size_t i = 0; i < ls->process_id.size() && i < params.size(); ++i)
+	{
+		if (ls->process_id[i] != kPlayerExpBoost)
+			continue;
+		const auto first = params[i].substr(0, params[i].find(','));
+		int32_t value = 0;
+		const auto [end, error] = std::from_chars(first.data(), first.data() + first.size(), value);
+		if (error == std::errc{} && value > 0)
+			percent += value;
+	}
+	return percent;
+}
+
+/*!
 * Applies pending EXP to the current user level.
 *
 * The caller should pass exp after adding the mission reward. This function
 * treats UserLevelMst::exp as the per-level chunk required to reach level + 1,
 * then mutates level and exp so exp remains the residual progress at the new
-* level.
+* level.  It never levels past maxLevel, and at the cap nothing carries over:
+* the client draws an empty bar there (MissionResultScene picks 0 when
+* getMaxTeamLv() == beforeLv @0x18CCE4C) and there is no level left to spend
+* it on.
 *
 * @return True if at least one level was gained.
 */
-bool levelUp(uint32_t& level, uint32_t& exp)
+bool levelUp(uint32_t& level, uint32_t& exp, const uint32_t maxLevel)
 {
 	bool leveled = false;
-	while (true)
+	while (level < maxLevel)
 	{
-		if (const auto mst = gme::getLevelMst(level + 1))
-		{
-			// We don't have enough to level up.
-			if (exp < mst->exp)
-			{
-				break;
-			}
-		
-			// Advance a level.
-			level++;
-			exp -= mst->exp;
-			leveled = true;
-			continue;
-		}
-		break;
+		const auto mst = gme::getLevelMst(level + 1);
+		if (!mst || exp < mst->exp)
+			break;
+
+		// Advance a level.
+		level++;
+		exp -= mst->exp;
+		leveled = true;
 	}
+
+	if (level >= maxLevel)
+		exp = 0;
 
 	return leveled;
 }
@@ -392,11 +471,25 @@ HANDLEF(MissionEnd)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
+	// THE SERIAL NAMES THE BATTLE, NOT THE MISSION (gme/common/MissionRuns.hpp).
+	// Resolved once here; everything below uses missionId.  A run serial this
+	// user was never issued cannot be settled against any mission.
+	const uint32_t wireSerial = req.mission_num.serial_id;
+	const bool issuedSerial = wireSerial >= gme::kMissionRunSerialFloor;
+	const auto resolvedMission = co_await gme::missionForSerial(theDb(), identity, wireSerial);
+	if (!resolvedMission)
+	{
+		LOG_WARN << "MissionEnd: " << identity.userId << " sent battle serial " << wireSerial
+			<< ", which was never issued to them";
+		co_return HandleResult::error("Unknown battle", "No battle was started with that serial");
+	}
+	const uint32_t missionId = *resolvedMission;
+
 	// Same battle-content fallback as MissionStart — without it a mission that
 	// STARTS on template content would fail on completion instead, which is a
 	// worse failure: the player fights the battle and then loses the result.
 	// See the block in MissionStart for why only content is substituted.
-	auto missionRecord = MissionArchiver::instance().lookup(req.mission_num.serial_id);
+	auto missionRecord = MissionArchiver::instance().lookup(missionId);
 	if (!missionRecord)
 	{
 		missionRecord = MissionArchiver::instance().lookup(10);
@@ -406,9 +499,9 @@ HANDLEF(MissionEnd)
 		}
 		// Relabelled for the same reason as MissionStart — the result screen
 		// reads the mission back out of the response.
-		missionRecord->id = req.mission_num.serial_id;
+		missionRecord->id = missionId;
 
-		LOG_WARN << "MissionEnd: mission " << req.mission_num.serial_id
+		LOG_WARN << "MissionEnd: mission " << missionId
 		         << " has no authored battle content; using the template record "
 		            "relabelled as this mission";
 	}
@@ -460,6 +553,79 @@ HANDLEF(MissionEnd)
 			const auto currentHonor = userInfo.front<int32_t>("friend_points");
 			const auto helperUserId = userInfo.front<std::string>("reinforce_user_id");
 
+			// ONE RESULT PER BATTLE.  MissionStart records the battle it opened
+			// (user_info.open_mission_id) and this clears it to 0, so a second
+			// MissionEnd for the same start -- a client retry after a lost
+			// reply, or a replayed request -- finds nothing open.  It must not
+			// pay, record, drop or spend anything a second time; it gets the
+			// current state with zero rewards instead of an error, because
+			// every handler error closes the client's session.  NULL is a
+			// battle opened before this column existed and is honoured once.
+			//
+			// EXACT FOR ISSUED SERIALS.  The client echoes the serial MissionStart
+			// gave it, and that serial settles only while it is the open battle's
+			// (open_mission_serial) -- so a repeat of a settled result, or a
+			// late result from an earlier run of the SAME mission after a new
+			// one started, both pay nothing.
+			//
+			// A MISSION-ID SERIAL SETTLES ONLY A BATTLE THAT PREDATES SERIALS.
+			// open_mission_serial is NULL until the first MissionStart after the
+			// upgrade (29092026_MissionRunSerials adds it without a default), and
+			// every start and every settled result writes it; so NULL, and only
+			// NULL, means the open battle -- open_mission_id, or nothing known for
+			// a save older than that column too -- was started by a server that
+			// sent the mission id as the serial.  That battle may settle once
+			// with the mission-id serial its client holds.  Once any run has been
+			// issued, the open battle has a serial of its own, and a mission-id
+			// serial is at best a delayed result from before the upgrade: letting
+			// it through would pay the new run and leave its genuine result
+			// nothing to settle (QC 2026-09-30, P1).
+			{
+				const auto open = co_await transaction->execSqlCoro(
+					"SELECT open_mission_id, open_mission_serial FROM user_info WHERE id = $1;",
+					identity.userId);
+				const bool serialEra = !open.empty() && !open[0]["open_mission_serial"].isNull();
+				const bool openUnknown = open.empty() || open[0]["open_mission_id"].isNull();
+				const auto openMission = openUnknown ? int64_t{ -1 } : open[0]["open_mission_id"].as<int64_t>();
+				const auto openSerial = serialEra ? open[0]["open_mission_serial"].as<int64_t>() : int64_t{ 0 };
+				const bool settles = issuedSerial
+					? serialEra && openSerial == static_cast<int64_t>(wireSerial)
+					: !open.empty() && !serialEra
+						&& (openUnknown || openMission == static_cast<int64_t>(missionId));
+				if (!settles)
+				{
+					LOG_WARN << "MissionEnd: " << identity.userId << " ended mission "
+						<< missionId << " (serial " << wireSerial << ") but the open battle is "
+						<< openMission << " (serial " << openSerial << "); answering with no rewards";
+
+					resp.login_info = std::move((co_await gme::getLoginInfo(transaction, identity)).nonEmpty());
+					gme::omitClientScenarioMarkers(resp.login_info);
+					resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+					resp.energy_recover.action_point_threshold = resp.team_info.max_action_point;
+					// Nothing was cleared by THIS reply, so it says so in the
+					// client's own sentinels (see "WHAT THIS RESULT NEWLY
+					// CLEARED" below): a mission id here would replay that
+					// mission's end script, and an empty area id resets the map.
+					resp.reward_info.clear_mission_id = 0;
+					resp.reward_info.clear_dungeon_id.clear();
+					resp.reward_info.clear_area_id = "0";
+					resp.reward_info.before_level = currentLevel;
+					resp.clear_mission_info = co_await gme::getClearedMissions(transaction, identity);
+					const auto permit = co_await gme::buildPermitPlace(transaction, identity);
+					if (const auto error = glz::write_json(resp, buffer); error)
+						throw std::runtime_error(glz::format_error(error, buffer));
+					gme::injectPermitPlace(buffer, permit);
+					co_return HandleResult::success(buffer);
+				}
+				co_await transaction->execSqlCoro(
+					"UPDATE user_info SET open_mission_id = 0, open_mission_serial = 0 WHERE id = $1;",
+					identity.userId);
+			}
+
+			// Parsed before anything is paid: a malformed log fails the whole
+			// result inside this transaction rather than being half-applied.
+			const auto usedItems = gme::parseUseItemLog(req.battle_result.use_item_log);
+
 			// HONOR for the Summoner Helper this run borrowed.  MissionStart
 			// recorded who it was; the amount is the one the card promised
 			// (gme::honorForMission picks the friend or stranger rate exactly
@@ -484,23 +650,69 @@ HANDLEF(MissionEnd)
 			// rewards are already once-only below.  Read before the clear is
 			// recorded.
 			const auto labReplay = !missionLost
-				&& gme::isResearchLabMission(static_cast<int32_t>(req.mission_num.serial_id))
+				&& gme::isResearchLabMission(static_cast<int32_t>(missionId))
 				&& !(co_await transaction->execSqlCoro(
 					"SELECT 1 FROM user_campaign_missions"
 					" WHERE user_id = $1 AND mission_id = $2 AND state = 2;",
 					identity.userId,
-					std::to_string(req.mission_num.serial_id))).empty();
+					std::to_string(missionId))).empty();
 
 			// A reported loss earns none of the archive clear rewards.
 			const auto payClear = !missionLost && !labReplay;
 			const auto rewardZel = req.battle_result.zel + (payClear ? missionRecord->zel : 0);
 			const auto rewardKarma = req.battle_result.karma + (payClear ? missionRecord->karma : 0);
-			const auto rewardExp = payClear ? missionRecord->exp : 0;
-	
-			// See if we leveled up.
+			// Nothing is earned at the level cap ("prevent the user from gaining
+			// any more experience"): the result shows no EXP obtained, and the
+			// stored progress stays at 0 (levelUp below).
+			const auto maxLevel = maxPlayerLevel();
+			const auto baseExp = (payClear && currentLevel < maxLevel) ? missionRecord->exp : 0;
+
+			// PLAYER EXP BOOST from the two leaders (see leaderExpBoostPercent).
+			// Global wiki, Player EXP Boost rev 653737: quest EXP x (leader skill
+			// 1 + leader skill 2 + ...), the player's leader and the friend's
+			// leader ADDING ("Zelnite lead and friend ... totaling up to 30%").
+			// The player's leader is the party member the client flags
+			// member_type 0 in this very request; the helper's is the unit the
+			// picker offered for the helper MissionStart recorded.  Rounded
+			// down.  NOT modelled: Extra Skill / SP enhancement / item / guild /
+			// event multipliers the same formula names.
+			int32_t expBoostPercent = 0;
+			if (baseExp > 0)
+			{
+				for (const auto& member : req.party_deck_info)
+				{
+					if (member.member_type != 0)
+						continue;
+					const auto unitRows = co_await transaction->execSqlCoro(
+						"SELECT unit_id FROM user_units WHERE user_id = $1 AND user_unit_id = $2;",
+						identity.userId, static_cast<int64_t>(member.user_unit_id));
+					if (!unitRows.empty())
+					{
+						const auto raw = unitRows[0]["unit_id"].as<std::string>();
+						int32_t species = 0;
+						std::from_chars(raw.data(), raw.data() + raw.size(), species);
+						expBoostPercent += leaderExpBoostPercent(species);
+					}
+					break;
+				}
+				if (gme::borrowedHelper(helperUserId))
+					expBoostPercent += leaderExpBoostPercent(
+						co_await gme::helperLeaderUnit(transaction, identity, helperUserId));
+			}
+			const auto rewardExp = static_cast<uint32_t>(
+				static_cast<uint64_t>(baseExp) * static_cast<uint64_t>(100 + expBoostPercent) / 100);
+			if (expBoostPercent > 0)
+			{
+				LOG_INFO << "MissionEnd: leader EXP boost +" << expBoostPercent << "% -> "
+					<< baseExp << " becomes " << rewardExp;
+			}
+
+			// See if we leveled up.  Summed wide: a save-edited exp near the top
+			// of the column must not wrap into a small number.
 			auto newLevel = currentLevel;
-			auto newExp = currentExp + rewardExp;
-			const auto leveledUp = levelUp(newLevel, newExp);
+			auto newExp = static_cast<uint32_t>(std::min<uint64_t>(
+				static_cast<uint64_t>(currentExp) + rewardExp, UINT32_MAX));
+			const auto leveledUp = levelUp(newLevel, newExp, maxLevel);
 
 			// The client expects the post-mission total, including the amount earned
 			// during this mission.
@@ -525,7 +737,7 @@ HANDLEF(MissionEnd)
 
 			// Persist tutorial checkpoints so leaving and returning mid-tutorial does not
 			// replay completed steps.
-			if (!missionLost && req.mission_num.serial_id == kFirstTutorialMission)
+			if (!missionLost && missionId == kFirstTutorialMission)
 			{
 				co_await transaction->execSqlCoro(
 					"UPDATE user_info SET tutorial_status = $1"
@@ -533,7 +745,7 @@ HANDLEF(MissionEnd)
 					kFirstTutorialCheckpoint, identity.userId, identity.gumiUserId);
 
 			}
-			else if (!missionLost && req.mission_num.serial_id == kSecondTutorialMission)
+			else if (!missionLost && missionId == kSecondTutorialMission)
 			{
 				// Chapter 10 arms the free-summon tutorial, and tuto15.txt opens
 				// with Karl handing over the gems for it ("You received 5 Gems",
@@ -567,6 +779,10 @@ HANDLEF(MissionEnd)
 			// empty otherwise, which is what the live server sent and what the
 			// result screen's length check expects.
 			std::string firstClearBonus;
+			// What this result newly cleared, for the reward block's clear ids
+			// (see "WHAT THIS RESULT NEWLY CLEARED").  A loss clears nothing.
+			bool newlyCleared = false;
+			int32_t completedDungeon = 0;
 
 			// A Frontier Gate battle reports the run's floors and score
 			// (eIQ79KO2).  They are stored for the next battle and the end of
@@ -622,7 +838,8 @@ HANDLEF(MissionEnd)
 					"SELECT 1 FROM user_campaign_missions"
 					" WHERE user_id = $1 AND mission_id = $2 AND state = 2;",
 					identity.userId,
-					std::to_string(req.mission_num.serial_id))).empty();
+					std::to_string(missionId))).empty();
+				newlyCleared = firstClear;
 
 				co_await transaction->execSqlCoro(
 					"INSERT INTO user_campaign_missions"
@@ -632,7 +849,7 @@ HANDLEF(MissionEnd)
 					" state=2, attain_percent=100,"
 					" clear_count=clear_count+1, last_cleared_at=$3;",
 					identity.userId,
-					std::to_string(req.mission_num.serial_id),
+					std::to_string(missionId),
 					clearedAt);
 
 				// DAILY TASKS.  Both quest codes are fed from here because this
@@ -654,12 +871,12 @@ HANDLEF(MissionEnd)
 						std::chrono::duration_cast<std::chrono::seconds>(
 							std::chrono::system_clock::now().time_since_epoch()).count() / 86400);
 					if (std::find(areas.begin(), areas.end(),
-							gme::missionAreaId(req.mission_num.serial_id)) != areas.end())
+							gme::missionAreaId(missionId)) != areas.end())
 					{
 						co_await gme::advanceDailyTask(transaction, identity, "QE");
 					}
 				}
-				if (theServer()->cache().vortexMissions().count(req.mission_num.serial_id))
+				if (theServer()->cache().vortexMissions().count(missionId))
 					co_await gme::advanceDailyTask(transaction, identity, "VV");
 
 				// "CLEARED (NO CONTINUES)".  A continue during this run left a
@@ -669,26 +886,26 @@ HANDLEF(MissionEnd)
 				const auto continued = co_await transaction->execSqlCoro(
 					"SELECT 1 FROM user_mission_continues"
 					" WHERE user_id = $1 AND mission_id = $2;",
-					identity.userId, std::to_string(req.mission_num.serial_id));
+					identity.userId, std::to_string(missionId));
 				if (continued.empty())
 				{
 					co_await transaction->execSqlCoro(
 						"UPDATE user_campaign_missions SET no_continue = 1"
 						" WHERE user_id = $1 AND mission_id = $2;",
-						identity.userId, std::to_string(req.mission_num.serial_id));
+						identity.userId, std::to_string(missionId));
 				}
 				co_await transaction->execSqlCoro(
 					"DELETE FROM user_mission_continues WHERE user_id = $1 AND mission_id = $2;",
-					identity.userId, std::to_string(req.mission_num.serial_id));
+					identity.userId, std::to_string(missionId));
 
 				if (firstClear)
 				{
-					co_await grantDungeonClearGem(transaction, identity, req.mission_num.serial_id);
+					completedDungeon = co_await grantDungeonClearGem(transaction, identity, missionId);
 
 					// Per-mission first-clear rewards, queued to the present box.
 					const auto& clearRewards = theServer()->cache().missionClearRewards();
 					const auto rewardIt = clearRewards.find(
-						static_cast<int32_t>(req.mission_num.serial_id));
+						static_cast<int32_t>(missionId));
 					if (rewardIt != clearRewards.end())
 					{
 						const auto rewards = parseClearRewards(rewardIt->second);
@@ -701,7 +918,7 @@ HANDLEF(MissionEnd)
 						// The result screen shows only the currency half.
 						firstClearBonus = encodeClearBonus(rewards);
 						LOG_INFO << "MissionEnd: first clear of "
-							<< req.mission_num.serial_id << " -> " << rewards.size()
+							<< missionId << " -> " << rewards.size()
 							<< " reward(s) queued (" << rewardIt->second << ")";
 					}
 				}
@@ -784,52 +1001,25 @@ HANDLEF(MissionEnd)
 				(co_await gme::addUserItem(transaction, identity, itemId, qty));
 			}
 
+			// Items used in the battle leave the OWNED bar, win or lose -- the
+			// client has already spent them from its copy (see
+			// gme/common/BattleItems.hpp).  A battle that ran on a supplied
+			// list (challenge item sets) spent nothing the player owns.
+			if (!usedItems.empty() && gme::missionUsesOwnedLoadout(
+					static_cast<int32_t>(missionId)))
+			{
+				co_await gme::consumeLoadoutItems(transaction, identity, usedItems);
+			}
+
 			// UserWarehouseInfoResponse @0x14060E0 clears its list. Send every
 			// positive stack, preserving instance IDs and unrelated inventory.
 			{
 				auto warehouse = co_await gme::loadWarehouseSnapshot(transaction, identity);
 				resp.warehouse_info = std::move(warehouse.warehouse);
+				resp.item_favorite = std::move(warehouse.favorites);
 				resp.item_dictionary_info = std::move(warehouse.dictionary);
 			}
 
-			resp.reward_info.clear_mission_id = req.mission_num.serial_id;
-
-			// WHERE the clear happened, not just what was cleared.  Both keys
-			// have real consumers and were going out empty:
-			//
-			//   GameUtils::getAppearDungeon @0x1196FE4 reads clear_dungeon_id,
-			//   looks it up in DungeonMstList and returns
-			//   DungeonMstList::getNext(areaId, dungeonId) -- the dungeon that
-			//   follows the one just cleared.  With the field empty it takes
-			//   the `cbz` at 0x1197028 and returns null, and both
-			//   DungeonSelectScene2::initialize @0x184DC60 and
-			//   AnotherDungeonSelectScene::initialize `cbz x0` straight past
-			//   it, so the dungeon list never lands on the newly opened
-			//   dungeon.  MissionResultFriendRequestScene::changeNextScene
-			//   reads all three for its post-result routing.
-			//
-			// This is NOT the progression gate -- PermitPlace opens the next
-			// mission and that works.  This is the polish on top: clearing a
-			// dungeon should leave the player looking at the next one instead
-			// of back at the top of the list.
-			{
-				const auto& cache = theServer()->cache();
-				const auto dungeonIt = cache.missionQuestDungeon().find(
-					static_cast<int32_t>(req.mission_num.serial_id));
-				if (dungeonIt != cache.missionQuestDungeon().end())
-				{
-					resp.reward_info.clear_dungeon_id = std::to_string(dungeonIt->second);
-					const auto& dungeons = cache.dungeonMst();
-					const auto row = std::find_if(dungeons.begin(), dungeons.end(),
-						[&dungeonIt](const ::DungeonMst& d)
-						{ return d.dungeon_id == dungeonIt->second; });
-					if (row != dungeons.end())
-						resp.reward_info.clear_area_id = std::to_string(row->area_id);
-				}
-				// A mission with no quest dungeon -- Vortex, Frontier Gate,
-				// event content -- leaves both empty, which is the same
-				// early-out the client already handles.
-			}
 			resp.reward_info.zel = rewardZel;
 			resp.reward_info.karma = rewardKarma;
 			resp.reward_info.before_level = currentLevel;
@@ -855,6 +1045,85 @@ HANDLEF(MissionEnd)
 			// PermitRecipeResponse @0x13E9BB8 replaces the list. Rebuild all
 			// unlocked recipes, including ones gated by this newly cleared mission.
 			resp.permit_receipes = co_await gme::Town::permittedRecipes(transaction, identity, cleared);
+			// THE TOWN TILES, against the same set.  Missions 11 and 12 open
+			// the Farm and the Mountain, and the client gates them itself on
+			// the UT1SVg59 above -- but a tile locked at the last UserInfo was
+			// sent with no taps, and nothing else re-sent this list, so a Farm
+			// opened mid-session passed its gate and stayed empty and inert
+			// until the next login (reported 2026-10-02).  locationState rolls
+			// a newly opened tile's first period, and any tile whose 3 hours
+			// are up.  Taps are never lost to it: the client flushes them in
+			// one TownUpdate on leaving town.  See town_location_detail in
+			// net/handlers.kdl.
+			{
+				std::vector<::UserTownLocationInfo> unusedInfo;
+				std::vector<::UserTownLocationDetail> tiles;
+				co_await gme::Town::locationState(transaction, identity, cleared, unusedInfo, tiles);
+				resp.town_location_detail = std::move(tiles);
+			}
+
+			// WHAT THIS RESULT NEWLY CLEARED -- and nothing on a repeat.
+			//
+			// MissionResultFriendRequestScene::changeNextScene @0x18C301C routes
+			// the player out of the result screens on these three ids, and
+			// trusts them completely:
+			//
+			//   mauD5qZ1 clear_mission_id -- "12" first offers the Randall
+			//     presentation; then, if that mission has an END script
+			//     (GameUtils::existMissionEvent(id, "1")), it is PLAYED, with no
+			//     once-only check of its own.  Mission 10's end script is the
+			//     Farm announcement, and it ends on script op 41 = 0: return
+			//     point 0, which MissionEventScene::updateEvent maps to Home.
+			//   4sQ8vBXm clear_dungeon_id -- the same for the DUNGEON's end
+			//     script (map1-ending.txt on dungeon 80), and
+			//     GameUtils::getAppearDungeon @0x1196FE4 animates
+			//     DungeonMstList::getNext of it on the dungeon list.
+			//   NgPQbA46 clear_area_id -- anything but "0", an EMPTY string
+			//     included, resets UserState's last area so the map shows the
+			//     newly opened one.
+			//
+			// With all three neutral a story clear goes to scene 61,
+			// DungeonSelectScene2 -- the area's dungeon list, where the next
+			// stage is picked (scene ids resolved through getGameScene's table).
+			//
+			// All three used to be sent on EVERY clear, so each repeat of
+			// mission 10 replayed the Farm scene and then went Home (reported
+			// 2026-10-02).  The client never resets them between results --
+			// MissionRewardInfo::init @0x1268830 leaves them alone and readParam
+			// stores the raw string -- so "nothing" must be sent explicitly, in
+			// the client's own sentinels: "0" for the mission (row 0 has no
+			// script) and the area, "" for the dungeon (what
+			// GameUtils::deleteAppearDungeon @0x1197188 writes).
+			resp.reward_info.clear_mission_id = 0;
+			resp.reward_info.clear_dungeon_id.clear();
+			resp.reward_info.clear_area_id = "0";
+			if (newlyCleared)
+			{
+				resp.reward_info.clear_mission_id = missionId;
+				// The dungeon only when this clear completed it -- the same
+				// fact the clear Gem pays on.  Quest dungeons only, as before:
+				// special content keeps its end scripts unplayed.
+				if (completedDungeon > 0)
+					resp.reward_info.clear_dungeon_id = std::to_string(completedDungeon);
+				// The area only when this clear OPENED another story area.  Not
+				// "every dungeon done": Mistral's EX dungeon opens at mission 365,
+				// long after Morgan, and the area presentation is for the
+				// opening (85 -> Morgan, 265 -> St. Lamia, ...).
+				const auto& cache = theServer()->cache();
+				const auto dungeonIt = cache.missionQuestDungeon().find(static_cast<int32_t>(missionId));
+				if (dungeonIt != cache.missionQuestDungeon().end()
+					&& gme::storyAreaOpenedBy(static_cast<int32_t>(missionId), cleared))
+				{
+					const auto& dungeons = cache.dungeonMst();
+					const auto row = std::find_if(dungeons.begin(), dungeons.end(),
+						[&dungeonIt](const ::DungeonMst& d) { return d.dungeon_id == dungeonIt->second; });
+					if (row != dungeons.end() && row->area_id > 0)
+						resp.reward_info.clear_area_id = std::to_string(row->area_id);
+				}
+				LOG_INFO << "MissionEnd: first clear of " << missionId
+					<< " (dungeon cleared: " << (resp.reward_info.clear_dungeon_id.empty() ? "-" : resp.reward_info.clear_dungeon_id)
+					<< ", area opened by: " << resp.reward_info.clear_area_id << ")";
+			}
 
 
 			// Fold this battle's statistics into the lifetime trophy archive.
@@ -886,6 +1155,10 @@ HANDLEF(MissionEnd)
 			co_await gme::clearMissionBreak(transaction, identity);
 
 			resp.login_info = std::move(loginInfo);
+			// Never echo the cutscene markers here: the client re-parses them
+			// from any reply and this one would roll back events it has just
+			// played (see omitClientScenarioMarkers).
+			gme::omitClientScenarioMarkers(resp.login_info);
 			resp.team_info = std::move(teamInfo);
 			// A level-up raises max energy, and with it the header's
 			// energy-refill threshold (see UserInfo).
@@ -919,6 +1192,23 @@ HANDLEF(MissionStart)
 		const auto error = glz::format_error(ec, json);
 		LOG_ERROR << "MissionStartReq deserialization failed:\n" << error;
 		co_return HandleResult::error("Deserialization error", error);
+	}
+
+	// Enforce the same prerequisites as the map (all-of, gme::storyMissionUnlocked)
+	// before spending energy or replacing an in-flight battle. A stale client
+	// tile cannot bypass them.
+	{
+		const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+		std::set<int32_t> cleared;
+		for (const auto& done : co_await gme::getClearedMissions(theDb(), identity))
+			cleared.insert(done.mission_id);
+		// A STALE TILE, NOT A CHEAT: the client drew this quest from a permit
+		// list it has not refreshed (#30), so the player gets the reason and
+		// Home instead of the app exiting.  Nothing has been spent yet.
+		if (!gme::storyMissionUnlocked(req.start_info.mission_id, cleared))
+			co_return HandleResult::refuseToHome(
+				"This quest is still locked. Clear the quests it requires first.",
+				"Mission locked: prerequisites not cleared");
 	}
 
 	// BATTLE-CONTENT FALLBACK.
@@ -1006,6 +1296,17 @@ HANDLEF(MissionStart)
 		co_return HandleResult::error("Archive error", "Unable to populate mission start response");
 	}
 
+	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
+
+	// THIS BATTLE'S OWN SERIAL, in place of the mission id populatePacket put
+	// there (see gme/common/MissionRuns.hpp): the client echoes it in MissionEnd
+	// and MissionContinue and seeds the battle from it.  Issued before the
+	// preflight below so the reply carries it; it only becomes the OPEN battle
+	// once the start has succeeded (open_mission_serial, further down).
+	const auto runSerial = co_await gme::issueMissionSerial(
+		theDb(), identity, static_cast<uint32_t>(req.start_info.mission_id));
+	resp.mission_num.serial_id = runSerial;
+
 	std::string buffer;
 	const auto& writeError = glz::write_json(resp, buffer);
 	if (writeError)
@@ -1023,8 +1324,6 @@ HANDLEF(MissionStart)
 	// cost lives in the archive (handbook §6.15 rule 3), which by definition
 	// does not have this one.  Frontier Gate in particular spends Hunter Orbs
 	// (Aube) client-side rather than energy — see §6.16.
-	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
-
 	if (!usingTemplate && missionRecord->energy_cost > 0)
 	{
 		(co_await gme::UserEnergy::consume(
@@ -1050,6 +1349,15 @@ HANDLEF(MissionStart)
 		gme::borrowedHelper(req.start_info.reinforce_user_id)
 			? req.start_info.reinforce_user_id
 			: std::string{},
+		identity.userId);
+
+	// THE BATTLE THIS START OPENS, so MissionEnd pays its result exactly once
+	// (see the ONE RESULT PER BATTLE block there).  A new start supersedes any
+	// battle the player walked away from, the same way the break record below
+	// does -- its serial can no longer settle.
+	co_await theDb()->execSqlCoro(
+		"UPDATE user_info SET open_mission_id = $1, open_mission_serial = $2 WHERE id = $3;",
+		static_cast<int64_t>(req.start_info.mission_id), static_cast<int64_t>(runSerial),
 		identity.userId);
 
 	// A FRESH RUN STARTS WITH A CLEAN CONTINUE RECORD, or a continue spent in an

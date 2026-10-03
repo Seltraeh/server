@@ -44,7 +44,14 @@ struct UserIdentity
 *
 *     -1     no second slot -- the slot is not drawn at all
 *      0     slot exists, empty
-*   1..14    slot exists, holding a sphere of that ItemMst.sphere_type
+*     >0     slot exists, holding the copy in that warehouse row
+*
+* The >0 case is the worn copy's user_warehouse_rows.instance_id, for BOTH
+* slots -- the client keys "which unit wears this row" on it
+* (UserUnitInfoList::updateSphereEquipList @0x12BA7F8) and names an unchanged
+* slot's copy by it in its next ItemSphereEqp.  It was documented, and stored,
+* as the ItemMst.sphere_type until 2026-10-02; gme::syncWarehouse repairs such
+* saves.  The -1/0 sentinel below was never in question.
 *
 * CONFIRMED IN-CLIENT 2026-09-05.  UnitMixMainScene::mixUnitDoubleSphereCheck
 * @0x1C118F8 walks the material list, calls UserUnitInfoBase::getEquipItemFrameID2
@@ -408,6 +415,47 @@ inline drogon::Task<db::InterfaceResult<>> addUserItem(
 		{ "item_num" });
 }
 
+// Call with the existing transaction during inventory mutations.
+drogon::Task<void> syncWarehouse(db::Database database, UserIdentity identity);
+drogon::Task<void> releaseWarehouseSphere(db::Database database, UserIdentity identity,
+    uint32_t unitId, int32_t slot);
+
+/*!
+* The item a request's warehouse id stands for when it is one of the client's
+* own placeholders, else nullopt.
+*
+* A row the client adds locally -- a craft (ItemMixScene::mixItem and the town,
+* Randall and accessory variants), a claimed present, a battle item taken off
+* the bar -- is named INT_MAX - itemId by GameUtils::incWarehouseItem
+* @0x118A304 (Windows build: helper at RVA 0x6E5580, inline at 0x6E5450), and
+* keeps that name until a reply carrying 9wjrh74P replaces the list.  ItemMix
+* answers {}, so a sphere crafted and then sold, locked or equipped before the
+* next such reply arrives under that name, not under its real row id.
+*
+* Only the exact INT_MAX - <an ItemMst id> form qualifies; a persistent row id
+* always wins over it (callers look the id up as a real row first).
+*/
+std::optional<int64_t> warehousePlaceholderItem(uint32_t wireId);
+
+/// A warehouse row the client has not been sent yet (see unseenWarehouseRows).
+struct UnseenWarehouseRow
+{
+    int64_t instanceId = 0;
+    int64_t count = 0;
+    bool favorite = false;
+    int64_t equipUnitId = 0;
+};
+
+/*!
+* One species' rows created since the last warehouse list the client was sent
+* (user_info.warehouse_seen_id, advanced by loadWarehouseSnapshot), oldest
+* first.  These are the copies the client still knows only by its placeholder,
+* so a placeholder is resolved among them and never to a row the client is
+* showing under its real id.
+*/
+drogon::Task<std::vector<UnseenWarehouseRow>> unseenWarehouseRows(
+    db::Database database, UserIdentity identity, int64_t itemId);
+
 /*!
 * Returns any spheres equipped on soon-to-be-consumed units to the owner's
 * warehouse.
@@ -464,9 +512,11 @@ inline drogon::Task<uint32_t> returnEquippedSpheres(
 		{
 			db::Data("eqip_item_id"),
 			db::Data("eqip_item_id2"),
+			db::Data("user_unit_id"),
 			db::Lookup("user_id", identity.userId),
 			db::LookupIn("user_unit_id", userUnitIds),
 		});
+	co_await syncWarehouse(database, identity);
 	uint32_t returned = 0;
 	for (const auto& row : result.data)
 	{
@@ -475,6 +525,8 @@ inline drogon::Task<uint32_t> returnEquippedSpheres(
 			const auto itemId = row[col].as<uint32_t>();
 			if (itemId != 0)
 			{
+				co_await releaseWarehouseSphere(database, identity,
+					row["user_unit_id"].as<uint32_t>(), std::string_view(col) == "eqip_item_id" ? 1 : 2);
 				co_await addUserItem(database, identity, itemId, 1);
 				++returned;
 			}
@@ -510,77 +562,10 @@ struct WarehouseSnapshot
 	std::vector<::ItemFavorite> favorites;
 };
 
-/*!
-* Reads the user's complete warehouse snapshot.
-*
-* 9wjrh74P is a replacement list — UserWarehouseInfoResponse::readParam
-* @0x14060E0 clears before adding — so every reply that carries it must carry
-* the whole warehouse, never just the stacks it changed.
-*
-* Stacks at 0 keep their row (ItemSell / ItemSphereEqp decrement without
-* deleting, so instance ids stay stable) but are filtered off the wire.  Every
-* species ever stacked still feeds the item dictionary; resending all of it is
-* harmless, because its readParam @0x13FFCBC never clears and
-* UserItemDictionaryList::addObject @0x12979D0 skips an id it already holds.
-* Favorited stacks are collected for UserInfo's item_favorite (VSRPkdId).
-*
-* @param database Database client or transaction to use.
-* @param identity Resolved user identity to read.
-* @return Positive stacks, every stacked species, and the favorited stacks.
-*/
-inline drogon::Task<WarehouseSnapshot> loadWarehouseSnapshot(
-	const db::Database database,
-	const UserIdentity identity)
-{
-	auto stacks = (co_await db::PacketInterfaceFor<UserWarehouseInfo>::read(
-		database,
-		"user_items",
-		{ db::Lookup("user_id", identity.userId) })).data;
-
-	WarehouseSnapshot snapshot;
-	snapshot.warehouse.reserve(stacks.size());
-	snapshot.dictionary.reserve(stacks.size());
-	for (auto& stack : stacks)
-	{
-		snapshot.dictionary.push_back(UserItemDictionaryInfo{ .item_id = stack.item_id });
-
-		// ⚠ DO NOT SKIP A STACK AT ZERO.  Equipping a sphere consumes one from
-		// its stack (ItemSphereEqp) and deliberately KEEPS the row -- "row kept
-		// so the instance id survives" -- so a player whose only Holy Cane is
-		// on Tridon holds a stack of 0.  Dropping it here defeated the other
-		// half of that design: the sphere vanished from the item list entirely,
-		// which also reads as "the sphere I claimed never arrived" because the
-		// present granted it and equipping it made it disappear.  Every one of
-		// this account's four zero stacks was an equipped sphere.
-		//
-		// The row still belongs in the list: the client knows WHICH unit holds
-		// it from UserUnitInfo.equipitem_id, so it can render it as equipped.
-		// The dictionary below already listed these, which is why the two lists
-		// disagreed by exactly the four equipped spheres.
-
-		if (stack.new_flg != 0)
-		{
-			// "::" — the packet struct, not GmeHandlers::ItemFavorite.
-			snapshot.favorites.push_back(::ItemFavorite{
-				.instance_id = stack.instance_id,
-				.favorite = 1,
-			});
-		}
-
-		// THE MEMBER IS NOT WHAT THE COLUMN IS.  `new_flg` was read from
-		// user_items.favorite_flg purely to build the list above, but on the
-		// wire it is `dJNpLc81`, which readParam @0x14060E0 hands to
-		// setNewFlg -- the NEW badge.  Sending the lock through it would put a
-		// NEW badge on every stack the player has locked.  Locks travel in
-		// item_favorite (`5JbjC3Pp` -> setFavorit) and nowhere else; nothing
-		// here tracks item newness, so 0 is the honest value.
-		stack.new_flg = 0;
-
-		snapshot.warehouse.push_back(std::move(stack));
-	}
-
-	co_return snapshot;
-}
+// Persistent wire rows are reconciled with the aggregate item quantities by
+// Warehouse.cpp. No arithmetic aliases: ids and per-row favorites survive
+// refreshes, quantity changes and restarts.
+drogon::Task<WarehouseSnapshot> loadWarehouseSnapshot(db::Database database, UserIdentity identity);
 
 /*!
 * Reads the user's complete unit dictionary (GV81ctzR).
@@ -880,6 +865,11 @@ drogon::Task<void> emitGrantedRewards(
 		auto warehouse = co_await loadWarehouseSnapshot(database, identity);
 		resp.warehouse_info = std::move(warehouse.warehouse);
 		resp.item_dictionary_info = std::move(warehouse.dictionary);
+		// The lock set rides with the warehouse (VSRPkdId; see its KDL doc):
+		// the client re-derives row locks from it whenever 9wjrh74P replaces
+		// the list, so a copy locked under a placeholder keeps its lock.
+		if constexpr (requires { resp.item_favorite; })
+			resp.item_favorite = std::move(warehouse.favorites);
 	}
 }
 
@@ -1186,10 +1176,78 @@ inline drogon::Task<db::InterfaceResult<LoginInfoResp>> getLoginInfo(
 	// consulted.  Nothing on the wire looked wrong.
 	packet.feature_gate = 1;
 
+	// The client's scenario markers, echoed so a new login restores what it
+	// last uploaded.  Callers other than the login replies drop them again
+	// with omitClientScenarioMarkers.
+	{
+		const auto markers = co_await database->execSqlCoro(
+			"SELECT scenario_info, special_scenario_info FROM user_info"
+			" WHERE gumi_user_id = $1 AND id = $2;",
+			identity.gumiUserId, identity.userId);
+		if (!markers.empty())
+		{
+			packet.user_scenario_info = markers[0]["scenario_info"].as<std::string>();
+			packet.user_special_scenario_info = markers[0]["special_scenario_info"].as<std::string>();
+		}
+	}
+
 	co_return db::InterfaceResult<LoginInfoResp>{
 		.data = std::move(packet),
 		.affected = result.affected,
 	};
+}
+
+/*!
+* Removes the client-authored scenario markers from a login-info block.
+*
+* UserInfoResponse::readParam @0x13FF340 answers N4XVE1uA with
+* UserScenarioInfoList::parse -- a full REPLACE of the client's cutscene
+* progress -- in EVERY reply carrying IKqx1Cn9, not just at login.  The
+* server's copy is only as new as the client's last upload (DeckEdit,
+* DungeonEventUpdate, ...), and MissionEnd does not upload it, so echoing it in
+* MissionEnd put back a list without the events the player had just watched:
+* a mission's end event, or a dungeon's "cleared" cutscene, then played again
+* after every clear.  A key that is absent is simply not read, so leaving both
+* out keeps the client's own, newer list.
+*/
+inline void omitClientScenarioMarkers(LoginInfoResp& info)
+{
+	info.user_scenario_info.reset();
+	info.user_special_scenario_info.reset();
+}
+
+/*!
+* Persists the scenario markers a request carried in its login block.
+*
+* BaseRequest::createDungeonEventUserInfoTag @0x13A0B8C writes both markers
+* (N4XVE1uA from UserScenarioInfoList::getSaveStr, 9yVsu21R from
+* UserSpecialScenarioInfoList::getSaveStr) into DeckEdit, DungeonEventUpdate,
+* the trial/campaign/guild deck requests and the raid chat requests.  Every
+* one of them carries the client's CURRENT progress, so each is stored as
+* sent; DungeonEventUpdate used to be the only one that was.
+*
+* Stored verbatim: the client sends the complete marker every time.  An empty
+* value (a request built before the list exists) is ignored rather than
+* wiping the stored one.
+*/
+inline drogon::Task<void> storeClientScenarioMarkers(
+	const db::Database database,
+	const UserIdentity identity,
+	const std::string& specialScenarioInfo,
+	const std::string& scenarioInfo)
+{
+	if (!specialScenarioInfo.empty())
+	{
+		co_await database->execSqlCoro(
+			"UPDATE user_info SET special_scenario_info = $1 WHERE id = $2;",
+			specialScenarioInfo, identity.userId);
+	}
+	if (!scenarioInfo.empty())
+	{
+		co_await database->execSqlCoro(
+			"UPDATE user_info SET scenario_info = $1 WHERE id = $2;",
+			scenarioInfo, identity.userId);
+	}
 }
 
 /*!

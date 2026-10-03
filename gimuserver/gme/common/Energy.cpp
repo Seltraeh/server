@@ -1,6 +1,7 @@
 #include "Energy.hpp"
 
 #include "Common.hpp"
+#include "GameClock.hpp"
 
 #include <gimuserver/db/DatabaseInterface.h>
 
@@ -28,18 +29,23 @@ uint32_t UserEnergy::derive(
 	}
 
 	// Energy should have regenerated to full.
-	const auto now = uint64_t(std::chrono::system_clock::to_time_t(
-		std::chrono::system_clock::now()));
+	const auto now = GameClock::nowSeconds();
 	if (now >= energyFullTs)
 	{
 		energy = mst->energy;
 		return 0;
 	}
 
-	const auto secondsUntilFull = uint32_t(energyFullTs - now);
+	const auto secondsUntilFull = static_cast<uint32_t>(std::min<uint64_t>(
+		energyFullTs - now, INT32_MAX));
 	const auto ticksUntilFull = (secondsUntilFull + kRegenSeconds - 1) / kRegenSeconds;
-	const auto missingEnergy = ticksUntilFull * regenAmount(level);
-	energy = mst->energy - missingEnergy;
+	const auto rate = regenAmount(level);
+	// A full timestamp rounds UP to a whole tick. Preserve the remainder
+	// from stored energy: spending 3 at the cap must leave cap-3, not cap-4
+	// just because a tick restores 2. The remainder is unchanged by ticks.
+	const auto padding = (rate - (mst->energy - energy) % rate) % rate;
+	const auto missingEnergy = static_cast<uint64_t>(ticksUntilFull) * rate - padding;
+	energy = missingEnergy >= mst->energy ? 0 : mst->energy - static_cast<uint32_t>(missingEnergy);
 	return secondsUntilFull;
 }
 
@@ -87,8 +93,7 @@ drogon::Task<db::InterfaceResult<>> UserEnergy::consume(
 		co_return db::InterfaceResult<>{};
 	}
 
-	const auto now = uint64_t(std::chrono::system_clock::to_time_t(
-		std::chrono::system_clock::now()));
+	const auto now = GameClock::nowSeconds();
 
 	// Spend, then update the full timestamp based on the post-spend state.
 	const auto newEnergy = energy - cost;

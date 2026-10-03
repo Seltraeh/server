@@ -1,0 +1,12 @@
+{
+ "recorded": "2026-10-02T15:09:37-04:00",
+ "note": "Known data baseline, NOT a clean validation: every finding here is open work.",
+ "total": 3117,
+ "by_code": {
+  "H15": 842,
+  "M2": 20,
+  "M3": 921,
+  "M4": 1334
+ },
+ "sha256": "7bae35bbe12077f73fa9b2d6ff7ea6698295d11efe8c7f4c44bda472a6bf5d2f"
+}

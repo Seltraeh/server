@@ -2,17 +2,29 @@
 Usage: python scripts/test_debug_cli.py SOURCE_SAVE [DEBUG_EXE]
 Requires a tutorial-complete account with six free slots, and unused port 19960.
 """
-import sys, tempfile
+import shutil, sys
 import json, sqlite3, subprocess, time, urllib.request
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
-(ROOT/'out').mkdir(exist_ok=True)
-work=Path(tempfile.mkdtemp(prefix='cli-grants-',dir=ROOT/'out'))
+# One reused fixture directory (out/qa/current/debug_cli), recreated per run;
+# removal fails if an earlier run's server still holds the save.
+work=ROOT/'out'/'qa'/'current'/'debug_cli'
+if work.exists(): shutil.rmtree(work)
+work.mkdir(parents=True)
 dbpath=work/'gme.sqlite'
 source=sqlite3.connect(Path(sys.argv[1]).resolve().as_uri()+'?mode=ro',uri=True)
 db=sqlite3.connect(dbpath,timeout=20)
 source.backup(db);source.close()
 db.row_factory=sqlite3.Row
+# FIXTURE: room for the six grants plus the rollback probe (which must pass the
+# capacity check to reach the dictionary insert).  The live box fills as the
+# player plays -- 104/110 on 2026-10-02 evening, which failed the probe with
+# "Inventory full" -- so make the room on the copy.  Capacity = 100 + max_unit_count.
+_user=db.execute('SELECT id FROM user_info LIMIT 1').fetchone()[0]
+_owned=db.execute('SELECT COUNT(*) FROM user_units WHERE user_id=?',(_user,)).fetchone()[0]
+_bought=db.execute('SELECT COALESCE(max_unit_count,0) FROM user_info WHERE id=?',(_user,)).fetchone()[0]
+if 100+_bought-_owned<7:
+    db.execute('UPDATE user_info SET max_unit_count=? WHERE id=?',(_owned+7-100,_user));db.commit()
 config=json.loads((ROOT/'packaging/config.json').read_text(encoding='utf-8'))
 config['db_clients'][0]['filename']=dbpath.as_posix()
 config['listeners'][0]['port']=19960

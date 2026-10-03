@@ -63,72 +63,84 @@ HANDLEF(UnitSell)
         idList += std::to_string(req.units[i].user_unit_id);
     }
 
-    // Step 1: look up sell price for each unit via the MST cache.
-    const auto& unitMst = theServer()->cache().unitMst();
-    const auto unitRows = co_await theDb()->execSqlCoro(
-        "SELECT unit_id FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + idList + ");",
-        std::string(kUserId)
-    );
-
-    int64_t totalZel = 0;
-    for (const auto& row : unitRows)
-    {
-        const std::string mstId = unitSell_stripSuffix(row["unit_id"].as<std::string>());
-        const int32_t mstIdInt  = std::stoi(mstId);
-        auto it = std::find_if(unitMst.begin(), unitMst.end(),
-            [mstIdInt](const UnitMst& u) { return u.id == mstIdInt; });
-        if (it != unitMst.end())
-            totalZel += it->sell_price;
-    }
-
-    LOG_INFO << "UnitSell: selling " << unitRows.size() << " units, total zel gain=" << totalZel;
-
-    // Step 2: return any spheres equipped on the sold units to the warehouse,
-    // then delete the units.  Without the return, the equipped items would be
-    // destroyed with the row.
-    const auto spheresReturned = co_await gme::returnEquippedSpheres(theDb(), identity, idList);
-    co_await theDb()->execSqlCoro(
-        "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + idList + ");",
-        std::string(kUserId)
-    );
-
-    // Step 3: credit zel.
-    co_await theDb()->execSqlCoro(
-        "UPDATE user_info SET zel = zel + $1 WHERE id=$2;",
-        totalZel, std::string(kUserId)
-    );
-
-    UnitSellResp resp = {};
-    resp.team_info = std::move(
-        (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
-
-    // UnitSellTopScene2::sellUnit drops the sold units from the client roster
-    // itself, but nothing on the sale path touches the client warehouse, so
-    // spheres handed back need the full snapshot (UnitSellResp in handlers.kdl).
-    if (spheresReturned > 0)
-    {
-        auto warehouse = co_await gme::loadWarehouseSnapshot(theDb(), identity);
-        resp.warehouse_info = std::move(warehouse.warehouse);
-        resp.item_dictionary_info = std::move(warehouse.dictionary);
-    }
-
+    // ONE TRANSACTION.  The sphere return, the delete and the Zel credit used to
+    // run as separate statements, so a sale that failed after the spheres came
+    // back left the unit owned WITH the sphere still on it -- and the next sale
+    // returned the same sphere again (a duplicate).  Now all of it, the reply's
+    // snapshot and the counters commit together or not at all.
+    auto transaction = co_await theDb()->newTransactionCoro();
     std::string buffer{};
-    if (const auto& ec2 = glz::write_json(resp, buffer); ec2)
+    try
     {
-        LOG_ERROR << "UnitSell: serialization error: " << glz::format_error(ec2, buffer);
-        co_return HandleResult::error("Serialization error");
+        // Step 1: look up sell price for each unit via the MST cache.
+        const auto& unitMst = theServer()->cache().unitMst();
+        const auto unitRows = co_await transaction->execSqlCoro(
+            "SELECT unit_id FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + idList + ");",
+            std::string(kUserId)
+        );
+
+        int64_t totalZel = 0;
+        for (const auto& row : unitRows)
+        {
+            const std::string mstId = unitSell_stripSuffix(row["unit_id"].as<std::string>());
+            const int32_t mstIdInt  = std::stoi(mstId);
+            auto it = std::find_if(unitMst.begin(), unitMst.end(),
+                [mstIdInt](const UnitMst& u) { return u.id == mstIdInt; });
+            if (it != unitMst.end())
+                totalZel += it->sell_price;
+        }
+
+        LOG_INFO << "UnitSell: selling " << unitRows.size() << " units, total zel gain=" << totalZel;
+
+        // Step 2: return any spheres equipped on the sold units to the warehouse,
+        // then delete the units.  Without the return, the equipped items would be
+        // destroyed with the row.
+        const auto spheresReturned = co_await gme::returnEquippedSpheres(transaction, identity, idList);
+        co_await transaction->execSqlCoro(
+            "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id IN (" + idList + ");",
+            std::string(kUserId)
+        );
+
+        // Step 3: credit zel.
+        co_await transaction->execSqlCoro(
+            "UPDATE user_info SET zel = zel + $1 WHERE id=$2;",
+            totalZel, std::string(kUserId)
+        );
+
+        UnitSellResp resp = {};
+        resp.team_info = std::move(
+            (co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+
+        // UnitSellTopScene2::sellUnit drops the sold units from the client roster
+        // itself, but nothing on the sale path touches the client warehouse, so
+        // spheres handed back need the full snapshot (UnitSellResp in handlers.kdl).
+        if (spheresReturned > 0)
+        {
+            auto warehouse = co_await gme::loadWarehouseSnapshot(transaction, identity);
+            resp.warehouse_info = std::move(warehouse.warehouse);
+            resp.item_favorite = std::move(warehouse.favorites);
+            resp.item_dictionary_info = std::move(warehouse.dictionary);
+        }
+
+        if (const auto& ec2 = glz::write_json(resp, buffer); ec2)
+            throw std::runtime_error("UnitSell: serialization error: " + glz::format_error(ec2, buffer));
+
+        // Journal: "Sell your excess units to earn 2000 zel" - the target is the
+        // ZEL earned, not the number of units, so the sale value is what counts.
+        // Trophy 100050 総合ユニット売却額 -- the zel the SERVER decided the sale was
+        // worth (UnitMst.sell_price), never the client's Rs7bCE3t claim.
+        co_await gme::bumpArchiveCounters(transaction, identity, {
+            { "zel_unit_sale", totalZel },
+        });
+
+        co_await gme::addJournalProgress(
+            transaction, identity, gme::kJournalTaskSellUnits, static_cast<int32_t>(totalZel));
     }
-
-    // Journal: "Sell your excess units to earn 2000 zel" - the target is the
-    // ZEL earned, not the number of units, so the sale value is what counts.
-    // Trophy 100050 総合ユニット売却額 -- the zel the SERVER decided the sale was
-    // worth (UnitMst.sell_price), never the client's Rs7bCE3t claim.
-    co_await gme::bumpArchiveCounters(theDb(), identity, {
-        { "zel_unit_sale", totalZel },
-    });
-
-    co_await gme::addJournalProgress(
-        theDb(), identity, gme::kJournalTaskSellUnits, static_cast<int32_t>(totalZel));
+    catch (...)
+    {
+        transaction->rollback();
+        throw;
+    }
 
     co_return HandleResult::success(buffer);
 }

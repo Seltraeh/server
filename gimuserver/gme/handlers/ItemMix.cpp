@@ -318,8 +318,8 @@ HANDLEF(ItemMix)
 
         // Records counters: 100250 syntheses performed, 100260 materials consumed,
         // 100270 spheres created.  A "sphere" is an ItemMst row with a non-zero
-        // sphere_type -- the same test ItemSphereEqp uses to pick the slot frame --
-        // so the Sphere Synthesis screen and the Item Synthesis screen both feed
+        // sphere_type (its sphere category), so the Sphere Synthesis screen and
+        // the Item Synthesis screen both feed
         // 100250/100260 and only the former also feeds 100270.
         {
             int64_t crafts = 0, materials = 0, spheres = 0;

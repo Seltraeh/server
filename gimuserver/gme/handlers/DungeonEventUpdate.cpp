@@ -55,13 +55,9 @@ HANDLEF(DungeonEventUpdate)
         {
             const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-            db::Cells cells{ db::Lookup("id", identity.userId) };
-            if (!reported.empty())
-                cells.emplace_back(db::Data("special_scenario_info", reported));
-            if (!reportedScenario.empty())
-                cells.emplace_back(db::Data("scenario_info", reportedScenario));
-
-            co_await db::DatabaseInterface::update(theDb(), "user_info", cells);
+            // The same store every uploading request uses (DeckEdit, the
+            // campaign deck requests): see gme::storeClientScenarioMarkers.
+            co_await gme::storeClientScenarioMarkers(theDb(), identity, reported, reportedScenario);
 
             LOG_INFO << "DungeonEventUpdate: stored scene-intro list \"" << reported
                      << "\", scenario marker \"" << reportedScenario << "\"";

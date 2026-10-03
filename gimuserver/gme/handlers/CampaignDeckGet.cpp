@@ -29,6 +29,12 @@ HANDLEF(CampaignDeckGet)
     const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
     const std::string kUserId = identity.userId;
 
+    // CampaignDeckGetRequest::createBody @0x13B1828 carries the client's current
+    // cutscene progress in its login block (createDungeonEventUserInfoTag).
+    co_await gme::storeClientScenarioMarkers(theDb(), identity,
+        req.login_info.special_scenario_info,
+        req.login_info.scenario_info.value_or(std::string{}));
+
     CampaignDeckGetResp resp{};
 
     try

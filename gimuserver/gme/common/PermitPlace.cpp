@@ -94,11 +94,89 @@ PermitChannel channelForRow(const std::string_view key, const int64_t id)
 }
 }
 
+namespace
+{
+// Story (Grand Gaia) ids sit below this; Vortex, Frontier Gate, trials and the
+// other special modes are numbered above it and gated by their own collectors.
+constexpr int32_t kSpecialIdFloor = 100000;
+}
+
+bool storyLandUnlocked(const int32_t landId, const std::set<int32_t>& cleared)
+{
+    // Lizeria: Grantos (Cordelica) AND Cardes (Palmyna). Both the area 700
+    // and dungeon 700 MST rows carry "666,20067". Source:
+    // https://bravefrontierglobal.fandom.com/wiki/Lizeria (2026-09-29).
+    return landId != 4 || (cleared.contains(666) && cleared.contains(20067));
+}
+
+bool storyMissionUnlocked(const int32_t missionId, const std::set<int32_t>& cleared)
+{
+    // Special modes keep their own entry rules.
+    if (missionId <= 0 || missionId >= kSpecialIdFloor)
+        return true;
+
+    // All-of, exactly as the map (buildPermitPlace) decides: the dungeon's and
+    // its area's lists, and the mission's own unless it is the dungeon's first.
+    const auto allOf = [&cleared](const auto& list) {
+        for (const auto need : list)
+            if (need != 0 && !cleared.contains(need))
+                return false;
+        return true;
+    };
+    const auto& cache = theServer()->cache();
+    for (const auto& [dungeonId, missions] : cache.missionsByDungeon())
+    {
+        const auto at = std::find(missions.begin(), missions.end(), missionId);
+        if (at == missions.end())
+            continue;
+        const auto dungeon = std::find_if(cache.dungeonMst().begin(), cache.dungeonMst().end(),
+            [dungeonId](const auto& d) { return d.dungeon_id == dungeonId; });
+        if (dungeon != cache.dungeonMst().end())
+        {
+            if (!storyLandUnlocked(dungeon->land_id, cleared) || !allOf(dungeon->need_mission_id))
+                return false;
+            const auto area = std::find_if(cache.areaMst().begin(), cache.areaMst().end(),
+                [&](const auto& a) { return a.area_id == dungeon->area_id; });
+            if (area != cache.areaMst().end() && !allOf(area->need_mission_id))
+                return false;
+        }
+        if (at != missions.begin())
+        {
+            const auto need = cache.missionNeeds().find(missionId);
+            if (need != cache.missionNeeds().end() && !allOf(need->second))
+                return false;
+        }
+        return true;
+    }
+    return true;
+}
+
+bool storyAreaOpenedBy(const int32_t missionId, const std::set<int32_t>& cleared)
+{
+    if (missionId <= 0 || missionId >= kSpecialIdFloor || !cleared.contains(missionId))
+        return false;
+    for (const auto& area : theServer()->cache().areaMst())
+    {
+        if (area.area_id <= 0 || area.area_id >= kSpecialIdFloor)
+            continue;
+        const auto& needs = area.need_mission_id;
+        if (std::find(needs.begin(), needs.end(), missionId) == needs.end())
+            continue;
+        // The map's own rule (buildPermitPlace): the land's gate, then every
+        // listed need.  Lizeria's "666,20067" opens on whichever is cleared last.
+        if (!storyLandUnlocked(area.land_id, cleared))
+            continue;
+        if (std::all_of(needs.begin(), needs.end(),
+                [&cleared](const int32_t need) { return need == 0 || cleared.contains(need); }))
+            return true;
+    }
+    return false;
+}
+
 drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIdentity identity)
 {
-    // Grand Gaia progression uses the low ID space; special modes have their
-    // own topology collectors. This preserves the existing authored policy.
-    static constexpr int32_t kSpecialIdFloor = 100000;
+    // Grand Gaia progression uses the low ID space (below kSpecialIdFloor);
+    // special modes have their own topology collectors.
     std::set<int32_t> clearedMissions;
     for (const auto& done : co_await getClearedMissions(db, identity))
         clearedMissions.insert(done.mission_id);
@@ -182,6 +260,39 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
                 add("j28VNcUW", id);
         }
 
+        // THE TRAINING GROUNDS NEED THEIR MISSION PERMITTED -- AND ONLY THAT.
+        //
+        // Randall's Battle Simulator is entered from ChallengeSelectScene's
+        // button, which checks nothing but the sandbag_op intro.  Its squad
+        // screen then finds the battle itself: SandbagCheckScene::initialize
+        // @0x159A6D0 scans DungeonMstList for dungeon_type 6 and keeps
+        // MissionMstList::getMissionListWithDungeonID(..)[0], a list that holds
+        // only missions PermitPlaceInfoList::isPermitMission accepts (@0x1332350
+        // -> @0x126C824).  With no permit it stores null, and Begin's
+        // setPreparation @0x159CE40 calls getMissionID on it unchecked -- the
+        // Windows client faulted reading 0x24 at +0xDE25E (2026-10-02 dump),
+        // before MissionStart was ever sent.
+        //
+        // Mission rows only.  Permitting the area (6000000: AreaMst type 1,
+        // land 99) would add a Training Ground tile to the Vortex list through
+        // AreaMstList::getActiveList, and isPermitMission is the one check the
+        // scene makes.  The row resolves to that special area, so it rides
+        // Y73tHKS8 and can be withdrawn like any other special permit.
+        {
+            const auto& byDungeon = theServer()->cache().missionsByDungeon();
+            for (const auto& dungeon : theServer()->cache().dungeonMst())
+            {
+                if (dungeon.dungeon_type != 6)
+                    continue;
+                const auto it = byDungeon.find(dungeon.dungeon_id);
+                if (it == byDungeon.end())
+                    continue;
+                for (const auto id : it->second)
+                    if (MissionArchiver::instance().archived(id))
+                        add("j28VNcUW", id);
+            }
+        }
+
         // THE VORTEX GETS THE SAME ARCHIVE GUARD AS THE CAMPAIGN AND THE TRIALS.
         //
         // ServerCache curates the Vortex list by hiding a tile that is empty,
@@ -245,8 +356,24 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         const auto& cache = theServer()->cache();
         const auto& needs = cache.missionNeeds();
 
-        // Authored policy: ANY prerequisite suffices; multi-prerequisite semantics
-        // remain unverified against the client. Preserve the existing rule.
+        // STORY PREREQUISITES ARE ALL-OF (#30).  A comma list names every
+        // mission the entry needs, and the client says so itself: its locked
+        // tile popup reads LOCK_DUNGEON_NOTICE "The dungeon will open when the
+        // requirements below have been met." and then lists EACH need as
+        // `Quest "<name>" Cleared` (MissionSelectScene2::touchEnded @0x18A2964).
+        // Lizeria (area/dungeon/mission 700, "666,20067") needs Cordelica AND
+        // Palmyna (Global wiki, Lizeria); land 20 (area 11000 / dungeon 10900)
+        // needs all nine chapter finals.  Read any-of, one clear opened them.
+        const auto satisfiedAll = [&cleared](const auto& list) {
+            for (const auto need : list)
+                if (need != 0 && !cleared.count(need))
+                    return false;
+            return true;
+        };
+
+        // Special modes (Vortex rotation, gated event missions) keep the rule
+        // they shipped with -- any listed prerequisite suffices -- until their
+        // compound lists are audited one by one (docs/CLAUDE_SESSION_2_HANDOFF.md).
         const auto satisfied = [&cleared](const auto& list) {
             if (list.empty())
                 return true;
@@ -271,7 +398,9 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         {
             if (area.area_id <= 0 || area.area_id >= kSpecialIdFloor)
                 continue;
-            if (!satisfied(area.need_mission_id))
+            if (!storyLandUnlocked(area.land_id, cleared))
+                continue;
+            if (!satisfiedAll(area.need_mission_id))
                 continue;
             append(permitPlace, first, "VjCY7rX4", area.area_id);
             ++gatedAreas;
@@ -286,7 +415,9 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         {
             if (dungeon.dungeon_id <= 0 || dungeon.dungeon_id >= kSpecialIdFloor)
                 continue;
-            if (!satisfied(dungeon.need_mission_id))
+            if (!storyLandUnlocked(dungeon.land_id, cleared))
+                continue;
+            if (!satisfiedAll(dungeon.need_mission_id))
                 continue;
             append(permitPlace, first, "MHx05sXt", dungeon.dungeon_id);
             ++gatedDungeons;
@@ -322,7 +453,7 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
                 if (missionId != entryMission)
                 {
                     const auto need = needs.find(missionId);
-                    if (need != needs.end() && !satisfied(need->second))
+                    if (need != needs.end() && !satisfiedAll(need->second))
                         continue;
                 }
                 append(permitPlace, first, "j28VNcUW", missionId);

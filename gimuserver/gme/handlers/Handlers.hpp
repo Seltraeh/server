@@ -21,6 +21,27 @@ struct HandleResult
 	std::string exceptionMsg;
 
 	/*!
+	* An error the player can walk away from.  Every other error goes out as
+	* GmeErrorCommand::Close, and GameScene::noticeOK (@0x16098AC) answers that
+	* with CommonUtils::appExit; this one goes out as ReturnToGame, which
+	* GameScene::checkResponseMessage (@0x1615E4C) maps to notice -3992, whose
+	* OK rebuilds HomeScene2 (outside a raid) -- the message, then Home.
+	*/
+	bool returnHome = false;
+
+	/*!
+	* An error that leaves the player on the screen that sent the request.
+	* Goes out as GmeErrorCommand::Retry (2); GameScene::checkResponseMessage
+	* maps it to notice -4000 (-0xfa0), which GameScene::noticeOK ignores (its
+	* jump table covers -3999..-3989), so what happens next is the scene's own
+	* noticeOK.  Only MissionGameOverScene::noticeOK @0x17FB62C gives it a
+	* meaning: back to initContinueConfirm (state 2; 4 in Frontier Gate) -- the
+	* client's refusal path for a revival.  A scene that does not handle
+	* -4000 just stays where it was, so use this only where that is decoded.
+	*/
+	bool retry = false;
+
+	/*!
 	* Checks if it's in error.
 	* @return true if the result is an error, otherwise false
 	*/
@@ -34,6 +55,35 @@ struct HandleResult
 	*/
 	static inline HandleResult error(const std::string& error, const std::string& ex = "") {
 		return HandleResult("", error, ex);
+	}
+
+	/*!
+	* Create a refusal the client survives: `error` is shown to the player as
+	* written and OK returns them Home (see returnHome).  Only for a request the
+	* player could legitimately send from stale client state, refused before
+	* anything changed.
+	* @param error Player-facing message
+	* @param ex Detail for the server log
+	* @return An error result that returns the client Home
+	*/
+	static inline HandleResult refuseToHome(const std::string& error, const std::string& ex = "") {
+		HandleResult result("", error, ex);
+		result.returnHome = true;
+		return result;
+	}
+
+	/*!
+	* Create a refusal that keeps the player where they are: `error` is shown
+	* as written and the requesting scene's own noticeOK decides what follows
+	* (see retry).  For the game-over screen that is the Continue prompt again.
+	* @param error Player-facing message
+	* @param ex Detail for the server log
+	* @return An error result sent as GmeErrorCommand::Retry
+	*/
+	static inline HandleResult refuseToRetry(const std::string& error, const std::string& ex = "") {
+		HandleResult result("", error, ex);
+		result.retry = true;
+		return result;
 	}
 
 	/*!
@@ -118,6 +168,7 @@ HANDLE(GuildRankingDetail);
 	HANDLE(UserInfo);
 	HANDLE(UnitFavorite);
 	HANDLE(UnitEvo);
+	HANDLE(FeSkillGet);
 HANDLE(UnitOmniEvo);
 	HANDLE(UnitMix);
 	HANDLE(UnitSell);

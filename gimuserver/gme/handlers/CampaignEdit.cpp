@@ -52,6 +52,12 @@ HANDLEF(CampaignDeckEdit)
 	auto transaction = co_await theDb()->newTransactionCoro();
 	try
 	{
+		// CampaignDeckEditRequest::createBody @0x13B1528 carries the client's
+		// current cutscene progress (createDungeonEventUserInfoTag).
+		co_await gme::storeClientScenarioMarkers(transaction, identity,
+			req.login_info.special_scenario_info,
+			req.login_info.scenario_info.value_or(std::string{}));
+
 		if (!req.mission.empty())
 			co_await gme::openCampaignRun(transaction, identity, req.mission.front().mission_id);
 

@@ -100,22 +100,35 @@ HANDLEF(SlotAction)
 
 	SlotActionResp resp{};
 	gme::GrantedRewards granted;
-	resp.results = co_await gme::playBraveSlot(theDb(), identity, drawCount, granted);
-	// A refused pull answers with the balance and header rather than an error,
-	// so the machine resynchronises instead of stranding the player.  The
-	// client gates on the medal count itself (RANDALL_SLOTGAME_MEDAL_ERROR), so
-	// this path should only be reached if the two ever disagree.
-
-	resp.medal_info = co_await gme::loadBraveMedals(theDb(), identity);
-	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
-	// A unit or item prize has no other way onto the client: no slot scene
-	// touches the roster or the warehouse (SlotActionResp in handlers.kdl).
-	co_await gme::emitGrantedRewards(theDb(), identity, granted, resp);
-
 	std::string buffer{};
-	if (const auto& ec = glz::write_json(resp, buffer); ec)
+
+	// ONE TRANSACTION for the charge, every pull's prize and the reply (#27).
+	// playBraveSlot charges all the medals up front and then pays each pull in
+	// turn; run statement by statement, a failure part-way kept the charge and
+	// whatever prizes had landed.  Now the medals, units, items and counters of
+	// an action commit together or not at all.
+	auto transaction = co_await theDb()->newTransactionCoro();
+	try
 	{
-		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
+		resp.results = co_await gme::playBraveSlot(transaction, identity, drawCount, granted);
+		// A refused pull answers with the balance and header rather than an error,
+		// so the machine resynchronises instead of stranding the player.  The
+		// client gates on the medal count itself (RANDALL_SLOTGAME_MEDAL_ERROR), so
+		// this path should only be reached if the two ever disagree.
+
+		resp.medal_info = co_await gme::loadBraveMedals(transaction, identity);
+		resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+		// A unit or item prize has no other way onto the client: no slot scene
+		// touches the roster or the warehouse (SlotActionResp in handlers.kdl).
+		co_await gme::emitGrantedRewards(transaction, identity, granted, resp);
+
+		if (const auto& ec = glz::write_json(resp, buffer); ec)
+			throw std::runtime_error("SlotAction: serialization error: " + glz::format_error(ec, buffer));
+	}
+	catch (...)
+	{
+		transaction->rollback();
+		throw;
 	}
 
 	co_return HandleResult::success(buffer);

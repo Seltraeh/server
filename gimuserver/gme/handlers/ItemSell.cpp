@@ -1,109 +1,100 @@
 #include "App.hpp"
 #include "Handlers.hpp"
-
 #include <gimuserver/gme/common/Common.hpp>
+#include <map>
+#include <utility>
+#include <vector>
 
-#include <algorithm>
-
-// ItemSell (qDQerU74) — sell warehouse item stacks for zel. Request
-// (ItemSellRequest::createBody, bfdata/createbody/ItemSellRequest.txt):
-//
-//   "M73i1c5U": [{"n6E8iMf3":"<instance_id>","wgV86x1q":"<count>"}, ...]
-//
-// Zel credit per unit is ItemMst.sell_price (eKtE6k0n, legacy sellPrice).
-// Stacks are decremented but the row is kept at 0 so instance ids stay stable
-// for the client's local warehouse model; UserInfo filters zero stacks off
-// the wire.
-//
-// Response: empty OK — the legacy fork acked without a body and the client
-// applies the zel/count changes from its own state.
-//
-// GroupId = "qDQerU74", AES key = "73aFNjPu" (legacy ItemSellRequestHandler).
+// Exact persistent warehouse row ids; the empty acknowledgement is the
+// existing client contract. Stock, Zel and counters commit together.
 HANDLEF(ItemSell)
 {
-	(void)session;
-	LOG_INFO << "ItemSell: " << json;
-
-	ItemSellReq req = {};
-	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
-	{
-		const auto& fmte = glz::format_error(ec, json);
-		LOG_DEBUG << "Gme ItemSell Error during JSON read: " << fmte;
-		co_return HandleResult::error("Deserialization error", fmte);
-	}
-
-	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
-	const std::string userId = identity.userId;
-
-	const auto& itemMst = theServer()->cache().itemMst();
-	const auto sellPrice = [&itemMst](uint32_t itemId) -> int64_t {
-		for (const auto& m : itemMst)
-		{
-			if (m.id == static_cast<int32_t>(itemId))
-				return m.sell_price;
-		}
-		LOG_WARN << "ItemSell: item " << itemId << " not in ItemMst — sell price defaults to 0";
-		return 0;
-	};
-
-	int64_t zelCredit = 0;
-	for (const auto& e : req.entries)
-	{
-		try
-		{
-			const auto rows = co_await theDb()->execSqlCoro(
-				"SELECT item_id, item_num FROM user_items "
-				"WHERE user_id = $1 AND instance_id = $2;",
-				userId, e.instance_id);
-			if (rows.size() == 0)
-			{
-				LOG_WARN << "ItemSell: instance " << e.instance_id << " not found";
-				continue;
-			}
-
-			const uint32_t itemId = rows[0]["item_id"].as<uint32_t>();
-			const uint32_t held   = rows[0]["item_num"].as<uint32_t>();
-			const uint32_t sold   = std::min<uint32_t>(held, e.item_num);
-			if (sold == 0)
-				continue;
-
-			co_await theDb()->execSqlCoro(
-				"UPDATE user_items SET item_num = item_num - $1 "
-				"WHERE user_id = $2 AND instance_id = $3;",
-				sold, userId, e.instance_id);
-
-			zelCredit += sellPrice(itemId) * sold;
-			LOG_INFO << "ItemSell: sold " << sold << "x item " << itemId
-				<< " (instance " << e.instance_id << ")";
-		}
-		catch (const drogon::orm::DrogonDbException& ex)
-		{
-			LOG_ERROR << "ItemSell: DB error for instance " << e.instance_id
-				<< ": " << ex.base().what();
-		}
-	}
-
-	if (zelCredit > 0)
-	{
-		try
-		{
-			// Same display-overflow cap the debug CLI enforces: the client
-			// wraps zel above 99'999'999 back to 0, which breaks cost checks.
-			co_await theDb()->execSqlCoro(
-				"UPDATE user_info SET zel = MIN(zel + $1, 99999999) WHERE id = $2;",
-				zelCredit, userId);
-			LOG_INFO << "ItemSell: credited " << zelCredit << " zel";
-			// TROPHY 100060 (total zel from items sold) and 100040 (total zel
-			// used is separate).  Records draws it from zel_item_sale.
-			co_await gme::bumpArchiveCounters(theDb(), identity, {
-				{ "zel_item_sale", zelCredit },
-			});
-		}
-		catch (const drogon::orm::DrogonDbException& ex)
-		{
-			LOG_ERROR << "ItemSell: zel credit failed: " << ex.base().what();
-		}
-	}
-
-	co_return HandleResult::success("{}");
+    (void)session;
+    ItemSellReq req{};
+    if (const auto ec=glz::read<glz::opts{.error_on_unknown_keys=false}>(req,json); ec)
+        co_return HandleResult::success("{}");
+    const auto identity=(co_await gme::getUserIdentity(theDb(),req.login_info)).nonEmpty();
+    auto transaction=co_await theDb()->newTransactionCoro();
+    try
+    {
+        co_await gme::syncWarehouse(transaction,identity);
+        // Ascending ids: real rows are settled before any placeholder
+        // (INT_MAX - itemId) is resolved among the rows that are left.
+        std::map<uint32_t,uint64_t> counts;
+        for (const auto& e:req.entries) counts[e.instance_id]+=e.item_num;
+        int64_t credit=0;
+        for (const auto& [id,count]:counts)
+        {
+            const auto refuse=[&](const char* why) {
+                transaction->rollback();
+                LOG_WARN << "ItemSell: " << why << " row " << id;
+            };
+            // (row, quantity) pairs this entry sells from.
+            std::vector<std::pair<int64_t,int64_t>> takes;
+            int64_t item=0;
+            const auto rows=co_await transaction->execSqlCoro(
+                "SELECT item_id,item_num,favorite_flg,equip_unit_id FROM user_warehouse_rows"
+                " WHERE user_id=$1 AND instance_id=$2;",identity.userId,id);
+            if (!rows.empty())
+            {
+                if (count==0 || count>static_cast<uint64_t>(rows[0]["item_num"].as<int64_t>())
+                    || rows[0]["favorite_flg"].as<int>()!=0 || rows[0]["equip_unit_id"].as<int64_t>()!=0)
+                {
+                    refuse("invalid, locked or unavailable");
+                    co_return HandleResult::success("{}");
+                }
+                item=rows[0]["item_id"].as<int64_t>();
+                takes.emplace_back(static_cast<int64_t>(id),static_cast<int64_t>(count));
+            }
+            else if (const auto placeholder=gme::warehousePlaceholderItem(id); placeholder && count>0)
+            {
+                // A copy the client added itself (a craft, a present) and still
+                // names by its placeholder: sell from the rows it has not been
+                // sent, never a locked or equipped one -- its sell list offers
+                // neither.  Short of stock is the same refusal as a bad row.
+                item=*placeholder;
+                auto left=static_cast<int64_t>(count);
+                const auto unseen=co_await gme::unseenWarehouseRows(transaction,identity,item);
+                for (const auto& r:unseen)
+                {
+                    if (r.favorite || r.equipUnitId!=0 || r.count<=0) continue;
+                    const auto take=std::min(left,r.count);
+                    takes.emplace_back(r.instanceId,take);
+                    left-=take;
+                    if (left==0) break;
+                }
+                if (left!=0)
+                {
+                    refuse("placeholder has no unsent copies for");
+                    co_return HandleResult::success("{}");
+                }
+            }
+            else
+            {
+                refuse("invalid, locked or unavailable");
+                co_return HandleResult::success("{}");
+            }
+            const auto& mst=theServer()->cache().itemMst();
+            const auto it=std::find_if(mst.begin(),mst.end(),[item](const auto& r){return r.id==item;});
+            if (it==mst.end() || it->sell_price<0)
+                throw std::runtime_error("ItemSell: invalid item master");
+            const auto quantity=static_cast<int64_t>(count);
+            const auto spent=co_await transaction->execSqlCoro(
+                "UPDATE user_items SET item_num=item_num-$1 WHERE user_id=$2 AND item_id=$3"
+                " AND item_num >= $1 RETURNING item_num;",quantity,identity.userId,item);
+            if (spent.empty()) throw std::runtime_error("ItemSell: stock mismatch");
+            for (const auto& [row,take]:takes)
+                co_await transaction->execSqlCoro(
+                    "UPDATE user_warehouse_rows SET item_num=item_num-$1 WHERE instance_id=$2;",take,row);
+            credit+=quantity*it->sell_price;
+        }
+        if (credit>0)
+        {
+            co_await transaction->execSqlCoro(
+                "UPDATE user_info SET zel=MIN(zel+$1,99999999) WHERE id=$2;",credit,identity.userId);
+            co_await gme::bumpArchiveCounters(transaction,identity,{{"zel_item_sale",credit}});
+        }
+    }
+    catch (...) { transaction->rollback(); throw; }
+    co_return HandleResult::success("{}");
 }

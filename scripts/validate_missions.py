@@ -330,9 +330,17 @@ def main() -> int:
             r.add("C5", mid, "no stages")
             continue
 
+        # Randall's Battle Simulator (GameUtils::isSandbag @0x1EC18D8 is
+        # DungeonMst.dungeon_type == 6).  Its six practice dummies never act
+        # (act 0..0), carry no ATK, drop nothing and are no boss -- the wiki's
+        # "enemies will not attack back" -- so the checks that would call
+        # that a defect do not apply.  See scripts/gen_battle_simulator.py.
+        sandbag = as_int(dungeon_mst.get(as_int((row or {}).get("MHx05sXt")), {}).get("3hPeI1RV")) == 6
+
         bosses = [i for i, s in enumerate(stages) if s.get("is_boss")]
         if not bosses:
-            r.add("H2", mid, "no boss stage")
+            if not sandbag:
+                r.add("H2", mid, "no boss stage")
         elif len(bosses) > 1:
             r.add("H2", mid, f"{len(bosses)} boss stages")
         elif bosses[0] != len(stages) - 1:
@@ -385,11 +393,16 @@ def main() -> int:
                         r.add("H7", where, f"position {position} also used by slot {seen_positions[position]}")
                     seen_positions[position] = order
 
-                if mon.get("hp", 0) <= 0 or mon.get("atk", 0) <= 0:
+                if mon.get("hp", 0) <= 0 or (mon.get("atk", 0) <= 0 and not sandbag):
                     r.add("H9", where, f"hp {mon.get('hp')} atk {mon.get('atk')}")
 
                 act_min, act_max = mon.get("act_min", 0), mon.get("act_max", 0)
-                if act_max <= 0 or act_min <= 0 or act_min > act_max:
+                # A dummy never acting is exactly 0..0 (MonsterUnit::initTurnChild
+                # @0x1159098 sums rolls over [min, max)); anything else is still
+                # inconsistent, sandbag or not.
+                if sandbag and act_min == act_max == 0:
+                    pass
+                elif act_max <= 0 or act_min <= 0 or act_min > act_max:
                     r.add("H13", where, f"act {act_min}..{act_max}")
 
                 drop_id, drop_chance = mon.get("unit_drop_id", 0), mon.get("unit_drop_chance", 0)
@@ -463,9 +476,9 @@ def main() -> int:
         # first-clear reward and nothing else -- "Subsequent victories won't
         # award anything" -- so a lab battle that drops nothing is correct.
         lab = as_int(dungeon_mst.get(as_int((row or {}).get("MHx05sXt")), {}).get("3hPeI1RV")) in (2, 8)
-        if not drops_something and not lab:
+        if not drops_something and not lab and not sandbag:
             r.add("H14", mid, m.get("name", ""))
-        if not boss_has_skill:
+        if not boss_has_skill and not sandbag:
             r.add("M4", mid, m.get("name", ""))
         if stat_blocks == {(PLACEHOLDER_HP, PLACEHOLDER_ATK)}:
             row = mission_mst.get(mid, {})

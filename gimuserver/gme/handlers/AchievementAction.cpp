@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
 #include <string>
 
 // The Merit Point loop, and the two buttons on an achievement's detail page.
@@ -229,17 +230,26 @@ HANDLEF(AchievementTrade)
 {
 	(void)session;
 
+	// A BODY THAT DOES NOT PARSE IS REFUSED WHOLE.  Every number in it is a
+	// quoted string (AchievementTradeRequest::createBody @0x139E600); a value
+	// glaze cannot read stops the parse at that field, and acting on whatever
+	// half of the request was read could buy the wrong thing.
 	AchievementTradeReq req{};
 	{
 		glz::context ctx{};
 		if (const auto ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json, ctx); ec)
+		{
 			LOG_WARN << "AchievementTrade: parse error: " << glz::format_error(ec, json);
+			co_return HandleResult::refuseToHome("The exchange request could not be read.",
+				"parse error");
+		}
 	}
-	if (req.nodes.empty())
-		co_return HandleResult::error("Invalid trade request", "no offer named");
+	// The scene sends exactly one offer per request.
+	if (req.nodes.size() != 1)
+		co_return HandleResult::refuseToHome("Invalid exchange request.",
+			std::to_string(req.nodes.size()) + " offers named");
 
 	const auto& node = req.nodes.front();
-	const auto count = std::max(node.count, 1);
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
 	const auto& shop = theServer()->cache().achievementTradeMst();
@@ -247,13 +257,34 @@ HANDLEF(AchievementTrade)
 		[&node](const ::AchievementTradeMst& o)
 		{ return std::to_string(o.id) == node.trade_id; });
 	if (offer == shop.end())
-		co_return HandleResult::error("Invalid trade request", "unknown offer " + node.trade_id);
+		co_return HandleResult::refuseToHome("That exchange is no longer available.",
+			"unknown offer " + node.trade_id);
 
-	if (node.count <= 0 || count > offer->limit_count || offer->price <= 0)
-		co_return HandleResult::error("Invalid trade request", "invalid quantity or price");
+	// HOW MANY, AGAINST THE PER-PLAYER TOTAL.  The quantity is the shop
+	// slider's (RandallAchievementShopDetailScene::sliderSet @0x1A62FBC: 1 up
+	// to limit_count minus what this player has bought), priced at
+	// quantity x price (getBeedPointStr).  limit_count is S8rdp9zk -- 400 on
+	// the Ignis Shard offer -- not 9Hau45Jj, which is 1 on every row and has
+	// no reader in the shop; reading that one refused every multi-quantity
+	// purchase (2026-10-02, offer 91000059 x 400).  The remaining-stock half
+	// is enforced atomically by the insert below.
+	if (node.count <= 0 || offer->price <= 0 || offer->limit_count <= 0
+		|| node.count > offer->limit_count)
+	{
+		co_return HandleResult::refuseToHome("Invalid quantity for this exchange.",
+			"quantity " + std::to_string(node.count) + " of offer " + node.trade_id
+			+ " (limit " + std::to_string(offer->limit_count) + ")");
+	}
+	const int32_t count = node.count;
 
 	const auto reward = parseReward(offer->reward_info);
 	const auto cost = static_cast<int64_t>(offer->price) * count;
+	// Each purchase pays the offer's own reward count; the quantity multiplies
+	// it.  Bounded by limit_count, but kept wide and checked all the same.
+	const auto grantCount = static_cast<int64_t>(reward.count) * count;
+	if (reward.count <= 0 || grantCount > INT32_MAX)
+		co_return HandleResult::refuseToHome("That exchange cannot be completed.",
+			"reward count " + std::to_string(reward.count) + " x " + std::to_string(count));
 
 	AchievementTradeResp resp{};
 	resp.signal_key.key = "5EdKHavF";
@@ -273,7 +304,7 @@ HANDLEF(AchievementTrade)
 			if (bought.empty())
 			{
 				transaction->rollback();
-				co_return HandleResult::error("Invalid trade request", "purchase limit reached");
+				co_return HandleResult::refuseToHome("This exchange is sold out.", "purchase limit reached");
 			}
 
 			// The points, debited only if there are enough.
@@ -286,7 +317,7 @@ HANDLEF(AchievementTrade)
 				transaction->rollback();
 				LOG_WARN << "AchievementTrade: " << identity.userId
 					<< " cannot afford offer " << node.trade_id << " (" << cost << " points)";
-				co_return HandleResult::error("Invalid trade request", "not enough merit points");
+				co_return HandleResult::refuseToHome("Not enough Merit Points.", "not enough merit points");
 			}
 
 			// The goods.  Same present vocabulary the box uses; the porter has
@@ -302,7 +333,7 @@ HANDLEF(AchievementTrade)
 				co_await transaction->execSqlCoro(
 					std::string("UPDATE user_info SET ") + column + " = " + column +
 					" + $1 WHERE id = $2;",
-					reward.count * count, identity.userId);
+					grantCount, identity.userId);
 				resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
 				break;
 			}
@@ -313,16 +344,16 @@ HANDLEF(AchievementTrade)
 				catch (const std::exception&)
 				{
 					transaction->rollback();
-					co_return HandleResult::error("Invalid trade request", "bad unit id");
+					co_return HandleResult::refuseToHome("That exchange cannot be completed.", "bad unit id");
 				}
 				auto unit = gme::fromArchivedUnit(unitId, UnitArchiver::getRandomType());
 				if (!unit)
 				{
 					transaction->rollback();
-					co_return HandleResult::error("Invalid trade request", "unit has no archive record");
+					co_return HandleResult::refuseToHome("That exchange cannot be completed.", "unit has no archive record");
 				}
 				std::vector<::UserUnitInfo> granted;
-				for (int32_t i = 0; i < reward.count * count; ++i)
+				for (int64_t i = 0; i < grantCount; ++i)
 					granted.push_back(std::move((co_await gme::addUserUnit(transaction, identity, *unit)).nonEmpty()));
 				resp.unit_info = std::move(granted);
 				resp.unit_dictionary = co_await gme::loadUnitDictionary(transaction, identity);
@@ -337,12 +368,13 @@ HANDLEF(AchievementTrade)
 				catch (const std::exception&)
 				{
 					transaction->rollback();
-					co_return HandleResult::error("Invalid trade request", "bad item id");
+					co_return HandleResult::refuseToHome("That exchange cannot be completed.", "bad item id");
 				}
 				(co_await gme::addUserItem(transaction, identity, itemId,
-					static_cast<uint32_t>(reward.count * count))).nonEmpty();
+					static_cast<uint32_t>(grantCount))).nonEmpty();
 				auto snapshot = co_await gme::loadWarehouseSnapshot(transaction, identity);
 				resp.warehouse_info = std::move(snapshot.warehouse);
+				resp.item_favorite = std::move(snapshot.favorites);
 				resp.item_dictionary_info = std::move(snapshot.dictionary);
 				break;
 			}
@@ -353,7 +385,7 @@ HANDLEF(AchievementTrade)
 				catch (const std::exception&)
 				{
 					transaction->rollback();
-					co_return HandleResult::error("Invalid trade request", "bad unit id");
+					co_return HandleResult::refuseToHome("That exchange cannot be completed.", "bad unit id");
 				}
 				// The unlock is per SPECIES and has no count: the offer's
 				// limit_count is what stops it being bought twice.
@@ -370,7 +402,7 @@ HANDLEF(AchievementTrade)
 				transaction->rollback();
 				LOG_WARN << "AchievementTrade: offer " << node.trade_id
 					<< " pays reward type " << reward.type << ", which this server cannot grant";
-				co_return HandleResult::error("Invalid trade request", "unsupported reward");
+				co_return HandleResult::refuseToHome("That exchange cannot be completed.", "unsupported reward");
 			}
 
 			resp.achievement_info = co_await gme::loadAchievementInfo(transaction, identity);

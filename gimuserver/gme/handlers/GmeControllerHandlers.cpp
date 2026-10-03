@@ -179,6 +179,7 @@ static GmeHandler getHandler(std::string_view cmd)
 	REGISTER("cTZ3W2JG", UserInfo, "ScJx6ywWEb0A3njT");
 	REGISTER("2p9LHCNh", UnitFavorite,            "cb4ESLa1");
 	REGISTER("0gUSE84e", UnitEvo,                 "biHf01DxcrPou5Qt");
+	REGISTER("nSQxNOeL", FeSkillGet,              "nZ2bVoWu");
 	// Omni+ Boost.  A PROBE that logs and refuses — see UnitOmniEvo.cpp.
 	REGISTER("4Dk4spf9", UnitOmniEvo,             "4s3lsODp");
 	REGISTER("Mw08CIg2", UnitMix,                 "JnegC7RrN3FoW8dQ");
@@ -421,9 +422,17 @@ drogon::Task<GmeAction> GmeController::Handle(drogon::SessionPtr session, const 
 				{
 					logReq << "RESPONSE IN ERROR: " << outputJson.errorMsg << " ex: " << outputJson.exceptionMsg << "\n";
 					GmeError err{};
-					err.cmd = GmeErrorCommand::Close;
+					// A refusal the player can recover from carries its message
+					// as written: back Home (HandleResult::refuseToHome), or
+					// left to the requesting scene (HandleResult::refuseToRetry);
+					// everything else keeps closing the client.
+					const bool refusal = outputJson.returnHome || outputJson.retry;
+					err.cmd = outputJson.returnHome ? GmeErrorCommand::ReturnToGame
+						: outputJson.retry ? GmeErrorCommand::Retry
+						: GmeErrorCommand::Close;
 					err.flag = GmeErrorFlags::IsInError;
-					err.message = std::format("Unable to handle request: \"{}\", Error: \"{}\"", header.id, outputJson.errorMsg);
+					err.message = refusal ? outputJson.errorMsg
+						: std::format("Unable to handle request: \"{}\", Error: \"{}\"", header.id, outputJson.errorMsg);
 					resp.error = err;
 				}
 				else

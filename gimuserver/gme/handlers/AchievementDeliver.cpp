@@ -253,10 +253,22 @@ HANDLEF(AchievementDeliver)
 			}
 			else   // Sphere
 			{
-				// n6E8iMf3 is the sphere screen's id list, but no store to that
-				// offset was read, so take whichever of the two string fields
-				// actually arrived and say which it was - the first live
-				// delivery settles it.
+				// THE IDS ARE WAREHOUSE ROWS, NOT ITEMS.
+				// RandallAchievementDedicateSphereScene::sell @0x1A3D5D0 joins
+				// UserWarehouseInfo::getItemIndex() of every selected row with
+				// ',' into the request's n6E8iMf3 string (request+0x60, which
+				// createBody @0x139DF80 sends under that key) and zeroes each row
+				// on its own side (setItemNum(0)): one id = one whole row handed
+				// over.  They were read as ItemMst ids, which no row id matches,
+				// so every sphere delivery was refused.  A row the client added
+				// itself (a craft) arrives under its placeholder
+				// (gme::warehousePlaceholderItem).
+				//
+				// Per ROW, so a locked copy stays put while an unlocked copy of
+				// the same sphere is delivered -- the species-wide
+				// user_items.favorite_flg used to block both.  A row that cannot
+				// be delivered (locked, equipped, gone, repeated) is skipped, as
+				// before; nothing is consumed for it.
 				const char* which = "n6E8iMf3";
 				auto packed = goods.item_ids;
 				if (packed.empty())
@@ -270,41 +282,72 @@ HANDLEF(AchievementDeliver)
 					transaction->rollback();
 					co_return HandleResult::error("Invalid deliver request", "no sphere named");
 				}
-				LOG_INFO << "AchievementDeliver: sphere ids arrived under " << which;
+				LOG_INFO << "AchievementDeliver: sphere rows arrived under " << which;
 
-				// A repeated id is a second copy of the same sphere.
-				std::map<int64_t, int32_t> byId;
+				co_await gme::syncWarehouse(transaction, identity);
+				const auto& itemMst = theServer()->cache().itemMst();
+				std::set<int64_t> usedRows;
+				std::map<int64_t, int64_t> perItem;    // item -> copies handed over
+				int64_t points = 0;
+				int64_t taken = 0;
 				for (const auto& raw : wanted)
 				{
 					int64_t id = 0;
-					if (parseId(raw, id))
-						++byId[id];
-				}
-
-				const auto& itemMst = theServer()->cache().itemMst();
-				int64_t points = 0;
-				int64_t taken = 0;
-				for (const auto& entry : byId)
-				{
-					const auto itemId = entry.first;
-					const auto count = entry.second;
-					const auto it = std::find_if(itemMst.begin(), itemMst.end(),
-						[itemId](const ::ItemMst& i) { return i.id == itemId; });
-					if (it == itemMst.end())
+					if (!parseId(raw, id) || id > INT32_MAX)
 						continue;
 
-					// Held-and-unlocked only, decremented in the statement that
-					// checks the stack, so two taps cannot both pass.
-					const auto spent = co_await transaction->execSqlCoro(
-						"UPDATE user_items SET item_num = item_num - $1"
-						" WHERE user_id = $2 AND item_id = $3 AND favorite_flg = 0"
-						" AND item_num >= $1 RETURNING item_num;",
-						count, identity.userId, itemId);
-					if (spent.empty())
-						continue;      // not held in that quantity, or locked
+					int64_t row = 0, item = 0, count = 0;
+					const auto exact = co_await transaction->execSqlCoro(
+						"SELECT item_id, item_num, favorite_flg, equip_unit_id FROM user_warehouse_rows"
+						" WHERE user_id = $1 AND instance_id = $2;",
+						identity.userId, id);
+					if (!exact.empty())
+					{
+						if (exact[0]["favorite_flg"].as<int32_t>() == 0
+							&& exact[0]["equip_unit_id"].as<int64_t>() == 0
+							&& exact[0]["item_num"].as<int64_t>() > 0 && !usedRows.contains(id))
+						{
+							row = id;
+							item = exact[0]["item_id"].as<int64_t>();
+							count = exact[0]["item_num"].as<int64_t>();
+						}
+					}
+					else if (const auto placeholder = gme::warehousePlaceholderItem(static_cast<uint32_t>(id)))
+					{
+						for (const auto& r : co_await gme::unseenWarehouseRows(transaction, identity, *placeholder))
+						{
+							if (r.favorite || r.equipUnitId != 0 || r.count <= 0 || usedRows.contains(r.instanceId))
+								continue;
+							row = r.instanceId;
+							item = *placeholder;
+							count = r.count;
+							break;
+						}
+					}
+					const auto it = std::find_if(itemMst.begin(), itemMst.end(),
+						[item](const ::ItemMst& i) { return i.id == item; });
+					if (!row || it == itemMst.end())
+					{
+						LOG_INFO << "AchievementDeliver: row " << id
+							<< " is not a deliverable (held, unlocked, unequipped) sphere; skipped";
+						continue;
+					}
 
+					usedRows.insert(row);
+					co_await transaction->execSqlCoro(
+						"UPDATE user_warehouse_rows SET item_num = 0 WHERE instance_id = $1;", row);
+					perItem[item] += count;
 					points += static_cast<int64_t>(gme::itemDeliverPoints(*it)) * count;
 					taken += count;
+				}
+				for (const auto& [item, count] : perItem)
+				{
+					const auto spent = co_await transaction->execSqlCoro(
+						"UPDATE user_items SET item_num = item_num - $1"
+						" WHERE user_id = $2 AND item_id = $3 AND item_num >= $1 RETURNING item_num;",
+						count, identity.userId, item);
+					if (spent.empty())
+						throw std::runtime_error("AchievementDeliver: warehouse rows and stock disagree");
 				}
 
 				points = std::min<int64_t>(points, headroom);
@@ -367,6 +410,7 @@ HANDLEF(AchievementDeliver)
 			{
 				auto snapshot = co_await gme::loadWarehouseSnapshot(transaction, identity);
 				resp.warehouse_info = std::move(snapshot.warehouse);
+				resp.item_favorite = std::move(snapshot.favorites);
 			}
 
 			// Serialize before the transaction closes: the goods are already

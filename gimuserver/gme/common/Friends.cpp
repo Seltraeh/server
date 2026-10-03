@@ -801,6 +801,39 @@ std::vector<::FriendInfo> socialList(
 	return out;
 }
 
+drogon::Task<int32_t> helperLeaderUnit(
+	const db::Database database,
+	const UserIdentity identity,
+	const std::string& helperId)
+{
+	if (helperId.empty() || helperId == "0")
+		co_return 0;
+
+	int32_t base = 0;
+	const auto roster = co_await loadFriendRoster(database, identity, false);
+	const auto row = std::find_if(roster.begin(), roster.end(),
+		[&helperId](const FriendRow& r) { return r.friend_id == helperId; });
+	if (row != roster.end())
+	{
+		base = row->base_unit_id;
+	}
+	else if (const auto dev = std::find_if(g_devs.begin(), g_devs.end(),
+				[&helperId](const DevFriend& d) { return devFriendId(d) == helperId; });
+			 dev != g_devs.end())
+	{
+		base = dev->base_unit_id;
+	}
+	else
+	{
+		base = strangerChainBase(helperId);
+	}
+	if (base == 0)
+		co_return 0;
+
+	const auto peak = co_await playerPeak(database, identity);
+	co_return friendUnitFor(FriendRow{ helperId, {}, base }, peak).unit_id;
+}
+
 drogon::Task<bool> isFriend(
 	const db::Database database,
 	const UserIdentity identity,

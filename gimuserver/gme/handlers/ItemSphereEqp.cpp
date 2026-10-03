@@ -1,187 +1,214 @@
 #include "App.hpp"
 #include "Handlers.hpp"
-
 #include <gimuserver/gme/common/Common.hpp>
+#include <array>
+#include <charconv>
+#include <optional>
+#include <set>
+#include <string_view>
 
-#include <sstream>
-#include <string>
-#include <vector>
+namespace
+{
+/// Splits on one delimiter, KEEPING empty pieces: an unequip arrives as
+/// "0:0:1000::", which is five fields, the last two empty.  getline drops the
+/// trailing one and reads it as four.
+std::vector<std::string_view> splitKeepEmpty(const std::string_view in, const char sep)
+{
+    std::vector<std::string_view> out;
+    size_t start = 0;
+    while (true)
+    {
+        const auto at = in.find(sep, start);
+        if (at == std::string_view::npos)
+        {
+            out.push_back(in.substr(start));
+            return out;
+        }
+        out.push_back(in.substr(start, at - start));
+        start = at + 1;
+    }
+}
 
-// ItemSphereEqp (0IXGiC9t) — equip/unequip spheres (equipment items) on units
-// from the sphere menu. Request (ItemSphereEqpRequest::createBody,
-// bfdata/createbody/ItemSphereEqpRequest.txt):
+/// One field of a segment.  "" is 0 -- the unit's string for an id it never
+/// held -- and the sign is kept, because frame2 is "-1" on every unit without
+/// a Sphere Frog.  Anything else non-numeric is malformed.
+std::optional<int64_t> parseField(const std::string_view token)
+{
+    if (token.empty())
+        return 0;
+    int64_t value = 0;
+    const auto [end, error] = std::from_chars(token.data(), token.data() + token.size(), value);
+    if (error != std::errc{} || end != token.data() + token.size())
+        return std::nullopt;
+    return value;
+}
+}
+
+// wx1ZLFj9.a2utCvs8 = frame1:frame2:unit:item1:item2[,...] -- one segment per
+// unit the screen changed, every field that unit's own string (see the field
+// doc in net/items.kdl).  A frame names the warehouse row of the copy in the
+// slot: a real row id, an INT32_MAX - item placeholder for a copy the client
+// crafted itself, 0 for an empty slot, or -1 for the second slot of a unit
+// without a Sphere Frog; an item is an ItemMst id, or 0/"" for none.
 //
-//   "wx1ZLFj9": [{"a2utCvs8": "wh1:wh2:userUnitId:itemId1:itemId2[,...]"}]
-//
-// Each comma segment updates one unit's two sphere slots; itemId 0 clears a
-// slot. wh1/wh2 are the client's warehouse instance ids (informational — the
-// authoritative join is the master item id). The frame id stored alongside
-// each slot is ItemMst.sphere_type, the sphere-category icon the client
-// renders on the unit (legacy MstConfig::GetItemSphereType).
-//
-// Warehouse accounting mirrors the legacy handler: equipping consumes one from
-// the sphere's stack, unequipping returns it. Rows are decremented to 0 rather
-// than deleted so instance ids stay stable for the client's local warehouse
-// model; UserInfo filters zero stacks off the wire.
-//
-// Response: empty OK (legacy-verified — the client applies the change from its
-// own state).
-//
-// GroupId = "0IXGiC9t", AES key = "CZE56XAY" (legacy ItemSphereEqpRequestHandler).
+// Retain copy identity (including its favorite flag) while it is equipped.
+// The entire batch is atomic; return all changed slots before assigning new
+// ones so moving a sphere between two units works in either request order.
 HANDLEF(ItemSphereEqp)
 {
-	(void)session;
-	LOG_INFO << "ItemSphereEqp: " << json;
-
-	ItemSphereEqpReq req = {};
-	if (const auto& ec = glz::read<glz::opts{ .error_on_unknown_keys = false }>(req, json); ec)
-	{
-		const auto& fmte = glz::format_error(ec, json);
-		LOG_DEBUG << "Gme ItemSphereEqp Error during JSON read: " << fmte;
-		co_return HandleResult::error("Deserialization error", fmte);
-	}
-
-	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
-	const std::string userId = identity.userId;
-
-	const auto& itemMst = theServer()->cache().itemMst();
-	const auto sphereFrame = [&itemMst](uint32_t itemId) -> int32_t {
-		if (itemId == 0)
-			return 0;
-		for (const auto& m : itemMst)
-		{
-			if (m.id == static_cast<int32_t>(itemId))
-				return m.sphere_type;
-		}
-		LOG_WARN << "ItemSphereEqp: item " << itemId << " not in ItemMst — frame defaults to 0";
-		return 0;
-	};
-
-	// user_items stack adjustment for one slot change: return the previously
-	// equipped sphere (UPSERT +1), consume the newly equipped one (-1, floored
-	// at 0, row kept so the instance id survives).
-	const auto adjustWarehouse = [&](uint32_t oldId, uint32_t newId) -> drogon::Task<void> {
-		if (oldId == newId)
-			co_return;
-		if (oldId != 0)
-		{
-			co_await gme::addUserItem(theDb(), identity, oldId, 1);
-		}
-		if (newId != 0)
-		{
-			co_await theDb()->execSqlCoro(
-				"UPDATE user_items SET item_num = MAX(0, item_num - 1) "
-				"WHERE user_id = $1 AND item_id = $2;",
-				userId, newId);
-		}
-	};
-
-	for (const auto& node : req.nodes)
-	{
-		// packed = "wh1:wh2:userUnitId:itemId1:itemId2[,wh1:wh2:...]"
-		std::istringstream ops(node.packed);
-		std::string segment;
-		while (std::getline(ops, segment, ','))
-		{
-			if (segment.empty())
-				continue;
-
-			std::vector<std::string> parts;
-			std::istringstream seg(segment);
-			std::string token;
-			while (std::getline(seg, token, ':'))
-				parts.push_back(token);
-
-			if (parts.size() < 5)
-			{
-				LOG_WARN << "ItemSphereEqp: segment has fewer than 5 parts: " << segment;
-				continue;
-			}
-
-			uint32_t userUnitId = 0, itemId1 = 0, itemId2 = 0;
-			try { userUnitId = static_cast<uint32_t>(std::stoul(parts[2])); } catch (...) {}
-			try { itemId1    = static_cast<uint32_t>(std::stoul(parts[3])); } catch (...) {}
-			try { itemId2    = static_cast<uint32_t>(std::stoul(parts[4])); } catch (...) {}
-
-			if (userUnitId == 0)
-			{
-				LOG_WARN << "ItemSphereEqp: bad user_unit_id in segment: " << segment;
-				continue;
-			}
-
-			const int32_t frame1 = sphereFrame(itemId1);
-
-			try
-			{
-				const auto oldRows = co_await theDb()->execSqlCoro(
-					"SELECT eqip_item_id, eqip_item_id2, sphere_ext FROM user_units "
-					"WHERE user_unit_id = $1 AND user_id = $2;",
-					userUnitId, userId);
-				if (oldRows.size() == 0)
-				{
-					LOG_WARN << "ItemSphereEqp: unit " << userUnitId << " not found";
-					continue;
-				}
-				const uint32_t oldItem1 = oldRows[0]["eqip_item_id"].as<uint32_t>();
-				const uint32_t oldItem2 = oldRows[0]["eqip_item_id2"].as<uint32_t>();
-
-				// SLOT 2 EXISTS ONLY IF A SPHERE FROG GRANTED IT.  A unit is born with one
-				// sphere slot; eqip_item_frame_id2 == -1 is how the client is told the second
-				// one is not there (gme::kNoSecondSphereSlot).
-				//
-				// Two things therefore have to happen here, and BOTH were wrong before:
-				//
-				//   * REFUSE a slot-2 equip on a unit without the slot.  The client will not
-				//     normally offer one -- it hides the slot on the same sentinel -- so this
-				//     is a backstop against a stale client model or a crafted request, not a
-				//     path players hit.
-				//   * NEVER WRITE 0 INTO frame2 FOR A UNIT WITHOUT THE SLOT.  This is the
-				//     bigger of the two: the old code wrote sphereFrame(itemId2) unconditionally,
-				//     and sphereFrame(0) is 0, so merely equipping a sphere in SLOT 1 rewrote
-				//     frame2 from -1 to 0 and silently handed the unit a second slot.
-				//
-				// // SUPERSEDES a comment that said the opposite -- "slot 2 is not gated and
-				// // must not be, do not re-add a check" -- and an ItemSphereEqp gate removed
-				// // on the strength of it.  That conclusion came from eight checks looking for
-				// // a slot COUNT, which does not exist; the capacity is a sentinel in the
-				// // frame id.  Some of those checks were also xref-absence arguments over
-				// // VIRTUAL getters, where absence means nothing.  Confirmed in-client
-				// // 2026-09-05; the reasoning is written out at gme::kNoSecondSphereSlot.
-				const bool hasSlot2 = oldRows[0]["sphere_ext"].as<int32_t>() != 0;
-
-				uint32_t eqItem2 = itemId2;
-				if (!hasSlot2 && itemId2 != 0)
-				{
-					LOG_WARN << "ItemSphereEqp: unit " << userUnitId
-						<< " has no second sphere slot -- refusing item " << itemId2;
-					eqItem2 = 0;
-				}
-
-				// -1 when the slot is absent, otherwise the sphere's frame (0 = empty).
-				const int32_t frame2 = hasSlot2 ? sphereFrame(eqItem2)
-				                                : gme::kNoSecondSphereSlot;
-
-				co_await theDb()->execSqlCoro(
-					"UPDATE user_units "
-					"SET eqip_item_id = $1, eqip_item_frame_id = $2, "
-					"    eqip_item_id2 = $3, eqip_item_frame_id2 = $4 "
-					"WHERE user_unit_id = $5 AND user_id = $6;",
-					itemId1, frame1, eqItem2, frame2, userUnitId, userId);
-
-				co_await adjustWarehouse(oldItem1, itemId1);
-				co_await adjustWarehouse(oldItem2, eqItem2);
-
-				LOG_INFO << "ItemSphereEqp: unit " << userUnitId
-					<< " slot1=(" << itemId1 << ",frame=" << frame1 << ")"
-					<< " slot2=(" << eqItem2 << ",frame=" << frame2 << ")";
-			}
-			catch (const drogon::orm::DrogonDbException& ex)
-			{
-				LOG_ERROR << "ItemSphereEqp: DB error for unit " << userUnitId
-					<< ": " << ex.base().what();
-			}
-		}
-	}
-
-	co_return HandleResult::success("{}");
+    (void)session;
+    ItemSphereEqpReq req{};
+    if (const auto ec=glz::read<glz::opts{.error_on_unknown_keys=false}>(req,json); ec)
+    {
+        LOG_WARN << "ItemSphereEqp: unreadable request: " << glz::format_error(ec, json);
+        co_return HandleResult::success("{}");
+    }
+    struct Change { uint32_t unit,slot,item,wire; int32_t frame; bool hasSlot2; };
+    // {frame1, frame2, unit, item1, item2}.  Frames are folded to 0 when
+    // negative: -1 is "this slot does not exist", which names no copy.
+    std::vector<std::array<uint32_t,5>> ops;
+    std::set<uint32_t> namedUnits;
+    for (const auto& node:req.nodes)
+    {
+        for (const auto segment:splitKeepEmpty(node.packed,','))
+        {
+            // An empty change list is sent as an empty string.
+            if (segment.empty()) continue;
+            const auto fields=splitKeepEmpty(segment,':');
+            std::array<uint32_t,5> values{};
+            bool valid=fields.size()==values.size();
+            for (size_t n=0; valid && n<values.size(); ++n)
+            {
+                const auto value=parseField(fields[n]);
+                const bool frame=n<2;
+                valid=value && *value<=static_cast<int64_t>(UINT32_MAX) && (frame || *value>=0);
+                if (valid) values[n]=static_cast<uint32_t>(std::max<int64_t>(*value,0));
+            }
+            // Refused whole and LOGGED.  This used to return silently, and a
+            // silent refusal is invisible to the player: the client has
+            // already drawn the change, and the next HomeInfo unit rebuild
+            // takes it back.
+            if (!valid || values[2]==0 || !namedUnits.insert(values[2]).second)
+            {
+                LOG_WARN << "ItemSphereEqp: refused malformed batch \"" << node.packed
+                         << "\" at segment \"" << std::string(segment) << "\"";
+                co_return HandleResult::success("{}");
+            }
+            ops.push_back(values);
+        }
+    }
+    const auto identity=(co_await gme::getUserIdentity(theDb(),req.login_info)).nonEmpty();
+    auto transaction=co_await theDb()->newTransactionCoro();
+    try
+    {
+        co_await gme::syncWarehouse(transaction,identity);
+        std::vector<Change> changes;
+        for (const auto& op:ops)
+        {
+            const auto unit=op[2];
+            const auto owned=co_await transaction->execSqlCoro(
+                "SELECT eqip_item_id,eqip_item_id2,sphere_ext FROM user_units WHERE user_id=$1 AND user_unit_id=$2;",
+                identity.userId,unit);
+            if (owned.empty()) throw std::invalid_argument("unit not owned");
+            const bool slot2=owned[0]["sphere_ext"].as<int>()!=0;
+            for (uint32_t slot=1;slot<=2;++slot)
+            {
+                const auto item=op[slot+2], wire=op[slot-1];
+                const auto old=owned[0][slot==1 ? "eqip_item_id" : "eqip_item_id2"].as<uint32_t>();
+                if (slot==2 && !slot2 && item) throw std::invalid_argument("second sphere slot locked");
+                // An emptied slot's frame; an equipped one gets its copy's
+                // row below, once that row is chosen.
+                int32_t frame=slot==2 && !slot2 ? gme::kNoSecondSphereSlot : 0;
+                if (item)
+                {
+                    const auto& mst=theServer()->cache().itemMst();
+                    const auto it=std::find_if(mst.begin(),mst.end(),[item](const auto& r){return r.id==item;});
+                    if (it==mst.end() || (it->item_type!=3 && it->item_type!=6))
+                        throw std::invalid_argument("item is not a sphere");
+                }
+                const auto prior=co_await transaction->execSqlCoro(
+                    "SELECT instance_id FROM user_warehouse_rows WHERE user_id=$1 AND equip_unit_id=$2 AND equip_slot=$3;",
+                    identity.userId,unit,slot);
+                // Unchanged: the same copy, or a copy the client equipped
+                // before it was sent the real id and still names by the
+                // placeholder (gme::warehousePlaceholderItem).
+                if (old==item && (!wire || (!prior.empty() && prior[0]["instance_id"].as<uint32_t>()==wire)
+                        || gme::warehousePlaceholderItem(wire)==static_cast<int64_t>(item)))
+                    continue;
+                changes.push_back({unit,slot,item,wire,frame,slot2});
+                if (old)
+                {
+                    co_await gme::releaseWarehouseSphere(transaction,identity,unit,slot);
+                    co_await gme::addUserItem(transaction,identity,old,1);
+                }
+            }
+        }
+        for (const auto& change:changes)
+        {
+            auto frame=change.frame;
+            if (change.item)
+            {
+                // A zero warehouse id is the older species-only request form.
+                // Nonzero ids must identify the actual selected owned copy.
+                const auto chosen=co_await transaction->execSqlCoro(
+                    "SELECT instance_id FROM user_warehouse_rows WHERE user_id=$1 AND item_id=$2"
+                    " AND item_num>0 AND equip_unit_id=0 AND ($3=0 OR instance_id=$3)"
+                    " ORDER BY instance_id LIMIT 1;",identity.userId,change.item,change.wire);
+                int64_t row=chosen.empty() ? 0 : chosen[0]["instance_id"].as<int64_t>();
+                if (!row && change.wire
+                    && gme::warehousePlaceholderItem(change.wire)==static_cast<int64_t>(change.item))
+                {
+                    // Not a real row: a copy the client added itself (a craft)
+                    // and equipped before it was sent the real id.  Take the
+                    // oldest free copy it has not been sent -- an unlocked one
+                    // first, so a lock stays on a copy still in storage, where
+                    // it is what keeps the copy from being sold.
+                    const auto real=co_await transaction->execSqlCoro(
+                        "SELECT 1 FROM user_warehouse_rows WHERE user_id=$1 AND instance_id=$2;",
+                        identity.userId,change.wire);
+                    if (real.empty())
+                    {
+                        const auto unseen=co_await gme::unseenWarehouseRows(transaction,identity,change.item);
+                        for (const bool locked:{false,true})
+                        {
+                            for (const auto& r:unseen)
+                            {
+                                if (r.count<=0 || r.equipUnitId!=0 || r.favorite!=locked) continue;
+                                row=r.instanceId;
+                                break;
+                            }
+                            if (row) break;
+                        }
+                    }
+                }
+                if (!row) throw std::invalid_argument("sphere copy unavailable");
+                const auto spent=co_await transaction->execSqlCoro(
+                    "UPDATE user_items SET item_num=item_num-1 WHERE user_id=$1 AND item_id=$2"
+                    " AND item_num>0 RETURNING item_num;",identity.userId,change.item);
+                if (spent.empty()) throw std::invalid_argument("sphere stock unavailable");
+                co_await transaction->execSqlCoro(
+                    "UPDATE user_warehouse_rows SET item_num=0,equip_unit_id=$1,equip_slot=$2 WHERE instance_id=$3;",
+                    change.unit,change.slot,row);
+                // THE FRAME IS THE COPY'S ROW, not its sphere_type: the
+                // client's "which unit wears this row" map is keyed on it
+                // (UserUnitInfoList::updateSphereEquipList), and the next batch
+                // that carries this slot unchanged names the copy by it.
+                frame=static_cast<int32_t>(row);
+            }
+            const std::string columns=change.slot==1 ? "eqip_item_id=$1,eqip_item_frame_id=$2" : "eqip_item_id2=$1,eqip_item_frame_id2=$2";
+            co_await transaction->execSqlCoro(
+                "UPDATE user_units SET "+columns+" WHERE user_id=$3 AND user_unit_id=$4;",
+                change.item,frame,identity.userId,change.unit);
+        }
+    }
+    catch (const std::invalid_argument& e)
+    {
+        transaction->rollback();
+        std::string batch;
+        for (const auto& node:req.nodes) batch+=(batch.empty() ? "" : "|")+node.packed;
+        LOG_WARN << "ItemSphereEqp: refused batch \"" << batch << "\": " << e.what();
+        co_return HandleResult::success("{}");
+    }
+    catch (...) { transaction->rollback(); throw; }
+    co_return HandleResult::success("{}");
 }

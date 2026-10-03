@@ -85,6 +85,25 @@ HANDLEF(UserInfo)
 			db::Lookup("user_id", identity.userId),
 		});
 
+	// Owned items come from user_items (seeded by the tutorial, grown by drops
+	// and rewards).  gme::loadWarehouseSnapshot is the one builder every reply
+	// that carries the warehouse uses — see it for the zero-stack and
+	// dictionary rules.  Favorited stacks are reported through item_favorite
+	// (VSRPkdId) so locks survive a reload.  The dictionary and favorites are
+	// appended, as they always were, to whatever the cached response holds.
+	//
+	// BEFORE the units: the snapshot's reconcile is what points each worn
+	// sphere slot's frame at its copy's row (gme/common/Warehouse.cpp), so the
+	// units read below go out already agreeing with this list.
+	{
+		auto warehouse = co_await gme::loadWarehouseSnapshot(db, identity);
+		resp.item_dictionary_info.insert(resp.item_dictionary_info.end(),
+			warehouse.dictionary.begin(), warehouse.dictionary.end());
+		resp.item_favorite.insert(resp.item_favorite.end(),
+			warehouse.favorites.begin(), warehouse.favorites.end());
+		resp.warehouse_info = std::move(warehouse.warehouse);
+	}
+
     // We should always have at least one unit, since the game will not let users
     // delete their only unit on the squad.
 	resp.unit_info = std::move((co_await db::PacketInterfaceFor<UserUnitInfo>::read(
@@ -102,21 +121,6 @@ HANDLEF(UserInfo)
 	// the alternate-art unlock (2pAyFjmZ), which is derived rather than stored
 	// on the row, and a direct read reported it as 0 on every login.
 	resp.unit_dictionary = co_await gme::loadUnitDictionary(db, identity);
-
-	// Owned items come from user_items (seeded by the tutorial, grown by drops
-	// and rewards).  gme::loadWarehouseSnapshot is the one builder every reply
-	// that carries the warehouse uses — see it for the zero-stack and
-	// dictionary rules.  Favorited stacks are reported through item_favorite
-	// (VSRPkdId) so locks survive a reload.  The dictionary and favorites are
-	// appended, as they always were, to whatever the cached response holds.
-	{
-		auto warehouse = co_await gme::loadWarehouseSnapshot(db, identity);
-		resp.item_dictionary_info.insert(resp.item_dictionary_info.end(),
-			warehouse.dictionary.begin(), warehouse.dictionary.end());
-		resp.item_favorite.insert(resp.item_favorite.end(),
-			warehouse.favorites.begin(), warehouse.favorites.end());
-		resp.warehouse_info = std::move(warehouse.warehouse);
-	}
 
 	// Battle-item loadout (71U5wzhI) — the 5 slots on the quest-prep screen.
 	//

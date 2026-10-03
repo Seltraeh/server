@@ -429,6 +429,7 @@ public:
 	inline const auto& unitCommentMst() const { return m_unitCommentMst; }
 	inline const auto& unitFeSkillMst() const { return m_unitFeSkillMst; }
 	inline const auto& unitFeCategoryMst() const { return m_unitFeCategoryMst; }
+	inline const auto& feSkillMst() const { return m_feSkillMst; }
 	inline const auto& missionEp3Mst() const { return m_missionEp3Mst; }
 
 	/*!
@@ -631,6 +632,7 @@ private:
 	std::vector<UnitCommentMst> m_unitCommentMst;
 	std::vector<UnitFeSkillMst> m_unitFeSkillMst;
 	std::vector<UnitFeCategoryMst> m_unitFeCategoryMst;
+	std::vector<FeSkillMst> m_feSkillMst;
 	std::vector<MissionEp3Mst> m_missionEp3Mst;
 
 	// World geography — mst/area.kdl

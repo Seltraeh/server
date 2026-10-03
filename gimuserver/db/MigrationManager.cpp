@@ -1525,6 +1525,121 @@ static void RegisterMigrations(MigrationMap& map)
 			"ALTER TABLE user_guild_members ADD COLUMN member_type INTEGER NOT NULL DEFAULT 4;");
 	});
 
+	// The battle MissionStart opened and MissionEnd has not yet settled:
+	// the mission id while it is open, 0 once its result has been paid, NULL
+	// for saves from before this column (a battle in flight across the upgrade
+	// is still paid once).  Lets a repeated MissionEnd -- a client retry after
+	// a lost reply -- answer without paying, dropping or spending twice.
+	migrate("29092026_AddUserInfoOpenMission", {
+		p->execSqlSync("ALTER TABLE user_info ADD COLUMN open_mission_id INTEGER;");
+	});
+
+	// Preserve old real warehouse ids. Extra rows are allocated from this one
+	// namespace, never derived by modulo/stride. Quantity splitting uses MST
+	// limits at first access, after the cache has been loaded. The aggregate
+	// user_items table remains compatible with existing rewards and recipes.
+	migrate("29092026_PersistentWarehouseRows", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_warehouse_rows ("
+			"instance_id INTEGER PRIMARY KEY AUTOINCREMENT CHECK(instance_id BETWEEN 1 AND 2147483647),"
+			"user_id TEXT NOT NULL, item_id INTEGER NOT NULL,"
+			"item_num INTEGER NOT NULL DEFAULT 0 CHECK(item_num >= 0),"
+			"favorite_flg INTEGER NOT NULL DEFAULT 0, disp_order INTEGER NOT NULL DEFAULT 0,"
+			"equip_unit_id INTEGER NOT NULL DEFAULT 0, equip_slot INTEGER NOT NULL DEFAULT 0);");
+		p->execSqlSync("CREATE INDEX IF NOT EXISTS warehouse_owner_item ON user_warehouse_rows(user_id,item_id);");
+		p->execSqlSync(
+			"CREATE UNIQUE INDEX IF NOT EXISTS warehouse_equipment ON user_warehouse_rows(user_id,equip_unit_id,equip_slot)"
+			" WHERE equip_unit_id != 0;");
+		p->execSqlSync(
+			"INSERT OR IGNORE INTO user_warehouse_rows(instance_id,user_id,item_id,item_num,favorite_flg,disp_order)"
+			" SELECT instance_id,user_id,item_id,item_num,favorite_flg,disp_order FROM user_items;");
+	});
+
+	// The newest warehouse row id the client has been sent (advanced by
+	// gme::loadWarehouseSnapshot).  Rows above it are the ones the client can
+	// still only name by its INT_MAX - itemId placeholder (see
+	// gme::warehousePlaceholderItem).  0 until the first list goes out, which
+	// every login's UserInfo does.
+	migrate("29092026_AddWarehouseSeenMark", {
+		p->execSqlSync("ALTER TABLE user_info ADD COLUMN warehouse_seen_id INTEGER NOT NULL DEFAULT 0;");
+	});
+
+	// Omni enhancement SP (UserUnitInfo bFQbZh3x / 3RgneFpP / GIO9DTif; see
+	// net/user.kdl).  The fe_bp / fe_max_usable_bp pair from 02072026 never
+	// reached the wire and carried invented defaults (100 / 200) that also
+	// apply to every newly inserted unit, so they are left unused and these
+	// carry the Global wiki's values instead (Unit Skills rev 656738): 10 SP to
+	// start, nothing spent, a 100 SP limit.
+	migrate("29092026_UnitEnhancementPoints", {
+		p->execSqlSync("ALTER TABLE user_units ADD COLUMN fe_sp INTEGER NOT NULL DEFAULT 10;");
+		p->execSqlSync("ALTER TABLE user_units ADD COLUMN fe_used_sp INTEGER NOT NULL DEFAULT 0;");
+		p->execSqlSync("ALTER TABLE user_units ADD COLUMN fe_max_sp INTEGER NOT NULL DEFAULT 100;");
+	});
+
+	// Battle serials (gme/common/MissionRuns.hpp).  The sequence is seeded so
+	// the first serial is 1000000001, above every mission id; the client echoes
+	// it verbatim.  open_mission_serial is the serial of the battle MissionStart
+	// last opened: NULL on a save from before this, whose open battle still
+	// carries the mission id as its serial and keeps the open_mission_id rule.
+	migrate("29092026_MissionRunSerials", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_mission_runs ("
+			"serial INTEGER PRIMARY KEY AUTOINCREMENT,"
+			"user_id TEXT NOT NULL, mission_id INTEGER NOT NULL,"
+			"started_at INTEGER NOT NULL DEFAULT 0);");
+		p->execSqlSync(
+			"INSERT INTO sqlite_sequence (name, seq) SELECT 'user_mission_runs', 1000000000"
+			" WHERE NOT EXISTS (SELECT 1 FROM sqlite_sequence WHERE name = 'user_mission_runs');");
+		p->execSqlSync("ALTER TABLE user_info ADD COLUMN open_mission_serial INTEGER;");
+	});
+
+	// The warehouse reads (gme/common/Warehouse.cpp) want only LIVE rows --
+	// in storage or on a unit.  Spent copies stay behind as tombstones so a
+	// spent id is never reused, and a long-lived save gathers thousands; this
+	// partial index lets those reads skip them instead of visiting each one.
+	// Its WHERE is spelt exactly as the queries spell theirs, which is what
+	// lets SQLite choose it.
+	migrate("30092026_WarehouseLiveRowIndex", {
+		p->execSqlSync(
+			"CREATE INDEX IF NOT EXISTS warehouse_live_rows ON user_warehouse_rows(user_id,instance_id)"
+			" WHERE item_num>0 OR equip_unit_id!=0;");
+	});
+
+	// A unit's acquired SP enhancements, UserUnitInfo.fe_skill_info
+	// (Fnxab5CN): "<category>@<skill>:<skill>/..." as the client's
+	// setFeSkillInfo parses it.  Written by FeSkillGet, cleared by ShopUse
+	// type 9; '' is "none", which the client reads the same way.
+	migrate("30092026_UnitFeSkillInfo", {
+		p->execSqlSync("ALTER TABLE user_units ADD COLUMN fe_skill_info TEXT NOT NULL DEFAULT '';");
+	});
+
+	// Every revival MissionContinue has judged, per battle run, so a delayed
+	// copy of an earlier revival is recognised however many genuine ones came
+	// after it (gme/handlers/MissionBreak.cpp).  The request carries no nonce:
+	// its body is built once, when the request object is created, and a client
+	// retry re-sends that same object, so a retry repeats the serial, status
+	// and suspend blob byte for byte.  `fingerprint` is the SHA-256 of
+	// "<status>:<blob>"; `run_serial` is the serial the client continued (an
+	// issued run serial, or the mission id of a battle that predates serials).
+	// `seq` is the order the run first saw each revival in, `accepted` whether
+	// it was charged (1) or refused for want of gems (0).  Nothing is pruned:
+	// a closed run's rows can never match an owned battle again.
+	migrate("02102026_MissionContinueReceipts", {
+		p->execSqlSync(
+			"CREATE TABLE IF NOT EXISTS user_mission_continue_receipts ("
+			"user_id      TEXT    NOT NULL,"
+			"run_serial   TEXT    NOT NULL,"
+			"fingerprint  TEXT    NOT NULL,"
+			"seq          INTEGER NOT NULL,"
+			"accepted     INTEGER NOT NULL,"
+			"gems_charged INTEGER NOT NULL DEFAULT 0,"
+			"first_seen   INTEGER NOT NULL,"
+			"last_seen    INTEGER NOT NULL,"
+			"deliveries   INTEGER NOT NULL DEFAULT 1,"
+			"PRIMARY KEY (user_id, run_serial, fingerprint)"
+			");");
+	});
+
 }
 
 /*!

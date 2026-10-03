@@ -12,6 +12,7 @@
 #include <gimuserver/drogon/GimuServer.hpp>
 #include <gimuserver/gme/common/Friends.hpp>
 #include <gimuserver/gme/common/Common.hpp>
+#include <gimuserver/gme/common/GameClock.hpp>
 #include <gimuserver/gme/common/SelectorRotation.hpp>
 #include <gimuserver/gme/common/Town.hpp>
 #include <gimuserver/utils/Macros.hpp>
@@ -161,6 +162,7 @@ void PrintHelp()
         << "                         Elements: fire water earth thunder light dark\n"
         << "    clearunits           Delete all units except the oldest (slot 1).\n"
         << "    cap                  Show current / max unit count.\n"
+        << "    clock [<unix>|off]   Pin the energy refill clock (tests); off = system time.\n"
         << "    additem <mst_id> [n] Add n of an item (default 1, clamped to MST max stack).\n"
         << "    additem usable [n]   Add every usable/battle item (potions etc.), n each (default 10).\n"
         << "    additem sphere [n]   Add every sphere (equipment), n each (default 1).\n"
@@ -1060,6 +1062,22 @@ void DispatchCommand(const std::string& line, bool& wantsQuit)
         if (userId.empty()) return;
         auto c = QueryCapacity(db, userId);
         std::cout << "  " << c.cur << "/" << c.cap << " (" << c.free << " free)\n";
+    }
+    else if (cmd == "clock")
+    {
+        // Energy-timer clock for regression tests (gme::GameClock): pinning it
+        // lets a test stand exactly on a 180 s regeneration tick.
+        std::string arg;
+        if (iss >> arg)
+        {
+            int64_t v = 0;
+            if (arg == "off") gme::GameClock::freeze(0);
+            else if (ParseInt(arg, v) && v > 0) gme::GameClock::freeze(v);
+            else { std::cout << "  Usage: clock [<unix seconds>|off]\n"; return; }
+        }
+        const auto frozen = gme::GameClock::frozenValue();
+        std::cout << "  clock " << (frozen > 0 ? "frozen at " : "system, now ")
+                  << gme::GameClock::nowSeconds() << "\n";
     }
     else if (cmd == "zel" || cmd == "karma" || cmd == "gems")
     {

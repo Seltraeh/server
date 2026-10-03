@@ -258,6 +258,7 @@ HANDLEF(UnitBondBoost)
 				{ db::Lookup("user_id", identity.userId) })).data);
 			auto snapshot = co_await gme::loadWarehouseSnapshot(transaction, identity);
 			resp.warehouse_info = std::move(snapshot.warehouse);
+			resp.item_favorite = std::move(snapshot.favorites);
 			resp.item_dictionary_info = std::move(snapshot.dictionary);
 
 			LOG_INFO << "UnitBondBoost: " << identity.userId << " raised DBB " << dbbId

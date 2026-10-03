@@ -82,7 +82,10 @@ for bb, sbb, material, expected in [(1, 0, 750004, (10, 10)),
     result = mix(base, [donor])
     after = read(base)
     assert (after['bb_lvl'], after['sbb_lvl']) == expected, after
-    assert int(result['xZH6EIQ7'][0]['3NbeC8AB']) == expected[0]
+    # The result screen reads UnitOpeResult (1ZbHB6Im).  xZH6EIQ7 is the helper
+    # picker list: an id-less row there empties it, so a fusion must not send it.
+    assert 'xZH6EIQ7' not in result, result['xZH6EIQ7']
+    assert (int(result['1ZbHB6Im'][0]['8hVR4Fjr']), int(result['1ZbHB6Im'][0]['0xgWq5bD'])) == expected
     assert db.execute('SELECT 1 FROM user_units WHERE user_unit_id=?', (donor,)).fetchone() is None
     mix(base, [donor], error=True)
     assert read(base) == after
@@ -105,6 +108,7 @@ for old_type, frog, target in [(1, 730312, 1), (1, 730322, 2), (1, 730332, 3),
         assert before[field] == after[field], field
     assert db.execute('SELECT COALESCE(SUM(target_cnt),0) FROM user_presents WHERE user_id=? AND target_id=?', (user, '750006')).fetchone()[0] == presents + 3
     assert result['1ZbHB6Im'][0]  # reset response must include a result record
+    assert 'xZH6EIQ7' not in result, result['xZH6EIQ7']  # the helper picker list
 print('PASS: all six fixed Mystery Frogs, random exclusion for every prior type, preserved upgrades, compensation')
 
 base = unit(int(species['pn16CNah']))

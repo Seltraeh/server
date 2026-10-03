@@ -58,17 +58,18 @@ namespace gme
 /*!
 * A level no player can reach, so a gate written with it reads as "not yet".
 *
-* Derived from the progression table rather than hardcoded: `user_level_mst`
-* has one row per attainable level (999 here), so one past its end cannot be
-* reached however the cap moves.  Falls back to a large constant if the table
-* is missing, because a gate that silently became reachable would quietly
-* re-open a feature that is not finished.
+* Derived from the level cap rather than hardcoded: DefineMst max_team_lv
+* (999 here) is the highest level MissionEnd will grant, so one past it cannot
+* be reached however the cap moves.  NOT the size of `user_level_mst`: that
+* table deliberately carries one row past the cap, which the result screen
+* reads (see maxPlayerLevel in handlers/Mission.cpp).  Falls back to a large
+* constant if the define is missing, because a gate that silently became
+* reachable would quietly re-open a feature that is not finished.
 */
 inline uint32_t unreachableLevel()
 {
-	const auto& progression = theServer()->cache().initializeResp().progression;
-	const auto cap = static_cast<uint32_t>(progression.size());
-	return cap > 0 ? cap + 1 : 100000;
+	const auto cap = theServer()->cache().initializeResp().defines.max_team_lv;
+	return cap > 0 ? static_cast<uint32_t>(cap) + 1 : 100000;
 }
 
 /*!
