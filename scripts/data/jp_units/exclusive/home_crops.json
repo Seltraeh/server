@@ -1,0 +1,113 @@
+{
+ "_source": "AUTHORED 2026-11-02 after Evan saw Harley Quinn off-centre on Home: the Home-panel strip for the 20 units whose wiki thumbnail is not a crop of their full art (build_jp_units falls back to the figure box, which centres on the image, not the character). Per unit [x centre, top, height] as fractions of the full art as installed; the strip keeps the template's width/height ratio and stays inside the art. Read off the art by eye; community-tunable. Also 41054/41055 (the Armored Knights), whose matched strip hung above the head.",
+ "11105": [
+  0.36,
+  0.02,
+  0.8
+ ],
+ "40955": [
+  0.45,
+  0.02,
+  0.8
+ ],
+ "21015": [
+  0.58,
+  0.02,
+  0.78
+ ],
+ "21025": [
+  0.45,
+  0.04,
+  0.72
+ ],
+ "30975": [
+  0.52,
+  0.02,
+  0.8
+ ],
+ "40965": [
+  0.45,
+  0.02,
+  0.8
+ ],
+ "51235": [
+  0.53,
+  0.02,
+  0.8
+ ],
+ "61175": [
+  0.5,
+  0.02,
+  0.8
+ ],
+ "61185": [
+  0.48,
+  0.02,
+  0.8
+ ],
+ "11155": [
+  0.47,
+  0.35,
+  0.6
+ ],
+ "11174": [
+  0.52,
+  0.02,
+  0.75
+ ],
+ "11175": [
+  0.6,
+  0.0,
+  0.75
+ ],
+ "21066": [
+  0.5,
+  0.33,
+  0.55
+ ],
+ "21115": [
+  0.45,
+  0.05,
+  0.8
+ ],
+ "41006": [
+  0.47,
+  0.4,
+  0.5
+ ],
+ "41043": [
+  0.6,
+  0.05,
+  0.75
+ ],
+ "50334": [
+  0.47,
+  0.05,
+  0.8
+ ],
+ "51286": [
+  0.52,
+  0.38,
+  0.55
+ ],
+ "51355": [
+  0.64,
+  0.36,
+  0.6
+ ],
+ "60905": [
+  0.33,
+  0.25,
+  0.75
+ ],
+ "41054": [
+  0.5,
+  0.33,
+  0.67
+ ],
+ "41055": [
+  0.53,
+  0.33,
+  0.67
+ ]
+}

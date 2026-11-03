@@ -12683,6 +12683,1511 @@
    "hjAy9St3": "2@62",
    "2Smu5Mtq": "6,0,25,25,25,0,25@6,5,0,0,0,0,20",
    "qp37xTDh": "200% boost to Atk, 60% boost to max HP and 30% boost to critical hit rate of Dark types, hugely boosts critical damage, hugely boosts Def, Rec when BB gauge is over 50% & hugely boosts Dark elemental damage. 25% boost to all parameters of Dark types & 20% damage reduction from Dark, Light types in Guild Raid"
+  },
+  {
+   "oS3kTZ2W": "710013",
+   "dJPf9a5v": "Flames of Purgatory",
+   "hjAy9St3": "2",
+   "2Smu5Mtq": "1,0,25,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710013_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710014",
+   "dJPf9a5v": "Blaze of Purgatory",
+   "hjAy9St3": "2",
+   "2Smu5Mtq": "1,6,50,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710014_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710015",
+   "dJPf9a5v": "Purgatory explosion",
+   "hjAy9St3": "2@31",
+   "2Smu5Mtq": "1,6,50,0,0,0,0@0,70,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710015_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710016",
+   "dJPf9a5v": "Eternal Flames of Purgatory",
+   "hjAy9St3": "2@31@34",
+   "2Smu5Mtq": "1,6,100,0,0,0,30@0,70,0,0,0,0@1.5",
+   "qp37xTDh": "MST_LEADERSKILLS_710016_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "780086",
+   "dJPf9a5v": "Light of Valhalla",
+   "hjAy9St3": "42@41",
+   "2Smu5Mtq": "2,30,0,0,0,0@5,30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_780086_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710115",
+   "dJPf9a5v": "Torch of Valhalla",
+   "hjAy9St3": "42@41",
+   "2Smu5Mtq": "2,35,0,0,0,0@5,30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710115_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710116",
+   "dJPf9a5v": "Valhalla's volcano",
+   "hjAy9St3": "42@41@1@35",
+   "2Smu5Mtq": "2,60,0,0,0,0@5,60,0,0,0,0@0,0,0,0,30@700,700,100",
+   "qp37xTDh": "MST_LEADERSKILLS_710116_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710133",
+   "dJPf9a5v": "Controlled Burn",
+   "hjAy9St3": "5",
+   "2Smu5Mtq": "3,15",
+   "qp37xTDh": "MST_LEADERSKILLS_710133_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710134",
+   "dJPf9a5v": "Wild Burn",
+   "hjAy9St3": "5",
+   "2Smu5Mtq": "3,15",
+   "qp37xTDh": "MST_LEADERSKILLS_710134_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710135",
+   "dJPf9a5v": "Free Flames",
+   "hjAy9St3": "5@1",
+   "2Smu5Mtq": "3,15@0,0,0,0,15",
+   "qp37xTDh": "MST_LEADERSKILLS_710135_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710143",
+   "dJPf9a5v": "Strength of the Lone Wolf",
+   "hjAy9St3": "11",
+   "2Smu5Mtq": "30,30,30,0,75,1",
+   "qp37xTDh": "MST_LEADERSKILLS_710143_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710144",
+   "dJPf9a5v": "Strength of the Pack",
+   "hjAy9St3": "11",
+   "2Smu5Mtq": "40,40,40,0,75,1",
+   "qp37xTDh": "MST_LEADERSKILLS_710144_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710145",
+   "dJPf9a5v": "Pack leader Aura",
+   "hjAy9St3": "11@1",
+   "2Smu5Mtq": "65,65,65,0,65,1@0,0,0,0,10",
+   "qp37xTDh": "MST_LEADERSKILLS_710145_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710146",
+   "dJPf9a5v": "Lycanthrope's Presence",
+   "hjAy9St3": "11@1@24",
+   "2Smu5Mtq": "65,65,65,0,50,1@0,0,0,0,30@20,20,20",
+   "qp37xTDh": "MST_LEADERSKILLS_710146_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710147",
+   "dJPf9a5v": "Lycanthrope Leader",
+   "hjAy9St3": "11@1@24@53@64",
+   "2Smu5Mtq": "120,120,120,0,50,1@0,0,0,0,60@25,25,25@100,100,0,0,100,100,0,0,0,0@250,250,250",
+   "qp37xTDh": "MST_LEADERSKILLS_710147_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710153",
+   "dJPf9a5v": "A Blazing Presence",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "5,0,15,0,0@0.75",
+   "qp37xTDh": "MST_LEADERSKILLS_710153_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710154",
+   "dJPf9a5v": "Presence of Flames",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "10,0,20,0,0@1",
+   "qp37xTDh": "MST_LEADERSKILLS_710154_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710155",
+   "dJPf9a5v": "An infernal presence",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "15,0,25,0,0@1.5",
+   "qp37xTDh": "MST_LEADERSKILLS_710155_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710157",
+   "dJPf9a5v": "An infernal presence",
+   "hjAy9St3": "1@46@34@31@143@77",
+   "2Smu5Mtq": "80,0,80,0,80@0,120,0,0,0,0,0@1.75@120,0,0,0,0,0@130000@25,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710157_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710164",
+   "dJPf9a5v": "Plot Twist",
+   "hjAy9St3": "20@20@50",
+   "2Smu5Mtq": "1,5,2,5,3,5,0,0@4,5,5,5,6,5,0,0@1,2,3,4,5,6,1",
+   "qp37xTDh": "MST_LEADERSKILLS_710164_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710165",
+   "dJPf9a5v": "Greater Scheme",
+   "hjAy9St3": "20@20@50",
+   "2Smu5Mtq": "1,7,2,7,3,7,0,0@4,7,5,7,6,7,0,0@1,2,3,4,5,6,1.25",
+   "qp37xTDh": "MST_LEADERSKILLS_710165_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710166",
+   "dJPf9a5v": "Master Plan",
+   "hjAy9St3": "20@20@50",
+   "2Smu5Mtq": "1,10,2,10,3,10,0,0@4,10,5,10,6,10,0,0@1,2,3,4,5,6,1.5",
+   "qp37xTDh": "MST_LEADERSKILLS_710166_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710176",
+   "dJPf9a5v": "Flaming Balista",
+   "hjAy9St3": "31@25@50@53",
+   "2Smu5Mtq": "0,70,0,0,0,0@300,500,100@1,2,3,4,5,6,1.5@0,0,0,100,0,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710176_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710186",
+   "dJPf9a5v": "Piercing Lion Claw",
+   "hjAy9St3": "2@32@37",
+   "2Smu5Mtq": "5,1,100,0,0,0,0@50@1,1,-50,0,0,0,0,100",
+   "qp37xTDh": "MST_LEADERSKILLS_710186_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710195",
+   "dJPf9a5v": "Fierce Kunoichi",
+   "hjAy9St3": "1@34@89",
+   "2Smu5Mtq": "60,0,0,0,0@1@1,40,-1,100,2",
+   "qp37xTDh": "MST_LEADERSKILLS_710195_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710196",
+   "dJPf9a5v": "Shiranui-ryuu Ninjutsu",
+   "hjAy9St3": "1@34@89@53",
+   "2Smu5Mtq": "100,0,0,0,50@1.5@1,100,-1,100,2@0,0,100,100,0,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710196_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710205",
+   "dJPf9a5v": "Ancient Pyrokinesis",
+   "hjAy9St3": "41@31",
+   "2Smu5Mtq": "5,50,0,0,0,0@50,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710205_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710206",
+   "dJPf9a5v": "Sealer of Orochi",
+   "hjAy9St3": "41@31@47",
+   "2Smu5Mtq": "5,75,0,0,0,30@75,0,0,0,0,0@100,200,100",
+   "qp37xTDh": "MST_LEADERSKILLS_710206_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710216",
+   "dJPf9a5v": "Noiseless Fury",
+   "hjAy9St3": "1@31@86@86",
+   "2Smu5Mtq": "40,0,0,0,40@100,0,0,0,0,0@1,40,-1,15,2@72,200&200&200,-1,15,2",
+   "qp37xTDh": "MST_LEADERSKILLS_710216_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710234",
+   "dJPf9a5v": "Loving Family",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "20,20,20,0,20",
+   "qp37xTDh": "MST_LEADERSKILLS_710234_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710237",
+   "dJPf9a5v": "Protective Sister",
+   "hjAy9St3": "1@4@77@97",
+   "2Smu5Mtq": "50,50,50,0,50@100,100,100,100,100,100@25,0@10",
+   "qp37xTDh": "MST_LEADERSKILLS_710237_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710247",
+   "dJPf9a5v": "Genesis Survivor",
+   "hjAy9St3": "2@62@69@73@31",
+   "2Smu5Mtq": "1,0,100,100,0,0,100@1,2,0,0,0,0,20@0,1,20,20,0@100,100,100,100,100,100,100,100,100@160,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_710247_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "710312",
+   "dJPf9a5v": "MechaBoost",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "15,15,15,0,15",
+   "qp37xTDh": "MST_LEADERSKILLS_710312_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720107",
+   "dJPf9a5v": "Lover's Will",
+   "hjAy9St3": "1@9@5@64",
+   "2Smu5Mtq": "80,0,0,0,60@800@1,15@200,200,200",
+   "qp37xTDh": "MST_LEADERSKILLS_720107_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720115",
+   "dJPf9a5v": "Torch of Valhalla",
+   "hjAy9St3": "42@41",
+   "2Smu5Mtq": "2,35,0,0,0,0@5,30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720115_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720133",
+   "dJPf9a5v": "Cold blessing",
+   "hjAy9St3": "32",
+   "2Smu5Mtq": "50",
+   "qp37xTDh": "MST_LEADERSKILLS_720133_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720134",
+   "dJPf9a5v": "Frozen Blessing",
+   "hjAy9St3": "32",
+   "2Smu5Mtq": "50",
+   "qp37xTDh": "MST_LEADERSKILLS_720134_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720135",
+   "dJPf9a5v": "Iced Benediction",
+   "hjAy9St3": "32@34",
+   "2Smu5Mtq": "40@0.5",
+   "qp37xTDh": "MST_LEADERSKILLS_720135_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720137",
+   "dJPf9a5v": "Bear Rider Commander",
+   "hjAy9St3": "1@46@31@47@86",
+   "2Smu5Mtq": "0,0,0,0,100@30,90,30,90,30,90,0@160,0,0,0,0,0@300,400,100@36,20,-1,15,2",
+   "qp37xTDh": "MST_LEADERSKILLS_720137_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720143",
+   "dJPf9a5v": "Sharktopus Glaze",
+   "hjAy9St3": "35@1",
+   "2Smu5Mtq": "400,400,100@20,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720143_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720144",
+   "dJPf9a5v": "Sharktopus Presence",
+   "hjAy9St3": "35@1",
+   "2Smu5Mtq": "500,500,100@30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720144_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720145",
+   "dJPf9a5v": "Sharktopus Sonar",
+   "hjAy9St3": "35@1",
+   "2Smu5Mtq": "700,700,100@40,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720145_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720146",
+   "dJPf9a5v": "Deep Sea Conqueror",
+   "hjAy9St3": "35@1@20",
+   "2Smu5Mtq": "700,700,100@80,0,0,0,0@4,30,6,20,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720146_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720147",
+   "dJPf9a5v": "Deep Sea Conqueror",
+   "hjAy9St3": "1@35@50@37@96",
+   "2Smu5Mtq": "150,0,0,0,80@1000,1000,100@1,2,3,4,5,6,1.5@1,1,75,0,0,0,0,100@-50,30",
+   "qp37xTDh": "MST_LEADERSKILLS_720147_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720153",
+   "dJPf9a5v": "Freshwater umbrella",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "0,10,0,0,10",
+   "qp37xTDh": "MST_LEADERSKILLS_720153_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720154",
+   "dJPf9a5v": "Waterfront umbrella",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "0,20,0,0,20",
+   "qp37xTDh": "MST_LEADERSKILLS_720154_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720155",
+   "dJPf9a5v": "River umbrella",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "0,30,0,0,30",
+   "qp37xTDh": "MST_LEADERSKILLS_720155_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720164",
+   "dJPf9a5v": "Viviane's Gift",
+   "hjAy9St3": "1@10",
+   "2Smu5Mtq": "0,0,20,0,20@50",
+   "qp37xTDh": "MST_LEADERSKILLS_720164_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720165",
+   "dJPf9a5v": "Viviane's Assistance",
+   "hjAy9St3": "1@10@19",
+   "2Smu5Mtq": "0,0,30,0,30@50@0,10,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720165_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720166",
+   "dJPf9a5v": "Viviane's Vindication",
+   "hjAy9St3": "1@10@19",
+   "2Smu5Mtq": "0,0,40,0,40@75@0,10,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720166_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720176",
+   "dJPf9a5v": "Ocean of Lies",
+   "hjAy9St3": "20@20@25@74",
+   "2Smu5Mtq": "2,15,3,15,4,15,0,0@1,10,5,10,6,10,0,0@300,500,100@1&2&3&4&5&6,100",
+   "qp37xTDh": "MST_LEADERSKILLS_720176_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720186",
+   "dJPf9a5v": "Five Soul Flow",
+   "hjAy9St3": "41@11@48",
+   "2Smu5Mtq": "5,35,35,35,0,35@100,0,0,0,100,1@20",
+   "qp37xTDh": "MST_LEADERSKILLS_720186_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720187",
+   "dJPf9a5v": "Five Soul Flow",
+   "hjAy9St3": "41@11@48@31@34",
+   "2Smu5Mtq": "5,80,80,80,0,80@100,0,0,0,50,1@25@150,0,0,0,0,0@1.75",
+   "qp37xTDh": "MST_LEADERSKILLS_720187_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720195",
+   "dJPf9a5v": "Freezing Presence",
+   "hjAy9St3": "1@80@25",
+   "2Smu5Mtq": "0,35,0,0,35@3,80,-1,20000,2@300,600,100",
+   "qp37xTDh": "MST_LEADERSKILLS_720195_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720196",
+   "dJPf9a5v": "Ice Doll",
+   "hjAy9St3": "1@80@25",
+   "2Smu5Mtq": "0,40,0,0,40@3,100,-1,20000,2@300,600,100",
+   "qp37xTDh": "MST_LEADERSKILLS_720196_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720197",
+   "dJPf9a5v": "Ice Crow",
+   "hjAy9St3": "1@80@25@33",
+   "2Smu5Mtq": "0,50,0,0,50@3,140,-1,20000,2@400,700,100@800,1000,10",
+   "qp37xTDh": "MST_LEADERSKILLS_720197_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720216",
+   "dJPf9a5v": "Spiritual Guidance",
+   "hjAy9St3": "1@62@43@78",
+   "2Smu5Mtq": "0,40,0,0,40@1,2,3,4,0,0,10@10@133,10&10&100,-1,20000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_720216_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720217",
+   "dJPf9a5v": "Monarch Guidance",
+   "hjAy9St3": "1@62@43@78",
+   "2Smu5Mtq": "0,60,0,0,60@1,2,3,4,0,0,15@15@133,10&10&100,-1,20000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_720217_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720226",
+   "dJPf9a5v": "Dead Sea Captain",
+   "hjAy9St3": "1@31@29",
+   "2Smu5Mtq": "0,40,0,0,40@80,0,0,0,0,0@20",
+   "qp37xTDh": "MST_LEADERSKILLS_720226_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720227",
+   "dJPf9a5v": "Dead Sea Queen",
+   "hjAy9St3": "1@31@29@92",
+   "2Smu5Mtq": "0,50,0,0,50@120,0,0,0,0,0@20@100",
+   "qp37xTDh": "MST_LEADERSKILLS_720227_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720244",
+   "dJPf9a5v": "Naval Force",
+   "hjAy9St3": "1@69",
+   "2Smu5Mtq": "30,0,0,0,30@0,1,15,15,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720244_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720247",
+   "dJPf9a5v": "Merciless Admiral",
+   "hjAy9St3": "1@30@111@112@69",
+   "2Smu5Mtq": "60,0,0,0,60@100,0,0,0,50,1@25@60,35@0,1,20,20,0",
+   "qp37xTDh": "MST_LEADERSKILLS_720247_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "720257",
+   "dJPf9a5v": "Trained Fists",
+   "hjAy9St3": "2@5@5@31@34@47",
+   "2Smu5Mtq": "2,0,150,0,0,0,80@1,20@2,20@150,0,0,0,0,0@1.75@200,300,100",
+   "qp37xTDh": "MST_LEADERSKILLS_720257_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730115",
+   "dJPf9a5v": "Torch of Valhalla",
+   "hjAy9St3": "42@41",
+   "2Smu5Mtq": "2,35,0,0,0,0@5,30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_730115_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730133",
+   "dJPf9a5v": "Legionarius Aura",
+   "hjAy9St3": "4",
+   "2Smu5Mtq": "100,100,100,100,100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_730133_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730134",
+   "dJPf9a5v": "Centurion Aura",
+   "hjAy9St3": "4",
+   "2Smu5Mtq": "100,100,100,100,100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_730134_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730135",
+   "dJPf9a5v": "Admiral Aura",
+   "hjAy9St3": "4@48",
+   "2Smu5Mtq": "100,100,100,100,100,100@15",
+   "qp37xTDh": "MST_LEADERSKILLS_730135_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730137",
+   "dJPf9a5v": "Feeling the Power of the Earth",
+   "hjAy9St3": "1@73@48@34@31",
+   "2Smu5Mtq": "200,0,0,0,100@100,100,100,100,100,100,100,100,100@30@2@200,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_730137_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730143",
+   "dJPf9a5v": "Mantis Proudness",
+   "hjAy9St3": "47",
+   "2Smu5Mtq": "100,200,100",
+   "qp37xTDh": "MST_LEADERSKILLS_730143_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730144",
+   "dJPf9a5v": "Mantis Greatness",
+   "hjAy9St3": "47@31",
+   "2Smu5Mtq": "100,200,100@30,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_730144_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730145",
+   "dJPf9a5v": "Mantis Noblesse",
+   "hjAy9St3": "47@31",
+   "2Smu5Mtq": "200,300,100@30,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_730145_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730146",
+   "dJPf9a5v": "Mantis Elegance",
+   "hjAy9St3": "47@31@1@86",
+   "2Smu5Mtq": "200,300,100@50,0,0,0,0,0@30,0,0,0,30@40,50,-1,20,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730146_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730153",
+   "dJPf9a5v": "Defensive tempo",
+   "hjAy9St3": "32",
+   "2Smu5Mtq": "20",
+   "qp37xTDh": "MST_LEADERSKILLS_730153_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730154",
+   "dJPf9a5v": "Defensive riff",
+   "hjAy9St3": "4@32",
+   "2Smu5Mtq": "100,100,100,100,100,100@20",
+   "qp37xTDh": "MST_LEADERSKILLS_730154_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730155",
+   "dJPf9a5v": "Defensive solo",
+   "hjAy9St3": "4@32",
+   "2Smu5Mtq": "100,100,100,100,100,100@35",
+   "qp37xTDh": "MST_LEADERSKILLS_730155_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730164",
+   "dJPf9a5v": "Gallant's Chivalry",
+   "hjAy9St3": "1@64",
+   "2Smu5Mtq": "10,10,10,0,10@50,50,50",
+   "qp37xTDh": "MST_LEADERSKILLS_730164_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730165",
+   "dJPf9a5v": "Knight's Benevolance",
+   "hjAy9St3": "1@64",
+   "2Smu5Mtq": "20,20,20,0,20@100,100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_730165_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730166",
+   "dJPf9a5v": "Crusader's Benediction",
+   "hjAy9St3": "1@64",
+   "2Smu5Mtq": "30,30,30,0,30@150,150,150",
+   "qp37xTDh": "MST_LEADERSKILLS_730166_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730176",
+   "dJPf9a5v": "Black Ram’s Corrupted Halo",
+   "hjAy9St3": "48@81@80",
+   "2Smu5Mtq": "25@1000,0,10000@36,20,-1,10000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730176_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730186",
+   "dJPf9a5v": "Honour of the Brave",
+   "hjAy9St3": "31@30@80",
+   "2Smu5Mtq": "75,0,0,0,0,0@50,50,50,0,50,1@84,1.5,-1,10000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730186_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730195",
+   "dJPf9a5v": "Gaia Chi Adept",
+   "hjAy9St3": "1@21@43",
+   "2Smu5Mtq": "0,0,0,0,35@120,120,0,0,2@10",
+   "qp37xTDh": "MST_LEADERSKILLS_730195_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730196",
+   "dJPf9a5v": "Martial Arts Master",
+   "hjAy9St3": "1@21@43@45",
+   "2Smu5Mtq": "0,0,0,0,40@140,140,0,0,2@15@100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_730196_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730214",
+   "dJPf9a5v": "Spirit of the Clan",
+   "hjAy9St3": "1@19@10@86",
+   "2Smu5Mtq": "20,20,20,0,20@0,15,0,0,0@40@40,50,-1,20,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730214_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730215",
+   "dJPf9a5v": "Listening of the Spirits",
+   "hjAy9St3": "1@19@10@86",
+   "2Smu5Mtq": "35,35,35,0,35@0,20,0,0,0@50@40,75,-1,20,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730215_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730216",
+   "dJPf9a5v": "Command of the Fallen",
+   "hjAy9St3": "1@19@10@86",
+   "2Smu5Mtq": "50,50,50,0,50@0,30,0,0,0@70@40,100,-1,20,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730216_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730217",
+   "dJPf9a5v": "Primal Lord",
+   "hjAy9St3": "1@19@10@86@86@64",
+   "2Smu5Mtq": "60,60,60,0,60@0,30,0,0,0@80@36,50,-1,15,2@40,150,-1,15,2@250,250,250",
+   "qp37xTDh": "MST_LEADERSKILLS_730217_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730226",
+   "dJPf9a5v": "Superior Engineering",
+   "hjAy9St3": "1@73@55",
+   "2Smu5Mtq": "30,30,30,0,30@0,0,0,0,0,0,100,100,100@36,15,-1,50,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730226_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730236",
+   "dJPf9a5v": "Ikari Style",
+   "hjAy9St3": "1@96@21",
+   "2Smu5Mtq": "40,40,0,0,40@-50,30@50,70,0,0,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730236_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730237",
+   "dJPf9a5v": "Ikari Mastery",
+   "hjAy9St3": "1@96@111@112",
+   "2Smu5Mtq": "100,100,0,0,60@-50,35@25@60,35",
+   "qp37xTDh": "MST_LEADERSKILLS_730237_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730246",
+   "dJPf9a5v": "Dangerous Alchemy",
+   "hjAy9St3": "1@46@34@74",
+   "2Smu5Mtq": "0,0,0,0,40@0,80,0,0,0,0,0@1.5@1&2&3&4&5&6,80",
+   "qp37xTDh": "MST_LEADERSKILLS_730246_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730247",
+   "dJPf9a5v": "Explosive Alchemy",
+   "hjAy9St3": "1@46@34@74@64",
+   "2Smu5Mtq": "0,0,0,0,50@20,100,0,0,0,0,0@1.75@1&2&3&4&5&6,100@250,250,250",
+   "qp37xTDh": "MST_LEADERSKILLS_730247_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730264",
+   "dJPf9a5v": "Devoted Historian",
+   "hjAy9St3": "1@25",
+   "2Smu5Mtq": "0,30,0,0,30@200,500,100",
+   "qp37xTDh": "MST_LEADERSKILLS_730264_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730267",
+   "dJPf9a5v": "Poetic Destiny",
+   "hjAy9St3": "1@53@92@25@55",
+   "2Smu5Mtq": "0,60,0,0,60@0,0,100,100,0,0,0,0,0,0@100@400,700,100@36,20,-1,50,2",
+   "qp37xTDh": "MST_LEADERSKILLS_730267_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "730277",
+   "dJPf9a5v": "Anatomy Mastery",
+   "hjAy9St3": "2@5@5@50@48@103",
+   "2Smu5Mtq": "3,0,85,85,85,0,85@3,20@4,20@3,0,0,0,0,0,2.5@25@300,300,300,50,1",
+   "qp37xTDh": "MST_LEADERSKILLS_730277_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740115",
+   "dJPf9a5v": "Torch of Valhalla",
+   "hjAy9St3": "42@41",
+   "2Smu5Mtq": "2,35,0,0,0,0@5,30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740115_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740133",
+   "dJPf9a5v": "Crystal Clear 1.0",
+   "hjAy9St3": "31",
+   "2Smu5Mtq": "0,40,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740133_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740134",
+   "dJPf9a5v": "Crystal Clear 2.0",
+   "hjAy9St3": "31@25",
+   "2Smu5Mtq": "0,40,0,0,0,0@100,200,100",
+   "qp37xTDh": "MST_LEADERSKILLS_740134_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740135",
+   "dJPf9a5v": "Crystal Clear 3.0",
+   "hjAy9St3": "31@25",
+   "2Smu5Mtq": "0,70,0,0,0,0@100,200,100",
+   "qp37xTDh": "MST_LEADERSKILLS_740135_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740143",
+   "dJPf9a5v": "Shy Ram",
+   "hjAy9St3": "34@1",
+   "2Smu5Mtq": "0.75@0,0,0,5,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740143_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740144",
+   "dJPf9a5v": "Proud Ram",
+   "hjAy9St3": "34@1",
+   "2Smu5Mtq": "0.75@0,0,0,10,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740144_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740145",
+   "dJPf9a5v": "King of the Ram ",
+   "hjAy9St3": "34@1",
+   "2Smu5Mtq": "1@0,0,0,10,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740145_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740146",
+   "dJPf9a5v": "Lackland King",
+   "hjAy9St3": "34@1@46",
+   "2Smu5Mtq": "1.5@0,0,0,20,40@0,300,0,0,0,0,1",
+   "qp37xTDh": "MST_LEADERSKILLS_740146_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740153",
+   "dJPf9a5v": "Air advantage",
+   "hjAy9St3": "50",
+   "2Smu5Mtq": "1,2,3,4,5,6,0.75",
+   "qp37xTDh": "MST_LEADERSKILLS_740153_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740154",
+   "dJPf9a5v": "Air superiority",
+   "hjAy9St3": "50@1",
+   "2Smu5Mtq": "1,2,3,4,5,6,0.75@0,0,15,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740154_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740155",
+   "dJPf9a5v": "Air domination",
+   "hjAy9St3": "50@1",
+   "2Smu5Mtq": "1,2,3,4,5,6,1@0,0,20,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740155_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740164",
+   "dJPf9a5v": "Undefeated",
+   "hjAy9St3": "24",
+   "2Smu5Mtq": "20,20,20",
+   "qp37xTDh": "MST_LEADERSKILLS_740164_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740165",
+   "dJPf9a5v": "Unstoppable",
+   "hjAy9St3": "24@17",
+   "2Smu5Mtq": "20,20,20@3,8,100",
+   "qp37xTDh": "MST_LEADERSKILLS_740165_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740166",
+   "dJPf9a5v": "Indomitable",
+   "hjAy9St3": "24@17",
+   "2Smu5Mtq": "20,20,40@3,8,100",
+   "qp37xTDh": "MST_LEADERSKILLS_740166_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740167",
+   "dJPf9a5v": "Richest Son",
+   "hjAy9St3": "1@46@143@4@19",
+   "2Smu5Mtq": "60,0,0,0,60@0,150,0,0,0,0,0@130000@100,100,100,100,100,100@0,0,5,100,15",
+   "qp37xTDh": "MST_LEADERSKILLS_740167_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740176",
+   "dJPf9a5v": "Fountain of Curses",
+   "hjAy9St3": "1@24@78@78",
+   "2Smu5Mtq": "30,30,30,0,30@20,20,40@3,70,-1,5000,2@5,70,-1,5000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_740176_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740186",
+   "dJPf9a5v": "Unshakeable Divine Balance",
+   "hjAy9St3": "32@47@1@31",
+   "2Smu5Mtq": "50@100,200,100@0,0,0,0,30@75,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740186_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740195",
+   "dJPf9a5v": "Electrostatic Surge",
+   "hjAy9St3": "1@37@48",
+   "2Smu5Mtq": "25,25,25,0,25@1,1,-50,0,0,0,0,100@20",
+   "qp37xTDh": "MST_LEADERSKILLS_740195_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740196",
+   "dJPf9a5v": "Electrokinesis Overflow",
+   "hjAy9St3": "1@37@48",
+   "2Smu5Mtq": "30,30,30,0,30@1,1,-50,0,0,0,0,100@25",
+   "qp37xTDh": "MST_LEADERSKILLS_740196_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740197",
+   "dJPf9a5v": "Lightning Mayhem",
+   "hjAy9St3": "1@37@48@96",
+   "2Smu5Mtq": "40,40,40,0,40@1,1,-50,0,0,0,0,100@25@-50,30",
+   "qp37xTDh": "MST_LEADERSKILLS_740197_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740216",
+   "dJPf9a5v": "Multiple Heritages",
+   "hjAy9St3": "1@8@53@30",
+   "2Smu5Mtq": "0,0,0,0,40@10@100,100,0,0,100,100,0,0,0,0@80,80,0,0,100,1",
+   "qp37xTDh": "MST_LEADERSKILLS_740216_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740217",
+   "dJPf9a5v": "Own Legacy",
+   "hjAy9St3": "1@8@53@30@31",
+   "2Smu5Mtq": "60,0,0,0,60@15@100,100,0,0,100,100,0,0,0,0@80,80,0,0,50,1@100,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_740217_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740226",
+   "dJPf9a5v": "Passion Quiver",
+   "hjAy9St3": "1@82@82@84",
+   "2Smu5Mtq": "0,0,0,0,40@1,80,-1,20,2@3,80,-1,20,2@72,200&200&200,-1,20,2",
+   "qp37xTDh": "MST_LEADERSKILLS_740226_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "740227",
+   "dJPf9a5v": "Freedom Quiver",
+   "hjAy9St3": "1@82@82@31@64",
+   "2Smu5Mtq": "0,0,0,0,60@1,120,-1,20,2@3,120,-1,20,2@130,0,0,0,0,0@250,250,250",
+   "qp37xTDh": "MST_LEADERSKILLS_740227_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750014",
+   "dJPf9a5v": "Chimney Sweep",
+   "hjAy9St3": "19",
+   "2Smu5Mtq": "0,0,10,10,10",
+   "qp37xTDh": "MST_LEADERSKILLS_750014_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750015",
+   "dJPf9a5v": "May the gifts be with you!",
+   "hjAy9St3": "19@32@10",
+   "2Smu5Mtq": "20,20,20,20,20@30@50",
+   "qp37xTDh": "MST_LEADERSKILLS_750015_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750115",
+   "dJPf9a5v": "Torch of Valhalla",
+   "hjAy9St3": "42@41",
+   "2Smu5Mtq": "2,35,0,0,0,0@5,30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750115_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750133",
+   "dJPf9a5v": "Empty Light",
+   "hjAy9St3": "34",
+   "2Smu5Mtq": "0.5",
+   "qp37xTDh": "MST_LEADERSKILLS_750133_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750134",
+   "dJPf9a5v": "Void Light",
+   "hjAy9St3": "34",
+   "2Smu5Mtq": "1.5",
+   "qp37xTDh": "MST_LEADERSKILLS_750134_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750135",
+   "dJPf9a5v": "Light of Nothingness",
+   "hjAy9St3": "34@31",
+   "2Smu5Mtq": "1.5@50,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750135_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750136",
+   "dJPf9a5v": "Galactic Light",
+   "hjAy9St3": "1@34@31@50",
+   "2Smu5Mtq": "30,30,30,0,30@1.5@70,0,0,0,0,0@5,6,0,0,0,0,1",
+   "qp37xTDh": "MST_LEADERSKILLS_750136_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750137",
+   "dJPf9a5v": "Immaculate Apex",
+   "hjAy9St3": "1@34@31@50@24",
+   "2Smu5Mtq": "80,80,80,0,80@1.75@150,0,0,0,0,0@1,2,3,4,5,6,2@30,30,50",
+   "qp37xTDh": "MST_LEADERSKILLS_750137_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750143",
+   "dJPf9a5v": "Beauty the Light Eagle",
+   "hjAy9St3": "8@1",
+   "2Smu5Mtq": "5@0,0,0,0,10",
+   "qp37xTDh": "MST_LEADERSKILLS_750143_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750144",
+   "dJPf9a5v": "Flight of the Light Eagle",
+   "hjAy9St3": "8@1",
+   "2Smu5Mtq": "10@0,0,0,0,20",
+   "qp37xTDh": "MST_LEADERSKILLS_750144_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750145",
+   "dJPf9a5v": "Ascendance of the Light Eagle",
+   "hjAy9St3": "8@1",
+   "2Smu5Mtq": "15@0,0,0,0,30",
+   "qp37xTDh": "MST_LEADERSKILLS_750145_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750146",
+   "dJPf9a5v": "Lightbringer's Wings",
+   "hjAy9St3": "8@1@25",
+   "2Smu5Mtq": "15@0,30,0,0,30@300,500,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750146_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750147",
+   "dJPf9a5v": "Protective Wings",
+   "hjAy9St3": "1@25@8@33@53",
+   "2Smu5Mtq": "0,60,0,0,60@400,700,100@15@800,1000,0@0,0,100,100,0,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750147_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750153",
+   "dJPf9a5v": "Dazzling light",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "0,0,20,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750153_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750154",
+   "dJPf9a5v": "Blinding light",
+   "hjAy9St3": "14@1",
+   "2Smu5Mtq": "100,10@0,0,20,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750154_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750155",
+   "dJPf9a5v": "Protective light",
+   "hjAy9St3": "14@1",
+   "2Smu5Mtq": "100,15@0,0,35,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750155_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750156",
+   "dJPf9a5v": "Wings of Destiny",
+   "hjAy9St3": "1@2@43",
+   "2Smu5Mtq": "0,0,55,0,0@5,2,140,0,0,0,0@10",
+   "qp37xTDh": "MST_LEADERSKILLS_750156_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750157",
+   "dJPf9a5v": "Revenge at Any Cost",
+   "hjAy9St3": "43@1@30@35",
+   "2Smu5Mtq": "15@60,0,60,0,60@80,0,80,0,50,1@1000,1000,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750157_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750164",
+   "dJPf9a5v": "Squire's Determination",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "10,10,10,0,10@1",
+   "qp37xTDh": "MST_LEADERSKILLS_750164_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750165",
+   "dJPf9a5v": "Knightly Bravery",
+   "hjAy9St3": "1@34@65",
+   "2Smu5Mtq": "20,20,20,0,20@1.5@400,600,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750165_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750176",
+   "dJPf9a5v": "Sisters of Desolation",
+   "hjAy9St3": "42@41@9@64",
+   "2Smu5Mtq": "2,75,0,0,0,0@5,75,0,0,0,0@400@100,100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750176_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750177",
+   "dJPf9a5v": "Sisters of Desolation",
+   "hjAy9St3": "42@41@64@74@9",
+   "2Smu5Mtq": "2,100,0,0,0,100@5,100,100,100,0,0@250,250,250@1&2&3&4&5&6,175@1000",
+   "qp37xTDh": "MST_LEADERSKILLS_750177_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750186",
+   "dJPf9a5v": "Determined Glitter",
+   "hjAy9St3": "10@19@1@78",
+   "2Smu5Mtq": "75@0,25,0,0,0@0,0,0,0,40@36,20,-1,5000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_750186_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750195",
+   "dJPf9a5v": "Psionic Genius",
+   "hjAy9St3": "1@24@26",
+   "2Smu5Mtq": "35,0,0,0,35@20,20,40@20,30,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750195_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750196",
+   "dJPf9a5v": "Psycho Soldier",
+   "hjAy9St3": "1@24@26",
+   "2Smu5Mtq": "40,0,0,0,40@25,25,50@25,35,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750196_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750197",
+   "dJPf9a5v": "Psycho Commando",
+   "hjAy9St3": "1@24@26@50",
+   "2Smu5Mtq": "50,0,0,0,50@25,25,50@50,50,100@1,2,3,4,5,6,1.25",
+   "qp37xTDh": "MST_LEADERSKILLS_750197_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750216",
+   "dJPf9a5v": "Prophecy of Valhalla",
+   "hjAy9St3": "42@53@62@31",
+   "2Smu5Mtq": "2,35,35,35,0,35@0,0,100,100,0,0,0,0,0,0@5,6,0,0,0,0,10@70,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750216_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750224",
+   "dJPf9a5v": "Loyalty",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "0,0,0,10,20@1",
+   "qp37xTDh": "MST_LEADERSKILLS_750224_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750225",
+   "dJPf9a5v": "Total Loyalty",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "0,0,0,15,30@1.5",
+   "qp37xTDh": "MST_LEADERSKILLS_750225_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750226",
+   "dJPf9a5v": "Eternal Loyalty",
+   "hjAy9St3": "1@34@89@89",
+   "2Smu5Mtq": "0,0,0,20,40@1.5@1,80,-1,100,2@5,80,-1,100,2",
+   "qp37xTDh": "MST_LEADERSKILLS_750226_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750237",
+   "dJPf9a5v": "Blessed Alliance",
+   "hjAy9St3": "43@1@2@37@50",
+   "2Smu5Mtq": "15@0,0,60,0,60@2,5,150,0,0,0,0@1,1,-50,0,0,0,0,100@2,5,0,0,0,0,1.5",
+   "qp37xTDh": "MST_LEADERSKILLS_750237_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750247",
+   "dJPf9a5v": "Epitaph Eternal",
+   "hjAy9St3": "1@50@31@64",
+   "2Smu5Mtq": "50,50,50,0,50@5,6,0,0,0,0,1.5@100,0,0,0,0,0@200,200,200",
+   "qp37xTDh": "MST_LEADERSKILLS_750247_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750257",
+   "dJPf9a5v": "Selfish Goddess's Wish",
+   "hjAy9St3": "1@11@24@8@143",
+   "2Smu5Mtq": "0,0,0,0,60@50,50,50,0,50,1@25,25,50@10@130000",
+   "qp37xTDh": "MST_LEADERSKILLS_750257_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750264",
+   "dJPf9a5v": "Ancient Lineage",
+   "hjAy9St3": "1@47",
+   "2Smu5Mtq": "30,0,0,0,30@100,200,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750264_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750267",
+   "dJPf9a5v": "Forgotten Bloodline",
+   "hjAy9St3": "1@47@31@101",
+   "2Smu5Mtq": "60,0,0,0,60@200,300,100@150,80,0,0,0,0@300,500,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750267_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750277",
+   "dJPf9a5v": "Unsuspected Leader",
+   "hjAy9St3": "2@30@5@5@70@31",
+   "2Smu5Mtq": "5,0,150,0,0,0,80@0,80,80,0,100,1@5,20@6,20@20@150,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_750277_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750287",
+   "dJPf9a5v": "Own Destiny",
+   "hjAy9St3": "1@65@34@31@89",
+   "2Smu5Mtq": "60,60,60,0,60@800,1000,100@1.75@100,0,0,0,0,0@72,200&200&200,-1,100,2",
+   "qp37xTDh": "MST_LEADERSKILLS_750287_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "750307",
+   "dJPf9a5v": "Prophecy of Valhalla",
+   "hjAy9St3": "42@62@31@53@47",
+   "2Smu5Mtq": "2,80,80,80,0,80@5,6,0,0,0,0,15@130,0,0,0,0,0@0,0,100,100,0,0,0,0,0,0@200,300,100",
+   "qp37xTDh": "MST_LEADERSKILLS_750307_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760013",
+   "dJPf9a5v": "Little Bogey's Song",
+   "hjAy9St3": "9@32",
+   "2Smu5Mtq": "300@25",
+   "qp37xTDh": "MST_LEADERSKILLS_760013_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760014",
+   "dJPf9a5v": "Bogey's Stage",
+   "hjAy9St3": "9@32",
+   "2Smu5Mtq": "300@25",
+   "qp37xTDh": "MST_LEADERSKILLS_760014_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760015",
+   "dJPf9a5v": "Bogey's Golden Record",
+   "hjAy9St3": "9@32",
+   "2Smu5Mtq": "300@40",
+   "qp37xTDh": "MST_LEADERSKILLS_760015_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760017",
+   "dJPf9a5v": "One Thousand and One Nights",
+   "hjAy9St3": "1@9@32@97",
+   "2Smu5Mtq": "50,0,0,0,50@700@50@15",
+   "qp37xTDh": "MST_LEADERSKILLS_760017_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760115",
+   "dJPf9a5v": "Torch of Valhalla",
+   "hjAy9St3": "42@41",
+   "2Smu5Mtq": "2,35,0,0,0,0@5,30,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760115_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760133",
+   "dJPf9a5v": "Dark Embrace",
+   "hjAy9St3": "29@31",
+   "2Smu5Mtq": "10@40,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760133_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760134",
+   "dJPf9a5v": "Dark Asphyxiation",
+   "hjAy9St3": "29@31",
+   "2Smu5Mtq": "10@70,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760134_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760135",
+   "dJPf9a5v": "Dark Coma",
+   "hjAy9St3": "29@31",
+   "2Smu5Mtq": "15@75,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760135_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760143",
+   "dJPf9a5v": "Curse of the Spider Lady",
+   "hjAy9St3": "20@20",
+   "2Smu5Mtq": "2,7,3,7,4,7,0,0@1,5,5,5,6,5,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760143_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760144",
+   "dJPf9a5v": "Curse of the Spider Countess",
+   "hjAy9St3": "20@20",
+   "2Smu5Mtq": "2,10,3,10,4,10,0,0@1,7,5,7,6,7,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760144_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760145",
+   "dJPf9a5v": "Glaze of the Spider Queen",
+   "hjAy9St3": "20@20",
+   "2Smu5Mtq": "2,15,3,15,4,15,0,0@1,10,5,10,6,10,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760145_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760146",
+   "dJPf9a5v": "Hidden Agendas",
+   "hjAy9St3": "1@20@20@74@37",
+   "2Smu5Mtq": "40,0,0,0,40@2,15,3,15,4,15,0,0@1,10,5,10,6,10,0,0@1&2&3&4&5&6,100@1,1,-50,0,0,0,0,100",
+   "qp37xTDh": "MST_LEADERSKILLS_760146_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760153",
+   "dJPf9a5v": "Important match",
+   "hjAy9St3": "17",
+   "2Smu5Mtq": "3,8,40",
+   "qp37xTDh": "MST_LEADERSKILLS_760153_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760154",
+   "dJPf9a5v": "Determining match",
+   "hjAy9St3": "25@17",
+   "2Smu5Mtq": "100,300,100@3,8,40",
+   "qp37xTDh": "MST_LEADERSKILLS_760154_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760155",
+   "dJPf9a5v": "Memorable match",
+   "hjAy9St3": "25@17",
+   "2Smu5Mtq": "300,500,100@3,8,50",
+   "qp37xTDh": "MST_LEADERSKILLS_760155_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760164",
+   "dJPf9a5v": "Mysterious Rumors",
+   "hjAy9St3": "9@32",
+   "2Smu5Mtq": "200@30",
+   "qp37xTDh": "MST_LEADERSKILLS_760164_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760165",
+   "dJPf9a5v": "Strange Myths",
+   "hjAy9St3": "9@32@24",
+   "2Smu5Mtq": "300@40@20,20,20",
+   "qp37xTDh": "MST_LEADERSKILLS_760165_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760166",
+   "dJPf9a5v": "Old Legends",
+   "hjAy9St3": "9@32@24",
+   "2Smu5Mtq": "400@50@20,20,40",
+   "qp37xTDh": "MST_LEADERSKILLS_760166_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760176",
+   "dJPf9a5v": "Black Ram’s Corrupted Halo",
+   "hjAy9St3": "34@1@31",
+   "2Smu5Mtq": "1.5@0,0,0,20,0@100,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760176_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760186",
+   "dJPf9a5v": "Antique Art of the Shadows",
+   "hjAy9St3": "19@34@65",
+   "2Smu5Mtq": "20,20,3,15,15@1.5@600,800,100",
+   "qp37xTDh": "MST_LEADERSKILLS_760186_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760187",
+   "dJPf9a5v": "Antique Art of the Shadows",
+   "hjAy9St3": "1@46@19@34@65",
+   "2Smu5Mtq": "0,0,0,0,80@0,120,0,120,0,0,0@35,35,3,60,50@1.75@800,1000,100",
+   "qp37xTDh": "MST_LEADERSKILLS_760187_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760195",
+   "dJPf9a5v": "Yasakani Heir",
+   "hjAy9St3": "1@64@81",
+   "2Smu5Mtq": "80,0,0,0,0@100,100,100@500,0,10000",
+   "qp37xTDh": "MST_LEADERSKILLS_760195_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760196",
+   "dJPf9a5v": "Curse of Orochi",
+   "hjAy9St3": "1@64@81@46",
+   "2Smu5Mtq": "80,0,0,0,40@100,100,100@600,0,10000@80,70,0,0,0,0,1",
+   "qp37xTDh": "MST_LEADERSKILLS_760196_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760205",
+   "dJPf9a5v": "Ruthless Manipulator",
+   "hjAy9St3": "64@2@1",
+   "2Smu5Mtq": "100,100,100@6,0,25,0,0,0,15@75,0,0,0,15",
+   "qp37xTDh": "MST_LEADERSKILLS_760205_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760206",
+   "dJPf9a5v": "Black Noah Genocide",
+   "hjAy9St3": "64@2@1@9",
+   "2Smu5Mtq": "100,100,100@6,0,50,0,0,0,20@100,0,0,0,20@600",
+   "qp37xTDh": "MST_LEADERSKILLS_760206_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760215",
+   "dJPf9a5v": "Guide's Advices ",
+   "hjAy9St3": "48@5@5@69",
+   "2Smu5Mtq": "20@5,10@6,10@0,1,15,15,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760215_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760216",
+   "dJPf9a5v": "Guide's Wisdom",
+   "hjAy9St3": "48@5@5@69",
+   "2Smu5Mtq": "25@5,15@6,15@0,1,20,20,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760216_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760217",
+   "dJPf9a5v": "Explorer's Wisdom",
+   "hjAy9St3": "1@48@5@5@69",
+   "2Smu5Mtq": "0,50,0,0,50@25@5,15@6,15@0,1,20,20,1",
+   "qp37xTDh": "MST_LEADERSKILLS_760217_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760236",
+   "dJPf9a5v": "Quiet Scavenger",
+   "hjAy9St3": "1@47@53",
+   "2Smu5Mtq": "35,35,35,0,35@200,300,100@0,0,100,100,0,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760236_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760237",
+   "dJPf9a5v": "Scavenger Lord",
+   "hjAy9St3": "1@47@53@4@78",
+   "2Smu5Mtq": "40,40,40,0,40@200,300,100@0,0,100,100,0,0,0,0,0,0@100,100,100,100,100,100@36,20,-1,5000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_760237_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760247",
+   "dJPf9a5v": "Angelic Wisdom",
+   "hjAy9St3": "1@46@25@24@73",
+   "2Smu5Mtq": "0,0,0,0,60@0,40,0,40,0,40,0@400,700,100@25,25,50@0,0,0,0,0,0,100,100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_760247_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760254",
+   "dJPf9a5v": "Defender of the Humanity",
+   "hjAy9St3": "1@31",
+   "2Smu5Mtq": "30,0,0,0,30@50,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_760254_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760257",
+   "dJPf9a5v": "Defender of the Republic",
+   "hjAy9St3": "1@34@31@64",
+   "2Smu5Mtq": "60,0,0,0,60@1.75@150,0,0,0,0,0@250,250,250",
+   "qp37xTDh": "MST_LEADERSKILLS_760257_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760264",
+   "dJPf9a5v": "Hidden Potential",
+   "hjAy9St3": "1@50",
+   "2Smu5Mtq": "30,0,0,0,30@1,2,3,4,5,6,0.75",
+   "qp37xTDh": "MST_LEADERSKILLS_760264_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760267",
+   "dJPf9a5v": "Mate Devourer",
+   "hjAy9St3": "1@46@70@31@50",
+   "2Smu5Mtq": "0,0,0,0,60@0,100,0,0,0,100,0@25@140,0,0,0,0,0@1,2,3,4,5,6,1.5",
+   "qp37xTDh": "MST_LEADERSKILLS_760267_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "760277",
+   "dJPf9a5v": "Survival of the Fittest",
+   "hjAy9St3": "2@62@37@25@127",
+   "2Smu5Mtq": "6,0,200,0,0,30,80@5,6,0,0,0,0,20@1,1,-25,0,0,0,0,100@600,1000,100@100,15",
+   "qp37xTDh": "MST_LEADERSKILLS_760277_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "8010",
+   "dJPf9a5v": "Ashen Sage's Staff",
+   "hjAy9St3": "2@5",
+   "2Smu5Mtq": "1,5,25,0,0,0,0@6,10",
+   "qp37xTDh": "MST_LEADERSKILLS_8010_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "8011",
+   "dJPf9a5v": "Ashen Radiant Staff",
+   "hjAy9St3": "2@5",
+   "2Smu5Mtq": "1,5,50,0,0,0,0@6,15",
+   "qp37xTDh": "MST_LEADERSKILLS_8011_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10800",
+   "dJPf9a5v": "Seal of the Sun",
+   "hjAy9St3": "46",
+   "2Smu5Mtq": "20,80,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_10800_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10801",
+   "dJPf9a5v": "Blessing of Spirit Freyr",
+   "hjAy9St3": "46@17",
+   "2Smu5Mtq": "20,80,0,0,0,0,0@3,8,50",
+   "qp37xTDh": "MST_LEADERSKILLS_10801_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "12540",
+   "dJPf9a5v": "Duty to Restore the Clan",
+   "hjAy9St3": "1@31",
+   "2Smu5Mtq": "20,20,0,0,0@50,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_12540_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10810",
+   "dJPf9a5v": "Unwavering Blade",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "30,0,0,0,30",
+   "qp37xTDh": "MST_LEADERSKILLS_10810_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10811",
+   "dJPf9a5v": "Pride of Steel",
+   "hjAy9St3": "1@78",
+   "2Smu5Mtq": "30,0,0,0,30@1,80,-1,3000,2",
+   "qp37xTDh": "MST_LEADERSKILLS_10811_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "8000",
+   "dJPf9a5v": "Silver Keen Light",
+   "hjAy9St3": "33@43",
+   "2Smu5Mtq": "200,400,0@5",
+   "qp37xTDh": "MST_LEADERSKILLS_8000_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "8001",
+   "dJPf9a5v": "Golden Radiant Ring",
+   "hjAy9St3": "33@43",
+   "2Smu5Mtq": "400,600,0@10",
+   "qp37xTDh": "MST_LEADERSKILLS_8001_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10820",
+   "dJPf9a5v": "Clawsong March",
+   "hjAy9St3": "1@9",
+   "2Smu5Mtq": "0,0,0,0,30@300",
+   "qp37xTDh": "MST_LEADERSKILLS_10820_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10821",
+   "dJPf9a5v": "Freedom for Cats",
+   "hjAy9St3": "1@9@25",
+   "2Smu5Mtq": "0,0,0,0,30@300@200,300,100",
+   "qp37xTDh": "MST_LEADERSKILLS_10821_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "12541",
+   "dJPf9a5v": "Musketeer's Memoir",
+   "hjAy9St3": "1@32",
+   "2Smu5Mtq": "20,20,0,0,0@50",
+   "qp37xTDh": "MST_LEADERSKILLS_12541_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10830",
+   "dJPf9a5v": "Karakuri Stratagem",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "0,0,0,15,0@0.75",
+   "qp37xTDh": "MST_LEADERSKILLS_10830_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10831",
+   "dJPf9a5v": "Vitalizing Light",
+   "hjAy9St3": "1@34@65",
+   "2Smu5Mtq": "0,0,0,15,0@0.75@400,600,100",
+   "qp37xTDh": "MST_LEADERSKILLS_10831_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "7700",
+   "dJPf9a5v": "Holy Guidance",
+   "hjAy9St3": "1@43",
+   "2Smu5Mtq": "25,0,0,0,0@10",
+   "qp37xTDh": "MST_LEADERSKILLS_7700_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "8020",
+   "dJPf9a5v": "Greenleaf Archer",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "0,0,0,10,0@0.5",
+   "qp37xTDh": "MST_LEADERSKILLS_8020_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "8021",
+   "dJPf9a5v": "Green-Gold Bow King",
+   "hjAy9St3": "1@34",
+   "2Smu5Mtq": "0,0,0,15,0@1",
+   "qp37xTDh": "MST_LEADERSKILLS_8021_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10840",
+   "dJPf9a5v": "Mark of a True Knight",
+   "hjAy9St3": "4",
+   "2Smu5Mtq": "100,100,100,100,100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_10840_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10841",
+   "dJPf9a5v": "Ideal of the White Knight",
+   "hjAy9St3": "1@4",
+   "2Smu5Mtq": "25,0,25,0,25@100,100,100,100,100,100",
+   "qp37xTDh": "MST_LEADERSKILLS_10841_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "12542",
+   "dJPf9a5v": "Spirit of Service",
+   "hjAy9St3": "1@33",
+   "2Smu5Mtq": "0,0,20,0,20@300,500,0",
+   "qp37xTDh": "MST_LEADERSKILLS_12542_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "7800",
+   "dJPf9a5v": "Fountain of Knowledge",
+   "hjAy9St3": "48@25",
+   "2Smu5Mtq": "15@200,300,100",
+   "qp37xTDh": "MST_LEADERSKILLS_7800_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10850",
+   "dJPf9a5v": "Sister Beloved of Death",
+   "hjAy9St3": "1",
+   "2Smu5Mtq": "70,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_10850_DESCRIPTION"
+  },
+  {
+   "oS3kTZ2W": "10851",
+   "dJPf9a5v": "Little Sister Potential",
+   "hjAy9St3": "1@24@20",
+   "2Smu5Mtq": "70,0,0,0,0@25,25,30@5,10,0,0,0,0,0,0",
+   "qp37xTDh": "MST_LEADERSKILLS_10851_DESCRIPTION"
   }
  ]
 }
