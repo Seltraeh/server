@@ -19,13 +19,16 @@ set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
 include(InstallRequiredSystemLibraries)
 install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} DESTINATION . CONFIGURATIONS Release)
 install(FILES
-    "${CMAKE_SOURCE_DIR}/packaging/config.json"
-    "${CMAKE_SOURCE_DIR}/packaging/Start Server.bat"
-    "${CMAKE_SOURCE_DIR}/packaging/Check-Package.ps1"
-    "${CMAKE_SOURCE_DIR}/packaging/Enable Client Loopback.ps1"
-    "${CMAKE_SOURCE_DIR}/packaging/README.txt"
+    "${CMAKE_SOURCE_DIR}/config.json"
     "${CMAKE_SOURCE_DIR}/LICENSE"
     DESTINATION . CONFIGURATIONS Release)
+# The player-package extras live in the maintainer's local packaging/ folder (with Build-Release.ps1), which is not
+# published; a checkout without it still configures, builds and installs the server itself.
+foreach(extra IN ITEMS "Start Server.bat" "Check-Package.ps1" "Enable Client Loopback.ps1" "README.txt")
+    if(EXISTS "${CMAKE_SOURCE_DIR}/packaging/${extra}")
+        install(FILES "${CMAKE_SOURCE_DIR}/packaging/${extra}" DESTINATION . CONFIGURATIONS Release)
+    endif()
+endforeach()
 foreach(folder IN ITEMS archive mst system)
     install(DIRECTORY "${CMAKE_SOURCE_DIR}/deploy/${folder}/"
         DESTINATION "${folder}" CONFIGURATIONS Release
@@ -42,5 +45,7 @@ foreach(notice IN LISTS dependency_notices)
 endforeach()
 install(FILES "${CMAKE_SOURCE_DIR}/packet-generator/LICENSE"
     DESTINATION "licenses/packet-generator" CONFIGURATIONS Release)
-install(FILES "${CMAKE_SOURCE_DIR}/packaging/date-LICENSE.txt"
-    DESTINATION "licenses/date" CONFIGURATIONS Release)
+if(EXISTS "${CMAKE_SOURCE_DIR}/packaging/date-LICENSE.txt")
+    install(FILES "${CMAKE_SOURCE_DIR}/packaging/date-LICENSE.txt"
+        DESTINATION "licenses/date" CONFIGURATIONS Release)
+endif()

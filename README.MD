@@ -8,7 +8,7 @@ the feasibility of a server emulator.
 For more information about the strategy of the offline mod/purpose of this server, please check [How the offline mod works](https://decompfrontier.github.io/pages/Architecture/Offlinemod-architecture.html) and [Emulator (Server) architecture](https://decompfrontier.github.io/pages/Architecture/Emulator-architecture.html)
 
 ## Portable Windows release
-See [RELEASE.md](RELEASE.md) to build the standalone server ZIP and separate game-content downloads. Players run `Start Server.bat`; they do not need the packet-generator or a development toolchain.
+The standalone server ZIP and the game-content downloads are published as releases of this repository. Players run `Start Server.bat`; they do not need the packet-generator or a development toolchain.
 
 ## Requirements
 - Visual Studio 2022 (Windows)
@@ -19,12 +19,9 @@ See [RELEASE.md](RELEASE.md) to build the standalone server ZIP and separate gam
 - vcpkg
 
 ## Building
-Use the [fresh-checkout development guide](docs/DEVELOPMENT.md). On Windows,
-`rebuild.bat` configures CMake before building Debug; generated Ninja files do
-not need to be copied from another PC.
-
-For gameplay work, start with the [current handbook](docs/BF_OFFLINE_SERVER_HANDBOOK.md)
-and [gameplay work queue](docs/GAMEPLAY_WORK_QUEUE.md).
+On Windows, `rebuild.bat` (which runs `Build-Dev.ps1`) configures CMake and builds Debug; generated Ninja files do
+not need to be copied from another PC. Pass `-VcpkgRoot <path>` (or set `VCPKG_ROOT`), or `-BootstrapVcpkg` to
+install a local vcpkg. The first build creates `deploy/config.json` from the `config.json` template.
 
 ## Legal
 The code of this project is released under the Affero GNU Public License v3.0+.

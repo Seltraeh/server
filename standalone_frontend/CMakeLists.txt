@@ -17,7 +17,7 @@ endif()
 # F5 must work after a direct IDE configure, before Build-Dev.ps1 has run.
 # Preserve local configuration and saves across all subsequent configurations.
 if (NOT EXISTS "${CMAKE_SOURCE_DIR}/deploy/config.json")
-    configure_file("${CMAKE_SOURCE_DIR}/packaging/config.json"
+    configure_file("${CMAKE_SOURCE_DIR}/config.json"
         "${CMAKE_SOURCE_DIR}/deploy/config.json" COPYONLY)
 endif()
 
@@ -30,5 +30,5 @@ target_compile_definitions(gimuserverw PRIVATE
 )
 
 if (WIN32)
-    include("${CMAKE_SOURCE_DIR}/packaging/Install.cmake")
+    include("${CMAKE_SOURCE_DIR}/Install.cmake")
 endif()

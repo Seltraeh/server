@@ -11,7 +11,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$root = Split-Path $PSScriptRoot -Parent
+$root = $PSScriptRoot
 function Invoke-Checked([string]$Command, [string[]]$Arguments) {
     & $Command @Arguments
     if ($LASTEXITCODE -ne 0) { throw "$Command failed with exit code $LASTEXITCODE" }
@@ -33,7 +33,7 @@ try {
         $env:PATH = "$ninjaDirectory;$env:PATH"
     }
     foreach ($command in @('git','cmake','ninja','cargo','cl')) {
-        if (!(Get-Command $command -ErrorAction SilentlyContinue)) { throw "Missing $command. See docs/DEVELOPMENT.md for prerequisites." }
+        if (!(Get-Command $command -ErrorAction SilentlyContinue)) { throw "Missing $command. See README.MD for prerequisites." }
     }
     # VS may prepend its older bundled CMake ahead of a separately installed 4.x.
     $cmake = $null
@@ -46,7 +46,7 @@ try {
         Invoke-Checked 'git' @('-C', $root, 'submodule', 'update', '--init', '--recursive')
     }
     # Never update an already initialized submodule behind a contributor's back.
-    foreach ($inputFile in @('packet-generator\Cargo.lock','packet-generator\assets\runtime\cpp\CMakeLists.txt','packaging\Install.cmake','packaging\config.json')) {
+    foreach ($inputFile in @('packet-generator\Cargo.lock','packet-generator\assets\runtime\cpp\CMakeLists.txt','Install.cmake','config.json')) {
         if (!(Test-Path -LiteralPath (Join-Path $root $inputFile))) { throw "Required source file missing: $inputFile. Pull the complete source and initialize submodules." }
     }
     if (!$BuildDirectory) { $BuildDirectory = Join-Path $root 'out\build\debug-win64' }
@@ -70,7 +70,7 @@ try {
             throw "The vcpkg this tree was configured with is missing: $treeVcpkg. Restore it, or use -Fresh -VcpkgRoot <path>."
         }
         if ($env:VCPKG_ROOT -and ([IO.Path]::GetFullPath($env:VCPKG_ROOT) -ne $treeVcpkg)) {
-            Write-Warning "VCPKG_ROOT is $env:VCPKG_ROOT, but $BuildDirectory uses $treeVcpkg; building with the tree's. Visual Studio's Open Folder configure reads VCPKG_ROOT, so it must name $treeVcpkg as well (docs/DEVELOPMENT.md)."
+            Write-Warning "VCPKG_ROOT is $env:VCPKG_ROOT, but $BuildDirectory uses $treeVcpkg; building with the tree's. Visual Studio's Open Folder configure reads VCPKG_ROOT, so it must name $treeVcpkg as well (README.MD)."
         }
         $VcpkgRoot = $treeVcpkg
     }
@@ -92,7 +92,7 @@ try {
     # Building needs no artwork. Do not overwrite an existing config or save.
     $config = Join-Path $root 'deploy\config.json'
     if (!(Test-Path -LiteralPath $config)) {
-        Copy-Item -LiteralPath (Join-Path $root 'packaging\config.json') -Destination $config
+        Copy-Item -LiteralPath (Join-Path $root 'config.json') -Destination $config
         Write-Host 'Created deploy/config.json from the shared template.'
     }
     $launchDirectory = Join-Path $root '.vs'

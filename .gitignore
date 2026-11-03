@@ -502,18 +502,8 @@ CONTEXT.md
 out/
 
 # Local dev tooling + docs — not for upstream
-tools/*
+tools/
 *.md
-# ...except the x86 binary-fact checkers run_bugfix_regressions.py runs
-# (x86_startup_rules_check.py, x86_mst_bootstrap_check.py) and the two
-# modules they import.  They need pefile, capstone and the supported client
-# EXE (fb4f3c25..., path in pe_x86.py or BF_CLIENT_EXE); see RELEASE.md.
-!tools/bin/
-tools/bin/*
-!tools/bin/pe_x86.py
-!tools/bin/x86_bundle_exclusions.py
-!tools/bin/x86_mst_bootstrap_check.py
-!tools/bin/x86_startup_rules_check.py
 
 # The optional developer console is shared source; release packages disable it.
 
@@ -521,14 +511,14 @@ tools/bin/*
 # caches now live in tracked ServerCache sources; keep old copies ignored.
 gimuserver/drogon/ServerCacheLocal*.inl
 
-# Portable release tooling and maintainer instructions belong in the repository.
-!RELEASE.md
-!packaging/config.json
-
-# Shared contributor documentation and build inputs.
-!docs/
-!docs/**/*.md
-!scripts/*.md
+# Maintainer-only material stays local (2026-11-03): the docs, the generator / test / QA scripts, the player-package
+# tooling (packaging/, rebuild_release.bat, RELEASE.md).  What a checkout needs to build is at the root:
+# Build-Dev.ps1 (rebuild.bat), Install.cmake and the config.json template.
+docs/
+scripts/
+packaging/
+RELEASE.md
+rebuild_release.bat
 CMakeUserPresets.json
 .tools/
 
