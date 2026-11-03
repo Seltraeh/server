@@ -46,7 +46,7 @@ HANDLEF(DailyTaskClaimReward)
 	resp.daily_task_bonuses = theServer()->cache().initializeResp().daily_task_bonuses;
 
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// The debit, the claim tick and the present must land together or a
@@ -73,6 +73,7 @@ HANDLEF(DailyTaskClaimReward)
 			// the counters the screen redraws are the ones just written.
 			co_await gme::fillDailyTaskTables(
 				transaction, identity, resp.daily_tasks, resp.daily_task_prizes);
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

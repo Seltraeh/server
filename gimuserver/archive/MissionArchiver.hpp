@@ -102,6 +102,23 @@ public:
 		std::optional<std::vector<MonsterCgsMst>>& msts);
 
 	/*!
+	* Populates the F_SKILL_MST rows of every skill the mission's monsters
+	* (wave and scripted) use, in first-use order, from the server's skill
+	* table.  The client keeps monster skills only for the battle it is sent
+	* them with -- see the 8aiBoHg5 field of MissionStartResp.
+	*
+	* Sets nullopt when no monster has a skill, so the block is omitted.
+	*
+	* @param record Archive record to read from.
+	* @param msts Packet rows to populate, or nullopt.
+	* @return False when a monster names a skill the table does not have: the
+	* client would crash on it at battle start.
+	*/
+	static bool populatePacket(
+		const MissionRecord& record,
+		std::optional<std::vector<SkillMst>>& msts);
+
+	/*!
 	* Populates all battle monster group MST rows referenced by the mission
 	* record.
 	*

@@ -44,6 +44,30 @@ public:
 	inline const auto& userInfoResp() const { return m_userrsp; }
 
 	/*!
+	* One master table a response carries to the client's startup download lists, as this cache
+	* parsed it at boot (Session 18 correction, docs/CLAUDE_SESSION_18_CORRECTION.md).
+	*
+	* scripts/startup_coverage.py derives the names of six startup lists from these tables' rows
+	* (its DERIVED response sources) and names them in the manifest's inputs.server_files.  The
+	* content broker refuses a complete coverage report unless the manifest names every one of them
+	* with the digest recorded here.  The digest is of exactly the bytes the cache parsed, Setup is
+	* the only writer and runs once, and the responses send these vectors as they are -- so it
+	* describes every Initialize / UserInfo / campaign response of this process, whatever happens
+	* to the file afterwards.
+	*/
+	struct StartupTable
+	{
+		//! "mst": a file the cache parsed, digest of its bytes.  "served" (Session 19): a response the
+		//! cache SYNTHESIZES at boot -- the area table -- digest of the projection of its served rows the
+		//! client's requests read (StartupProjection), so whatever produced them is bound.
+		std::string root;
+		std::string file;       //!< the file under mst_root ("banner_info_mst.json"), or the response key
+		std::string digest;     //!< "sha256:<hex>" of the bytes parsed (or of the projection)
+		std::string carriedBy;  //!< the response(s) and key carrying its rows ("Initialize Pk5F1vhx")
+	};
+	inline const auto& startupTables() const { return m_startupTables; }
+
+	/*!
 	* Vortex dungeon-key catalog (Metal / Jewel / Imp).
 	*
 	* A view onto the copy already held for the Initialize response rather than
@@ -384,6 +408,9 @@ public:
 	* collab content, and repeats of a tile the player already has.
 	*/
 	inline const auto& vortexHiddenAreas() const { return m_vortexHiddenAreas; }
+	inline const auto& vortexTrialAreas() const { return m_vortexTrialAreas; }
+	// A land-99 area in the Vortex: the low id range, or the Vortex Trials subtree above it.
+	bool isVortexArea(int32_t areaId) const;
 
 	/*!
 	* Summoner Unit master data — the player avatar's level curve, per-element
@@ -463,6 +490,11 @@ private:
 	* Cached common data of the Initialize response
 	*/
 	InitializeResp m_initrsp{};
+
+	/*!
+	* The tables responses carry to the startup download lists, as parsed (startupTables()).
+	*/
+	std::vector<StartupTable> m_startupTables;
 
 	/*!
 	* Cached slot response
@@ -597,6 +629,11 @@ private:
 	// Vortex areas curated out of the tile list at boot.
 	// Consumers: m_clientAreaMst and the m_vortexPermits collection.
 	std::set<int32_t> m_vortexHiddenAreas;
+
+	// Land-99 areas above the Vortex id range that descend from "Vortex Trials" (kVortexTrialsAreaId).
+	// Consumers: isVortexArea() (the curation and the permits) and PermitPlace (an area here is advertised only
+	// when something under it has a battle).
+	std::set<int32_t> m_vortexTrialAreas;
 
 	// m_areaMst minus m_vortexHiddenAreas, Parade Garden reordered.
 	// Consumer: UserInfo's 3SG2wX0R emission.

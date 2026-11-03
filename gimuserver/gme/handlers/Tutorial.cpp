@@ -116,7 +116,7 @@ HANDLEF(CreateUser)
 	// intermediate state. Keep this directly in the handler coroutine so local
 	// packet objects remain alive across co_await suspension points.
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// Create the new user.
@@ -226,6 +226,7 @@ HANDLEF(CreateUser)
 				// client-side by the cleared-mission set, so seeding the rows
 				// does not hand a new player a town they haven't unlocked.
 				co_await gme::provisionTown(transaction, identity);
+				co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

@@ -159,7 +159,7 @@ HANDLEF(UnitEvo)
     UnitEvoResp resp = {};
     std::string buffer{};
 
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     try
     {
         const auto baseRows = co_await transaction->execSqlCoro(
@@ -346,6 +346,7 @@ HANDLEF(UnitEvo)
         co_await gme::bumpArchiveCounters(transaction, identity, {
             { "unit_evo_cnt", 1 },
         });
+        co_await gme::commitTransaction(transaction);
     }
     catch (...)
     {

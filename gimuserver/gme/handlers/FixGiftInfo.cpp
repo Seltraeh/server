@@ -50,7 +50,7 @@ HANDLEF(FixGiftInfo)
 	int32_t paid = 0;
 	try
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 
 		// The preference first, so that even a claim that grants nothing still
 		// records what the player asked for.
@@ -62,6 +62,8 @@ HANDLEF(FixGiftInfo)
 		}
 
 		paid = co_await gme::claimGifts(transaction, identity, receiveIds);
+		// A commit that fails lands in the catch below: rolled back, "did not land".
+		co_await gme::commitTransaction(transaction);
 	}
 	catch (const drogon::orm::DrogonDbException& ex)
 	{

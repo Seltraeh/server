@@ -123,7 +123,11 @@ HANDLEF(UserLoginCampaignInfo)
     ::UserLoginCampaignInfoResp resp{};
     try
     {
-        const auto state = co_await gme::advanceLoginCampaign(theDb(), identity);
+        // The day's advance and its rewards in one transaction (several
+        // statements: a failure part-way kept the day without its rewards).
+        auto transaction = co_await gme::beginTransaction(theDb());
+        const auto state = co_await gme::advanceLoginCampaign(transaction, identity);
+        co_await gme::commitTransaction(transaction);
         resp.campaign_info = gme::loginCampaignInfo(state);
         LOG_INFO << "UserLoginCampaignInfo: day " << state.current_day << "/" << state.total_days
                  << (state.first_for_the_day ? " (new day, granted)" : "");

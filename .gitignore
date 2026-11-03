@@ -502,8 +502,18 @@ CONTEXT.md
 out/
 
 # Local dev tooling + docs — not for upstream
-tools/
+tools/*
 *.md
+# ...except the x86 binary-fact checkers run_bugfix_regressions.py runs
+# (x86_startup_rules_check.py, x86_mst_bootstrap_check.py) and the two
+# modules they import.  They need pefile, capstone and the supported client
+# EXE (fb4f3c25..., path in pe_x86.py or BF_CLIENT_EXE); see RELEASE.md.
+!tools/bin/
+tools/bin/*
+!tools/bin/pe_x86.py
+!tools/bin/x86_bundle_exclusions.py
+!tools/bin/x86_mst_bootstrap_check.py
+!tools/bin/x86_startup_rules_check.py
 
 # The optional developer console is shared source; release packages disable it.
 

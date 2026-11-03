@@ -9,6 +9,7 @@
 #include <drogon/drogon.h>
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <exception>
 #include <filesystem>
@@ -116,6 +117,45 @@ bool validMimicChests(const MissionRecord& record)
 		}
 	}
 	return true;
+}
+
+// Per-hit material drops (BattleMonster.material_drops -> BattleMonsterGroupMst i30R8TAs, round 8).  The client
+// takes `per` as a percent per hit and `max_count` as how often the monster can drop the item in one battle
+// (MonsterParty::setMaterialDrop @0x10C2354, BattleUnit::getDropMaterialPer @0x111F7B0).
+constexpr uint32_t kMaxMaterialDropCount = 99;
+
+bool validMaterialDrops(const std::vector<MaterialDrop>& drops)
+{
+	return std::all_of(drops.begin(), drops.end(), [](const MaterialDrop& drop) {
+		return std::isfinite(drop.per) && drop.per > 0.0f && drop.per <= 100.0f && drop.item_id != 0
+			&& drop.max_count >= 1 && drop.max_count <= kMaxMaterialDropCount;
+	});
+}
+
+// A list with an invalid entry is refused whole, so the mission still loads and nothing half-authored is sent.
+size_t refuseInvalidMaterialDrops(BattleMonster& monster, uint32_t missionId)
+{
+	if (!monster.material_drops || validMaterialDrops(*monster.material_drops))
+		return 0;
+	LOG_ERROR << "Mission " << missionId << " monster " << monster.id << ": invalid material_drops (per must be in "
+		"(0, 100], item_id non-zero, max_count 1.." << kMaxMaterialDropCount << "); sent without material drops";
+	monster.material_drops.reset();
+	return 1;
+}
+
+// "per:itemId:maxCount" entries joined by ',', in authored order; nullopt (the key is omitted) when there are none.
+std::optional<std::string> encodeMaterialDrops(const BattleMonster& monster)
+{
+	if (!monster.material_drops || monster.material_drops->empty())
+		return std::nullopt;
+	std::string out;
+	for (const auto& drop : *monster.material_drops)
+	{
+		if (!out.empty())
+			out += ',';
+		out += std::format("{}:{}:{}", drop.per, drop.item_id, drop.max_count);
+	}
+	return out;
 }
 } // namespace
 
@@ -352,12 +392,20 @@ std::string MissionArchiver::encodeMissionDropInfo(const MissionRecord& record)
 		std::string treasureDrops;
 		for (size_t monsterIdx = 0; monsterIdx < stage.battle_monsters.size(); ++monsterIdx)
 		{
+			// The client holds ONE capture per wave.  MissionDropInfoList::parse (x86 0x57FCB0, arm64
+			// 0x12671C8) splits records on '@' and fields on '|', and hands field [1] once to
+			// MissionDropInfo::parseUnitDropInfo (x86 0x57F340, arm64 0x126617C), which splits on ':' only
+			// and builds a single drop; getObject (x86 0x20D090) returns the first record per battle order.
+			// A second entry joined with '-' was never a capture: the client read it into the first one's
+			// type token ("2-1" -> 2) and extra-skill slot, then claimed only the first at MissionEnd
+			// (round 4, docs/CLAUDE_FRESH_ROUND4_HANDOFF_2026-10-30.md).  So only the first successful roll
+			// is sent -- exactly the capture the client already showed and settled -- while every monster
+			// still rolls, keeping the random sequence (types, chests, Mimics) unchanged.
 			const auto unitDrop = encodeUnitDrop(monsterIdx, stage.battle_monsters[monsterIdx]);
-			if (!unitDrop.empty() && !unitDrops.empty())
+			if (unitDrops.empty())
 			{
-				unitDrops += '-';
+				unitDrops = unitDrop;
 			}
-			unitDrops += unitDrop;
 
 			std::string treasureDrop;
 			bool mimicHost = false;
@@ -501,6 +549,34 @@ void MissionArchiver::setup(const Json::Value& serverObj)
 	}
 	LOG_INFO << "Mission archive: raised " << raisedCaptures << " capturable monster(s) to a "
 		<< kMinCaptureChance << "% capture chance";
+
+	// Per-hit material drops: every monster the server can send, checked once here.
+	size_t materialMonsters = 0;
+	size_t refusedMaterials = 0;
+	const auto checkMaterials = [&](BattleMonster& monster, uint32_t missionId) {
+		refusedMaterials += refuseInvalidMaterialDrops(monster, missionId);
+		materialMonsters += (monster.material_drops && !monster.material_drops->empty()) ? 1 : 0;
+	};
+	for (auto& mission : missions)
+	{
+		for (auto& stage : mission.stages)
+			for (auto& monster : stage.battle_monsters)
+				checkMaterials(monster, mission.id);
+		if (mission.script_monsters)
+			for (auto& monster : *mission.script_monsters)
+				checkMaterials(monster, mission.id);
+		if (mission.mimic_chests)
+			for (auto& chest : *mission.mimic_chests)
+				checkMaterials(chest.monster, mission.id);
+		if (mission.random_mimics)
+			for (auto& monster : mission.random_mimics->monsters)
+				checkMaterials(monster, mission.id);
+	}
+	if (randomMimics_)
+		for (auto& monster : randomMimics_->monsters)
+			checkMaterials(monster, 0);
+	LOG_INFO << "Mission archive: " << materialMonsters << " monster(s) with per-hit material drops; "
+		<< refusedMaterials << " invalid list(s) refused";
 
 	AiRecordCache nextAiCache;
 	nextAiCache.reserve(ais.size());
@@ -855,6 +931,54 @@ bool MissionArchiver::populatePacket(
 
 bool MissionArchiver::populatePacket(
 	const MissionRecord& record,
+	std::optional<std::vector<SkillMst>>& msts)
+{
+	// Every skill a monster in this battle may cast, once each, in first-use
+	// order.  The client filed these rows as battle-temporary at boot and has
+	// emptied that list since (see the 8aiBoHg5 field of MissionStartResp), so
+	// without them the mission preload reads a missing skill and crashes.
+	std::vector<uint32_t> wanted;
+	for (const auto& monsters : describedMonsters(record))
+		for (const auto& monster : monsters)
+			for (const auto& skill : monster.skills.value_or(std::vector<MonsterSkill>{}))
+				if (std::find(wanted.begin(), wanted.end(), skill.skill_id) == wanted.end())
+					wanted.push_back(skill.skill_id);
+
+	if (wanted.empty())
+	{
+		msts = std::nullopt;
+		return true;
+	}
+
+	std::vector<SkillMst> rows(wanted.size());
+	std::vector<bool> found(wanted.size(), false);
+	for (const auto& row : theServer()->cache().skillMst())
+	{
+		const auto at = std::find(wanted.begin(), wanted.end(), static_cast<uint32_t>(row.id));
+		if (at != wanted.end())
+		{
+			const auto i = static_cast<size_t>(at - wanted.begin());
+			rows[i] = row;
+			found[i] = true;
+		}
+	}
+
+	for (size_t i = 0; i < wanted.size(); ++i)
+	{
+		if (!found[i])
+		{
+			LOG_ERROR << "Unable to populate monster skill rows: mission " << record.id
+				<< " names skill " << wanted[i] << ", which the skill table does not have";
+			return false;
+		}
+	}
+
+	msts = std::move(rows);
+	return true;
+}
+
+bool MissionArchiver::populatePacket(
+	const MissionRecord& record,
 	std::vector<BattleMonsterGroupMst>& msts)
 {
 	msts.clear();
@@ -873,6 +997,7 @@ bool MissionArchiver::populatePacket(
 				.monster_id = monster.id,
 				.group_order = static_cast<uint32_t>(monsterIdx),
 				.position = monster.position,
+				.item_drop = encodeMaterialDrops(monster),
 				// The client does not use this field to resolve unit drops; it uses the
 				// encoded drop info in MissionNumInfo instead. This value only tells the
 				// client which unit assets may be needed, so keep the other fields as zero.

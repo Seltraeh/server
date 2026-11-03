@@ -21,12 +21,14 @@ The client side is modelled from BraveFrontier.Windows.exe (x86), not assumed:
                                 the flags as the player set them
   9wjrh74P                      replaces the list outright
 
-So a lock on the FIRST of k crafted copies goes up as the placeholder k times and
-comes back as all k locked; a lock on the 2nd..kth is never sent and comes back
-as none.  The server must end each exchange holding exactly what the client then
-shows: every real id's lock, and as many locked unsent copies as the client
-shows locked placeholder rows.  A lock request built before a warehouse list the
-client never received must not cost any existing lock.
+The craft is applied by the client BEFORE it is sent, and since 2026-10-03 the
+ItemMix reply is the warehouse list (net/items.kdl ItemMixResp; consumer chain in
+test_craft_row_identity_wire.py), so the placeholder rows are replaced by real
+ids before any lock screen can be reached: a lock on the 1st, 2nd or kth new copy
+goes up under that copy's own id and sticks.  The placeholder can still reach the
+lock handler from a client that never received the list (a lost reply), and such
+a set must not cost any existing lock.  The server must end each exchange
+holding exactly what the client then shows.
 """
 import argparse
 import sys
@@ -104,6 +106,9 @@ def main():
         apply_lock_reply(reply)
         return body, reply
 
+    def seen(db):
+        return db.execute('SELECT warehouse_seen_id FROM user_info WHERE id=?', (user,)).fetchone()[0]
+
     def agrees(db, mark):
         """Server holds what the client shows: per real id, and in count for the placeholders."""
         server = server_rows(db)
@@ -132,48 +137,62 @@ def main():
         check('setup: the locked copy is equipped and keeps its lock', server_rows(db)[r_eq] == (0, 1, unit),
               server_rows(db)[r_eq])
         receive_list(c.call('UserInfo'))
-        mark = db.execute('SELECT warehouse_seen_id FROM user_info WHERE id=?', (user,)).fetchone()[0]
 
-        # A: craft three; lock the FIRST new row.
-        crafted = c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': '2005:3'}]})
+        # A: craft three -- applied locally first, then the reply renames them;
+        # lock the FIRST new copy.
+        known = {row[0] for row in client_rows}
         client_rows.extend([P, False] for _ in range(3))
-        check('A: three crafted in one batch, reply leaves the list alone', 'error' not in crafted
-              and '9wjrh74P' not in crafted, crafted)
-        next(row for row in client_rows if row[0] == P)[1] = True
+        crafted = c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': '2005:3'}]})
+        check('A: three crafted in one batch, the reply is the warehouse list with its locks', 'error' not in crafted
+              and '9wjrh74P' in crafted and 'VSRPkdId' in crafted, sorted(crafted)[:6])
+        receive_list(crafted)
+        new_a = [row[0] for row in client_rows if row[0] not in known]
+        check('A: the three new copies now have their own ids, no placeholder left',
+              len(new_a) == 3 and len(set(new_a)) == 3 and P not in new_a, new_a)
+        next(row for row in client_rows if row[0] == new_a[0])[1] = True
         body, reply = send_locks(c)
-        check('A: the request carries the placeholder once per crafted row', body.count(P) == 3, body)
-        check('A: the client now shows all three new copies locked',
-              sum(1 for row in client_rows if row[0] == P and row[1]) == 3, client_rows)
-        ok, detail = agrees(db, mark)
-        check('A: the server holds exactly that -- all three unsent copies locked', ok, detail)
+        check('A: the request names the first new copy once, and no placeholder',
+              body.count(new_a[0]) == 1 and P not in body, body)
+        check('A: the client shows exactly that copy locked among the new ones',
+              [row[0] for row in client_rows if row[0] in new_a and row[1]] == [new_a[0]], client_rows)
+        ok, detail = agrees(db, seen(db))
+        check('A: the server holds exactly that -- one new copy locked', ok and server_rows(db)[new_a[0]][1] == 1
+              and server_rows(db)[new_a[1]][1] == 0 and server_rows(db)[new_a[2]][1] == 0, detail)
         check('A: the real copies kept their own locks', server_rows(db)[r_lock][1] == 1
               and server_rows(db)[r_free][1] == 0 and server_rows(db)[r_eq] == (0, 1, unit), server_rows(db))
         receive_list(c.call('UserInfo'))
         ok, detail = agrees(db, db.execute('SELECT warehouse_seen_id FROM user_info WHERE id=?', (user,)).fetchone()[0])
-        check('A: after the next list every copy has its own id and the same lock on both sides', ok, detail)
+        check('A: after the next list every copy has the same id and lock on both sides', ok, detail)
         state['a_locked'] = sorted(i for i, (n, f, u) in server_rows(db).items() if f)
 
-        # B: craft three more; lock the SECOND new row, then the THIRD.
-        mark = db.execute('SELECT warehouse_seen_id FROM user_info WHERE id=?', (user,)).fetchone()[0]
-        c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': '2005:3'}]})
+        # B: craft three more; lock the SECOND new copy, then the THIRD.
+        known = {row[0] for row in client_rows}
         client_rows.extend([P, False] for _ in range(3))
+        receive_list(c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': '2005:3'}]}))
+        new_b = [row[0] for row in client_rows if row[0] not in known]
+        check('B: three more copies, three more ids', len(set(new_b)) == 3 and P not in new_b, new_b)
         for position in (1, 2):
-            new_rows = [row for row in client_rows if row[0] == P]
-            for row in new_rows:
-                row[1] = False
-            new_rows[position][1] = True
+            for row in client_rows:
+                if row[0] in new_b:
+                    row[1] = new_b.index(row[0]) == position
             body, reply = send_locks(c)
-            check(f'B: a lock on new row {position + 1} is not in the request', P not in body, body)
-            check(f'B: the reply shows it gone on the client (a client limitation, see the handler)',
-                  not any(row[1] for row in client_rows if row[0] == P), client_rows)
-            ok, detail = agrees(db, mark)
-            check(f'B: row {position + 1}: the server locked none of the new copies either', ok, detail)
-            check(f'B: row {position + 1}: every earlier lock survived',
+            check(f'B: a lock on new copy {position + 1} is in the request under its own id',
+                  new_b[position] in body and P not in body, body)
+            check(f'B: new copy {position + 1}: the reply shows that copy locked on the client',
+                  [row[0] for row in client_rows if row[0] in new_b and row[1]] == [new_b[position]], client_rows)
+            ok, detail = agrees(db, seen(db))
+            check(f'B: new copy {position + 1}: the server locked exactly that copy', ok and
+                  [i for i in new_b if server_rows(db)[i][1]] == [new_b[position]], detail)
+            check(f'B: new copy {position + 1}: every earlier lock survived',
                   all(server_rows(db)[i][1] == 1 for i in state['a_locked']), server_rows(db))
 
-        # C: a warehouse list the client never receives.
+        # C: a warehouse list the client never receives -- here the reply to a
+        # craft, so the client is left holding the placeholder rows it added.
         before_locks = {i: f for i, (n, f, u) in server_rows(db).items()}
-        c.call('UserInfo')                                   # reply lost: client_rows unchanged
+        client_rows.extend([P, False] for _ in range(2))
+        lost = c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': '2005:2'}]})   # reply lost
+        check('C: the craft was made and its list built (then lost)', 'error' not in lost and '9wjrh74P' in lost)
+        before_locks.update({i: f for i, (n, f, u) in server_rows(db).items() if i not in before_locks})
         new_rows = [row for row in client_rows if row[0] == P]
         new_rows[0][1] = True
         body, reply = send_locks(c)

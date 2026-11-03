@@ -35,7 +35,7 @@ HANDLEF(TownUpdate)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	auto transaction = co_await theDb()->newTransactionCoro();
+	auto transaction = co_await gme::beginTransaction(theDb());
 	try
 	{
 		const auto taps = co_await gme::Town::applyTaps(transaction, identity, req.collect.collect_log);
@@ -45,6 +45,7 @@ HANDLEF(TownUpdate)
 				" ON CONFLICT(user_id) DO UPDATE SET town_harvest_cnt = town_harvest_cnt + excluded.town_harvest_cnt;",
 				identity.userId, taps);
 		co_await gme::recordBoughtSounds(transaction, identity, req.collect.bought_sound_ids);
+		co_await gme::commitTransaction(transaction);
 	}
 	catch (const std::exception& ex)
 	{

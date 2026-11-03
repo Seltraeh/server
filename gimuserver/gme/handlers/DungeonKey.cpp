@@ -406,7 +406,7 @@ HANDLEF(DungeonKeyUse)
 	const auto identity = (co_await gme::getUserIdentity(database, req.login_info)).nonEmpty();
 	// Read the balance, spend, and build the complete response on one transaction.
 	// A state/serialization failure must not leave a partial purchase behind.
-	auto db = co_await database->newTransactionCoro();
+	auto db = co_await gme::beginTransaction(database);
 	try
 	{
 		const auto requestedId = req.use.dungeon_key_id;
@@ -424,6 +424,7 @@ HANDLEF(DungeonKeyUse)
 		if (key == keyMst.end())
 		{
 			LOG_WARN << "DungeonKeyUse: no DungeonKeyMst row for id " << requestedId;
+			co_await gme::commitTransaction(db);
 			co_return HandleResult::success(keyStateBody(state));
 		}
 
@@ -445,6 +446,7 @@ HANDLEF(DungeonKeyUse)
 		{
 			LOG_WARN << "DungeonKeyUse: " << useCount << " is not a tier of \"" << key->usage_pattern
 			         << "\" — no change";
+			co_await gme::commitTransaction(db);
 			co_return HandleResult::success(keyStateBody(state));
 		}
 
@@ -452,6 +454,7 @@ HANDLEF(DungeonKeyUse)
 		{
 			LOG_INFO << "DungeonKeyUse: holding " << row->possession << ", tier needs "
 			         << tier->keysRequired << " — no change";
+			co_await gme::commitTransaction(db);
 			co_return HandleResult::success(keyStateBody(state));
 		}
 
@@ -493,6 +496,7 @@ HANDLEF(DungeonKeyUse)
 			throw std::runtime_error(glz::format_error(error, body));
 		gme::injectPermitPlace(body, co_await gme::buildPermitPlace(db, identity));
 
+		co_await gme::commitTransaction(db);
 		co_return HandleResult::success(body);
 	}
 	catch (...)

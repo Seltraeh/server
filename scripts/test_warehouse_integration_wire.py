@@ -4,8 +4,8 @@ python scripts/test_warehouse_integration_wire.py PATH_TO_DEBUG_EXE [--port 1997
 
 * Merit sphere delivery sends WAREHOUSE ROW ids (RandallAchievementDedicateSphereScene
   ::sell @0x1A3D5D0 joins getItemIndex()), so a locked copy must stay while an
-  unlocked copy of the same sphere is delivered; a crafted copy may arrive under
-  its INT_MAX - itemId placeholder.
+  unlocked copy of the same sphere is delivered; a crafted copy arrives under the
+  row id its craft reply named (since 2026-10-03 the ItemMix reply is the list).
 * A sphere equipped on a unit that is sold, fused away or used up by evolution
   comes back as the SAME row with its lock (gme::returnEquippedSpheres).
 * Every reply that replaces the warehouse (9wjrh74P) now also carries the lock set
@@ -139,12 +139,19 @@ def main():
         check('merit: a repeated row id is handed over once', rows()[r3][0] == 0 and stock() == 1
               and merit() - m1 == m1 - m0, (rows()[r3], stock(), merit() - m1, m1 - m0))
 
-        # A craft the client applied itself, delivered before any refresh.
-        c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': '2005:1'}]})
-        check('merit: craft added a copy', stock() == 2, stock())
-        m2 = merit()
+        # A craft the client applied itself: its reply is the warehouse list, so
+        # the copy is delivered under the row id that reply named (ItemMixResp).
+        crafted = c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': '2005:1'}]})
+        new = sorted(set(listed(crafted)) - {r1, r2, r3})
+        check('merit: craft added a copy and its reply names it by its own row id',
+              stock() == 2 and len(new) == 1 and INT_MAX - SPHERE not in new, (stock(), new))
+        before = state()
         reply = deliver([INT_MAX - SPHERE])
-        check('merit: the crafted copy is delivered under its placeholder', 'error' not in reply and stock() == 1
+        check('merit: after that reply the placeholder names no copy; nothing taken', 'error' in reply
+              and state() == before, reply.get('error'))
+        m2 = merit()
+        reply = deliver(new)
+        check('merit: the crafted copy is delivered under its row id', 'error' not in reply and stock() == 1
               and merit() > m2 and rows()[r1] == (1, 1, 0), (reply.get('error'), stock(), rows()))
 
         # ---- sphere returns keep the row and its lock ------------------------------

@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <ctime>
+#include <map>
 #include <set>
 #include <stdexcept>
 
@@ -212,7 +213,8 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         s.special.reserve(32'000);
         auto add = [&](std::string_view key, int64_t id) { s.add(key, id); };
 
-        for (int i = 1; i <= 100; ++i) add("0Cq2AlXW", i); // gates, incl. 99 (Vortex)
+        // Gates (0Cq2AlXW) are per player, built below: GateMst gives each one a
+        // need_mission_id.
 
         const auto& fg = theServer()->cache().frontierGatePermits();
         for (const auto id : fg.lands)    add("9C64Qwe0", id);
@@ -320,8 +322,39 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
                 [](const int32_t id) { return MissionArchiver::instance().archived(id); });
         };
 
+        // The Vortex Trials subtree (ServerCache::m_vortexTrialAreas) is a tree of categories, and most of its
+        // trials have no battle yet: an area there is advertised only when a servable dungeon sits in it or under
+        // it, so an unbuilt trial draws no tile and a category with nothing built draws none either.
+        const auto& trialAreas = theServer()->cache().vortexTrialAreas();
+        std::set<int32_t> builtTrialAreas;
+        {
+            std::map<int32_t, int32_t> parentOf;
+            for (const auto& area : theServer()->cache().areaMst())
+            {
+                const auto parent = area.parent_area_id;
+                if (!parent || parent->empty() || *parent == "0")
+                    continue;
+                try { parentOf[area.area_id] = std::stoi(*parent); }
+                catch (const std::exception&) {}
+            }
+            for (const auto& dungeon : theServer()->cache().dungeonMst())
+            {
+                if (!trialAreas.contains(dungeon.area_id) || !servable(dungeon.dungeon_id))
+                    continue;
+                for (int32_t area = dungeon.area_id; trialAreas.contains(area) && builtTrialAreas.insert(area).second;)
+                {
+                    const auto it = parentOf.find(area);
+                    if (it == parentOf.end())
+                        break;
+                    area = it->second;
+                }
+            }
+        }
+
         for (const auto id : vx.lands) add("9C64Qwe0", id);
-        for (const auto id : vx.areas) add("VjCY7rX4", id);
+        for (const auto id : vx.areas)
+            if (!trialAreas.contains(id) || builtTrialAreas.contains(id))
+                add("VjCY7rX4", id);
         for (const auto id : vx.dungeons)
             if (servable(id))
                 add("MHx05sXt", id);
@@ -388,6 +421,32 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
             }
             return !anyReal;
         };
+
+        // WORLD GATES OPEN ON THEIR SHIPPED REQUIREMENT (GateMst HSRhkf70).
+        // Home's Quest button counts the permitted gates of type 0:
+        // HomeScene2::touchEnded2 @0x16F52E4 changes to scene 2001, the world
+        // select, at two or more, and otherwise to 61, the Grand Gaia quest
+        // select.  Ishgria (gate 2, type 0) ships needing 1577, "Facing the
+        // Sealed God", the finale of Grand Gaia Crater.  Permitted from the
+        // first login, it sent a new player to the world select.  The
+        // tutorial (tuto8.txt) waits for change_dungeon_select_scene there, so
+        // it froze every input on the quest select the player reached next.
+        // Gate 99, the Vortex, ships needing 0 and stays open from the start.
+        // Ids with no GateMst row keep the blanket permit they always had.
+        size_t gatesPermitted = 0;
+        {
+            std::map<int32_t, int32_t> gateNeeds;
+            for (const auto& gate : cache.gateMst())
+                gateNeeds.emplace(gate.gate_id, gate.need_mission_id);
+            for (int32_t id = 1; id <= 100; ++id)
+            {
+                const auto need = gateNeeds.find(id);
+                if (need != gateNeeds.end() && need->second != 0 && !cleared.count(need->second))
+                    continue;
+                append(permitPlace, first, "0Cq2AlXW", id);
+                ++gatesPermitted;
+            }
+        }
 
         size_t gatedAreas = 0, gatedDungeons = 0, gatedMissions = 0;
         size_t unarchivedMissions = 0;
@@ -484,7 +543,7 @@ drogon::Task<std::string> buildPermitPlace(const db::Database db, const UserIden
         LOG_INFO << "PermitPlace: Research Lab — permitting " << labMissions << " trial(s)";
 
         LOG_INFO << "PermitPlace: progression gate — " << cleared.size()
-                 << " mission(s) cleared, permitting " << gatedAreas << " area(s), "
+                 << " mission(s) cleared, permitting " << gatesPermitted << " gate(s), " << gatedAreas << " area(s), "
                  << gatedDungeons << " dungeon(s), " << gatedMissions << " mission(s)"
                  << ", land(s) [" << landList << "]"
                  << "; withheld " << unarchivedMissions

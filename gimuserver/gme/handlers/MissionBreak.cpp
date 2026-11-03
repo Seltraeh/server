@@ -121,7 +121,7 @@ HANDLEF(MissionContinue)
 	// reverse), cannot leave a receipt that would turn the player's next try
 	// into a "repeat", and a MissionEnd for the same battle is ordered strictly
 	// before or after it.  Success is reported only once the commit has.
-	auto transaction = co_await theDb()->newTransactionCoro();
+	auto transaction = co_await gme::beginTransaction(theDb());
 	try
 	{
 		const auto rows = co_await transaction->execSqlCoro(
@@ -279,7 +279,7 @@ HANDLEF(MissionContinue)
 			"unknown exception");
 	}
 
-	if (!(co_await gme::CommitTransaction(std::move(transaction))))
+	if (!(co_await gme::tryCommitTransaction(transaction)))
 	{
 		LOG_ERROR << "MissionContinue: " << identity.userId << " serial " << wireSerial << " did not commit";
 		co_return HandleResult::refuseToRetry("The Continue could not be saved. Please try again.",

@@ -202,7 +202,7 @@ HANDLEF(UnitSelectorGachaTicket)
 	GachaActionResp resp{};
 	int32_t ticketsLeft = 0;
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// Spend one of THIS selector's tickets.  Guarded on count >= 1, so a
@@ -251,6 +251,7 @@ HANDLEF(UnitSelectorGachaTicket)
 			// The inventory after the spend.  The client never decrements it, so
 			// without this the banner would keep offering the ticket just used.
 			resp.selector_ticket_info = co_await gme::loadSelectorTickets(transaction, identity);
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

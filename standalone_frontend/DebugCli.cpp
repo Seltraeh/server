@@ -27,6 +27,7 @@
 #include <map>
 #include <optional>
 #include <random>
+#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -126,13 +127,15 @@ static void InsertUnitFromMst(const drogon::orm::DbClientPtr& db,
 
     // This runs on the CLI pipe thread, never the HTTP event-loop thread.
     // Reserve stock/capacity and include dictionary/counter writes in the grant.
-    auto transaction = db->newTransaction();
+    auto transaction = drogon::sync_wait(gme::beginTransaction(db));
     try
     {
         if (QueryCapacity(transaction, userId).free <= 0)
             throw std::runtime_error("Unit inventory is full");
         const gme::UserIdentity identity{ .userId = userId };
         (void)drogon::sync_wait(gme::addUserUnit(transaction, identity, *packet)).nonEmpty();
+        // "Added unit" is printed only once this commit is durable.
+        drogon::sync_wait(gme::commitTransaction(transaction));
     }
     catch (...)
     {
@@ -160,9 +163,14 @@ void PrintHelp()
         << "    addunit enh          Fill remaining capacity with enhancer/XP-feeder units, even-spread.\n"
         << "    addunit <element>    Fill remaining capacity with mat+enh mix for one element.\n"
         << "                         Elements: fire water earth thunder light dark\n"
-        << "    clearunits           Delete all units except the oldest (slot 1).\n"
+        << "    clearunits           Delete all units except the oldest (slot 1); return their spheres\n"
+        << "                         and repair squads/bonds that named them (one transaction).\n"
         << "    cap                  Show current / max unit count.\n"
         << "    clock [<unix>|off]   Pin the energy refill clock (tests); off = system time.\n"
+        << "    dbwedge              Leave the DB connection inside an open transaction, as a\n"
+        << "                         commit that failed after its reply did (tests recovery).\n"
+        << "    dbfault              The next request's commit throws instead (a handler failing\n"
+        << "                         after its writes); one shot (tests atomicity).\n"
         << "    additem <mst_id> [n] Add n of an item (default 1, clamped to MST max stack).\n"
         << "    additem usable [n]   Add every usable/battle item (potions etc.), n each (default 10).\n"
         << "    additem sphere [n]   Add every sphere (equipment), n each (default 1).\n"
@@ -358,14 +366,203 @@ void DoAddElement(const drogon::orm::DbClientPtr& db, const std::string& userId,
         "element");
 }
 
+// What RepairSquads changed in one table.
+struct SquadRepair
+{
+    int64_t squads = 0;    //!< squads that needed any change
+    int64_t dropped = 0;   //!< slots removed because they named a unit the user does not own
+    int64_t leaders = 0;   //!< squads that had no leader and got the kept unit as one
+};
+
+// One squad table (user_decks or user_campaign_decks, described by its squad
+// key columns and its slot column): drop every slot naming a unit the user
+// does not own, then give each squad left without a leader -- member_type 0,
+// what addDefaultDecks writes -- the kept unit as its leader: promoted in place
+// when it is already in that squad, otherwise put in the old leader's slot (or
+// the default slot 2, then the first free one).
+static SquadRepair RepairSquads(const drogon::orm::DbClientPtr& tx, const std::string& userId, int64_t keep,
+                                const std::string& table, const std::vector<std::string>& squadKey,
+                                const std::string& slotColumn)
+{
+    std::unordered_set<int64_t> owned;
+    for (const auto& r : tx->execSqlSync("SELECT user_unit_id FROM user_units WHERE user_id=$1;", userId))
+        owned.insert(r["user_unit_id"].as<int64_t>());
+
+    struct Slot { int64_t unit, member, pos; };
+    std::string keyColumns;
+    for (const auto& k : squadKey)
+        keyColumns += k + ", ";
+    std::map<std::vector<int64_t>, std::vector<Slot>> squads;
+    for (const auto& r : tx->execSqlSync("SELECT " + keyColumns + "user_unit_id, member_type, " + slotColumn
+                                         + " AS pos FROM " + table + " WHERE user_id=$1;", userId))
+    {
+        std::vector<int64_t> key;
+        for (const auto& k : squadKey)
+            key.push_back(r[k].as<int64_t>());
+        squads[key].push_back({ r["user_unit_id"].as<int64_t>(), r["member_type"].as<int64_t>(), r["pos"].as<int64_t>() });
+    }
+
+    SquadRepair out{};
+    for (const auto& [key, slots] : squads)
+    {
+        // Key values are integers read back from this table, never user input.
+        std::string where = "user_id=$1";
+        for (size_t i = 0; i < squadKey.size(); ++i)
+            where += " AND " + squadKey[i] + "=" + std::to_string(key[i]);
+        std::optional<int64_t> oldLeaderSlot, keptSlot;
+        std::set<int64_t> used;
+        bool hasLeader = false, changed = false;
+        for (const auto& s : slots)
+        {
+            if (!owned.count(s.unit))
+            {
+                if (s.member == 0)
+                    oldLeaderSlot = s.pos;
+                tx->execSqlSync("DELETE FROM " + table + " WHERE " + where + " AND " + slotColumn + "=$2;", userId, s.pos);
+                ++out.dropped;
+                changed = true;
+                continue;
+            }
+            used.insert(s.pos);
+            hasLeader |= s.member == 0;
+            if (s.unit == keep)
+                keptSlot = s.pos;
+        }
+        if (!hasLeader)
+        {
+            if (keptSlot)
+            {
+                tx->execSqlSync("UPDATE " + table + " SET member_type=0 WHERE " + where + " AND " + slotColumn + "=$2;",
+                                userId, *keptSlot);
+            }
+            else
+            {
+                std::optional<int64_t> pos;
+                for (const int64_t candidate : { oldLeaderSlot.value_or(2), int64_t{ 2 }, int64_t{ 0 }, int64_t{ 1 },
+                                                 int64_t{ 3 }, int64_t{ 4 }, int64_t{ 5 } })
+                {
+                    if (!used.count(candidate))
+                    {
+                        pos = candidate;
+                        break;
+                    }
+                }
+                if (!pos)
+                    throw std::runtime_error(table + ": no free slot for the kept unit");
+                std::string columns = "user_id, user_unit_id, member_type, " + slotColumn;
+                std::string values = "$1, $2, 0, $3";
+                for (size_t i = 0; i < squadKey.size(); ++i)
+                {
+                    columns += ", " + squadKey[i];
+                    values += ", " + std::to_string(key[i]);
+                }
+                tx->execSqlSync("INSERT INTO " + table + " (" + columns + ") VALUES (" + values + ");", userId, keep, *pos);
+            }
+            ++out.leaders;
+            changed = true;
+        }
+        if (changed)
+            ++out.squads;
+    }
+    return out;
+}
+
+// clearunits keeps the oldest unit (lowest user_unit_id) and deletes every
+// other unit of the user, and repairs what named them -- in ONE transaction, so
+// a failure leaves the roster exactly as it was.
+//
+// WHY THE REPAIR: deleting unit rows alone left squads naming units that no
+// longer exist, and UserInfo sends user_decks verbatim.  The client trusts
+// them: PartyEditTopScene2 (Manage Squad, and the Home squad panes that open
+// it) looks each slot up with UserUnitInfoList::getObjectWithUserUnitID and
+// calls isMySummoner() on the result with no null check (arm64 setUnitAnime;
+// x86 +0xA6ECFC in all three Session 11 Run C crash dumps).  The deleted units'
+// worn spheres were lost as well.  So, as UnitSell does, worn spheres return
+// to the warehouse first; then
+//   - squad slots (user_decks, user_campaign_decks) naming a unit the user no
+//     longer owns are dropped, and squads left without a leader get the kept
+//     unit (RepairSquads);
+//   - the active squad (user_info.active_deck, deck_type 1) is created with
+//     the kept unit as leader if it has no rows at all;
+//   - DBB bonds naming a unit the user no longer owns are dropped.
+// The repairs cover any dangling reference, so running clearunits again also
+// mends a roster an older clearunits left broken.  A Frontier Gate run keeps a
+// full snapshot of its party (FrontierGateRun.cpp), and species-level records
+// (dictionary, alternate art) are not per unit: both are left alone.  With no
+// unit at all there is nothing to keep, so nothing is changed.
 void DoClearUnits(const drogon::orm::DbClientPtr& db, const std::string& userId)
 {
-    db->execSqlSync(
-        "DELETE FROM user_units WHERE user_id=$1 "
-        "AND user_unit_id <> (SELECT MIN(user_unit_id) FROM user_units WHERE user_id=$1);",
-        userId);
-    auto c = QueryCapacity(db, userId);
-    std::cout << "  Cleared. Now at " << c.cur << "/" << c.cap << ".\n";
+    const gme::UserIdentity identity{ .userId = userId };
+    auto transaction = drogon::sync_wait(gme::beginTransaction(db));
+    int64_t keep = 0, keptSpecies = 0, deleted = 0, bonds = 0;
+    uint32_t spheres = 0;
+    SquadRepair decks{}, campaign{};
+    CapacityInfo capacity{};
+    try
+    {
+        const auto first = transaction->execSqlSync(
+            "SELECT user_unit_id, unit_id FROM user_units WHERE user_id=$1 ORDER BY user_unit_id LIMIT 1;", userId);
+        if (first.empty())
+        {
+            drogon::sync_wait(gme::commitTransaction(transaction));   // nothing was written
+            std::cout << "  No units: there is nothing to keep, so nothing was changed.\n";
+            return;
+        }
+        keep = first[0]["user_unit_id"].as<int64_t>();
+        keptSpecies = first[0]["unit_id"].as<int64_t>();
+
+        std::string doomed;
+        for (const auto& r : transaction->execSqlSync(
+                 "SELECT user_unit_id FROM user_units WHERE user_id=$1 AND user_unit_id<>$2 ORDER BY user_unit_id;",
+                 userId, keep))
+            doomed += (doomed.empty() ? "" : ",") + std::to_string(r["user_unit_id"].as<int64_t>());
+        if (!doomed.empty())
+            spheres = drogon::sync_wait(gme::returnEquippedSpheres(transaction, identity, doomed));
+        deleted = static_cast<int64_t>(transaction->execSqlSync(
+            "DELETE FROM user_units WHERE user_id=$1 AND user_unit_id<>$2;", userId, keep).affectedRows());
+
+        decks = RepairSquads(transaction, userId, keep, "user_decks", { "deck_type", "deck_num" }, "disp_order");
+        campaign = RepairSquads(transaction, userId, keep, "user_campaign_decks", { "deck_num" }, "disporder");
+
+        const auto active = transaction->execSqlSync("SELECT active_deck FROM user_info WHERE id=$1;", userId);
+        const int64_t activeDeck = active.empty() ? 0 : active[0]["active_deck"].as<int64_t>();
+        if (transaction->execSqlSync(
+                "SELECT 1 FROM user_decks WHERE user_id=$1 AND deck_type=1 AND deck_num=$2 LIMIT 1;",
+                userId, activeDeck).empty())
+        {
+            transaction->execSqlSync(
+                "INSERT INTO user_decks (user_id, user_unit_id, deck_type, deck_num, member_type, disp_order)"
+                " VALUES ($1, $2, 1, $3, 0, 2);", userId, keep, activeDeck);
+            ++decks.squads;
+            ++decks.leaders;
+        }
+
+        bonds = static_cast<int64_t>(transaction->execSqlSync(
+            "DELETE FROM user_unit_dbb WHERE user_id=$1"
+            " AND (user_unit_id NOT IN (SELECT user_unit_id FROM user_units WHERE user_id=$1)"
+            " OR bonded_user_unit_id NOT IN (SELECT user_unit_id FROM user_units WHERE user_id=$1));",
+            userId).affectedRows());
+
+        // Read through the TRANSACTION: until this handle is released it holds
+        // the server's only SQLite connection, so a query on `db` here would
+        // wait for it forever (the console thread is the one holding it).
+        capacity = QueryCapacity(transaction, userId);
+        // Reported only once the whole change is durable.
+        drogon::sync_wait(gme::commitTransaction(transaction));
+    }
+    catch (...)
+    {
+        transaction->rollback();
+        throw;
+    }
+
+    const auto& c = capacity;
+    std::cout << "  Cleared " << deleted << " unit(s); kept user unit " << keep << " (unit " << keptSpecies << ").\n"
+              << "  Returned " << spheres << " worn sphere(s); squads repaired " << decks.squads
+              << " (dropped " << decks.dropped << " slot(s), set " << decks.leaders << " leader(s)); campaign squads "
+              << campaign.squads << " (dropped " << campaign.dropped << ", leaders " << campaign.leaders
+              << "); DBB bonds removed " << bonds << ".\n"
+              << "  Cleared. Now at " << c.cur << "/" << c.cap << ".\n";
 }
 
 // Unlock the full story campaign map. The client only shows missions whose row
@@ -1078,6 +1275,24 @@ void DispatchCommand(const std::string& line, bool& wantsQuit)
         const auto frozen = gme::GameClock::frozenValue();
         std::cout << "  clock " << (frozen > 0 ? "frozen at " : "system, now ")
                   << gme::GameClock::nowSeconds() << "\n";
+    }
+    else if (cmd == "dbwedge")
+    {
+        // The state a commit Drogon issues from a destructor leaves behind when
+        // it fails: the one connection back in the pool, still inside its
+        // transaction.  A plain BEGIN through the client (not a transaction
+        // object) reproduces it, so scripts/test_db_commit_contention_wire.py
+        // can prove gme::beginTransaction rolls it back and carries on.
+        db->execSqlSync("BEGIN");
+        std::cout << "  connection left inside an open transaction\n";
+    }
+    else if (cmd == "dbfault")
+    {
+        // A non-database exception after every write of the next request
+        // (gme::armCommitFault): nothing of that request may survive it.
+        // scripts/test_db_exception_atomicity_wire.py.
+        gme::armCommitFault();
+        std::cout << "  the next commit throws a non-database exception\n";
     }
     else if (cmd == "zel" || cmd == "karma" || cmd == "gems")
     {

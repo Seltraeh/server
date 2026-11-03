@@ -107,7 +107,7 @@ HANDLEF(SlotAction)
 	// turn; run statement by statement, a failure part-way kept the charge and
 	// whatever prizes had landed.  Now the medals, units, items and counters of
 	// an action commit together or not at all.
-	auto transaction = co_await theDb()->newTransactionCoro();
+	auto transaction = co_await gme::beginTransaction(theDb());
 	try
 	{
 		resp.results = co_await gme::playBraveSlot(transaction, identity, drawCount, granted);
@@ -124,6 +124,7 @@ HANDLEF(SlotAction)
 
 		if (const auto& ec = glz::write_json(resp, buffer); ec)
 			throw std::runtime_error("SlotAction: serialization error: " + glz::format_error(ec, buffer));
+		co_await gme::commitTransaction(transaction);
 	}
 	catch (...)
 	{
@@ -212,25 +213,31 @@ HANDLEF(MysteryBoxClaim)
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
 	MysteryBoxClaimResp resp{};
+	gme::GrantedRewards granted;
+	std::string buffer{};
+	// ONE TRANSACTION for the rewards, the opened chest and the reply, as in
+	// SlotAction: run statement by statement, a failure part-way kept whatever
+	// rewards had landed while the chest stayed closed (or the reverse).  The
+	// handle rolls back anything not committed (gme::beginTransaction).
+	auto transaction = co_await gme::beginTransaction(theDb());
 	// A refused claim — unknown, already opened or expired — still answers with
 	// the current chest list and header rather than an error, so the screen
 	// resynchronises instead of stranding the player on a chest that is gone.
-	gme::GrantedRewards granted;
-	co_await gme::claimMysteryChest(theDb(), identity, req.entries.front().box_id, resp.rewards, granted);
+	co_await gme::claimMysteryChest(transaction, identity, req.entries.front().box_id, resp.rewards, granted);
 
-	resp.boxes = co_await gme::listMysteryChests(theDb(), identity);
-	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+	resp.boxes = co_await gme::listMysteryChests(transaction, identity);
+	resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
 	// Chest units and items have no other way onto the client: no Mystery
 	// Chest scene touches the roster or the warehouse (MysteryBoxClaimResp in
 	// handlers.kdl).
-	co_await gme::emitGrantedRewards(theDb(), identity, granted, resp);
+	co_await gme::emitGrantedRewards(transaction, identity, granted, resp);
 
-	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
 	{
 		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
 	}
 
+	co_await gme::commitTransaction(transaction);
 	co_return HandleResult::success(buffer);
 }
 
@@ -266,7 +273,13 @@ HANDLEF(DailyLogin)
 	}
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
-	auto state = co_await gme::loadDailySpin(theDb(), identity);
+	// ONE TRANSACTION for the prize, the spin it uses and the reply, as in
+	// SlotAction: run statement by statement, a failure between them kept a
+	// prize without using up the spin (or the reverse).  The state is read
+	// inside it too, so two quick spins cannot both draw on one unused spin.
+	// The handle rolls back anything not committed (gme::beginTransaction).
+	auto transaction = co_await gme::beginTransaction(theDb());
+	auto state = co_await gme::loadDailySpin(transaction, identity);
 
 	// The reward the wheel lands on.  ⚠ THIS IS A PROBE, NOT THE FINAL RULE.
 	//
@@ -305,10 +318,10 @@ HANDLEF(DailyLogin)
 	gme::GrantedRewards granted;
 	if (state.spinsUsed < gme::kDailySpinLimit)
 	{
-		awarded = co_await gme::awardDailySpin(theDb(), identity, state, granted);
+		awarded = co_await gme::awardDailySpin(transaction, identity, state, granted);
 	}
 
-	const bool spun = co_await gme::consumeDailySpin(theDb(), identity, state);
+	const bool spun = co_await gme::consumeDailySpin(transaction, identity, state);
 	if (!spun)
 	{
 		LOG_INFO << "DailyLogin: user " << identity.userId
@@ -343,8 +356,8 @@ HANDLEF(DailyLogin)
 	// items.  DailyLoginScene calls no zel/karma mutator and no roster or
 	// warehouse mutator, so the header and any prize block ride here
 	// (DailyLoginResp in handlers.kdl).
-	resp.team_info = std::move((co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
-	co_await gme::emitGrantedRewards(theDb(), identity, granted, resp);
+	resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+	co_await gme::emitGrantedRewards(transaction, identity, granted, resp);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
@@ -357,5 +370,6 @@ HANDLEF(DailyLogin)
 		<< ", awarded " << awarded
 		<< ", used " << state.spinsUsed << "/" << gme::kDailySpinLimit
 		<< ", next day " << state.spinDay;
+	co_await gme::commitTransaction(transaction);
 	co_return HandleResult::success(buffer);
 }

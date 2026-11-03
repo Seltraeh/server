@@ -322,7 +322,7 @@ drogon::Task<HandleResult> restoreHunterOrbs(const gme::UserIdentity identity)
 {
     constexpr int64_t price = 1;
     std::string body;
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     try
     {
         const auto before = co_await gme::loadHunterOrbRefresh(transaction, identity);
@@ -337,6 +337,7 @@ drogon::Task<HandleResult> restoreHunterOrbs(const gme::UserIdentity identity)
         resp.user_team = co_await gme::loadHunterOrbRefresh(transaction, identity);
         if (const auto error = glz::write_json(resp, body); error)
             throw std::runtime_error(glz::format_error(error, body));
+        co_await gme::commitTransaction(transaction);
     }
     catch (const std::exception& ex)
     {
@@ -395,7 +396,7 @@ drogon::Task<HandleResult> resetFeSkills(const gme::UserIdentity identity, const
     std::string cleared;
     int64_t refunded = 0;
     bool reset = false;
-    auto tx = co_await theDb()->newTransactionCoro();
+    auto tx = co_await gme::beginTransaction(theDb());
     try
     {
         const auto rows = co_await tx->execSqlCoro(
@@ -482,7 +483,7 @@ drogon::Task<HandleResult> resetFeSkills(const gme::UserIdentity identity, const
         co_return HandleResult::refuseToHome("Enhancement reset failed. Please try again.", "unknown exception");
     }
 
-    if (!(co_await gme::CommitTransaction(std::move(tx))))
+    if (!(co_await gme::tryCommitTransaction(tx)))
         co_return HandleResult::refuseToHome("Enhancement reset could not be saved. Please reconnect.",
                                              "commit failed");
 

@@ -124,7 +124,7 @@ HANDLEF(AchievementRewardReceive)
 	int32_t queuedPresents = 0;
 	int64_t paidPoints = 0;
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// EACH ID IS CLAIMED INDEPENDENTLY AND A REFUSAL IS NOT FATAL.
@@ -206,6 +206,7 @@ HANDLEF(AchievementRewardReceive)
 			// with no way to tell.  Failing here rolls the whole claim back.
 			if (const auto error = glz::write_json(resp, body); error)
 				throw std::runtime_error(glz::format_error(error, body));
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{
@@ -289,7 +290,7 @@ HANDLEF(AchievementTrade)
 	AchievementTradeResp resp{};
 	resp.signal_key.key = "5EdKHavF";
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// The purchase limit, enforced in the same statement that records
@@ -407,6 +408,7 @@ HANDLEF(AchievementTrade)
 
 			resp.achievement_info = co_await gme::loadAchievementInfo(transaction, identity);
 			resp.trades = co_await gme::loadAchievementTrades(transaction, identity);
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

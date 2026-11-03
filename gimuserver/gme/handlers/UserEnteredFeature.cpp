@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 #include <gimuserver/gme/common/FeatureVisits.hpp>
+#include <gimuserver/gme/common/Transactions.hpp>
 
 // Android createBody @0x1C706F0 sends one visit under 2386Diw1.
 // This is visit history only: it never releases a feature or grants rewards.
@@ -18,7 +19,7 @@ HANDLEF(UserEnteredFeature)
         co_return HandleResult::error("Invalid feature visit values");
 
     const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     try
     {
         co_await transaction->execSqlCoro(
@@ -30,6 +31,7 @@ HANDLEF(UserEnteredFeature)
         std::string body;
         if (const auto ec = glz::write_json(resp, body); ec)
             throw std::runtime_error("Cannot serialize feature visits");
+        co_await gme::commitTransaction(transaction);
         co_return HandleResult::success(body);
     }
     catch (...)

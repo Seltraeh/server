@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/Transactions.hpp>
 #include <gimuserver/gme/common/Campaign.hpp>
 
 #include <map>
@@ -49,7 +50,7 @@ HANDLEF(CampaignDeckEdit)
 
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
-	auto transaction = co_await theDb()->newTransactionCoro();
+	auto transaction = co_await gme::beginTransaction(theDb());
 	try
 	{
 		// CampaignDeckEditRequest::createBody @0x13B1528 carries the client's
@@ -94,6 +95,7 @@ HANDLEF(CampaignDeckEdit)
 		}
 
 		LOG_INFO << "CampaignDeckEdit: stored " << stored << " party member(s)";
+		co_await gme::commitTransaction(transaction);
 	}
 	catch (...)
 	{
@@ -126,7 +128,7 @@ HANDLEF(CampaignItemEdit)
 	const auto eqp = gme::toCampaignItems(req.eqp_items);
 	const auto rsv = gme::toCampaignItems(req.rsv_items);
 
-	auto transaction = co_await theDb()->newTransactionCoro();
+	auto transaction = co_await gme::beginTransaction(theDb());
 	try
 	{
 		co_await gme::ensureCampaignState(transaction, identity);
@@ -174,6 +176,7 @@ HANDLEF(CampaignItemEdit)
 
 		LOG_INFO << "CampaignItemEdit: loadout " << eqp.size() << " equipped + "
 			<< rsv.size() << " reserve slot(s)";
+		co_await gme::commitTransaction(transaction);
 	}
 	catch (...)
 	{

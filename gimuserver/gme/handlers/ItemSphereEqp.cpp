@@ -98,7 +98,7 @@ HANDLEF(ItemSphereEqp)
         }
     }
     const auto identity=(co_await gme::getUserIdentity(theDb(),req.login_info)).nonEmpty();
-    auto transaction=co_await theDb()->newTransactionCoro();
+    auto transaction=co_await gme::beginTransaction(theDb());
     try
     {
         co_await gme::syncWarehouse(transaction,identity);
@@ -200,6 +200,7 @@ HANDLEF(ItemSphereEqp)
                 "UPDATE user_units SET "+columns+" WHERE user_id=$3 AND user_unit_id=$4;",
                 change.item,frame,identity.userId,change.unit);
         }
+        co_await gme::commitTransaction(transaction);
     }
     catch (const std::invalid_argument& e)
     {

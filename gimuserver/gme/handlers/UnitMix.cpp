@@ -272,7 +272,7 @@ HANDLEF(UnitMix)
 
     // Keep material consumption, the type reset and compensation in one
     // transaction, including the reads that prevent duplicate consumption.
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     try
     {
         // Step 1: SELECT base unit full stats.
@@ -1025,6 +1025,7 @@ HANDLEF(UnitMix)
             { "zel_use",           static_cast<int64_t>(zelCost) },
         });
 
+        co_await gme::commitTransaction(transaction);
         co_return HandleResult::success(buffer);
     }
     catch (...)

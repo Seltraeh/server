@@ -3,7 +3,7 @@
 Idempotent: rerunning replaces the same records.  `--check` reports whether
 deploy/archive/mission.json and ai.json already match without writing anything.
 
-    python scripts/gen_battle_simulator.py [--check]
+    python scripts/gen_battle_simulator.py [--check] [--archive DIR]
 
 WHAT THE SIMULATOR IS (evidence, 2026-09-29)
   * Global wiki "Summoners' Training Ground" rev 599590 (2018-12-02), read
@@ -110,7 +110,25 @@ def dummy(slot):
             # ("0,70" came from adding the 110 px to -40 one-for-one.)
             # Production rows are "0,0" or small positives ("0,10".."0,20").
             'cursor_disp_pos': '0,17',
-            'hp_disp_pos': '0,-60',
+            # The status icons (buffs, debuffs, ailments) and the HP-bar point.
+            # MonsterUnit::initialize @0x1155FDC hands this string to
+            # BattleUnit::setStateIconPoint (a unit_id that resolves would use
+            # UnitMst's instead), and BattleUnit::getStateIconPoint @0x11350B4
+            # places the icons at (x, base y - EdgeAnime::getSize(1).height + y):
+            # the TOP of the box every idle-frame cgg part spans, plus this
+            # offset, in battle units, y-down (positive moves them down).  The
+            # dummy box (unit_cgg_10000.csv) starts at its faint additive halo,
+            # well above the lantern itself.  The invented "0,-60" (every
+            # archived special monster's default) put each icon ~190 px = ~101
+            # units above its dummy's visible top on a 600-px-wide battle layer
+            # (1.875 px per unit), over the DAMAGE/SPARK counters, and the top
+            # three dummies' icons off-screen (round 8, run v1).  Production
+            # UnitMst rows are mostly small POSITIVE offsets (median "0,25").
+            # Calibrated against ordinary enemies in the same client (run v2):
+            # their icon centres sit ~21 px above the sprite's visible top
+            # (Squirty, a witch, Priest Merith); "0,35" left the dummies' ~10 px
+            # above, so "0,30" (~6 units, ~11 px higher) matches (run v3).
+            'hp_disp_pos': '0,30',
         },
         'position': POSITIONS[slot],
         'hp': 100_000_000,
@@ -185,8 +203,11 @@ def updated(path, entry, indent):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--check', action='store_true')
+    ap.add_argument('--archive', type=Path, default=MISSIONS.parent,
+                    help='the archive folder to check or write (default deploy/archive); QA runs pass a copy')
     args = ap.parse_args()
-    changes = [(MISSIONS, *updated(MISSIONS, record(), 1)), (AIS, *updated(AIS, ai_record(), 4))]
+    missions, ais = args.archive / MISSIONS.name, args.archive / AIS.name
+    changes = [(missions, *updated(missions, record(), 1)), (ais, *updated(ais, ai_record(), 4))]
     stale = [path.name for path, raw, new in changes if new != raw]
     if args.check:
         print('up to date' if not stale else f'stale: {", ".join(stale)}')

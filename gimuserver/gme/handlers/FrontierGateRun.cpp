@@ -205,7 +205,7 @@ HANDLEF(FrontierGateEnd)
     // marks a run in progress, and FrontierGateSuspendedInfo then reports
     // nothing suspended.
     ::FrontierGateEndResp resp{};
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     try
     {
         if (const auto run = co_await gme::loadFrontierRun(transaction, identity))
@@ -241,6 +241,7 @@ HANDLEF(FrontierGateEnd)
         LOG_INFO << "FrontierGateEnd: run " << req.run.frogate_num
                  << " retired with status " << req.run.mission_status
                  << "; merit points now " << resp.achievement_info.id;
+        co_await gme::commitTransaction(transaction);
     }
     catch (...)
     {

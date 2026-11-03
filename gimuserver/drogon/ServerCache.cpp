@@ -5,6 +5,10 @@
 #include <gimuserver/utils/BfCrypt.hpp>
 #include <gimuserver/utils/JsonFile.hpp>
 
+#include <cryptopp/filters.h>
+#include <cryptopp/hex.h>
+#include <cryptopp/sha.h>
+
 #include <algorithm>
 #include <filesystem>
 #include <map>
@@ -25,6 +29,14 @@
 // is 700000 "A Dark Ritual", so the cut is wide.
 static constexpr int32_t kVortexLandId = 99;
 static constexpr int32_t kVortexAreaIdMax = 200000;
+
+// "Vortex Trials" (area 100003, sp_quest_banner_legacy4) is a CATEGORY: the client draws it as the list of its
+// child areas only, and every one of those sits above kVortexAreaIdMax -- 800150 Scrolls of Urzyma and 800167
+// Battles of Brave Frontier 2 are categories themselves (Burden of Aesys, Amduat, The Savage Lion ...), and the
+// Battles of Brave Frontier 2 children run up to 25010001.  So the Vortex is the low range PLUS every land-99 area
+// whose parent chain (AreaMst.sHMai2ZG) reaches this one; nothing else above the range joins (Travellers' and
+// Seasons Past's children are event content with their own paths, Trial of the Gods among them).
+static constexpr int32_t kVortexTrialsAreaId = 100003;
 
 // Above this, an id belongs to event/special content rather than the Grand
 // Gaia quest line.  Same floor UserInfo's PermitPlace uses for its dense
@@ -183,9 +195,89 @@ static std::string BuildJson(const T& d)
 	return buffer;
 }
 
+/*!
+* "sha256:<hex>" of bytes, the identity format the content broker writes.
+*/
+static std::string Sha256Tag(const std::string& bytes)
+{
+	CryptoPP::SHA256 sha;
+	CryptoPP::byte raw[CryptoPP::SHA256::DIGESTSIZE];
+	sha.CalculateDigest(raw, reinterpret_cast<const CryptoPP::byte*>(bytes.data()), bytes.size());
+	std::string hex;
+	CryptoPP::HexEncoder enc(new CryptoPP::StringSink(hex), false);
+	enc.Put(raw, sizeof raw);
+	enc.MessageEnd();
+	return "sha256:" + hex;
+}
+
+/*!
+* LoadJson for a table a response carries to the client's startup download lists: the same read and
+* parse into one buffer, plus the digest of exactly the bytes parsed, recorded in @p tables for the
+* content broker's coverage binding (see ServerCache::StartupTable).
+*/
+template <typename T>
+static T LoadStartupTable(std::vector<ServerCache::StartupTable>& tables, const std::string& mstRoot,
+	const char* file, const char* carriedBy)
+{
+	T obj{};
+	const std::string path = mstRoot + "/" + file;
+	std::string buffer;
+	const auto& ec = glz::read_file_json(obj, path, buffer);
+	if (ec)
+	{
+		throw std::runtime_error(std::format("Cannot read JSON file \"{}\", error:\n{}", path, glz::format_error(ec, buffer)));
+	}
+	tables.push_back({ "mst", file, Sha256Tag(buffer), carriedBy });
+	return obj;
+}
+
+/*!
+* One value of a served projection: '\', tab, CR and LF escaped so a line is one row.
+* scripts/startup_coverage.py _projection_text does the same.
+*/
+static std::string ProjectionText(const std::string& value)
+{
+	std::string out;
+	out.reserve(value.size());
+	for (const char c : value)
+	{
+		switch (c)
+		{
+		case '\\': out += "\\\\"; break;
+		case '\t': out += "\\t"; break;
+		case '\n': out += "\\n"; break;
+		case '\r': out += "\\r"; break;
+		default: out += c;
+		}
+	}
+	return out;
+}
+
+/*!
+* The bytes the cache hashes for the area table it synthesizes (Session 19): a header naming the key
+* and the columns, then one line per SERVED row, in served order, with the values the client's startup
+* requests read from it -- the area id (the check-list key and the link to its dungeons), the area type
+* (which folder its plate is asked under), img and plate_img (the names).  scripts/startup_coverage.py
+* served_projection writes the same bytes from the rows it predicts.
+*/
+static std::string StartupProjection(const std::vector<AreaMst>& rows)
+{
+	std::string out = "3SG2wX0R VjCY7rX4,3v1qg7Uj,b5VveUd8,H0UB8pqm\n";
+	for (const auto& row : rows)
+		out += std::to_string(row.area_id) + "\t" + std::to_string(row.area_type) + "\t" + ProjectionText(row.img)
+			+ "\t" + ProjectionText(row.plate_img) + "\n";
+	return out;
+}
+
+bool ServerCache::isVortexArea(int32_t areaId) const
+{
+	return areaId < kVortexAreaIdMax || m_vortexTrialAreas.contains(areaId);
+}
+
 void ServerCache::Setup(const Json::Value& serverObj)
 {
 	const auto& mstRoot = serverObj["mst_root"].asString();
+	m_startupTables.clear();
 	// Not every file the server loads at boot is a decoded MST.  features/
 	// brave_slots/notice_info are server config and response fixtures, so they
 	// live in system_root while mst_root holds only reference tables.
@@ -236,12 +328,16 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_initrsp.town_facility_lv = LoadJson<TownFacilityLvMstCache>(mstRoot, "town_facility_lv_mst.json").data;
 		m_initrsp.town_location = LoadJson<TownLocationMstCache>(mstRoot, "town_location_mst.json").data;
 		m_initrsp.town_location_lv = LoadJson<TownLocationLvMstCache>(mstRoot, "town_location_lv_mst.json").data;
-		m_initrsp.dungeon_keys = LoadJson<DungeonKeyMstCache>(mstRoot, "dungeon_key_mst.json").data;
+		// The tables a startup download list reads (scripts/startup_coverage.py DERIVED) load
+		// through LoadStartupTable, which records what was parsed for the content broker.
+		m_initrsp.dungeon_keys = LoadStartupTable<DungeonKeyMstCache>(m_startupTables, mstRoot,
+			"dungeon_key_mst.json", "Initialize 4NG79sX1").data;
 		m_initrsp.arena_ranks = LoadJson<ArenaRankMstCache>(mstRoot, "arena_rank_mst.json").data;
 		m_initrsp.gacha_effects = LoadJson<GachaEffectMstCache>(mstRoot, "gacha_effect_mst.json").data;
 		m_initrsp.gachas = LoadJson<GachaMstCache>(mstRoot, "gacha_mst.json").data;
 		m_initrsp.npcs = LoadJson<NpcMstCache>(mstRoot, "npc_mst.json").data;
-		m_initrsp.banner_info = LoadJson <BannerInfoMstCache>(mstRoot, "banner_info_mst.json").data;
+		m_initrsp.banner_info = LoadStartupTable<BannerInfoMstCache>(m_startupTables, mstRoot,
+			"banner_info_mst.json", "Initialize Pk5F1vhx").data;
 		m_initrsp.extra_passive_skills = LoadJson<ExtraPassiveSkillMstCache>(mstRoot, "extra_passive_skill_mst.json").data;
 		m_initrsp.notice_info = LoadJson<NoticeInfo>(systemRoot, "notice_info.json");
 		m_initrsp.defines = LoadJson<DefineMst>(mstRoot, "defines_mst.json");
@@ -309,7 +405,8 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_userrsp.video_ad_info = LoadJson<VideoAdInfoCache>(mstRoot, "video_ad_info_mst.json").data;
 		m_userrsp.excluded_dungeon_missions = LoadJson<ExcludedDungeonMissionMstCache>(mstRoot, "excluded_dungeon_mission_mst.json").data;
 		m_userrsp.gift = LoadJson<GiftItemMstCache>(mstRoot, "gift_item_mst.json").data;
-		m_userrsp.general_event = LoadJson<GeneralEventMstCache>(mstRoot, "general_event_mst.json").data;
+		m_userrsp.general_event = LoadStartupTable<GeneralEventMstCache>(m_startupTables, mstRoot,
+			"general_event_mst.json", "UserInfo Md9gG3c0").data;
 		m_userrsp.first_desc = LoadJson<FirstDescMstCache>(mstRoot, "first_desc_mst.json").data;
 		m_userrsp.summon_ticket_v2 = LoadJson<SummonTicketV2MstCache>(mstRoot, "summon_ticket_v2_mst.json").data;
 		m_userrsp.resummon_gacha = LoadJson<ResummonGachaMstCache>(mstRoot, "resummon_gacha_mst.json").data;
@@ -376,8 +473,10 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_achievementTradeMst = LoadJson<AchievementTradeMstCache>(mstRoot, "achievement_trade_mst.json").data;
 		m_achievementDeliverRateMst = LoadJson<AchievementDeliverRateMstCache>(mstRoot, "achievement_deliver_rate_mst.json").data;
 
-		m_grandMissionMst = LoadJson<GrandMissionMstCache>(mstRoot, "grand_mission_mst.json").data;
-		m_grandMissionMapMst = LoadJson<GrandMissionMapMstCache>(mstRoot, "grand_mission_map_mst.json").data;
+		m_grandMissionMst = LoadStartupTable<GrandMissionMstCache>(m_startupTables, mstRoot,
+			"grand_mission_mst.json", "CampaignMissionGet/CampaignStart as8G75gK").data;
+		m_grandMissionMapMst = LoadStartupTable<GrandMissionMapMstCache>(m_startupTables, mstRoot,
+			"grand_mission_map_mst.json", "CampaignMissionGet/CampaignStart iyCP4N1h").data;
 		m_grandMissionSpotMst = LoadJson<GrandMissionSpotMstCache>(mstRoot, "grand_mission_spot_mst.json").data;
 		m_grandMissionRouteMst = LoadJson<GrandMissionRouteMstCache>(mstRoot, "grand_mission_route_mst.json").data;
 		m_grandMissionIconMst = LoadJson<GrandMissionIconMstCache>(mstRoot, "grand_mission_icon_mst.json").data;
@@ -410,7 +509,7 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		m_colosseumSupportMst = LoadJson<ColosseumSupportMstCache>(mstRoot, "colosseum_support_mst.json").data;
 
 		// Dual Brave Burst master data — see mst/dbb.kdl.
-		m_dbbMst = LoadJson<DbbMstCache>(mstRoot, "dbb_mst.json").data;
+		m_dbbMst = LoadStartupTable<DbbMstCache>(m_startupTables, mstRoot, "dbb_mst.json", "UserInfo fTV3A0By").data;
 		m_dbbBondRecipeMst = LoadJson<DbbBondRecipeMstCache>(mstRoot, "dbb_bond_recipe_mst.json").data;
 
 		// Guild master data — see mst/guild.kdl (ART and SKILL_DETAILS remain
@@ -720,14 +819,41 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		// wherever the player already expected the tile to be.
 		std::map<std::vector<std::string>, int32_t> bannersSeen;
 		{
+			// The Vortex Trials subtree above the id range (see kVortexTrialsAreaId).  Parents are walked to any
+			// depth; a cycle or a dangling parent ends the walk.
+			std::map<int32_t, int32_t> parentOf;
+			for (const auto& area : m_areaMst)
+			{
+				const auto parent = area.parent_area_id;
+				if (!parent || parent->empty() || *parent == "0")
+					continue;
+				try { parentOf[area.area_id] = std::stoi(*parent); }
+				catch (const std::exception&) {}
+			}
+			for (const auto& area : m_areaMst)
+			{
+				if (area.land_id != kVortexLandId || area.area_id < kVortexAreaIdMax)
+					continue;
+				std::set<int32_t> seen;
+				for (auto it = parentOf.find(area.area_id); it != parentOf.end() && seen.insert(it->second).second;
+				     it = parentOf.find(it->second))
+					if (it->second == kVortexTrialsAreaId)
+					{
+						m_vortexTrialAreas.insert(area.area_id);
+						break;
+					}
+			}
+			LOG_INFO << "ServerCache: Vortex Trials subtree — " << m_vortexTrialAreas.size()
+			         << " area(s) above the Vortex id range";
+
 			std::map<int32_t, std::vector<const DungeonMst*>> vortexDungeons;
 			for (const auto& dungeon : m_dungeonMst)
-				if (dungeon.land_id == kVortexLandId && dungeon.area_id < kVortexAreaIdMax)
+				if (dungeon.land_id == kVortexLandId && isVortexArea(dungeon.area_id))
 					vortexDungeons[dungeon.area_id].push_back(&dungeon);
 
 			std::vector<const AreaMst*> vortexAreas;
 			for (const auto& area : m_areaMst)
-				if (area.land_id == kVortexLandId && area.area_id < kVortexAreaIdMax)
+				if (area.land_id == kVortexLandId && isVortexArea(area.area_id))
 					vortexAreas.push_back(&area);
 
 			std::sort(vortexAreas.begin(), vortexAreas.end(),
@@ -832,6 +958,13 @@ void ServerCache::Setup(const Json::Value& serverObj)
 			LOG_INFO << "ServerCache: serving " << m_clientAreaMst.size()
 			         << " area(s) to the client, " << localised
 			         << " with translated banner art";
+
+			// The client's startup check list requests its area art from THESE rows (UserInfo's
+			// 3SG2wX0R replaces its AreaMstList): bound by their served projection, recorded once --
+			// nothing changes m_clientAreaMst after this, whatever happens to the files or the banner
+			// folder later.
+			m_startupTables.push_back({ "served", "3SG2wX0R", Sha256Tag(StartupProjection(m_clientAreaMst)),
+				"UserInfo 3SG2wX0R (the area table curated at boot)" });
 		}
 
 		// Everything PermitPlace must allow before the Vortex draws a tile.
@@ -842,13 +975,13 @@ void ServerCache::Setup(const Json::Value& serverObj)
 		// survives and is all this needs to walk dungeon -> missions.
 		{
 			for (const auto& area : m_areaMst)
-				if (area.land_id == kVortexLandId && area.area_id < kVortexAreaIdMax
+				if (area.land_id == kVortexLandId && isVortexArea(area.area_id)
 					&& !m_vortexHiddenAreas.contains(area.area_id))
 					m_vortexPermits.areas.insert(area.area_id);
 
 			for (const auto& dungeon : m_dungeonMst)
 			{
-				if (dungeon.land_id != kVortexLandId || dungeon.area_id >= kVortexAreaIdMax)
+				if (dungeon.land_id != kVortexLandId || !isVortexArea(dungeon.area_id))
 					continue;
 
 				// A hidden area has no tile, so nothing inside it is reachable.

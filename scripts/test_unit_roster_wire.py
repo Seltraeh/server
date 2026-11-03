@@ -14,10 +14,11 @@ in the report is that ONE unit, Deemo and the Girl: Light 50563/50564/50565
 (4-6★) and Dark 60864/60865 (5-6★), per the wiki's unit pages
 (tools/wiki_units/cache/Deemo_and_the_Girl__4__.wikitext etc.).
 
-The 31 still unarchived are named only in Japanese (MEIKO/KAITO, 吉田くん, ...) or
-not at all; they are JP-only releases and stay out rather than be invented.
-30645 Young Sheep Ullah evolves into one of them (30646, no name anywhere) --
-the one evolution link left pointing outside the archive.
+The 31 then unarchived were named only in Japanese (MEIKO/KAITO, 吉田くん, ...) or
+not at all.  Since November 2 (Evan: every unit playable) scripts/jp_units.py archives
+29 of them under English names (scripts/data/jp_units/units.json), so a JP unit counts
+as named when that file names it; what stays out still has no name anywhere.
+30645 Young Sheep Ullah's evolution 30646 is one of the 29, so no link leaves the archive.
 
 Static: the archive rule over all 2,291 client units, identities (rarity,
 element, skills) against unit_mst, art on disk, evolution links.
@@ -35,7 +36,8 @@ from bf_testkit import qa_dir  # noqa: E402
 ENGLISH = re.compile(r"^[A-Za-z0-9À-ɏ ×,.'&:!?\-’()/+]+$")
 UNIT_ART = [('img', 'unit_ills_full', 'png'), ('img', 'unit_anime', 'png'), ('cgg', 'unit_cgg', 'csv')]
 DEEMO = {50563: (4, 5), 50564: (5, 5), 50565: (6, 5), 60864: (5, 6), 60865: (6, 6)}
-KNOWN_UNNAMED_EVOLUTION = {(30645, 30646)}
+# 30645 Young Sheep Ullah -> 30646 was the one link out of the archive until jp_units.py named and archived 30646.
+KNOWN_UNNAMED_EVOLUTION: set = set()
 
 
 def mst(name):
@@ -60,8 +62,19 @@ def main():
         uid, _, name = line.partition('\t')
         client[uid] = name.replace(' ', ' ')
 
+    # The EU-only units (scripts/eu_units.py, round 8) are named in the reissued units dictionary, not in the
+    # Global wiki scrape or the shipped dictionary dump.
+    eu_names = json.loads((ROOT / 'scripts/data/eu_units/text.json').read_text(encoding='utf-8'))['units']
+    # The JP-only units in the client's tables (scripts/jp_units.py, November 2: Evan wants every unit playable)
+    # are named in English the same way.
+    jp_names = {f'MST_UNIT_{u["id"]}_NAME': u['name'] for u in
+                json.loads((ROOT / 'scripts/data/jp_units/units.json').read_text(encoding='utf-8'))}
+    # and the JP-exclusive units (scripts/jp_exclusive_units.py, installed November 2), named in AUTHORED English
+    jx_names = json.loads((ROOT / 'scripts/data/jp_units/exclusive/text.json').read_text(encoding='utf-8'))['units']
+    eu_names = {**eu_names, **jp_names, **jx_names}
+
     def english_name(uid):
-        for name in ((wiki.get(str(uid)) or {}).get('name'), client.get(str(uid))):
+        for name in ((wiki.get(str(uid)) or {}).get('name'), client.get(str(uid)), eu_names.get(f'MST_UNIT_{uid}_NAME')):
             if name and ENGLISH.match(name):
                 return name
         return None
@@ -101,7 +114,7 @@ def main():
     # ---- evolution links ------------------------------------------------------------
     out = {(u, int(r['74VFwuTd'])) for u, r in evo.items()
            if u in archive and int(r['74VFwuTd']) and int(r['74VFwuTd']) not in archive}
-    check('every archived unit evolves into an archived unit (but the one unnamed form)',
+    check('every archived unit evolves into an archived unit',
           out == KNOWN_UNNAMED_EVOLUTION, sorted(out))
     check('the Deemo chains are whole', all(int(evo[u]['74VFwuTd']) in archive for u in (50563, 50564, 60864)))
 

@@ -12,6 +12,7 @@
 #include <gimuserver/gme/common/DailySpin.hpp>
 #include <gimuserver/gme/common/MysteryChest.hpp>
 #include <gimuserver/gme/common/Exchange.hpp>
+#include <gimuserver/content/ContentBroker.hpp>
 
 GimuServer::GimuServer() : m_dlc_error_log(), m_have_log(false), m_cache() {}
 
@@ -73,6 +74,17 @@ void GimuServer::initAndStart(const Json::Value& config)
 	// Needs UnitArchiver::setup above: it sweeps the archive for 6-star units.
 	gme::loadSelectorRotation();
 	gme::loadExchangeArchive(server["archive_root"].asString());
+	// Read-only content broker for the offline-proxy content provider.  Dormant
+	// unless system_root/content_provider.json says "enabled": true.  It binds the
+	// startup coverage manifest to the response tables the cache parsed above.
+	std::vector<content::ServedTable> served;
+	for (const auto& table : m_cache.startupTables())
+		served.push_back({ table.root, table.file, table.digest, table.carriedBy });
+	content::ContentBroker::instance().start(drogon::app().getDocumentRoot(),
+		server.get("system_root", "./system").asString(), std::move(served));
 }
 
-void GimuServer::shutdown() {}
+void GimuServer::shutdown()
+{
+	content::ContentBroker::instance().stop();
+}

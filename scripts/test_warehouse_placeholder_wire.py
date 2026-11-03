@@ -1,21 +1,26 @@
-"""#34: act on a crafted sphere before the client has been sent its real row id.
+"""#34: act on a sphere the client added itself before it has been sent its real row id.
 
 python scripts/test_warehouse_placeholder_wire.py PATH_TO_DEBUG_EXE [--port 19976]
 
-The client applies a craft locally and names each row it adds INT_MAX - itemId
-(ARM64 GameUtils::incWarehouseItem @0x118A304; Windows: helper RVA 0x6E5580 and
-inline stores of 0x7FFFFFFF - itemId into the row's +0x14 index field at
-0x6E546D / 0xD49AFE / 0xD703C8 / 0x4D2761), and ItemMix answers {}.  Until a reply
-carrying 9wjrh74P replaces its list, a sell, lock or equip of that sphere arrives
-under the placeholder (Windows ItemSellRequest 0x4B4A40 and ItemFavoriteRequest
-0x4B4060 both send [row+0x14]).
+The client names each row it adds locally INT_MAX - itemId (ARM64
+GameUtils::incWarehouseItem @0x118A304; Windows: helper RVA 0x6E5580 and inline
+stores of 0x7FFFFFFF - itemId into the row's +0x14 index field at 0x6E546D /
+0xD49AFE / 0xD703C8).  Until a reply carrying 9wjrh74P replaces its list, a sell,
+lock or equip of that copy arrives under the placeholder (Windows ItemSellRequest
+0x4B4A40 and ItemFavoriteRequest 0x4B4060 both send [row+0x14]).
 
-The sequence below is the client's: craft, craft again, then lock / sell / equip
-WITHOUT any UserInfo in between.  Requests use the client's numeric-string
-encoding against an isolated SQLite backup.  Every assertion reads the rows,
-aggregate stock, Zel and unit columns -- including that a placeholder never
-touches a copy the client is showing under its real id (here a real high id,
-2097123), and that every refusal or injected failure changes nothing.
+Crafts no longer leave such rows: since 2026-10-03 the ItemMix reply is the list
+(net/items.kdl ItemMixResp; test_craft_row_identity_wire.py), which the first
+section checks.  The other local appends remain -- a harvest, a gift, a battle
+item taken off the bar -- so the copies here come from a grant whose reply carries
+no list (a direct stock change on the copy; the server mints their rows at its
+next sync, above the seen mark), and the client's own placeholder rows for them.
+Then lock / sell / equip WITHOUT any UserInfo in between.  Requests use the
+client's numeric-string encoding against an isolated SQLite backup.  Every
+assertion reads the rows, aggregate stock, Zel and unit columns -- including that
+a placeholder never touches a copy the client is showing under its real id (here
+a real high id, 2097123, and the crafted copy), and that every refusal or
+injected failure changes nothing.
 """
 import argparse
 import sys
@@ -115,6 +120,12 @@ def main():
         def craft(count):
             return c.call('ItemMix', body={'JTf2jY5o': [{'4HqhTf3a': f'2005:{count}'}]})
 
+        def grant(count):
+            """A grant whose reply carries no list: stock only; rows come at the next sync."""
+            db.execute('UPDATE user_items SET item_num=item_num+? WHERE user_id=? AND item_id=?',
+                       (count, user, SPHERE))
+            db.commit()
+
         # ---- the client is shown its warehouse (login) --------------------------
         view = c.call('UserInfo')
         sent = view['9wjrh74P']
@@ -137,12 +148,12 @@ def main():
         #                                row with that id), sent only if locked
         #   setFavorite (arm64 0x12BCA34)  after the reply, every row's flag =
         #                                "is my id in the reply's VSRPkdId"
-        # Town crafts go through MyTownItemMixConnectScene (sent at once) and
-        # sells through ItemSellConnectScene (at once), while a lock is QUEUED by
-        # ItemDetailScene::touchEnded and built when StepScene sends the queue.
+        # Sells go through ItemSellConnectScene (at once), while a lock is QUEUED
+        # by ItemDetailScene::touchEnded and built when StepScene sends the
+        # queue, as town crafts are (createItemMixConnectList).
         client_rows = [[HIGH_REAL_ID, False]]          # [id, locked] in list order
 
-        def client_craft(n):
+        def client_add(n):
             client_rows.extend([placeholder, False] for _ in range(n))
 
         def client_lock_request():
@@ -168,16 +179,28 @@ def main():
             new_locked = sum(1 for i in unsent if server[i][1] and server[i][0] > 0)
             return real_ok and shown_new == new_locked, (shown_real, shown_new, new_locked)
 
-        # ---- one craft, then one more: the reply stays {} -------------------------
+        # ---- a craft: the reply is the list, so the copy has its own id ----------
         zel_start, karma_start = zel(), karma()
+        client_add(1)                                  # applied at the tap, as the client does
         r1 = craft(1)
-        r2 = craft(1)
-        client_craft(2)
-        check('craft: single and repeated batches accepted, replies do not replace the list',
-              all('error' not in r and '9wjrh74P' not in r for r in (r1, r2)), (r1, r2))
-        check('craft: two spheres for exactly 10 material and 1000 Karma',
-              stock() == 3 and stock(MATERIAL) == 5 and karma() == karma_start - 1000,
+        crafted = [int(r['n6E8iMf3']) for r in r1.get('9wjrh74P', [])
+                   if r['kixHbe54'] == str(SPHERE) and int(r['n6E8iMf3']) != HIGH_REAL_ID]
+        check('craft: accepted and answered with the list and its lock set',
+              'error' not in r1 and '9wjrh74P' in r1 and 'VSRPkdId' in r1, sorted(r1)[:6])
+        check('craft: the crafted copy is listed under its own row id', len(crafted) == 1
+              and crafted[0] != placeholder, crafted)
+        check('craft: one sphere for exactly 5 material and 500 Karma',
+              stock() == 2 and stock(MATERIAL) == 10 and karma() == karma_start - 500,
               (stock(), stock(MATERIAL), karma()))
+        client_rows[:] = [[HIGH_REAL_ID, False]] + [[i, False] for i in crafted]
+        crafted_id = crafted[0] if crafted else -1
+        mark = seen()
+        check('seen mark: the craft reply covers the crafted row',
+              isinstance(mark, int) and mark >= crafted_id, mark)
+
+        # ---- two copies the client adds itself, with no list in their reply -------
+        grant(2)
+        client_add(2)
 
         # ---- an injected failure mid-sale changes nothing -------------------------
         db.execute("CREATE TRIGGER qc_placeholder_sell_fail BEFORE UPDATE OF zel ON user_info"
@@ -198,14 +221,18 @@ def main():
         # (gme::syncWarehouse), so the unsent ids are read after it.
         first_two = sorted(i for i in now if isinstance(mark, int) and i > mark)
         check('sell: accepted', 'error' not in r, r)
-        check('sell: one sphere leaves stock', stock() == 2)
+        # The crafted copy stays in storage throughout: it is a real id the
+        # client holds, which no placeholder may touch.
+        check('sell: one sphere leaves stock', stock() == 3, stock())
         check('sell: the oldest unsent copy was sold',
               len(first_two) == 2 and now[first_two[0]] == (0, 0, 0) and now[first_two[1]] == (1, 0, 0), now)
-        check('sell: the real high-id copy is untouched', now[HIGH_REAL_ID] == (1, 0, 0), now[HIGH_REAL_ID])
+        check('sell: the real high-id copy and the crafted copy are untouched',
+              now[HIGH_REAL_ID] == (1, 0, 0) and now.get(crafted_id) == (1, 0, 0),
+              (now[HIGH_REAL_ID], now.get(crafted_id)))
         check('sell: Zel credited', zel() > z, (z, zel()))
 
         # ---- lock the new copy (queued, built at send time) ------------------------
-        client_rows[1][1] = True                           # the first placeholder row
+        next(row for row in client_rows if row[0] == placeholder)[1] = True   # the first placeholder row
         body = client_lock_request()
         check('lock: the client sends the placeholder once per placeholder row it holds',
               body == [placeholder], body)
@@ -219,13 +246,13 @@ def main():
         ok, detail = client_shows_server()
         check('lock: what the client shows after the reply is what the server holds', ok, detail)
 
-        # ---- craft once more: a new, unlocked copy beside the locked one -----------
-        r3 = craft(1)
-        client_craft(1)
-        check('craft: a third copy for 5 material and 500 Karma', 'error' not in r3 and stock() == 3
-              and stock(MATERIAL) == 0 and karma() == karma_start - 1500, (stock(), stock(MATERIAL), karma()))
+        # ---- one more such copy: a new, unlocked one beside the locked one ----------
+        grant(1)
+        client_add(1)
+        check('grant: a third unsent copy, no material or Karma spent', stock() == 4
+              and stock(MATERIAL) == 10 and karma() == karma_start - 500, (stock(), stock(MATERIAL), karma()))
         ok, detail = client_shows_server()
-        check('craft: the new copy shows unlocked on both sides until the next lock reply', ok, detail)
+        check('grant: the new copy shows unlocked on both sides until the next lock reply', ok, detail)
 
         # ---- equip new copies on two units in one request ---------------------------
         r = equip([(placeholder, 0, unit_a, SPHERE, 0), (placeholder, 0, unit_b, SPHERE, 0)])
@@ -237,7 +264,8 @@ def main():
         check('equip: the unlocked copy went first, the locked one second (lock stays with its copy)',
               len(unseen) == 3 and now[unseen[2]] == (0, 0, unit_a) and now[unseen[1]] == (0, 1, unit_b), now)
         check('equip: stock falls by exactly two, the real high-id copy untouched',
-              stock() == 1 and now[HIGH_REAL_ID] == (1, 0, 0), (stock(), now[HIGH_REAL_ID]))
+              stock() == 2 and now[HIGH_REAL_ID] == (1, 0, 0) and now.get(crafted_id) == (1, 0, 0),
+              (stock(), now[HIGH_REAL_ID], now.get(crafted_id)))
         locked_copy = unseen[1] if len(unseen) == 3 else None
 
         before = state()
@@ -264,7 +292,7 @@ def main():
         # ---- the real high id still sells exactly --------------------------------
         z = zel()
         sell([(HIGH_REAL_ID, 1)])
-        check('exact: the real high id sells itself', rows()[HIGH_REAL_ID][0] == 0 and stock() == 0 and zel() > z,
+        check('exact: the real high id sells itself', rows()[HIGH_REAL_ID][0] == 0 and stock() == 1 and zel() > z,
               (rows()[HIGH_REAL_ID], stock()))
 
         # ---- regular stacks: the overflow of a grant ----------------------------
@@ -304,7 +332,7 @@ def main():
         equip([(0, 0, unit_b, 0, 0)])
         after_rows = rows()
         check('unequip: the locked copy returns to storage with its lock and id',
-              locked_copy is not None and after_rows[locked_copy] == (1, 1, 0) and stock() == 1, after_rows)
+              locked_copy is not None and after_rows[locked_copy] == (1, 1, 0) and stock() == 2, after_rows)
         db.close()
 
     with IsolatedServer(args.exe, fx, log_name='restart.log'):

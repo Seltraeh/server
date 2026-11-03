@@ -68,7 +68,7 @@ HANDLEF(UnitSell)
     // back left the unit owned WITH the sphere still on it -- and the next sale
     // returned the same sphere again (a duplicate).  Now all of it, the reply's
     // snapshot and the counters commit together or not at all.
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     std::string buffer{};
     try
     {
@@ -135,6 +135,7 @@ HANDLEF(UnitSell)
 
         co_await gme::addJournalProgress(
             transaction, identity, gme::kJournalTaskSellUnits, static_cast<int32_t>(totalZel));
+        co_await gme::commitTransaction(transaction);
     }
     catch (...)
     {

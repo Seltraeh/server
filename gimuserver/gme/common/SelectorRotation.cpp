@@ -129,8 +129,9 @@ drogon::Task<bool> grantStarterSelectorIfDue(
 	if (rows[0]["level"].as<int32_t>() < kStarterSelectorLevel)
 		co_return false;
 
-	// Mark first: a throw in the grant costs one ticket, whereas marking after
-	// would hand out a new one on every request until it succeeded.
+	// Mark first.  The caller (UserInfo) passes a transaction, so the mark and
+	// the ticket land together or not at all; the order only mattered when each
+	// statement committed on its own.
 	co_await database->execSqlCoro(
 		"UPDATE user_info SET starter_selector_granted = 1 WHERE id = $1;",
 		identity.userId);

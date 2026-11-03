@@ -122,7 +122,7 @@ HANDLEF(ItemEdit)
 		co_return HandleResult::success("{}");
 	}
 
-	auto transaction = co_await theDb()->newTransactionCoro();
+	auto transaction = co_await gme::beginTransaction(theDb());
 	try
 	{
 		// What the bars hold now, per item, across both bars.
@@ -207,6 +207,7 @@ HANDLEF(ItemEdit)
 
 		LOG_INFO << "ItemEdit: stored " << equip->size() << " item slot(s) and "
 		         << bonus->size() << " bonus slot(s) for " << identity.userId;
+		co_await gme::commitTransaction(transaction);
 	}
 	catch (...)
 	{

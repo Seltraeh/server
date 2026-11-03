@@ -41,7 +41,7 @@ HANDLEF(DbbBond)
 	DbbBondResp resp{};
 	resp.signal_key.key = "5EdKHavF";
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			if (unbond)
@@ -155,6 +155,7 @@ HANDLEF(DbbBond)
 			co_await gme::fillDbb(transaction, identity, resp,
 				unbond ? std::vector<int32_t>{ node.main_unit_id, node.sub_unit_id }
 				       : std::vector<int32_t>{});
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

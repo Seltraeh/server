@@ -45,9 +45,12 @@ endif()
 # even without LTCG. Keep the workaround local; all other Release objects
 # remain optimized. Recheck when upgrading the compiler.
 if (MSVC)
-    set_property(SOURCE gme/handlers/Mission.cpp gme/handlers/Present.cpp gme/handlers/UserInfo.cpp
+    # AchievementDeliver.cpp and UnitMix.cpp joined the list on 2026-11-03 (C4737 in the Release build; a
+    # `ninja -k 0` pass over the whole tree found no other).
+    set(C4737_SOURCES gme/handlers/Mission.cpp gme/handlers/Present.cpp gme/handlers/UserInfo.cpp
+        gme/handlers/AchievementDeliver.cpp gme/handlers/UnitMix.cpp)
+    set_property(SOURCE ${C4737_SOURCES}
         APPEND PROPERTY COMPILE_OPTIONS "$<$<NOT:$<CONFIG:Debug>>:/Od>")
     # MSVC otherwise restores /O2 from the shared PCH (C4653), ignoring /Od.
-    set_source_files_properties(gme/handlers/Mission.cpp gme/handlers/Present.cpp gme/handlers/UserInfo.cpp
-        PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+    set_source_files_properties(${C4737_SOURCES} PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 endif()

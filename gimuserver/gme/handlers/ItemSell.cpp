@@ -14,7 +14,7 @@ HANDLEF(ItemSell)
     if (const auto ec=glz::read<glz::opts{.error_on_unknown_keys=false}>(req,json); ec)
         co_return HandleResult::success("{}");
     const auto identity=(co_await gme::getUserIdentity(theDb(),req.login_info)).nonEmpty();
-    auto transaction=co_await theDb()->newTransactionCoro();
+    auto transaction=co_await gme::beginTransaction(theDb());
     try
     {
         co_await gme::syncWarehouse(transaction,identity);
@@ -94,6 +94,7 @@ HANDLEF(ItemSell)
                 "UPDATE user_info SET zel=MIN(zel+$1,99999999) WHERE id=$2;",credit,identity.userId);
             co_await gme::bumpArchiveCounters(transaction,identity,{{"zel_item_sale",credit}});
         }
+        co_await gme::commitTransaction(transaction);
     }
     catch (...) { transaction->rollback(); throw; }
     co_return HandleResult::success("{}");

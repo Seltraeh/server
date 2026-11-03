@@ -16,7 +16,7 @@ HANDLEF(DeckEdit)
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info, true)).nonEmpty();
 
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			(co_await db::DatabaseInterface::update(
@@ -41,6 +41,7 @@ HANDLEF(DeckEdit)
 			co_await gme::storeClientScenarioMarkers(transaction, identity,
 				req.login_info.special_scenario_info,
 				req.login_info.scenario_info.value_or(std::string{}));
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

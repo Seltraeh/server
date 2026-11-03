@@ -69,8 +69,38 @@ int main(int argc, char** argv)
 
         drogon::app()
             .loadConfigFile(absConfig.filename().string())
+            // Idle keep-alive connections are never closed.  The client's
+            // WinINet pools its connections to this server, and drogon's
+            // default idle_connection_timeout (60 s) drops one under it: a
+            // socket left idle for 90 s was aborted on its next request with
+            // the default and answered with 0 (2026-10-23,
+            // out/qa/current/session19/visual/keepalive_probe.py).
+            // This is NOT what hung the title after the start tap.  That was
+            // the proxy's debug console: a QuickEdit selection in it blocked
+            // the login's console write on the game's main thread
+            // (offline-proxy console_log.cpp).  With the console not held,
+            // late logins succeeded on the old server too, so the client
+            // recovers from a dropped idle socket and no observed failure
+            // depends on this setting.  Kept as a defensive default (one local
+            // client keeps few sockets open); change it only on evidence of
+            // its own.  Set in code so a config cannot bring the timeout back.
+            .setIdleConnectionTimeout(0)
             .registerBeginningAdvice([]() {
                 auto db = drogon::app().getDbClient();
+                // ⚠ WITHOUT A BUSY TIMEOUT ONE OUTSIDE READER WEDGES THE SERVER.
+                // Drogon opens SQLite with none, queues a transaction's COMMIT
+                // after the handler has already replied, and on SQLITE_BUSY
+                // only logs "Transaction submission failed" -- no retry, no
+                // rollback.  The connection then stays inside the open
+                // transaction: the acknowledged action is never written and
+                // every later request fails at "transaction begin" until a
+                // restart (out/qa/current/session9/commit_race_probe_*.log).  A
+                // backup-API copy of the save, a suite's direct read or a DB
+                // browser overlapping one request was enough.  With a timeout
+                // the COMMIT waits for such a reader instead.  The config uses
+                // one connection (connection_number's default), so this one
+                // statement reaches the connection every transaction runs on.
+                db->execSqlSync("PRAGMA busy_timeout = 5000;");
                 MigrationManager::RunMigrations(db);
                 // Legacy SeedDefaultUnits/SeedDefaultTown removed: the
                 // tutorial (CreateUser + UnitArchiver) provisions the user

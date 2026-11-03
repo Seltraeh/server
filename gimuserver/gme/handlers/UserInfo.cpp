@@ -384,7 +384,13 @@ HANDLEF(UserInfo)
     // The one starter selector a fresh account is owed at Summoner Rank 50.
     // Checked here rather than at the point of level-up so it cannot be missed
     // by whichever path did the levelling.
-    co_await gme::grantStarterSelectorIfDue(db, identity);
+    // Its mark and its present are two statements: one transaction, so a
+    // failure between them cannot cost the ticket (or grant it twice).
+    {
+        auto transaction = co_await gme::beginTransaction(db);
+        co_await gme::grantStarterSelectorIfDue(transaction, identity);
+        co_await gme::commitTransaction(transaction);
+    }
     resp.selector_ticket_info = co_await gme::loadSelectorTickets(db, identity);
 
     // V2 summon tickets (a3d5d12i) — the per-type inventory.  Also load-bearing:
@@ -442,8 +448,14 @@ HANDLEF(UserInfo)
     // paid nothing, because the client's claim @0x1CB14CC is animation and the
     // server is what actually grants.  advanceLoginCampaign does the granting
     // and is idempotent within a day, so the 12-hour re-check can call it too.
-    resp.campaign_info = gme::loginCampaignInfo(
-        co_await gme::advanceLoginCampaign(db, identity));
+    // The day's advance and its rewards in one transaction (several
+    // statements: a failure part-way kept the day without its rewards).
+    {
+        auto transaction = co_await gme::beginTransaction(db);
+        const auto campaign = co_await gme::advanceLoginCampaign(transaction, identity);
+        co_await gme::commitTransaction(transaction);
+        resp.campaign_info = gme::loginCampaignInfo(campaign);
+    }
 
     // The Summoner itself (n5mdIUqj) — a SINGLETON, so exactly one row.  Built
     // by gme::loadSummonerInfo, shared with PresentReceipt (which pays SP);

@@ -181,7 +181,7 @@ HANDLEF(PresentReceipt)
 
 	PresentReceiptResp resp = {};
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// ⚠ "RECEIVE ALL" SENDS NO PRESENT ID AT ALL.
@@ -624,6 +624,7 @@ HANDLEF(PresentReceipt)
 			// Brave Slots counter keeps the pre-claim number until some later
 			// call happens to bring UserInfo along.
 			resp.medal_info = co_await gme::loadBraveMedals(transaction, identity);
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

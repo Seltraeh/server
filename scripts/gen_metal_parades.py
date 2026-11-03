@@ -2,6 +2,7 @@
 
 python scripts/gen_metal_parades.py          # rewrite deploy/archive/mission.json
 python scripts/gen_metal_parades.py --check  # exit 1 if the archive differs
+python scripts/gen_metal_parades.py --out DIR/mission.json   # write the result elsewhere (never deploy/)
 
 EVIDENCE -- Global wiki, one page per parade (each lists the tiers and their HP):
   Metal Parade!       Parade:Metal rev 630717  1000 EXP  Ghost 10, King 35, God 100, Crystal 300
@@ -18,12 +19,17 @@ difference this build's data does not resolve, so the archive keeps agreeing
 with its own MST (validate_missions.py H4) and the page's figure is recorded
 in docs/CLAUDE_SESSION_2_HANDOFF.md instead.
 
-AUTHORED -- the pages give tiers and HP but no wave layout.  So stages 1-4 of
+AUTHORED -- the pages give tiers and HP but no wave layout.  So the waves of
 Super and Mega are the normal parade's (100600, left untouched) with every slot
 moved up the same ladder the pages describe, same element, same position, same
 drops: Super one step (Ghost->King, King->God), Mega two (Ghost->God,
-King->Crystal).  Each keeps the lone-boss finale it already had (Super: Dark God,
-Mega: Dark Crystal).  ATK is each tier's existing parade value; DEF 999999 is
+King->Crystal).  Super takes all five waves that way, so its boss wave is the
+normal parade's Dark King + Water Ghost + Thunder Ghost one tier up: Dark (Metal)
+God + Water King + Thunder King.  That is the SMP page's "1 God and 2 Kings"
+formation (its only other one is "1 Crystal"; listed in every revision from 64415,
+2014-08-07, to 630719), chosen by Evan on 2026-10-30 over the lone Dark God this
+generator used to keep.  Mega keeps its lone Dark Crystal finale: the MMP page
+lists no boss formation.  ATK is each tier's existing parade value; DEF 999999 is
 the parade convention for the pages' "cannot be hit for more than 1 damage per
 hit" (not a sourced number); capture chance stays at the existing 60, since no
 page gives rates.  Monster ids and art are the archive's own for each unit.
@@ -69,10 +75,11 @@ def rebuild(by_id):
     base = by_id[BASE]
     for mission in (SUPER, MEGA):
         rec = by_id[mission]
-        stages = [copy.deepcopy(s) for s in base['stages'][:4]]
+        tiered = 5 if mission == SUPER else 4       # Super's boss wave too; Mega keeps its finale
+        stages = [copy.deepcopy(s) for s in base['stages'][:tiered]]
         for stage in stages:
             stage['battle_monsters'] = [tier_up(m, mission) for m in stage['battle_monsters']]
-        rec['stages'] = stages + [rec['stages'][4]]      # keep the authored finale
+        rec['stages'] = stages + rec['stages'][tiered:]
 
 
 def dump(data):
@@ -80,23 +87,38 @@ def dump(data):
     return text.encode('utf-8')
 
 
+def generate(raw: bytes) -> bytes:
+    by_id = {m['id']: m for m in json.loads(raw)}
+    # Super's finale is the lone Dark God this generator used to keep, or the God + 2 Kings it now writes.
+    finale = {m: [b['name'] for b in by_id[m]['stages'][4]['battle_monsters']] for m in (SUPER, MEGA)}
+    if finale[SUPER] not in (['Dark God'], ['Dark God', 'Water King', 'Thunder King']) \
+            or finale[MEGA] != ['Dark Crystal']:
+        raise SystemExit(f'unexpected finales {finale}')
+    rebuild(by_id)
+    return dump([by_id[k] for k in sorted(by_id)])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--check', action='store_true')
+    ap.add_argument('--source', type=Path, default=MISSIONS)
+    ap.add_argument('--out', type=Path, help='write here instead of over --source (a new or identical file)')
     args = ap.parse_args()
-    raw = MISSIONS.read_bytes()
-    by_id = {m['id']: m for m in json.loads(raw)}
-    finale = {m: by_id[m]['stages'][4]['battle_monsters'][0]['name'] for m in (SUPER, MEGA)}
-    if finale != {SUPER: 'Dark God', MEGA: 'Dark Crystal'}:
-        raise SystemExit(f'unexpected finales {finale}')
-    rebuild(by_id)
-    new = dump([by_id[k] for k in sorted(by_id)])
+    raw = args.source.read_bytes()
+    new = generate(raw)
     if args.check:
-        print('up to date' if new == raw else f'stale: {MISSIONS.name}')
+        print('up to date' if new == raw else f'stale: {args.source.name}')
         return 0 if new == raw else 1
-    if new != raw:
-        MISSIONS.write_bytes(new)
-        print(f'wrote {MISSIONS.name}')
+    target = (args.out or args.source).resolve()
+    if args.out:
+        deploy = (ROOT / 'deploy').resolve()
+        if target == deploy or deploy in target.parents:
+            raise SystemExit(f'refusing --out {target}: inside deploy/ (omit --out to rewrite the source)')
+        if target.exists() and target.read_bytes() != new:
+            raise SystemExit(f'refusing --out {target}: it exists with different bytes')
+    if not target.exists() or target.read_bytes() != new:
+        target.write_bytes(new)
+        print(f'wrote {target}')
     else:
         print('nothing to write (already current)')
     return 0

@@ -12,6 +12,12 @@ finals) and land 101 (dungeon 20250 / mission 21050: "21033,21043" inside area
 20200, which needs 20705).  Each case replaces the copied save's clear list with
 exactly the set named, then reads UserInfo's PermitPlace (yXNM8kL3) and tries
 MissionStart the way a stale client tile would.
+
+World gates (0Cq2AlXW) follow GateMst need_mission_id.  Home's Quest button goes
+to the world select only with two or more permitted type-0 gates
+(HomeScene2::touchEnded2 @0x16F52E4), and Ishgria, gate 2, ships needing 1577:
+permitted from the first login, it took a new player to the world select, and
+the tutorial (tuto8.txt), waiting for the Grand Gaia quest select, froze.
 """
 import argparse
 import sys
@@ -47,6 +53,15 @@ def main():
             reply = c.call('MissionStart', body=mission_start_body(mission))
             after = db.execute('SELECT energy FROM user_info WHERE id=?', (c.user,)).fetchone()[0]
             return 'error' not in reply, before == after, reply
+
+        # ---- world gates: GateMst need_mission_id ----------------------------------
+        seen = clears(())
+        check('gates with no clears: Grand Gaia (1) and the Vortex (99) open',
+              seen('0Cq2AlXW', 1) and seen('0Cq2AlXW', 99))
+        check('gates with no clears: Ishgria (2) closed, it needs 1577', not seen('0Cq2AlXW', 2))
+        check('gates with no clears: Otherworld (100) open, it needs 0', seen('0Cq2AlXW', 100))
+        seen = clears((1577,))
+        check('gates with 1577 cleared: Ishgria (2) open', seen('0Cq2AlXW', 2))
 
         # ---- land 12: dungeon/mission 10170 needs 10080 AND 10165 ------------------
         for extra, open_ in (((), False), ((10080,), False), ((10165,), False), ((10080, 10165), True)):

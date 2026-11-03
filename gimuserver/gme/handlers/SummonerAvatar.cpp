@@ -179,7 +179,7 @@ HANDLEF(SummonerMix)
 
 	std::string body;
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// Resolve the offered units to species server-side.  A favourited
@@ -246,6 +246,7 @@ HANDLEF(SummonerMix)
 				<< " frog(s) for " << spGain << " SP at " << zelCost << " zel";
 
 			body = co_await summonerReply(transaction, identity, req.signal_key);
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{
@@ -282,7 +283,7 @@ HANDLEF(SummonerSkillGet)
 
 	std::string body;
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			const auto held = co_await transaction->execSqlCoro(
@@ -331,6 +332,7 @@ HANDLEF(SummonerSkillGet)
 				<< abilityId << " to level " << want << " for " << next->need_sp << " SP";
 
 			body = co_await summonerReply(transaction, identity, req.signal_key);
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

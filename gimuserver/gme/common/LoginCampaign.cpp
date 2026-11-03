@@ -194,9 +194,9 @@ drogon::Task<LoginCampaignState> advanceLoginCampaign(
 
 	const auto nextDay = currentDay + 1;
 
-	// Write BEFORE granting.  If a grant throws halfway the player keeps what
-	// landed and does not get the same day again on the next request; the other
-	// order would re-run the whole day and could pay the early prizes twice.
+	// Write before granting.  Every caller passes a transaction (UserInfo,
+	// UserLoginCampaignInfo), so the day and its prizes land together or not at
+	// all; the order only mattered when each statement committed on its own.
 	co_await database->execSqlCoro(
 		"INSERT INTO user_login_campaign (user_id, current_day, last_day) VALUES ($1, $2, $3)"
 		" ON CONFLICT(user_id) DO UPDATE SET current_day = excluded.current_day,"

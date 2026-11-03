@@ -108,7 +108,7 @@ HANDLEF(AchievementDeliver)
 	int64_t deliveredAmount = 0;
 
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// What this flow has already earned today, which is what the
@@ -418,6 +418,7 @@ HANDLEF(AchievementDeliver)
 			// leave the player short with nothing on screen to show for it.
 			if (const auto error = glz::write_json(resp, body); error)
 				throw std::runtime_error(glz::format_error(error, body));
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

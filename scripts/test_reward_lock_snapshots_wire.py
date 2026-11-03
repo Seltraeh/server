@@ -40,6 +40,14 @@ def main():
         db.execute('INSERT INTO user_items(user_id,item_id,item_num,favorite_flg) VALUES (?,?,3,0)'
                    ' ON CONFLICT(user_id,item_id) DO UPDATE SET item_num=3,favorite_flg=0', (user, SPHERE))
         db.execute('UPDATE user_items SET favorite_flg=0 WHERE user_id=?', (user,))
+        # FIXTURE: three loose, unlocked copies.  Since 2026-10-04 the live save
+        # wears one Famous Blade (unit 1113) and locks another; a worn copy is
+        # listed beside the three, so reset both on the copy, as
+        # test_craft_row_identity_wire does.
+        db.execute('UPDATE user_warehouse_rows SET favorite_flg=0 WHERE user_id=? AND item_id=?', (user, SPHERE))
+        db.execute('UPDATE user_units SET eqip_item_id=0,eqip_item_id2=0,eqip_item_frame_id=0,'
+                   'eqip_item_frame_id2=-1 WHERE user_id=? AND (eqip_item_id=? OR eqip_item_id2=?)',
+                   (user, SPHERE, SPHERE))
         db.execute('UPDATE user_info SET energy=20000, energy_full_ts=0 WHERE id=?', (user,))
         db.commit()
 

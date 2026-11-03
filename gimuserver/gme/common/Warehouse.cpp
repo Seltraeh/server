@@ -195,8 +195,14 @@ drogon::Task<void> syncWarehouse(db::Database database, UserIdentity identity)
 {
     auto transaction=std::dynamic_pointer_cast<drogon::orm::Transaction>(database);
     const bool owns=!transaction;
-    if (owns) transaction=co_await database->newTransactionCoro();
-    try { co_await reconcile(transaction,identity); }
+    if (owns) transaction=co_await gme::beginTransaction(database);
+    try
+    {
+        co_await reconcile(transaction,identity);
+        // Our own transaction is committed (and awaited) here; a caller's is
+        // the caller's to commit before it replies (db::commitTransaction).
+        if (owns) co_await gme::commitTransaction(transaction);
+    }
     catch (...) { transaction->rollback(); throw; }
 }
 
@@ -238,7 +244,8 @@ drogon::Task<std::vector<UnseenWarehouseRow>> unseenWarehouseRows(
 drogon::Task<WarehouseSnapshot> loadWarehouseSnapshot(db::Database database, UserIdentity identity)
 {
     auto transaction=std::dynamic_pointer_cast<drogon::orm::Transaction>(database);
-    if (!transaction) transaction=co_await database->newTransactionCoro();
+    const bool owns=!transaction;
+    if (owns) transaction=co_await gme::beginTransaction(database);
     try
     {
         co_await reconcile(transaction,identity);
@@ -289,6 +296,9 @@ drogon::Task<WarehouseSnapshot> loadWarehouseSnapshot(db::Database database, Use
         }
         for (const auto item : dictionary)
             result.dictionary.push_back(UserItemDictionaryInfo{.item_id=item});
+        // The seen mark above must be durable before the list it describes is
+        // sent; a caller's transaction is the caller's to commit.
+        if (owns) co_await gme::commitTransaction(transaction);
         co_return result;
     }
     catch (...) { transaction->rollback(); throw; }

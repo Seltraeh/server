@@ -1,0 +1,69 @@
+// Content provider policy for the offline-proxy (docs/OFFLINE_CONTENT_LOADING_PLAN.md).
+// Read once at server start by gimuserver/content/ContentBroker.cpp; unknown keys are an error.
+//
+// "enabled" is the rollout switch.  While false the broker is dormant and a
+// provider-enabled proxy DLL falls back to the client's own cache, so turning
+// it off is the rollback that needs no client change.
+{
+	"enabled": false,
+
+	// Phase B proof scope: the Town map bundle and Mauve Tenebrosity Zeal (60956),
+	// as exact paths so the provider owns exactly the bundle members below.
+	// Only files matching these relative paths (globs are allowed) are served.
+	"scope": [
+		"sam/MapVillage/MapVillage.sam",
+		"sam/MapVillage/MapVillage_111x55.png",
+		"sam/MapVillage/MapVillage_285x167.png",
+		"_dlcbundle/MapVillage/MapVillage_320x289.jpg",
+		"sam/MapVillage/MapVillage_421x157.png",
+		"sam/MapVillage/MapVillage_429x144.png",
+		"sam/MapVillage/MapVillage_640x208.png",
+		"_dlcbundle/MapVillage/MapVillage_640x384.png",
+		"sam/MapVillage/MapVillage_640x809.png",
+		"sam/MapVillageAdd/*",
+		"unit/cgg/unit_cgg_60956.csv",
+		"unit/cgs/unit_*_cgs_60956.csv",
+		"unit/img/unit_*_60956.png"
+	],
+
+	// The client keys files by basename only.  These basenames exist more than
+	// once with different bytes, so each needs an explicit choice.  The choices
+	// are the copies the player-confirmed Town (2026-10-03) was drawn from: the
+	// 2:3-framed MapVillage.sam and the sam/MapVillage page images.
+	// _dlcbundle/MapVillage/MapVillage.sam holds the iph5 layout under the
+	// plain name and must never be served as MapVillage.sam.
+	"aliases": {
+		"MapVillage.sam": "sam/MapVillage/MapVillage.sam",
+		"MapVillage_111x55.png": "sam/MapVillage/MapVillage_111x55.png",
+		"MapVillage_285x167.png": "sam/MapVillage/MapVillage_285x167.png",
+		"MapVillage_421x157.png": "sam/MapVillage/MapVillage_421x157.png",
+		"MapVillage_429x144.png": "sam/MapVillage/MapVillage_429x144.png",
+		"MapVillage_640x208.png": "sam/MapVillage/MapVillage_640x208.png"
+	},
+
+	// File families the provider reads in this phase (SuperAnim, textures, CSV
+	// layouts).  Audio, scripts, plists, fonts and MST parts are not routed.
+	"extensions": [".sam", ".png", ".jpg", ".csv"],
+
+	// All-or-nothing sets.  If one member cannot be served, every member is
+	// reported missing, so the client never draws a unit's frame layout without
+	// its texture (the white blob of 2026-10-02) or a Town SAM without a page.
+	"bundles": {
+		"town": [
+			"MapVillage.sam", "MapVillage_111x55.png", "MapVillage_285x167.png", "MapVillage_320x289.jpg",
+			"MapVillage_421x157.png", "MapVillage_429x144.png", "MapVillage_640x208.png",
+			"MapVillage_640x384.png", "MapVillage_640x809.png",
+			"MapVillageAdd.sam", "MapVillageAdd_122x192.png", "MapVillageAdd_170x88.png", "MapVillageAdd_170x88_2.png"
+		],
+		"unit_60956": [
+			"unit_cgg_60956.csv", "unit_atk_cgs_60956.csv", "unit_idle_cgs_60956.csv", "unit_move_cgs_60956.csv",
+			"unit_anime_60956.png", "unit_ills_battle_60956.png", "unit_ills_full_60956.png", "unit_ills_thum_60956.png"
+		]
+	},
+
+	// Never served even inside the scope: client state and the MST channel.
+	"exclude": [
+		"UserDefault.xml", "XMLFileProcessor.xml", "Ver*.dat", "*.dat",
+		"*.xml", "*.ini", "*.tmp", "*.json", "*.zip", "Thumbs.db", ".DS_*"
+	]
+}

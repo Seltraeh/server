@@ -107,7 +107,12 @@ HANDLEF(GuildCreate)
 			<< node.guild_art_id << "; defaulting to " << artId;
 	}
 
-	const auto charged = co_await theDb()->execSqlCoro(
+	// ONE TRANSACTION for the fee, the guild and the reply.  Run statement by
+	// statement the fee could land without the guild, and the refund that
+	// covered a refused creation did not cover a failure part-way.  The handle
+	// rolls back anything not committed (gme::beginTransaction), fee included.
+	auto transaction = co_await gme::beginTransaction(theDb());
+	const auto charged = co_await transaction->execSqlCoro(
 		"UPDATE user_info SET zel = zel - $1 WHERE id = $2 AND zel >= $1;",
 		static_cast<int64_t>(gme::kGuildCreateCost), identity.userId);
 	if (charged.affectedRows() == 0)
@@ -118,29 +123,28 @@ HANDLEF(GuildCreate)
 	}
 
 	const auto guild = co_await gme::createGuild(
-		theDb(), identity, node.name, node.description, artId);
+		transaction, identity, node.name, node.description, artId);
 	if (!guild)
 	{
-		// Refund: the charge landed but the guild did not, so the player must
-		// not be left paying for nothing.
-		co_await theDb()->execSqlCoro(
-			"UPDATE user_info SET zel = zel + $1 WHERE id = $2;",
-			static_cast<int64_t>(gme::kGuildCreateCost), identity.userId);
-		LOG_WARN << "GuildCreate: " << identity.userId << " could not create a guild; fee refunded";
+		// The fee is rolled back with everything else: the player does not pay
+		// for a guild that was not founded.
+		LOG_WARN << "GuildCreate: " << identity.userId << " could not create a guild; nothing charged";
 		co_return HandleResult::error("Already in a guild", "This Summoner already belongs to a guild");
 	}
 
 	const auto handle = (co_await db::DatabaseInterface::read(
-		theDb(), "user_info",
+		transaction, "user_info",
 		{ db::Data("username"), db::Lookup("id", identity.userId) }))
 		.front<std::string>("username");
 
 	::GuildInfoResp resp{};
 	resp.guild.push_back(gme::guildInfoBlock(*guild, handle));
-	resp.members = co_await gme::guildRoster(theDb(), identity);
+	resp.members = co_await gme::guildRoster(transaction, identity);
 	resp.exchange_mst = theServer()->cache().guildPointExchangeMst();
-	resp.exchange_stock = co_await gme::loadGuildExchangeStock(theDb(), identity);
-	co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+	resp.exchange_stock = co_await gme::loadGuildExchangeStock(transaction, identity);
+	const auto buffer = glz::write_json(resp).value_or("{}");
+	co_await gme::commitTransaction(transaction);
+	co_return HandleResult::success(buffer);
 }
 
 // GuildRecomendedMember (ja5Enusw) -- who the player could invite.
@@ -196,6 +200,11 @@ HANDLEF(GuildMemberUpdate)
 	}
 	const auto identity = (co_await gme::getUserIdentity(theDb(), req.login_info)).nonEmpty();
 
+	// One transaction for every change in the request: dissolving a guild is
+	// two statements (members, then the guild), and run one by one a failure
+	// between them left a guild with nobody in it.  The handle rolls back
+	// anything not committed (gme::beginTransaction).
+	auto transaction = co_await gme::beginTransaction(theDb());
 	for (const auto& node : req.members)
 	{
 		if (node.user_id.empty())
@@ -208,10 +217,11 @@ HANDLEF(GuildMemberUpdate)
 				<< "\" for " << node.user_id;
 			continue;
 		}
-		co_await gme::updateGuildMember(theDb(), identity, node.user_id, memberType);
+		co_await gme::updateGuildMember(transaction, identity, node.user_id, memberType);
 	}
 
 	// Refusals answer the same way: every handler error closes the session.
+	co_await gme::commitTransaction(transaction);
 	co_return HandleResult::success("{}");
 }
 

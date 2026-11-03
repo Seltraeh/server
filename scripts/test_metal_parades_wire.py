@@ -30,8 +30,12 @@ def main():
     ap.add_argument('--port', type=int, default=19984)
     ap.add_argument('--archive', type=Path, default=ROOT / 'deploy/archive',
                     help='archive_root to serve (a copy of an older archive, for before/after evidence)')
+    ap.add_argument('--fixture', default='metal_parades', help='fixture folder name under out/qa/current')
     args = ap.parse_args()
-    fx = Fixture.create(qa_dir('metal_parades'), port=args.port, archive_root=args.archive)
+    # Absolute: the server's working directory is its fixture, so a relative root fails at boot -- and a
+    # boot-time fatal leaves a gimuserverw that cannot be stopped until reboot (round 4, pid 11336).
+    args.archive = args.archive.resolve()
+    fx = Fixture.create(qa_dir(args.fixture), port=args.port, archive_root=args.archive)
     check = Checker()
     archive = {r['id']: r for r in json.loads((args.archive / 'mission.json').read_text(encoding='utf-8'))
                if r['id'] in EXPECT}

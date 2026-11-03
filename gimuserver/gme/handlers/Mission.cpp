@@ -36,25 +36,27 @@ constexpr uint32_t kSecondTutorialMission = 2;
 //     chapter 11    -> tuto16.txt   (Tilith's farewell)
 //     chapter 12    -> tuto17.txt   (does not exist -> nothing plays = done)
 //
-// ⚠ THE SECOND CHECKPOINT USED TO BE 10, AND THAT SKIPPED FIVE SCRIPTS.
-// Chapter 10 is tuto15, so clearing mission 2 jumped the player straight from
-// tuto2 to the free-summon tutorial and the whole 50..54 band -- tuto10 through
-// tuto14 -- never ran.  The cost was not cosmetic: **tuto14 is the one that
-// issues `battle_ui_on`**, so the BB/SBB/UBB/DBB commands were never enabled
-// and manual play was left with Guard.  It also fires the summon tutorial ahead
-// of the ones meant to precede it, which is why fresh saves see tutorials out
-// of order.
+// The opening runs 1..9, then 10, 11, 12.  TutorialStepScene::checkChapter
+// (arm64 0x1B9275C) ends the tutorial outright for any chapter above 11
+// (`ch > 11 -> setTutoEndFlg(1)`), and the client's own skip path sets 10 once
+// the battle is skipped (MissionScene::updateEvent).  50..54 are the
+// TRIGGERABLE tutorials that come afterwards: GameScene::checkTouchFooter moves
+// a finished player (chapter 12) to 50 when getTriggerableTutorialEnabled().
+//
+// ⚠ THIS CHECKPOINT WAS 50 FOR A WHILE, AND THAT ENDED THE TUTORIAL AT MISSION 2.
+// The theory was that tuto14's `battle_ui_on` had to run before manual Brave
+// Bursts worked; features.json's bb_timer turned out to be that cause.  50 is
+// above 11, so the client finished the tutorial on the spot: no free summon,
+// no farewell, and its TutorialUpdate reported chapter 12 (S19 Fresh client,
+// October 2026).
 //
 // These checkpoints are RESUME points, not the driver: the client walks the
 // sequence itself and reports each step through TutorialUpdate, which stores
 // what it is told.  A resume point ahead of the player therefore does not
 // "skip ahead harmlessly" -- it tells the client it is further along than it
 // is, and everything in between is lost.
-//
-// 50 is the chapter that follows tuto9, so the client resumes at tuto10 and
-// walks 50->54 then 10, 11, 12 (tuto17 does not exist = done) in order.
 constexpr uint8_t kFirstTutorialCheckpoint = 2;
-constexpr uint8_t kSecondTutorialCheckpoint = 50;
+constexpr uint8_t kSecondTutorialCheckpoint = 10;
 
 // What Karl hands over in tuto15.txt ("You received 5 Gems"), which is exactly
 // the cost of summon gate 2000 — the gate the client itself labels
@@ -382,7 +384,8 @@ uint32_t maxPlayerLevel()
 * The leader is read from UnitMst by species, as the battle does
 * (BattleParty::setPartyPassiveList @0x10B3E10 -> UnitMst::getLeaderSkillID),
 * not from user_units.leader_skill_id, which is 0 on units granted before that
-* column was written.
+* column was written and on archive grants made before fromArchivedUnit set it
+* (scripts/repair_leader_skills.py repairs those rows).
 *
 * LeaderSkillMst.process_param is modelled as a comma list, but its per-process
 * separator is '@' ("80,80,80,0,80@15@110,0,0,0,0,0@15" for LS 10167), so the
@@ -526,7 +529,7 @@ HANDLEF(MissionEnd)
 	// This needs to be wrapped as a transaction to prevent cases where we issue
 	// partial rewards upon mission completion.
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			auto userInfo = co_await db::DatabaseInterface::read(
@@ -615,6 +618,7 @@ HANDLEF(MissionEnd)
 					if (const auto error = glz::write_json(resp, buffer); error)
 						throw std::runtime_error(glz::format_error(error, buffer));
 					gme::injectPermitPlace(buffer, permit);
+					co_await gme::commitTransaction(transaction);
 					co_return HandleResult::success(buffer);
 				}
 				co_await transaction->execSqlCoro(
@@ -732,7 +736,9 @@ HANDLEF(MissionEnd)
 
 			if (leveledUp)
 			{
-				(co_await gme::UserEnergy::refresh(transaction, identity, newLevel, true)).nonEmpty();
+				// The stored energy and its refill timer still belong to
+				// currentLevel; only the added cap is newLevel's.
+				(co_await gme::UserEnergy::refresh(transaction, identity, newLevel, true, currentLevel)).nonEmpty();
 			}
 
 			// Persist tutorial checkpoints so leaving and returning mid-tutorial does not
@@ -753,13 +759,14 @@ HANDLEF(MissionEnd)
 				// draws that message — the balance has to come from here, or the
 				// player reaches the summon gate unable to pay for it.
 				//
-				// ⚠ THE GUARD CANNOT BE `tutorial_status < <checkpoint>`.  The
-				// chapter ids are not monotonic -- the order is 1..9, 50..54,
-				// 10, 11, 12 -- so against a checkpoint of 50 a FINISHED player
-				// (chapter 12) still compares "less than", and replaying
-				// mission 2 would reset them into the tutorial and pay the gems
-				// again.  The old `< 10` hid this only because 10 happened to
-				// be low.
+				// ⚠ THE GUARD IS A RANGE, NOT `tutorial_status < <checkpoint>`.
+				// The chapter ids are not monotonic -- the opening is 1..9, 10,
+				// 11, 12, and the triggerable band after it is 50..54 -- so an
+				// ordering test only works while the checkpoint happens to sit
+				// below every finished or triggerable chapter.  Against 50 a
+				// FINISHED player (chapter 12) compared "less than", and
+				// replaying mission 2 would have reset them into the tutorial
+				// and paid the gems again.
 				//
 				// Advance only a player still inside the opening band, which is
 				// the one case this checkpoint is for.  MissionEnd runs again on
@@ -1171,7 +1178,7 @@ HANDLEF(MissionEnd)
 			if (const auto error = glz::write_json(resp, buffer); error)
 			    throw std::runtime_error(glz::format_error(error, buffer));
 			gme::injectPermitPlace(buffer, permit);
-
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{
@@ -1290,6 +1297,7 @@ HANDLEF(MissionStart)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.ais)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.monsters)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.monster_cgs)
+		|| !MissionArchiver::populatePacket(*missionRecord, resp.skills)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.battle_monster_groups)
 		|| !MissionArchiver::populatePacket(*missionRecord, resp.battle_groups))
 	{
@@ -1303,8 +1311,16 @@ HANDLEF(MissionStart)
 	// and MissionContinue and seeds the battle from it.  Issued before the
 	// preflight below so the reply carries it; it only becomes the OPEN battle
 	// once the start has succeeded (open_mission_serial, further down).
+	//
+	// ONE TRANSACTION from the serial to the reply: the run record, the energy
+	// spent, the borrowed helper, the open battle and the cleared continue and
+	// break records.  Run statement by statement, a failure part-way spent the
+	// energy and opened nothing -- the player paid for a battle that never
+	// started.  The handle rolls back anything not committed
+	// (gme::beginTransaction), the serial included.
+	auto transaction = co_await gme::beginTransaction(theDb());
 	const auto runSerial = co_await gme::issueMissionSerial(
-		theDb(), identity, static_cast<uint32_t>(req.start_info.mission_id));
+		transaction, identity, static_cast<uint32_t>(req.start_info.mission_id));
 	resp.mission_num.serial_id = runSerial;
 
 	std::string buffer;
@@ -1327,7 +1343,7 @@ HANDLEF(MissionStart)
 	if (!usingTemplate && missionRecord->energy_cost > 0)
 	{
 		(co_await gme::UserEnergy::consume(
-			theDb(),
+			transaction,
 			identity,
 			missionRecord->energy_cost)).nonEmpty();
 	}
@@ -1344,7 +1360,7 @@ HANDLEF(MissionStart)
 	// solo start has to CLEAR whatever the last start left, or the next clear
 	// would pay for a helper it never took.  A start that fails validation
 	// above never reaches this line.
-	co_await theDb()->execSqlCoro(
+	co_await transaction->execSqlCoro(
 		"UPDATE user_info SET reinforce_user_id = $1 WHERE id = $2;",
 		gme::borrowedHelper(req.start_info.reinforce_user_id)
 			? req.start_info.reinforce_user_id
@@ -1355,7 +1371,7 @@ HANDLEF(MissionStart)
 	// (see the ONE RESULT PER BATTLE block there).  A new start supersedes any
 	// battle the player walked away from, the same way the break record below
 	// does -- its serial can no longer settle.
-	co_await theDb()->execSqlCoro(
+	co_await transaction->execSqlCoro(
 		"UPDATE user_info SET open_mission_id = $1, open_mission_serial = $2 WHERE id = $3;",
 		static_cast<int64_t>(req.start_info.mission_id), static_cast<int64_t>(runSerial),
 		identity.userId);
@@ -1363,7 +1379,7 @@ HANDLEF(MissionStart)
 	// A FRESH RUN STARTS WITH A CLEAN CONTINUE RECORD, or a continue spent in an
 	// earlier attempt would still be counted against this one and the "Cleared
 	// (No Continues)" achievements could never be earned after a single bad run.
-	co_await theDb()->execSqlCoro(
+	co_await transaction->execSqlCoro(
 		"DELETE FROM user_mission_continues WHERE user_id = $1 AND mission_id = $2;",
 		identity.userId, std::to_string(req.start_info.mission_id));
 
@@ -1371,7 +1387,8 @@ HANDLEF(MissionStart)
 	// through here -- MissionRestartScene fires MissionRestart and rebuilds from
 	// the client's own suspend data -- so a MissionStart means the player walked
 	// away from whatever was open.  The statement is a no-op when nothing is.
-	co_await gme::clearMissionBreak(theDb(), identity);
+	co_await gme::clearMissionBreak(transaction, identity);
 
+	co_await gme::commitTransaction(transaction);
 	co_return HandleResult::success(buffer);
 }

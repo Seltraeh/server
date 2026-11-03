@@ -184,7 +184,7 @@ HANDLEF(GachaAction)
 	GachaActionResp resp{};
 	resp.signal_key = req.signal_key;
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// Deduct what is paying for the pull: a ticket, or the currency.
@@ -278,6 +278,7 @@ HANDLEF(GachaAction)
 			resp.unit_dictionary = co_await gme::loadUnitDictionary(transaction, identity);
 
 			resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

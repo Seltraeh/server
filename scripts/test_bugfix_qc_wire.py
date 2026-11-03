@@ -118,6 +118,22 @@ def main():
             start()
             reply=end(zel=7)
             check(f'level cap: {lv}/{xp} completes with level 999 and zero residual XP','error' not in reply and info()['level']==999 and info()['exp']==0,(reply.get('error'),info()['level'],info()['exp']))
+        # Level-up energy (client run 2026-10-28: 998 -> 999 showed 857/431).  Spend from a full bar so a
+        # refill timer exists, then level up: the stored energy belongs to the old level, and the new
+        # level's cap is added on top -- whatever the new level's regen rate (998 -> 999) or cap (7 -> 8).
+        for lv in (998, 7):
+            cap, new_cap = int(levels[lv]['0P9X1YHs']), int(levels[lv + 1]['0P9X1YHs'])
+            execute('UPDATE user_info SET level=?,exp=?,energy=?,energy_full_ts=0 WHERE id=?',
+                    (lv, int(levels[lv + 1]['d96tuT2E']) - 1, cap, c.user))
+            reply = c.call('MissionStart', body=mission_start_body(10))  # cost 3
+            assert 'error' not in reply, reply
+            issued[10] = started_serial(reply)
+            reply = end()
+            after = info()
+            check(f'level-up energy: {lv} -> {lv + 1} from {cap - 3}/{cap} keeps it and adds {new_cap}',
+                  'error' not in reply and after['level'] == lv + 1
+                  and (after['energy'], after['energy_full_ts']) == (cap - 3 + new_cap, 0),
+                  (reply.get('error'), after['level'], after['energy'], after['energy_full_ts']))
         # Actual debug-console clock controls the C++ helper (not a Python model).
         with open(r'\\.\pipe\gimudebug_'+str(server.proc.pid),'r+b',buffering=0) as pipe:
             def response():

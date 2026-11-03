@@ -21,13 +21,12 @@ db = sqlite3.connect(path, timeout=20)
 user, login = db.execute('SELECT id,gumi_user_id FROM user_info LIMIT 1').fetchone()
 
 
-def call(csv):
-    body = {'IKqx1Cn9': [{'iN7buP2h': login, 'h7eY3sAK': user}],
-            'JTf2jY5o': [{'4HqhTf3a': csv}]}
+def send(group, key, body):
+    body = dict(body, IKqx1Cn9=[{'iN7buP2h': login, 'h7eY3sAK': user}])
     raw = json.dumps(body).encode()
     pad = 16-len(raw) % 16
-    cipher = AES.new(b'AFqKIJ8Z4mHPB9xg', AES.MODE_ECB)
-    envelope = {'F4q6i9xe': {'Hhgi79M1': '4P5GELTF', 'aV6cLn3v': 'synthesis-test'},
+    cipher = AES.new(key.encode().ljust(16, b'\0')[:16], AES.MODE_ECB)
+    envelope = {'F4q6i9xe': {'Hhgi79M1': group, 'aV6cLn3v': 'synthesis-test'},
                 'a3vSYuq2': {'Kn51uR4Y': base64.b64encode(cipher.encrypt(raw+bytes([pad])*pad)).decode()}}
     request = urllib.request.Request('http://127.0.0.1:19962/bf/gme/action.php',
                                     json.dumps(envelope).encode(), {'Content-Type': 'application/json'})
@@ -36,6 +35,18 @@ def call(csv):
         if response.headers.get('Content-Encoding') == 'gzip':
             data = gzip.decompress(data)
     return json.loads(data)
+
+
+def call(csv):
+    reply = send('4P5GELTF', 'AFqKIJ8Z4mHPB9xg', {'JTf2jY5o': [{'4HqhTf3a': csv}]})
+    # BARRIER before this script reads the save directly.  Drogon queues a
+    # transaction's COMMIT after the reply is sent, so a read straight after
+    # the reply can run before it: it saw the pre-craft state (or, before the
+    # server had a busy timeout, wedged the server's connection).  BadgeInfo
+    # reads the database without a transaction on the server's one connection,
+    # so its reply only arrives after that COMMIT has run.
+    send('nJ3A7qFp', 'bGxX67KB', {})
+    return reply
 
 
 def fixture(materials=15, karma=5000):

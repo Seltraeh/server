@@ -86,7 +86,9 @@ try {
     foreach ($manifestPath in @(Get-ChildItem -LiteralPath (Join-Path $folder 'game_content\content') -Filter manifest.json -Recurse -File)) {
         $manifest = Get-Content -LiteralPath $manifestPath.FullName -Raw | ConvertFrom-Json
         if (!$manifest.file_key -or !$manifest.file_count) { continue }
-        $parts = @(Get-ChildItem -LiteralPath $manifestPath.DirectoryName -Filter '*.dat' -File)
+        # Only the announced version's parts: a folder keeps the superseded versions it was staged over, which are
+        # inert (the client is offered the manifest's version alone).
+        $parts = @(Get-ChildItem -LiteralPath $manifestPath.DirectoryName -Filter ('Ver{0}_*.dat' -f $manifest.version) -File)
         Assert ($parts.Count -eq [int]$manifest.file_count) "Incomplete staged MST table: $($manifest.table)"
         $offered = @($initialize.KeC10fuL | Where-Object { $_.moWQ30GH -eq $manifest.table })
         Assert ($offered.Count -eq 1 -and [int]$offered[0].d2RFtP8T -eq [int]$manifest.version) "Staged MST table not offered: $($manifest.table)"

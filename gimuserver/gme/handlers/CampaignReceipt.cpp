@@ -61,47 +61,39 @@ HANDLEF(CampaignReceipt)
     int32_t missionId = -1;
     try { missionId = std::stoi(req.mission_id); } catch (const std::exception&) {}
 
-    // Claim gate: the mission must be cleared and not yet claimed.  The flip
-    // to reward_claimed=1 happens before granting so a mid-grant failure can
-    // not be replayed into duplicates.
+    // ONE TRANSACTION for the claim gate, the claim, every reward and the
+    // reply.  Run statement by statement the claim was flipped first, so a
+    // failure part-way lost the rest of the rewards for good (flipping last
+    // would have replayed them); a failed statement was logged and the receipt
+    // still answered as paid.  Now the claim and its rewards land together or
+    // not at all, and a failure is an error the player can retry.  The handle
+    // rolls back anything not committed (gme::beginTransaction).
+    auto transaction = co_await gme::beginTransaction(theDb());
+
+    // Claim gate: the mission must be cleared and not yet claimed.
     bool grantRewards = false;
     int32_t attainPercent = 0;
     if (missionId >= 0)
     {
-        try
+        const auto rows = co_await transaction->execSqlCoro(
+            "SELECT state, attain_percent, reward_claimed"
+            " FROM user_campaign_missions WHERE user_id=$1 AND mission_id=$2;",
+            std::string(kUserId), req.mission_id);
+        if (!rows.empty()
+            && rows[0]["state"].as<int32_t>() >= 2
+            && rows[0]["reward_claimed"].as<int32_t>() == 0)
         {
-            const auto rows = co_await theDb()->execSqlCoro(
-                "SELECT state, attain_percent, reward_claimed"
-                " FROM user_campaign_missions WHERE user_id=$1 AND mission_id=$2;",
-                std::string(kUserId), req.mission_id);
-            if (!rows.empty()
-                && rows[0]["state"].as<int32_t>() >= 2
-                && rows[0]["reward_claimed"].as<int32_t>() == 0)
-            {
-                attainPercent = rows[0]["attain_percent"].as<int32_t>();
-                grantRewards  = true;
-            }
-        }
-        catch (const drogon::orm::DrogonDbException& ex)
-        {
-            LOG_WARN << "CampaignReceipt: mission SELECT failed: " << ex.base().what();
+            attainPercent = rows[0]["attain_percent"].as<int32_t>();
+            grantRewards  = true;
         }
     }
 
     if (grantRewards)
     {
-        try
-        {
-            co_await theDb()->execSqlCoro(
-                "UPDATE user_campaign_missions SET reward_claimed=1"
-                " WHERE user_id=$1 AND mission_id=$2;",
-                std::string(kUserId), req.mission_id);
-        }
-        catch (const drogon::orm::DrogonDbException& ex)
-        {
-            LOG_WARN << "CampaignReceipt: claim UPDATE failed: " << ex.base().what();
-            grantRewards = false;
-        }
+        co_await transaction->execSqlCoro(
+            "UPDATE user_campaign_missions SET reward_claimed=1"
+            " WHERE user_id=$1 AND mission_id=$2;",
+            std::string(kUserId), req.mission_id);
     }
 
     if (grantRewards)
@@ -149,7 +141,7 @@ HANDLEF(CampaignReceipt)
                     break;
                 }
                 for (int32_t i = 0; i < rw.target_cnt; ++i)
-                    co_await gme::addUserUnit(theDb(), identity, *unit);
+                    co_await gme::addUserUnit(transaction, identity, *unit);
                 LOG_INFO << "CampaignReceipt: granted unit " << rw.target_id
                          << " x" << rw.target_cnt << " (" << rw.message << ")";
                 break;
@@ -157,7 +149,7 @@ HANDLEF(CampaignReceipt)
             case 4:
             case 5:
             case 7:  // item / material / sphere — all item_mst domains
-                co_await gme::addUserItem(theDb(), identity,
+                co_await gme::addUserItem(transaction, identity,
                     static_cast<uint32_t>(rw.target_id),
                     static_cast<uint32_t>(rw.target_cnt));
                 LOG_INFO << "CampaignReceipt: granted item " << rw.target_id
@@ -173,23 +165,16 @@ HANDLEF(CampaignReceipt)
 
         if (zel > 0 || gems > 0)
         {
-            try
-            {
-                // $N in strict first-appearance order (sqlite named-param
-                // gotcha — see CampaignBattleEnd).
-                co_await theDb()->execSqlCoro(
-                    "UPDATE user_info SET"
-                    " zel  = MIN(zel  + $1, $2),"
-                    " gems = MIN(gems + $3, $4)"
-                    " WHERE id=$5;",
-                    zel, kMaxZelKarma, gems, kMaxGems, std::string(kUserId));
-                LOG_INFO << "CampaignReceipt: credited zel +" << zel
-                         << ", gems +" << gems;
-            }
-            catch (const drogon::orm::DrogonDbException& ex)
-            {
-                LOG_WARN << "CampaignReceipt: currency UPDATE failed: " << ex.base().what();
-            }
+            // $N in strict first-appearance order (sqlite named-param
+            // gotcha — see CampaignBattleEnd).
+            co_await transaction->execSqlCoro(
+                "UPDATE user_info SET"
+                " zel  = MIN(zel  + $1, $2),"
+                " gems = MIN(gems + $3, $4)"
+                " WHERE id=$5;",
+                zel, kMaxZelKarma, gems, kMaxGems, std::string(kUserId));
+            LOG_INFO << "CampaignReceipt: credited zel +" << zel
+                     << ", gems +" << gems;
         }
     }
     else
@@ -202,7 +187,9 @@ HANDLEF(CampaignReceipt)
     // return it alongside the receipt stub (4MCxgS5p) in one serialization.
     CampaignReceiptResp resp{};
     resp.team_info = std::move(
-        (co_await gme::getTeamInfo(theDb(), identity)).nonEmpty());
+        (co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
 
-    co_return HandleResult::success(glz::write_json(resp).value_or("{}"));
+    const auto buffer = glz::write_json(resp).value_or("{}");
+    co_await gme::commitTransaction(transaction);
+    co_return HandleResult::success(buffer);
 }

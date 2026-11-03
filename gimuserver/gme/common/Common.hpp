@@ -2,6 +2,7 @@
 
 #include <gimuserver/archive/UnitArchiver.hpp>
 #include <gimuserver/db/PacketInterface.hpp>
+#include <gimuserver/gme/common/Transactions.hpp>
 #include <gimuserver/gme/common/Energy.hpp>
 #include <gimuserver/gme/common/Town.hpp>
 #include <gimuserver/utils/Random.hpp>
@@ -163,6 +164,24 @@ inline std::vector<UsagePatternTier> parseUsagePatternTiers(std::string_view pat
 }
 
 /*!
+* The Leader Skill a unit of this species carries: its UnitMst row's oS3kTZ2W.
+*
+* 0 when the row names none, and 0 (logged) when UnitMst has no row for the
+* unit at all -- a skill is never guessed for a unit the master data does not
+* know.  The value is the CURRENT form's: UnitEvo stores the target form's.
+*/
+inline int32_t unitLeaderSkillId(uint32_t unitId)
+{
+	for (const auto& row : theServer()->cache().unitMst())
+	{
+		if (row.id == static_cast<int32_t>(unitId))
+			return std::max<int32_t>(row.leader_skill_id, 0);
+	}
+	LOG_WARN << "unit " << unitId << " has no UnitMst row: stored without a Leader Skill";
+	return 0;
+}
+
+/*!
 * Builds a user-unit packet from curated unit archive data.
 *
 * @param unit_id Unit id to look up in the archive.
@@ -184,6 +203,19 @@ inline std::optional<UserUnitInfo> fromArchivedUnit(uint32_t unit_id, uint32_t u
 		return std::nullopt;
 	}
 
+	// ⚠ THE ARCHIVE RECORD CARRIES NO LEADER SKILL, and populatePacket left it
+	// 0, so every unit granted through here -- summons, presents, exchanges,
+	// achievement trades, captures, tutorial starters, selector picks, CLI
+	// addunit -- was stored without one (the live save held 0 on 37 of its 38
+	// units whose UnitMst names a skill).  The other two writers already store the
+	// UnitMst value (addUserUnit(UnitMst), UnitEvo).  Ordinary, Trial, Raid
+	// and campaign battles read UnitMst::getLeaderSkillID and never showed it;
+	// what reads THIS value is Training Grounds (PlayerParty::entrySandbag ->
+	// BattleUnit::setGuestLeaderSkillID for a helper taken from the player's
+	// own units), the Challenge Arena copies and the campaign / Frontier Gate
+	// save-data echoes (UserUnitInfo::getLeaderSkillID, 10 callers).
+	// Existing rows: scripts/repair_leader_skills.py.
+	unit.leader_skill_id = unitLeaderSkillId(unit_id);
 	return unit;
 }
 
@@ -429,8 +461,10 @@ drogon::Task<void> releaseWarehouseSphere(db::Database database, UserIdentity id
 * the bar -- is named INT_MAX - itemId by GameUtils::incWarehouseItem
 * @0x118A304 (Windows build: helper at RVA 0x6E5580, inline at 0x6E5450), and
 * keeps that name until a reply carrying 9wjrh74P replaces the list.  ItemMix
-* answers {}, so a sphere crafted and then sold, locked or equipped before the
-* next such reply arrives under that name, not under its real row id.
+* now replies with that list (net/items.kdl ItemMixResp), so a crafted copy is
+* renamed before any screen can act on it; the placeholder still arrives from
+* the other local-append paths, and from a request built before a list its
+* client never received.
 *
 * Only the exact INT_MAX - <an ItemMst id> form qualifies; a persistent row id
 * always wins over it (callers look the id up as a real row first).

@@ -37,6 +37,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import gen_boss_icon_offsets as icons  # noqa: E402
+
 MISSIONS = ROOT / 'deploy/archive/mission.json'
 AIS = ROOT / 'deploy/archive/ai.json'
 MISSION_MST = ROOT / 'deploy/mst/mission_mst.json'
@@ -120,6 +123,12 @@ def monster(mid, name, unit_id, position, hp, ai_id, act_max, skill_ids,
     if resists:
         m['ailment_resists'] = {k: resists.get(k, 0) for k in AILMENTS}
     if visuals:
+        # The story row's icon offset is measured for the story position (gen_boss_icon_offsets clamps a giant
+        # by where it stands), so a measured one is re-derived for this position; "0,-60" stays until measured.
+        visuals = dict(visuals)
+        y = icons.offset_for(visuals, position) if visuals.get('hp_disp_pos') != icons.INVENTED else None
+        if y is not None:
+            visuals['hp_disp_pos'] = f'0,{y}'
         m['visuals'] = visuals
     return m
 

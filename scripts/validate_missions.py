@@ -29,6 +29,7 @@ Usage:
   python scripts/validate_missions.py --check C2       # one check
   python scripts/validate_missions.py --wire           # + live permit checks
   python scripts/validate_missions.py --json out.json  # machine-readable
+  python scripts/validate_missions.py --archive DIR    # another archive folder (QA copies)
 """
 from __future__ import annotations
 
@@ -160,11 +161,13 @@ def main() -> int:
     ap.add_argument("--wire", action="store_true",
                     help="also check what a running server advertises")
     ap.add_argument("--host", default="http://127.0.0.1:9960/bf/gme/action.php")
+    ap.add_argument("--archive", type=pathlib.Path, default=ARCHIVE,
+                    help="the archive folder to validate (default deploy/archive)")
     args = ap.parse_args()
 
-    missions = load(ARCHIVE / "mission.json")
-    units = {u["id"]: u for u in load(ARCHIVE / "unit.json")}
-    ais = {a["id"] for a in load(ARCHIVE / "ai.json")}
+    missions = load(args.archive / "mission.json")
+    units = {u["id"]: u for u in load(args.archive / "unit.json")}
+    ais = {a["id"] for a in load(args.archive / "ai.json")}
 
     mission_mst = {as_int(r["j28VNcUW"]): r for r in mst_rows("mission_mst")}
     dungeon_mst = {as_int(r["MHx05sXt"]): r for r in mst_rows("dungeon_mst")}
@@ -207,6 +210,9 @@ def main() -> int:
             "and cgs_move are all missing inside missions that have been "
             "cleared, so the client tolerates those and flagging them would "
             "bury this in 1,272 false positives.")
+    r.check("C13", "CRITICAL", "Material drop item id does not resolve in item_mst",
+            "The client drops the item, MissionEnd reports it, and the server "
+            "refuses an unknown item: the clear ends in an error.")
     r.check("C12", "CRITICAL", "Scripted monster id repeats or collides with a wave monster",
             "MissionArchiver refuses the whole mission: MonsterParty::changeMonster "
             "finds the replacement by monster id alone, so it must be unique.")
@@ -233,6 +239,9 @@ def main() -> int:
     r.check("H13", "HIGH", "act_min/act_max are inconsistent")
     r.check("H14", "HIGH", "Mission drops nothing at all",
             "No capture, no chest, no zel and no karma from any enemy.")
+    r.check("H16", "HIGH", "Material drop list is out of bounds",
+            "MissionArchiver refuses the whole list at load (0 < per <= 100, "
+            "1 <= max_count <= 99), so the monster drops nothing.")
     r.check("H15", "HIGH", "Every enemy carries the placeholder stat block",
             f"hp {PLACEHOLDER_HP} atk {PLACEHOLDER_ATK} on every monster in the "
             "mission, so it has no difficulty curve and plays the same as every "
@@ -433,6 +442,14 @@ def main() -> int:
                             r.add("C7", where, f"item {drop.get('target_id')!r}")
                     if not drop.get("weight", 0):
                         r.add("H12", where, f"weight 0 on {drop!r}")
+
+                for drop in mon.get("material_drops", []) or []:
+                    if as_int(drop.get("item_id")) not in items:
+                        r.add("C13", where, f"item {drop.get('item_id')!r}")
+                    if not (0 < drop.get("per", 0) <= 100 and 1 <= drop.get("max_count", 0) <= 99):
+                        r.add("H16", where, f"{drop!r}")
+                    else:
+                        drops_something = True
 
                 if mon.get("zel_max_drop", 0) or mon.get("karma_max_drop", 0):
                     drops_something = True

@@ -53,22 +53,37 @@ EXPECTED_FAILURES = {}
 SERVER_SUITES = [
     'test_battle_simulator_wire.py', 'test_mission_progression_wire.py', 'test_merit_exchange_wire.py',
     'test_mission_settlement_wire.py', 'test_mission_run_edges_wire.py', 'test_mission_run_ownership_wire.py',
-    'test_story_gates_wire.py', 'test_lizeria_qc_wire.py', 'test_bugfix_qc_wire.py',
+    'test_story_gates_wire.py', 'test_tutorial_checkpoint_wire.py', 'test_lizeria_qc_wire.py', 'test_bugfix_qc_wire.py',
     'test_continue_delayed_retry_wire.py', 'test_enhancement_sp_wire.py', 'test_leader_exp_boost_wire.py',
     'test_metal_parades_wire.py', 'test_evolution_qc_wire.py', 'test_fe_skill_purchase_wire.py',
     'test_fe_skill_qc_wire.py', 'test_sphere_qc_wire.py', 'test_unit_roster_wire.py',
     'test_warehouse_placeholder_wire.py', 'test_warehouse_integration_wire.py',
-    'test_warehouse_consumer_model_wire.py', 'test_reward_lock_snapshots_wire.py',
+    'test_warehouse_consumer_model_wire.py', 'test_reward_lock_snapshots_wire.py', 'test_craft_row_identity_wire.py',
     'test_summon_reveal_wire.py', 'test_brave_slots_wire.py',
     'test_town_unlock_wire.py', 'test_sphere_equip_format_wire.py', 'test_grant_bundle_wire.py',
+    'test_leader_skill_grants_wire.py', 'test_db_commit_contention_wire.py', 'test_db_exception_atomicity_wire.py',
+    'test_content_broker_wire.py', 'test_content_generation_qc.py', 'check_content_policy.py',
+    'test_content_coverage_wire.py', 'test_content_server_tables.py',
+    'test_clearunits_wire.py', 'test_town_harvest_wire.py', 'test_mst_bootstrap.py',
+    'test_mission_capture_wire.py', 'test_mission_material_drops_wire.py',
+    'test_gen_material_drops.py',
+    'test_eu_units.py', 'test_gen_story_bosses.py', 'test_gen_mecha_gods.py', 'test_jp_units.py', 'test_gen_vortex_trials.py', 'test_unit_sprite_stand_ins.py', 'test_jp_exclusive_units.py', 'test_mission_monster_skills_wire.py',
+    'test_vortex_trials_topology.py',
 ]
 # Suites that take a copied save and expect a server this runner provisions.
 SAVE_SUITES = [('test_fusion_merit.py', 19960), ('test_exchange_ui_wire.py', 19960),
                ('test_synthesis_wire.py', 19962), ('test_feature_visits_wire.py', 19962),
                ('test_research_lab_wire.py', 19960), ('test_guild_invite_wire.py', 19960)]
 # Checks that need no server (or start their own on a fresh save).
-OTHER = ['test_qa_runner.py', 'test_research_lab_ai.py', 'test_unit_text_data.py', 'audit_handlers.py',
-         'validate_missions.py', 'gen_battle_simulator.py --check', 'test_debug_startup.py', 'test_debug_cli.py']
+OTHER = ['test_qa_runner.py', 'test_content_harness_startup.py', 'test_research_lab_ai.py', 'test_unit_text_data.py',
+         'audit_handlers.py', 'audit_transactions.py', 'validate_missions.py', 'gen_battle_simulator.py --check',
+         'test_debug_startup.py', 'test_debug_cli.py', 'test_gen_effect_family_policy.py',
+         'test_gate_overlay_model.py', 'test_startup_coverage_manifest.py', 'check_startup_evidence.py',
+         'x86_startup_rules_check.py', 'x86_mst_bootstrap_check.py', 'test_content_patches.py',
+         'test_unit_mst_corrections.py', 'test_gen_metal_parades.py', 'test_sgtext_corrections.py',
+         'test_gen_boss_icon_offsets.py', 'test_check_fixture_units.py']
+# OTHER entries that live in tools/bin rather than scripts/.
+TOOLS_BIN = {'x86_startup_rules_check.py', 'x86_mst_bootstrap_check.py'}
 
 # How each entry proves it finished.  The default, 'checker', is bf_testkit's
 # Checker: "PASS  label" / "FAIL  label  -- detail" lines and a closing
@@ -84,7 +99,9 @@ COMPLETION = {
     'test_synthesis_wire.py': ('pass', 5), 'test_feature_visits_wire.py': ('pass', 4),
     'test_debug_startup.py': ('pass', 1), 'test_debug_cli.py': ('pass', 2),
     'audit_handlers.py': ('marker', r'^\d+ registrations; 0 structural errors$'),
+    'audit_transactions.py': ('marker', r'^\d+ transaction site\(s\); 0 unchecked success replies$'),
     'gen_battle_simulator.py --check': ('marker', r'^up to date$'),
+    'check_startup_evidence.py': ('marker', r'^check_startup_evidence: .*: consistent with the client evidence$'),
 }
 
 VALIDATOR_BASELINE = ROOT / 'scripts' / 'qa_baselines' / 'validate_missions.json'
@@ -337,6 +354,8 @@ def main():
             if report_path.exists():
                 report_path.unlink()
             cmd = [PY, f'scripts/{name}', '--json', str(report_path)]
+        elif name in TOOLS_BIN:
+            cmd = [PY, f'tools/bin/{name}', *parts[1:]]
         else:
             cmd = [PY, f'scripts/{name}', *parts[1:]]
         code, seconds = run(cmd, log)

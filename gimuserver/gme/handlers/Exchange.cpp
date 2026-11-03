@@ -1,5 +1,6 @@
 #include "App.hpp"
 #include "Handlers.hpp"
+#include <gimuserver/gme/common/Transactions.hpp>
 #include <gimuserver/gme/common/Exchange.hpp>
 #include <gimuserver/gme/common/EventTokens.hpp>
 #include <gimuserver/gme/common/Guilds.hpp>
@@ -32,7 +33,7 @@ HANDLEF(EventExchangePurchase)
     std::vector<EventExchangeResult> results;
     int32_t token = 0;
     {
-        auto transaction = co_await theDb()->newTransactionCoro();
+        auto transaction = co_await gme::beginTransaction(theDb());
         try
         {
             gme::GrantedRewards granted;
@@ -59,6 +60,7 @@ HANDLEF(EventExchangePurchase)
             resp.offers = co_await gme::loadEventExchangeOffers(transaction, identity, token);
             resp.event_token_info = co_await gme::loadEventTokens(transaction, identity);
             co_await gme::emitGrantedRewards(transaction, identity, granted, resp);
+            co_await gme::commitTransaction(transaction);
         }
         catch (...)
         {
@@ -80,7 +82,7 @@ HANDLEF(GuildTrade)
     if (!offer) co_return HandleResult::error("Unknown Guild exchange offer");
     ExchangeResp resp{};
     {
-        auto transaction = co_await theDb()->newTransactionCoro();
+        auto transaction = co_await gme::beginTransaction(theDb());
         try
         {
             if (!(co_await gme::loadGuild(transaction, identity)))
@@ -99,6 +101,7 @@ HANDLEF(GuildTrade)
             resp.guild_stock = co_await gme::loadGuildExchangeStock(transaction, identity);
             resp.guild_members = co_await gme::guildRoster(transaction, identity);
             co_await gme::emitGrantedRewards(transaction, identity, granted, resp);
+            co_await gme::commitTransaction(transaction);
         }
         catch (...)
         {

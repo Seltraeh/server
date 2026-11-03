@@ -36,7 +36,7 @@ HANDLEF(ItemFavorite)
     if (const auto ec=glz::read<glz::opts{.error_on_unknown_keys=false}>(req,json); ec)
         co_return HandleResult::success("{}");
     const auto identity=(co_await gme::getUserIdentity(theDb(),req.login_info)).nonEmpty();
-    auto transaction=co_await theDb()->newTransactionCoro();
+    auto transaction=co_await gme::beginTransaction(theDb());
     std::string buffer;
     try
     {
@@ -114,6 +114,7 @@ HANDLEF(ItemFavorite)
             " AND w.favorite_flg!=0 AND (w.item_num>0 OR w.equip_unit_id!=0)) WHERE user_id=$1;",identity.userId);
         if (const auto ec=glz::write_json(resp,buffer); ec)
             throw std::runtime_error("ItemFavorite: serialization failed");
+        co_await gme::commitTransaction(transaction);
     }
     catch (...) { transaction->rollback(); throw; }
     co_return HandleResult::success(buffer);

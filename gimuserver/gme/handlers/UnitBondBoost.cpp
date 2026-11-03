@@ -82,7 +82,7 @@ HANDLEF(UnitBondBoost)
 	UnitBondBoostResp resp{};
 	resp.signal_key.key = "5EdKHavF";
 	{
-		auto transaction = co_await theDb()->newTransactionCoro();
+		auto transaction = co_await gme::beginTransaction(theDb());
 		try
 		{
 			// The bond, and the two units that make it — their elements are
@@ -264,6 +264,7 @@ HANDLEF(UnitBondBoost)
 			LOG_INFO << "UnitBondBoost: " << identity.userId << " raised DBB " << dbbId
 				<< " to rank " << want << " for " << recipe->zel << " zel, " << recipe->karma
 				<< " karma and " << spendUnits.size() << " unit(s)";
+			co_await gme::commitTransaction(transaction);
 		}
 		catch (...)
 		{

@@ -47,7 +47,7 @@ HANDLEF(TownFacilityUpdate)
     const int64_t karmaCost     = req.karma_payment.karma;
 
     std::string buffer;
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     try
     {
         // Persist each facility's new level AND its banked karma, batched into one
@@ -155,6 +155,7 @@ HANDLEF(TownFacilityUpdate)
 
         if (const auto error = glz::write_json(resp, buffer); error)
             throw std::runtime_error(glz::format_error(error, buffer));
+        co_await gme::commitTransaction(transaction);
     }
     catch (const std::exception& ex)
     {

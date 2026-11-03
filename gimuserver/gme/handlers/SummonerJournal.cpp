@@ -160,6 +160,12 @@ HANDLEF(SummonerJournalTaskRewards)
 	// claimed still sitting there as claimable.
 	//
 	// The group is modelled as a list too, so both nestings are handled.
+	//
+	// ONE TRANSACTION for every claim, the milestones they unlock and the
+	// reply: a claim marks the task and adds its present in two statements,
+	// and run one by one a failure between them kept one without the other.
+	// The handle rolls back anything not committed (gme::beginTransaction).
+	auto transaction = co_await gme::beginTransaction(theDb());
 	uint32_t claimed = 0;
 	uint32_t requested = 0;
 	for (const auto& entry : req.entries)
@@ -171,7 +177,7 @@ HANDLEF(SummonerJournalTaskRewards)
 				co_return;
 			}
 			++requested;
-			if (co_await gme::claimJournalTask(theDb(), identity, current))
+			if (co_await gme::claimJournalTask(transaction, identity, current))
 			{
 				++claimed;
 			}
@@ -199,13 +205,13 @@ HANDLEF(SummonerJournalTaskRewards)
 	// whole ladder is what fired five unearned reward popups and crashed the
 	// client (see the queue note in buildSummonerJournal).
 	const auto paidMilestones = claimed > 0
-		? co_await gme::claimJournalMilestones(theDb(), identity)
+		? co_await gme::claimJournalMilestones(transaction, identity)
 		: std::vector<std::string>{};
 
 	// Answered with the whole journal so the rows, the points header and the
 	// buttons all re-render from one reply — the same reason PresentReceipt
 	// returns the refreshed box.
-	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity, paidMilestones);
+	const auto resp = co_await gme::buildSummonerJournal(transaction, identity, paidMilestones);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
@@ -213,6 +219,7 @@ HANDLEF(SummonerJournalTaskRewards)
 		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
 	}
 
+	co_await gme::commitTransaction(transaction);
 	co_return HandleResult::success(buffer);
 }
 
@@ -231,12 +238,14 @@ HANDLEF(SummonerJournalMilestoneRewards)
 	// createBody @0xE379E8 sends identity and the signal key only — no
 	// milestone id — so this claims everything the player has earned rather
 	// than one named rung.  Reuses SummonerJournalInfoReq for that reason.
-	const auto paid = co_await gme::claimJournalMilestones(theDb(), identity);
+	// One transaction for the claims and the reply, as for task rewards.
+	auto transaction = co_await gme::beginTransaction(theDb());
+	const auto paid = co_await gme::claimJournalMilestones(transaction, identity);
 	LOG_INFO << "SummonerJournalMilestoneRewards: paid " << paid.size() << " milestone(s)";
 
 	// The ids just paid are handed back so the reply announces THOSE and only
 	// those — r3D28bqW is a popup queue, not a state list.
-	const auto resp = co_await gme::buildSummonerJournal(theDb(), identity, paid);
+	const auto resp = co_await gme::buildSummonerJournal(transaction, identity, paid);
 
 	std::string buffer{};
 	if (const auto& ec = glz::write_json(resp, buffer); ec)
@@ -244,5 +253,6 @@ HANDLEF(SummonerJournalMilestoneRewards)
 		co_return HandleResult::error("Serialization error", glz::format_error(ec, buffer));
 	}
 
+	co_await gme::commitTransaction(transaction);
 	co_return HandleResult::success(buffer);
 }

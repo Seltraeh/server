@@ -27,6 +27,11 @@
 // setRecipeID, so these are ReceipeMst ids, not item ids.  The handler consumes
 // ReceipeMst.materials and karma and credits the result.
 //
+// The reply is the whole warehouse (9wjrh74P + VSRPkdId + bd5Rj6pN).  The
+// client has already applied every craft in the batch, naming each new copy of
+// a max-stack-1 item INT_MAX - itemId, and this reply is the first thing it
+// parses after that; see ItemMixResp in net/items.kdl for the consumer chain.
+//
 // Full model: tools/TOWN_STATE_MODEL.md.
 //
 // GroupId = "4P5GELTF", AES key = "AFqKIJ8Z4mHPB9xg" (legacy ItemMixRequestHandler).
@@ -84,6 +89,22 @@ std::optional<std::vector<MixOrder>> parseOrders(const std::string& csv)
     return orders;
 }
 
+/// The reply to every accepted batch: the server's warehouse with a row id for
+/// each copy, replacing the client's local placeholder rows.  Built after the
+/// effects, inside the same transaction, so it is exactly what was committed.
+drogon::Task<std::string> warehouseReply(const db::Database transaction, const gme::UserIdentity identity)
+{
+    auto warehouse = co_await gme::loadWarehouseSnapshot(transaction, identity);
+    ItemMixResp resp{};
+    resp.warehouse_info = std::move(warehouse.warehouse);
+    resp.item_favorite = std::move(warehouse.favorites);
+    resp.item_dictionary_info = std::move(warehouse.dictionary);
+    std::string buffer;
+    if (const auto ec = glz::write_json(resp, buffer); ec)
+        throw std::runtime_error("ItemMix: serialization error: " + glz::format_error(ec, buffer));
+    co_return buffer;
+}
+
 } // namespace
 
 HANDLEF(ItemMix)
@@ -107,7 +128,7 @@ HANDLEF(ItemMix)
 
     // Reserve the connection before reading stock. All effects and counters
     // commit together; callers cannot both spend the same pre-transaction stock.
-    auto transaction = co_await theDb()->newTransactionCoro();
+    auto transaction = co_await gme::beginTransaction(theDb());
     try
     {
 
@@ -149,6 +170,7 @@ HANDLEF(ItemMix)
             if (rows.size() == 0)
             {
                 LOG_WARN << "ItemMix: no user_info row for " << identity.userId;
+                co_await gme::commitTransaction(transaction);
                 co_return HandleResult::success("{}");
             }
             karmaHeld = rows[0]["karma"].as<int64_t>();
@@ -215,9 +237,13 @@ HANDLEF(ItemMix)
 
         }
 
+        // Nothing affordable or permitted: the client applied the batch anyway,
+        // so its copies and spent materials are put back by the same list.
         if (crafted.empty())
         {
-            co_return HandleResult::success("{}");
+            auto reply = co_await warehouseReply(transaction, identity);
+            co_await gme::commitTransaction(transaction);
+            co_return HandleResult::success(std::move(reply));
         }
 
         // One batched statement per effect rather than one await per craft — the
@@ -353,7 +379,11 @@ HANDLEF(ItemMix)
             }, true);
         }
 
-        co_return HandleResult::success("{}");
+        // Every craft, cost and the seen mark are durable before the list
+        // that names them is sent (gme::commitTransaction).
+        auto reply = co_await warehouseReply(transaction, identity);
+        co_await gme::commitTransaction(transaction);
+        co_return HandleResult::success(std::move(reply));
     }
     catch (...)
     {

@@ -36,7 +36,7 @@ HANDLEF(FeSkillGet)
         co_return HandleResult::refuseToHome("This enhancement is not available for that unit.");
 
     std::string body;
-    auto tx = co_await theDb()->newTransactionCoro();
+    auto tx = co_await gme::beginTransaction(theDb());
     try
     {
         const auto rows = co_await tx->execSqlCoro(
@@ -86,9 +86,9 @@ HANDLEF(FeSkillGet)
         tx->rollback();
         co_return HandleResult::refuseToHome("Enhancement purchase failed. Please try again.", ex.what());
     }
-    // Drogon commits on destruction: the SP is spent only once that commit
-    // reports success, not when the reply is ready.
-    if (!(co_await gme::CommitTransaction(std::move(tx))))
+    // The SP is spent only once the commit is durable, not when the reply is
+    // ready; a failed commit is rolled back and refused (gme::commitTransaction).
+    if (!(co_await gme::tryCommitTransaction(tx)))
         co_return HandleResult::refuseToHome("Enhancement purchase could not be saved. Please reconnect.");
     co_return HandleResult::success(body);
 }

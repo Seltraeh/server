@@ -142,7 +142,8 @@ drogon::Task<db::InterfaceResult<>> UserEnergy::refresh(
 	const db::Database database,
 	const UserIdentity identity,
 	const uint32_t level,
-	const bool overcap)
+	const bool overcap,
+	const uint32_t storedLevel)
 {
 	if (!database || identity.gumiUserId.empty() || identity.userId.empty())
 	{
@@ -175,10 +176,15 @@ drogon::Task<db::InterfaceResult<>> UserEnergy::refresh(
 				db::Lookup("id", identity.userId),
 			});
 
-		// Derive current energy and overcap it.
+		// Derive current energy and overcap it.  The refill timestamp counts
+		// the energy missing under the cap and regen rate of the level it was
+		// written at, so it must be read at that level: read at the new one,
+		// 998 -> 999 doubles the rate and 428 came back as 426 (client run
+		// 2026-10-28: 857/431 instead of 859), and an ordinary level-up
+		// misreads it by the cap's increase.
 		energy = user.front<uint32_t>("energy");
 		const auto energyFullTs = user.front<uint64_t>("energy_full_ts");
-		derive(level, energyFullTs, energy);
+		derive(storedLevel ? storedLevel : level, energyFullTs, energy);
 		energy = energy + mst->energy;
 	}
 

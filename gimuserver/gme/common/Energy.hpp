@@ -52,13 +52,16 @@ public:
 	* @param identity Resolved user identity that owns the energy row.
 	* @param level Player level used to look up max energy.
 	* @param overcap True to add max energy on top of derived current energy.
+	* @param storedLevel Level the stored energy and refill timestamp were
+	*        written under (before a level-up); 0 means @p level.
 	* @return Number of affected rows.
 	*/
 	static drogon::Task<db::InterfaceResult<>> refresh(
 		db::Database database,
 		UserIdentity identity,
 		uint32_t level,
-		bool overcap=false);
+		bool overcap=false,
+		uint32_t storedLevel=0);
 
 private:
 	// Seconds required to regenerate one energy tick.

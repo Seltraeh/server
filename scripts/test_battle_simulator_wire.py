@@ -156,6 +156,8 @@ def main():
                 # Reticle offset calibrated in-client (see gen_battle_simulator.py):
                 # "0,-40" drew it ~110 px above the dummy.
                 check(f'{mid}: target reticle offset centres on the sprite', m['Lkh6gYkT'] == '0,17', m['Lkh6gYkT'])
+                check(f'{mid}: status icons sit just above the lantern (hp_disp_pos "0,30", not the invented "0,-60")',
+                      m['3BpHN6VD'] == '0,30', m['3BpHN6VD'])
                 check(f'{mid}: AI {m["i74vGUFa"]} is described', int(m['i74vGUFa']) in ais)
                 # NEVER ACTS, by AI: every row of its AI ends the turn
                 # (setAiTargetList: action type 4, self-targeted -- no move, no

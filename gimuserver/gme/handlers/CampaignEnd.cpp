@@ -1,6 +1,7 @@
 #include "App.hpp"
 #include "Handlers.hpp"
 
+#include <gimuserver/gme/common/Transactions.hpp>
 #include <gimuserver/gme/common/Campaign.hpp>
 
 #include <set>
@@ -85,7 +86,7 @@ HANDLEF(CampaignEnd)
 	const auto flags = req.event.empty() ? std::set<std::string>{} : splitCsv(req.event.front().mission_flg);
 
 	CampaignEndResp resp{};
-	auto transaction = co_await theDb()->newTransactionCoro();
+	auto transaction = co_await gme::beginTransaction(theDb());
 	try
 	{
 		co_await gme::ensureCampaignState(transaction, identity);
@@ -254,6 +255,7 @@ HANDLEF(CampaignEnd)
 
 		resp.missions = co_await gme::loadCampaignMissions(transaction, identity);
 		resp.team_info = std::move((co_await gme::getTeamInfo(transaction, identity)).nonEmpty());
+		co_await gme::commitTransaction(transaction);
 	}
 	catch (...)
 	{
