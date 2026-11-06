@@ -3,8 +3,11 @@
 #include "WebTerms.hpp"
 
 #include <filesystem>
+#include <atomic>
 #include <chrono>
+#include <memory>
 #include <mutex>
+#include <thread>
 #include <unordered_map>
 
 using namespace drogon;
@@ -99,12 +102,74 @@ fs::path findMstPart(const std::string& requestPath)
 *
 * The lookup is served from an index rather than a walk -- the tree is 76,000
 * files, so scanning per request would turn a cold cache into a stall -- but a
-* MISS rescans (at most once every 10s) so files dropped in after boot are
-* found without a restart.  See the note at the miss below.
+* MISS starts a background rescan (at most once every 10s) so files dropped in
+* after boot are found without a restart.  See the notes at the rescan and the miss.
 *
 * @param requestPath Request path, untrusted, e.g. "/content/_dlcbundle/MapVillage/x.png".
 * @return Path to a file with that name, or empty when nothing matches.
 */
+// The name index behind findContentByName.  The lock guards only the pointer and its timestamp: it is never held
+// while the tree is walked, so one lookup never waits for another's rescan.
+struct ContentNameIndex
+{
+	std::unordered_map<std::string, fs::path> byName;
+};
+
+std::mutex g_contentIndexLock;
+std::shared_ptr<const ContentNameIndex> g_contentIndex;
+std::chrono::steady_clock::time_point g_contentIndexBuiltAt{};
+std::atomic<bool> g_contentIndexRebuilding{ false };
+
+std::shared_ptr<const ContentNameIndex> buildContentNameIndex(const fs::path& root)
+{
+	auto index = std::make_shared<ContentNameIndex>();
+	std::error_code ec;
+	if (!fs::is_directory(root, ec))
+		return index;
+	fs::recursive_directory_iterator it(root, fs::directory_options::skip_permission_denied, ec);
+	if (ec)
+		return index;
+	size_t files = 0;
+	for (const auto& entry : it)
+	{
+		std::error_code fileEc;
+		if (!entry.is_regular_file(fileEc) || fileEc)
+			continue;
+		++files;
+		// FIRST WINS, and the walk is depth-first from the root, so a file
+		// sitting at a shallower path beats a copy buried deeper.  When the
+		// same name exists twice the shallower one is the canonical drop,
+		// and either copy renders the same art anyway.
+		index->byName.emplace(entry.path().filename().string(), entry.path());
+	}
+	LOG_INFO << "content index: " << index->byName.size() << " distinct filename(s) from "
+	         << files << " file(s) -- used to answer requests whose path does "
+	            "not match how the package is laid out";
+	return index;
+}
+
+// ⚠ NEVER WALK THE TREE ON A REQUEST THREAD AFTER THE FIRST BUILD.  The server
+// has two IO threads; a rescan of 76,000 files used to run inside the request
+// that missed, holding the lookup lock, so on a slow or cold disk every
+// connection on that thread -- and every other miss -- waited seconds behind it
+// (one cause of the "Full Download stalls" reports, 2026-11-05).  A rescan now
+// runs on its own thread, one at a time; lookups keep answering from the index
+// they have and see the new one as soon as it is swapped in.
+void rescanContentNamesInBackground(const fs::path& root)
+{
+	if (g_contentIndexRebuilding.exchange(true))
+		return;
+	std::thread([root] {
+		auto index = buildContentNameIndex(root);
+		{
+			std::lock_guard<std::mutex> lock(g_contentIndexLock);
+			g_contentIndex = std::move(index);
+			g_contentIndexBuiltAt = std::chrono::steady_clock::now();
+		}
+		g_contentIndexRebuilding = false;
+	}).detach();
+}
+
 fs::path findContentByName(const std::string& requestPath)
 {
 	const auto slash = requestPath.find_last_of('/');
@@ -116,64 +181,46 @@ fs::path findContentByName(const std::string& requestPath)
 	if (name.empty() || name == "." || name.find("..") != std::string::npos)
 		return {};
 
-	static std::mutex guard;
-	static std::unordered_map<std::string, fs::path> index;
-	static std::chrono::steady_clock::time_point builtAt{};
-
-	const auto rebuild = [] {
-		const fs::path root = fs::path(app().getDocumentRoot()) / "content";
-		std::error_code ec;
-		index.clear();
-		if (!fs::is_directory(root, ec))
-			return;
-		fs::recursive_directory_iterator it(
-			root, fs::directory_options::skip_permission_denied, ec);
-		if (ec)
-			return;
-		size_t files = 0;
-		for (const auto& entry : it)
-		{
-			std::error_code fileEc;
-			if (!entry.is_regular_file(fileEc) || fileEc)
-				continue;
-			++files;
-			// FIRST WINS, and the walk is depth-first from the root, so a file
-			// sitting at a shallower path beats a copy buried deeper.  When the
-			// same name exists twice the shallower one is the canonical drop,
-			// and either copy renders the same art anyway.
-			index.emplace(entry.path().filename().string(), entry.path());
-		}
-		builtAt = std::chrono::steady_clock::now();
-		LOG_INFO << "content index: " << index.size() << " distinct filename(s) from "
-		         << files << " file(s) -- used to answer requests whose path does "
-		            "not match how the package is laid out";
-	};
-
-	std::lock_guard<std::mutex> lock(guard);
-	if (builtAt == std::chrono::steady_clock::time_point{})
-		rebuild();
-
-	auto hit = index.find(name);
-	if (hit == index.end())
+	const fs::path root = fs::path(app().getDocumentRoot()) / "content";
+	std::shared_ptr<const ContentNameIndex> index;
+	std::chrono::steady_clock::time_point builtAt;
 	{
-		// ⚠ A MISS MUST BE ABLE TO SEE FILES ADDED SINCE BOOT.  An index built
-		// once per process means anything dropped into the content tree after
-		// startup stays invisible until a restart -- and dropping files in is
-		// exactly how this gap gets closed (tools/seed_client_assets.py, or a
-		// hand-copied folder).  The client asking to download is the moment to
-		// look again, so a miss rescans.
-		//
-		// Rate-limited because a genuinely absent file is requested repeatedly:
-		// the client retries, and rescanning 76,000 files per retry would turn
-		// one missing asset into a stall.
-		const auto now = std::chrono::steady_clock::now();
-		if (now - builtAt > std::chrono::seconds(10))
-		{
-			rebuild();
-			hit = index.find(name);
-		}
+		std::lock_guard<std::mutex> lock(g_contentIndexLock);
+		index = g_contentIndex;
+		builtAt = g_contentIndexBuiltAt;
 	}
-	return hit == index.end() ? fs::path{} : hit->second;
+	if (!index)
+	{
+		// The first lookup of the process builds the index itself, once: it
+		// needs an answer now.  Two first lookups racing both walk; the first
+		// to finish is kept.
+		auto built = buildContentNameIndex(root);
+		std::lock_guard<std::mutex> lock(g_contentIndexLock);
+		if (!g_contentIndex)
+		{
+			g_contentIndex = std::move(built);
+			g_contentIndexBuiltAt = std::chrono::steady_clock::now();
+		}
+		index = g_contentIndex;
+		builtAt = g_contentIndexBuiltAt;
+	}
+
+	const auto hit = index->byName.find(name);
+	if (hit != index->byName.end())
+		return hit->second;
+
+	// ⚠ A MISS MUST BE ABLE TO SEE FILES ADDED SINCE BOOT.  An index built
+	// once per process means anything dropped into the content tree after
+	// startup stays invisible until a restart -- and dropping files in is
+	// exactly how this gap gets closed (tools/seed_client_assets.py, or a
+	// hand-copied folder).  The client asking to download is the moment to
+	// look again, so a miss starts a rescan -- in the background, and at most
+	// once every 10 s, because a genuinely absent file is requested
+	// repeatedly: the client retries.  This request answers from the current
+	// index; the client's retry sees the new one.
+	if (std::chrono::steady_clock::now() - builtAt > std::chrono::seconds(10))
+		rescanContentNamesInBackground(root);
+	return {};
 }
 
 } // namespace

@@ -32,6 +32,19 @@ int main(int argc, char** argv)
 
 #ifdef _WIN32
     SetConsoleTitleW(L"GimuFrontier standalone server");
+    // ⚠ A CLICK IN THIS WINDOW MUST NOT FREEZE THE SERVER.  With QuickEdit on
+    // (the console default), one click starts a text selection, and while it
+    // lasts every write to the console blocks -- and the logger writes from the
+    // request threads, so requests stall until Esc or Enter.  The proxy's
+    // console had exactly this bug (the title-screen hang); the server's had
+    // the same exposure.  Selecting text is still possible from the window
+    // menu (Edit > Mark), deliberately.  Decided here, not in config.json.
+    {
+        HANDLE input = GetStdHandle(STD_INPUT_HANDLE);
+        DWORD mode = 0;
+        if (input != INVALID_HANDLE_VALUE && input != nullptr && GetConsoleMode(input, &mode))
+            SetConsoleMode(input, (mode & ~ENABLE_QUICK_EDIT_MODE) | ENABLE_EXTENDED_FLAGS);
+    }
 #endif
 
     // Config path resolution priority:
